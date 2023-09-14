@@ -18,11 +18,24 @@ api.get('/api', (req, res) => {
 })
 
 async function init_db() {
-
+    let table_name = 'week_lessons';
+    let query = db.query(`SELECT count(name) as cnt FROM sqlite_master WHERE type='table' AND name='${table_name}';`);
+    if (query.get().cnt === 0) {
+        // db.query(`create table week_lessons (
+        //     id INT primary key,
+        //     day_of_week INT check (x >= 0 AND x < 7),
+        //
+        // )`).run()
+    }
 }
 
-async function list_lessons() {
-    let res = await fetch("https://digital.etu.ru/attendance/api/schedule/check-in", {
+async function list_lessons(date) {
+    let opt_date = "";
+
+    if (typeof date === 'string') {
+        opt_date = "?date=" + date;
+    }
+    let res = await fetch("https://digital.etu.ru/attendance/api/schedule/check-in" + opt_date, {
         "headers": {
             "accept": "application/json, text/plain, */*",
             "cookie": "connect.digital-attendance=" + attend_token,
@@ -34,6 +47,8 @@ async function list_lessons() {
     for (let ent of res) {
         console.log(ent.id + ": \n\t" + ent.lesson.title + " " + ent.lesson.subjectType);
     }
+
+    return res
 }
 
 async function checkin(id) {
@@ -70,7 +85,8 @@ async function ask() {
         switch (input[0]) {
             case "1":
 
-                await list_lessons();
+                let res = await list_lessons(input[1]);
+                console.dir(res)
                 break;
             case "2":
                 await checkin(input[1]);
@@ -79,6 +95,9 @@ async function ask() {
             case "3": 
                 process.exit()
                 return;
+            default:
+                console.log("cannot recognize input!")
+                break;
             
         }
         await ask()
