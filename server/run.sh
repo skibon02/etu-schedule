@@ -1,1 +1,1 @@
-DATABASE_URL="sqlite:db/sqlite.db" cargo run --release -- $@
+DATABASE_URL="sqlite:db/sqlite.db" cargo run -- $@

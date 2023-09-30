@@ -1,0 +1,11 @@
+// path to settings.json
+// C:\Users\acer\AppData\Roaming\Code\User
+// ширина моего окна - 1229 x 590
+
+@import "_nullstyle";
+
+@function pxToEm($pixels, $baseFontSize: 20px) {
+    @return ($pixels / $baseFontSize) * 1em;
+  }
+  
+

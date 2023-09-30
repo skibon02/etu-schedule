@@ -1,2 +1,6 @@
 [default.databases.sqlx]
 url= "db/sqlite.db"
+
+
+[global.cors]
+enable = true

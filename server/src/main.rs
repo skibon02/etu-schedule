@@ -11,6 +11,11 @@ use futures::{stream::TryStreamExt, future::TryFutureExt};
 
 use rocket::fs::FileServer;
 
+
+// added to use fetches :3000 -> :8000
+use rocket_cors::{AllowedOrigins, Cors, CorsOptions};
+
+
 #[macro_use]
 extern crate rocket;
 
@@ -88,13 +93,13 @@ async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
     }
 }
 
-pub fn stage() -> AdHoc {
-    AdHoc::on_ignite("SQLx Stage", |rocket| async {
-        rocket.attach(Db::init())
-            .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
-            .mount("/api", routes![list, create, read, delete, destroy])
-    })
-}
+// pub fn stage() -> AdHoc {
+//     AdHoc::on_ignite("SQLx Stage", |rocket| async {
+//         rocket.attach(Db::init())
+//             .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
+//             .mount("/api", routes![list, create, read, delete, destroy])
+//     })
+// }
 
 #[launch]
 fn rocket() -> _ {
@@ -111,3 +116,28 @@ fn rocket() -> _ {
         rocket
     }
 }
+
+
+
+// added to use fetches :3000 -> :8000
+pub fn stage() -> AdHoc {
+    AdHoc::on_ignite("SQLx Stage", |rocket| async {
+        rocket.attach(Db::init())
+            .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
+            .attach(cors_options())
+            .mount("/api", routes![list, create, read, delete, destroy])
+    })
+}
+
+fn cors_options() -> CorsOptions {
+    let allowed_origins = AllowedOrigins::some_exact(&["http://localhost:3000"]);
+
+    CorsOptions {
+        allowed_origins,
+        allowed_methods: vec![rocket::http::Method::Get, rocket::http::Method::Post, rocket::http::Method::Delete],
+        allowed_headers: vec![rocket::http::Header::new("Accept")],
+        allow_credentials: true,
+        ..Default::default()
+    }
+}
+
