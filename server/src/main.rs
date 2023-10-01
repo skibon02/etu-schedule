@@ -89,14 +89,6 @@ async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
     }
 }
 
-// pub fn stage() -> AdHoc {
-//     AdHoc::on_ignite("SQLx Stage", |rocket| async {
-//         rocket.attach(Db::init())
-//             .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
-//             .mount("/api", routes![list, create, read, delete, destroy])
-//     })
-// }
-
 use rocket::http::Header;
 use rocket::{Request, Response};
 use rocket::fairing::{Fairing, Info, Kind};
