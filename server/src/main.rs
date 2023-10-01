@@ -12,10 +12,6 @@ use futures::{stream::TryStreamExt, future::TryFutureExt};
 use rocket::fs::FileServer;
 
 
-// added to use fetches :3000 -> :8000
-use rocket_cors::{AllowedOrigins, Cors, CorsOptions};
-
-
 #[macro_use]
 extern crate rocket;
 
@@ -101,15 +97,41 @@ async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
 //     })
 // }
 
+use rocket::http::Header;
+use rocket::{Request, Response};
+use rocket::fairing::{Fairing, Info, Kind};
+
+pub struct CORS;
+
+#[rocket::async_trait]
+impl Fairing for CORS {
+    fn info(&self) -> Info {
+        Info {
+            name: "Add CORS headers to responses",
+            kind: Kind::Response
+        }
+    }
+
+    async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
+        response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
+        response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, OPTIONS"));
+        response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
+        response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
+    }
+}
+
 #[launch]
 fn rocket() -> _ {
+
+
     let args: Vec<String> = env::args().collect();
 
     let with_client = args.contains(&"--with-client".to_string());
     let rocket = rocket::build()
-        .attach(stage());
-    if with_client {
+        .attach(stage())
+        .attach(CORS);
 
+    if with_client {
         rocket.mount("/", FileServer::from("../client/build"))
     }
     else {
@@ -119,25 +141,10 @@ fn rocket() -> _ {
 
 
 
-// added to use fetches :3000 -> :8000
 pub fn stage() -> AdHoc {
     AdHoc::on_ignite("SQLx Stage", |rocket| async {
         rocket.attach(Db::init())
             .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
-            .attach(cors_options())
             .mount("/api", routes![list, create, read, delete, destroy])
     })
 }
-
-fn cors_options() -> CorsOptions {
-    let allowed_origins = AllowedOrigins::some_exact(&["http://localhost:3000"]);
-
-    CorsOptions {
-        allowed_origins,
-        allowed_methods: vec![rocket::http::Method::Get, rocket::http::Method::Post, rocket::http::Method::Delete],
-        allowed_headers: vec![rocket::http::Header::new("Accept")],
-        allow_credentials: true,
-        ..Default::default()
-    }
-}
-
