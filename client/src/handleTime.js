@@ -28,14 +28,16 @@ export function getSortedWeekSchedule(schedule) {
 export function getLessonTime(start, end) {
   let date = new Date(start);
   let hours = date.getHours().toString();
+  hours = hours.length == 1 ? '0' + hours : hours;
   let minutes = date.getMinutes().toString(); 
-  minutes = minutes.length == 1 ? minutes + '0' : minutes;
+  minutes = minutes.length == 1 ? '0' + minutes : minutes;
   let lessonStart = `${hours}:${minutes}`;
   
   date = new Date(end);
   hours = date.getHours().toString();
+  hours = hours.length == 1 ? '0' + hours : hours;
   minutes = date.getMinutes().toString(); 
-  minutes = minutes.length == 1 ? minutes + '0' : minutes;
+  minutes = minutes.length == 1 ? '0' + minutes : minutes;
   let lessonEnd = `${hours}:${minutes}`;
 
   return [lessonStart, lessonEnd];
