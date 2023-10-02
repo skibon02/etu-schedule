@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;700&family=Poppins:wght@100;400&display=swap");
 * {
   padding: 0;
   margin: 0;
@@ -76,4 +77,180 @@ img {
 h1, h2, h3, h4, h5, h6 {
   font-size: inherit;
   font-weight: inherit;
+}
+
+.container {
+  font-family: "Poppins", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.schedule {
+  width: 62.5em;
+  margin: 0 auto;
+}
+
+.day {
+  margin-bottom: 1.25em;
+}
+.day__date {
+  margin-bottom: 0.625em;
+  font-weight: 700;
+  font-size: 1.2em;
+}
+.lesson {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  gap: 0.625em;
+  margin-bottom: 0.625em;
+}
+.lesson__info {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  background: #ececec;
+  border-radius: 0.625em;
+  padding: 1.25em;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.lesson__time {
+  margin-right: 3.125em;
+}
+.lesson__start {
+  margin-bottom: 0.3125em;
+  font-weight: 700;
+}
+.lesson__end {
+  font-size: 0.9em;
+}
+.lesson__name {
+  font-weight: 700;
+  margin-bottom: 0.3125em;
+}
+.lesson__teachers-room {
+  font-size: 0.9em;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.lesson__teacher {
+  margin-bottom: 0.3125em;
+}
+.lesson__type {
+  margin-left: auto;
+}
+.lesson__type p {
+  font-size: 0.9em;
+  padding: 0.3125em;
+  margin-top: -0.3125em;
+  height: auto;
+  background: #fff;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  border-radius: 0.3125em;
+}
+.attendance {
+  width: 13.75em;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  padding: 0.625em;
+  background: #a4a4a4;
+  border-radius: 0.625em;
+}
+.attendance_locked {
+  background: #a4a4a4;
+}
+.attendance__body {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+.attendance__icon {
+  margin-right: 0.625em;
+}
+.attendance__icon img {
+  width: 2.5em;
+}
+.attendance__status {
+  padding: 0.625em 0.9375em;
+  border-radius: 0.3125em;
+  background: #ffffff;
+  font-weight: 700;
+  text-align: center;
+  color: #fff;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+.attendance__status_active {
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.attendance__status_active:hover {
+  -webkit-box-shadow: 0 0 0.3125em #5f5f5f;
+          box-shadow: 0 0 0.3125em #5f5f5f;
+}
+.attendance__status_active:active {
+  -webkit-box-shadow: inset 0 0 0.3125em #fff;
+          box-shadow: inset 0 0 0.3125em #fff;
+}
+.attendance__status_auto {
+  color: #000;
+}
+.attendance__status_process {
+  background: #011474;
+}
+.attendance__status_planning {
+  background: #484860;
+}
+.attendance__status_accepted {
+  background: #2DB694;
+}
+.attendance__status_declined {
+  background: rgba(214, 0, 0, 0.9568627451);
+}
+.attendance__cancel {
+  font-weight: 700;
+  padding-top: 0.625em;
+  width: 100%;
+}
+.attendance__cancel p {
+  text-align: center;
+  background: rgba(214, 0, 0, 0.9568627451);
+  color: #fff;
+  border-radius: 0.9375em;
+  padding: 0.4375em;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
