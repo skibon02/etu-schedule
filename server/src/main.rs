@@ -40,6 +40,14 @@ async fn create(mut db: Connection<Db>, post: Json<Post>) -> Result<Created<Json
     Ok(Created::new("/").body(post))
 }
 
+use rocket::http::Status;
+use rocket::response::Responder;
+
+#[options("/<path..>")]
+fn options_handler<'r>(path: Option<std::path::PathBuf>) -> impl Responder<'r, 'static> {
+    Status::Ok
+}
+
 #[get("/")]
 async fn list(mut db: Connection<Db>) -> Result<Json<Vec<i64>>> {
     let ids = sqlx::query!("SELECT id FROM posts")
@@ -137,6 +145,7 @@ pub fn stage() -> AdHoc {
     AdHoc::on_ignite("SQLx Stage", |rocket| async {
         rocket.attach(Db::init())
             .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
-            .mount("/api", routes![list, create, read, delete, destroy])
+            .mount("/api", routes![list, create, read, delete, destroy,
+            options_handler])
     })
 }

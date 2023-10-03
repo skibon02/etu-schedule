@@ -4,3 +4,7 @@ url= "db/sqlite.db"
 
 [global.cors]
 enable = true
+
+[prod]
+address="0.0.0.0"
+port=80
