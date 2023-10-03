@@ -20,7 +20,7 @@ export default function App() {
 function Week({weekSchedule}) {
   let week = [];
   for (let i = 0; i < weekSchedule.length; i++) {
-    if (weekSchedule[i].length !== 0) week.push(<Day daySchedule={weekSchedule[i]}/>);
+    if (weekSchedule[i].length !== 0) week.push(<Day key={i} daySchedule={weekSchedule[i]}/>);
   }
 
   return (
@@ -35,7 +35,7 @@ function Day({daySchedule}) {
   
   let lessons = [];
   for (let i = 0; i < daySchedule.length; i++) {
-    lessons.push(<Subject props={daySchedule[i]} />);
+    lessons.push(<Subject key={daySchedule[i].id} props={daySchedule[i]} />);
   }
   return (
     <div className="day">
