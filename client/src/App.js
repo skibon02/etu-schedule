@@ -103,7 +103,7 @@ function Subject({props}) {
         </div>
         <div className="lesson__type-room lesson-type-room">
           <p className="lesson-type-room__type">{lessonType}</p>
-          {room && <p className='lesson-type-room__room'><img className='lesson-type-room__image' src={GPS} alt="gps" /> {room}</p>}
+          {room && <p className='lesson-type-room__room'><img draggable={false} className='lesson-type-room__image' src={GPS} alt="gps" /> {room}</p>}
         </div>
       </div>
       <div className="lesson__attendance attendance">
