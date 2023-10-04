@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { CSSTransition } from 'react-transition-group';
 import schedule from './schedule';
 import { getLessonTime, getSortedWeekSchedule, formatDate } from './handleTime';
+import CLOCK from './icons/icons8-clock.svg'
+import GPS from './icons/location-pin-svgrepo-com.svg'
 
 export default function App() {
   const sortedWeekSchedule = getSortedWeekSchedule(schedule);
   console.log(sortedWeekSchedule);
   
-
-
 
   return (
     <div className="container">
@@ -51,6 +52,10 @@ function Day({daySchedule}) {
 
 
 function Subject({props}) {
+  const [toggleClock, setToggleClock] = useState(false);
+  const [toggleMessage, setToggleMessage] = useState(false);
+  const [timerId,  setTimerId] = useState(0);
+
   const [lessonStart, lessonEnd] = getLessonTime(props.start, props.end);
   const lessonName = props.lesson.title;
   const lessonType = props.lesson.subjectType;
@@ -61,10 +66,23 @@ function Subject({props}) {
     let teacher = props.teachers[i];
     teachers.push(
       <div key={teacher.id} className="lesson__teacher">
-        {`${teacher.surname} ${teacher.name} ${teacher.midname}`}
-        {i == 0 ? ' ,' : ''}&nbsp;
+        {teacher.surname} {teacher.name} {teacher.midname}
       </div>
     );
+  }
+
+  function handleClockClick() {
+    clearTimeout(timerId);
+    setToggleClock(!toggleClock)
+    setToggleMessage(!toggleClock)
+
+    setTimerId(setTimeout(() => {
+      setToggleMessage(false)
+    }, 5000));
+  }
+
+  function handleMessageClick() {
+    setToggleMessage(false);
   }
 
 
@@ -76,30 +94,44 @@ function Subject({props}) {
           <div className="lesson__end">{lessonEnd}</div>
         </div>
         <div className="lesson__about">
-          <div className="lesson__name">{lessonName}</div>
-          <div className="lesson__teachers-room">
-            <div className="lesson__teachers">
-              {teachers}
-            </div>
-            <div className="lesson__room">
-              <div className="lesson__room">{room}</div>
-            </div>
+          <div className="lesson__name">
+            {lessonName}
+          </div>
+          <div className="lesson__teachers">
+            {teachers}
           </div>
         </div>
-        <div className="lesson__type">
-          <p>{lessonType}</p>
+        <div className="lesson__type-room lesson-type-room">
+          <p className="lesson-type-room__type">{lessonType}</p>
+          {room && <p className='lesson-type-room__room'><img className='lesson-type-room__image' src={GPS} alt="gps" /> {room}</p>}
         </div>
       </div>
-      {/* <div className="lesson__attendance attendance attendance_locked">
-        <div className="attendance__body">
-          <div className="attendance__icon">
-            <img src="icons/icons8-clock.svg" alt="ico" />
+      <div className="lesson__attendance attendance">
+        <div className="attendance__container" >
+          <div className='attendance__pseudo-body' onClick={handleClockClick} >
+            <div 
+              className={toggleClock ? "attendance__body attendance__body_red pulse-clock-red" :
+              "attendance__body attendance__body_green" } >
+              <div className="attendance__icon attendance-icon">
+                <img
+                  className="attendance-icon__image"
+                  src={CLOCK}
+                  alt="ico"
+                  draggable="false"
+                />
+              </div>
+            </div>
           </div>
-          <div className="attendance__status attendance__status_planning attendance__status_active">
-            Запланировать на сегодня
-          </div>
+          {toggleClock && toggleMessage &&
+            <div 
+              className="attendance__message message"
+              onClick={handleMessageClick} >
+              Изменение актуально только для этой недели
+            </div> 
+          }
+  
         </div>
-      </div> */}
+      </div>
     </div>
   )
 }

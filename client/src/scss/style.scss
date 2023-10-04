@@ -9,7 +9,54 @@
 
 @function pxToEm($pixels, $baseFontSize: 16px) {
     @return calc($pixels / $baseFontSize) * 1em;
+}
+
+@keyframes show-message {
+  0% {
+    opacity: 0;
   }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes pulseClockRed {
+  0% {
+    background: #d60000f4;
+  }
+  50% {
+    // background: #f35151f4;
+    background: #ff8f8ff4;
+  }
+  100% {
+    background: #d60000f4;
+  }
+}
+
+@keyframes pulseClockGreen {
+  0% {
+    background: #2DB694;
+  }
+  50% {
+    background: #7fccb9;
+  }
+  100% {
+    background: #2DB694;
+  }
+}
+
+.pulse-clock-red {
+  animation: pulseClockRed 3.5s infinite;
+}
+.pulse-clock-green {
+  animation: pulseClockGreen 3.5s infinite;
+}
   
 .container {
   font-family: 'Poppins', sans-serif;
@@ -17,18 +64,39 @@
   font-weight: 400;
 }
 .schedule {
-  // width: pxToEm(1000px);
-  width: 70%;
-  // background: #b2b2b2;
+  width: 60%;
+  max-width: 1000px;
   margin: 0 auto;
 }
 .day {
   margin-bottom: pxToEm(20px);
+  padding: pxToEm(10px, );
+  border-radius: pxToEm(10px, );
+  box-shadow: 0 pxToEm(2px, ) pxToEm(10px, ) rgb(142, 142, 142);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 
     &__date {
       margin-bottom: pxToEm(10px);
       font-weight: 700;
       font-size: 1.2em;
+      padding: pxToEm(5px, );
+      border-radius: pxToEm(5px, );
+      // background: #ececec;
+
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 0.1px;
+        background: #000;
+      }
     }
 
     &__lessons {
@@ -39,14 +107,32 @@
 }
 .lesson {
   display: flex;
-  justify-content: space-between;
   gap: pxToEm(10px);
-  margin-bottom: pxToEm(10px);
+  margin-bottom: pxToEm(8px);
+  position: relative;
+
+  &:last-child {
+    margin-bottom: 0;
+
+    &::after {
+      height: 0;
+    }
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: .1px;
+    background: #000;
+  }
 
     &__info {
       flex: 1;
 
-      background: #ececec;
+      // background: #ececec;
       border-radius: pxToEm(10px);
       padding: pxToEm(20px);
 
@@ -54,12 +140,15 @@
     }
 
     &__time {
-      margin-right: pxToEm(50px);
+      width: pxToEm(90px, );
+      flex-shrink: 0;
+      text-align: center;
     }
 
     &__start {
       margin-bottom: pxToEm(5px);
       font-weight: 700;
+      color: #0b2376;
     }
 
     &__end {
@@ -72,11 +161,7 @@
     &__name {
       font-weight: 700;
       margin-bottom: pxToEm(5px);
-    }
-
-    &__teachers-room {
-      font-size: 0.9em;
-      display: flex;
+      line-height: 1.2em;
     }
 
     &__teachers {
@@ -86,156 +171,187 @@
       margin-bottom: pxToEm(5px);
     }
 
-    &__room {
-    }
-
-    &__type {
+    &__type-room {
       margin-left: auto;
-
-      & p {
-        font-size: 0.9em;
-        padding: pxToEm(5px);
-        margin-top: pxToEm(-5px);
-        height: auto;
-        background: #fff;
-        display: flex;
-        align-items: center;
-        border-radius: pxToEm(5px);
-      }
+      flex-shrink: 0;
     }
 
     &__attendance {
     }
 }
-.attendance {
-  position: relative;
-  width: pxToEm(70px);
+
+.lesson-type-room {
+  font-size: 0.9em;
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
+
+  &__type {
+    text-align: center;
+    margin-left: pxToEm(15px, );
+    padding: pxToEm(5px);
+    margin-top: pxToEm(-5px);
+    background: #0b2376;
+    color: #fff;
+    border-radius: pxToEm(5px);
+    margin-bottom: pxToEm(10px, );
+    width: pxToEm(40px, );
+  }
+
+  &__room {
+    text-align: right;
+    margin-left: pxToEm(15px, );
+
+  }
+
+  &__image {
+    width: pxToEm(15px, );
+  }
+}
+
+.attendance {
+  display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  width: pxToEm(70px, );
 
-  cursor: pointer;
-  user-select: none;
-  padding: pxToEm(10px);
-  // background: #484860;
-  // background: #a4a4a4;
-  
-  background: #d60000f4;
-  border-radius: pxToEm(10px);
-  box-shadow: 0 0 7px black;
+  &__container {
+    width: pxToEm(70px);
+    height: pxToEm(70px);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
+  &__pseudo-body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+
+    cursor: pointer;
+    user-select: none;
+
+    border-radius: pxToEm(10px);
+    box-shadow: 0 0 pxToEm(7px, ) black;
+
+    transition: width 0.05s ease, height 0.05s ease;
+
+    &:hover {
+      box-shadow: 0 0 pxToEm(4px, ) black;
+    }
   
-  & p {
+    &:active {
+      width: 80%;
+      height: 80%;
+      .attendance-icon__image {
+        width: 80%;
+      }
+    }
+    
+    &_red {
+      background: #d60000f4;
+
+      &:hover {
+        background: #f35151f4;
+      }
+      &:active{
+        background: #f35151f4;
+      }
+    }
+    
+    &_green {
+      background: #2DB694;
+
+      &:hover {
+        background: #7fccb9;
+      }
+      &:active{
+        background: #7fccb9;
+      }
+    }
+
+  }
+
+  &__message {
+    cursor: pointer;
     font-size: 0.8em;
     position: absolute;
-    top: -20px;
-    left: -100px;
-    padding: 5px;
-    border-radius: 5px;
+    top: pxToEm(-25px, );
+    left: pxToEm(-110px, );
+    padding: pxToEm(7px, );
+    border-radius: pxToEm(5px, );
     background: #ff4d00;
     color: #fff;
+    user-select: none;
+    animation: show-message 4s forwards;
+    pointer-events: auto;
+    &:hover {
+      // opacity: 0.65;
+      // animation: none;
+      background: #ff4d00aa;
+    }
   }
 
-  
-  &_locked {
-    background: #a4a4a4;
-    background: #2DB694;
+  &__icon {
   }
+}
 
-    &__body {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-
-    &__icon {
-      // margin-right: pxToEm(10px);
-
-      & img {
-        width: pxToEm(50px);
-        box-shadow: inset 0 0 5px black;
-        border-radius: 50%;
-      }
-    }
-
-    &__status {
-      padding: pxToEm(10px) pxToEm(15px, );
-      border-radius: pxToEm(5px);
-      background: #ffffff;
-      font-weight: 700;
-      text-align: center;
-      color: #fff;
-      user-select: none;
-      width: 150px;
-      height: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-
-      &_hover {
-        transition: all 0.3s ease;
-        cursor: pointer;
-        &:hover {
-          box-shadow: 0 0 pxToEm(5px, ) #5f5f5f;
-        }
-      }
-
-      &_auto {
-        color: #000;
-      }
-
-      &_process {
-        background: #011474;
-        &:active {
-          box-shadow: inset 0 0 1px pxToEm(3px, ) #7f72c0;
-        }
-      }
-
-      &_planning {
-        background: #484860;
-        &:active {
-          box-shadow: inset 0 0 1px pxToEm(3px, ) #c7c7c7;
-        }
-      }
-
-      &_accepted {
-        background: #2DB694;
-      }
-
-      &_declined {
-        background: #d60000f4;
-      }
-
-    }
-
-    &__cancel {
-      font-weight: 700;
-      padding-top: pxToEm(10px, );
-      width: 100%;
-      
-      & p {
-        text-align: center;
-        background: #d60000f4;
-        color: #fff;
-        border-radius: pxToEm(15px, );
-        padding: pxToEm(7px, );
-        user-select: none;
-        &:active {
-          box-shadow: inset 0 0 1px pxToEm(3px, ) #c07372;
-        }
-      }
-    }
+.my-class {
+  opacity: 0.65;
 }
 
 
-.block {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  // background: #ff0000;
-  background: radial-gradient(circle, rgba(255,0,0,1) 60%, rgba(255,255,255,1) 100%);
-  box-shadow: 2px 2px 2px rgb(167, 69, 69);
+.attendance-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &__image {
+    transition: width 0.05s ease, height 0.05s ease;
+    width: pxToEm(50px);
+    box-shadow: inset 0 0 pxToEm(5px, ) black;
+    border-radius: 50%;
+  }
+}
+
+
+@media screen and (max-width: 1000px) {
+  .schedule {
+    width: calc(100% - 80px);
+    margin: 0 auto;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .container {
+    font-size: 14px;
+  }
+  .lesson {
+    &__info {
+      padding-left: pxToEm(5px, );
+    }
+    &__time {
+      width: pxToEm(60px, );
+    }
+  }
+}
+@media screen and (max-width: 500px) {
+  .container {
+    font-size: 12px;
+  }
+  .schedule {
+    width: 95%;
+  }
 }
