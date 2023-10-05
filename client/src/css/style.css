@@ -166,6 +166,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: "Poppins", sans-serif;
   font-size: 16px;
   font-weight: 400;
+  line-height: 1.2em;
 }
 
 .schedule {
@@ -229,13 +230,16 @@ h1, h2, h3, h4, h5, h6 {
       -ms-flex: 1;
           flex: 1;
   border-radius: 0.625em;
-  padding: 1.25em;
+  padding: 1.25em 1.25em 1.25em 0;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
 }
+.lesson__info :last-child {
+  padding-bottom: 0;
+}
 .lesson__time {
-  width: 5.625em;
+  width: 5em;
   -ms-flex-negative: 0;
       flex-shrink: 0;
   text-align: center;
@@ -251,7 +255,6 @@ h1, h2, h3, h4, h5, h6 {
 .lesson__name {
   font-weight: 700;
   margin-bottom: 0.3125em;
-  line-height: 1.2em;
 }
 .lesson__teacher {
   margin-bottom: 0.3125em;
@@ -273,24 +276,32 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-box-align: end;
       -ms-flex-align: end;
           align-items: flex-end;
+  line-height: 1em;
 }
 .lesson-type-room__type {
   text-align: center;
-  margin-left: 0.9375em;
   padding: 0.3125em;
   margin-top: -0.3125em;
+  margin-left: 0.9375em;
   background: #0b2376;
   color: #fff;
   border-radius: 0.3125em;
   margin-bottom: 0.625em;
   width: 2.5em;
+  height: 1.5625em;
 }
 .lesson-type-room__room {
   text-align: right;
+  margin-top: auto;
+  margin-bottom: 0.375em;
   margin-left: 0.9375em;
 }
 .lesson-type-room__image {
   width: 0.9375em;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .attendance {
@@ -438,9 +449,6 @@ h1, h2, h3, h4, h5, h6 {
 @media screen and (max-width: 700px) {
   .container {
     font-size: 14px;
-  }
-  .lesson__info {
-    padding-left: 0.3125em;
   }
   .lesson__time {
     width: 3.75em;
