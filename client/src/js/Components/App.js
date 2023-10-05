@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { CSSTransition } from 'react-transition-group';
-import schedule from './schedule';
-import { getLessonTime, getSortedWeekSchedule, formatDate } from './handleTime';
-import CLOCK from './icons/icons8-clock.svg'
-import GPS from './icons/location-pin-svgrepo-com.svg'
+import schedule from '../functions/schedule';
+import { getLessonTime, getSortedWeekSchedule, formatDate } from '../functions/handleTime';
+import CLOCK from './../../icons/icons8-clock.svg'
+import GPS from './../../icons/location-pin-svgrepo-com.svg'
+import GPSLIGHT from './../../icons/gpslite.svg'
 
 export default function App() {
   const sortedWeekSchedule = getSortedWeekSchedule(schedule);
@@ -55,11 +56,43 @@ function Subject({props}) {
   const [toggleClock, setToggleClock] = useState(false);
   const [toggleMessage, setToggleMessage] = useState(false);
   const [timerId,  setTimerId] = useState(0);
+  const [isDead, setIsDead] = useState(false);
 
   const [lessonStart, lessonEnd] = getLessonTime(props.start, props.end);
   const lessonName = props.lesson.title;
   const lessonType = props.lesson.subjectType;
   const room = props.room;
+  const checkInDeadline = new Date(props.checkInDeadline);
+
+  const checkTimeAndSetTheme = () => {
+    const currentTime = new Date();
+    let isLate = false;
+    if (
+      currentTime.getMonth() > checkInDeadline.getMonth() ||
+      currentTime.getDay() > checkInDeadline.getDay() ||
+
+      (currentTime.getDay() === checkInDeadline.getDay() &&
+      currentTime.getHours() > checkInDeadline.getHours()) ||
+
+      (currentTime.getDay() === checkInDeadline.getDay() &&
+      currentTime.getHours() === checkInDeadline.getHours() &&
+      currentTime.getMinutes > checkInDeadline.getMinutes)
+    ) {
+      isLate = true;
+    } 
+    if (isLate) setIsDead(true);
+  };
+
+  useEffect(() => {
+    checkTimeAndSetTheme();
+
+    const intervalId = setInterval(() => {
+      checkTimeAndSetTheme();
+    }, 1000 * 60 * 1); // last number - number of minutes
+
+    return () => clearInterval(intervalId);
+  }, []);
+
 
   let teachers = [];
   for (let i = 0; i < props.teachers.length; i++) {
@@ -72,26 +105,36 @@ function Subject({props}) {
   }
 
   function handleClockClick() {
-    clearTimeout(timerId);
-    setToggleClock(!toggleClock)
-    setToggleMessage(!toggleClock)
+    if (!isDead) {
+      clearTimeout(timerId);
+      setToggleClock(!toggleClock)
+      setToggleMessage(!toggleClock)
 
-    setTimerId(setTimeout(() => {
-      setToggleMessage(false)
-    }, 5000));
+      setTimerId(setTimeout(() => {
+        setToggleMessage(false)
+      }, 5000));
+    }
   }
 
   function handleMessageClick() {
-    setToggleMessage(false);
+    if (!isDead) {
+      setToggleMessage(false);
+    }
   }
 
 
   return (
-    <div className="day__lesson lesson">
+    <div className={isDead ? "day__lesson lesson disabled-font" : "day__lesson lesson"}>
       <div className="lesson__info">
         <div className="lesson__time">
-          <div className="lesson__start">{lessonStart}</div>
-          <div className="lesson__end">{lessonEnd}</div>
+          <div className={
+            isDead ? "lesson__start disabled-font" :
+            "lesson__start"
+          }>{lessonStart}</div>
+          <div className={
+            isDead ? "lesson__end disabled-font" :
+            "lesson__end"
+          }>{lessonEnd}</div>
         </div>
         <div className="lesson__about">
           <div className="lesson__name">
@@ -102,16 +145,25 @@ function Subject({props}) {
           </div>
         </div>
         <div className="lesson__type-room lesson-type-room">
-          <p className="lesson-type-room__type">{lessonType}</p>
-          {room && <p className='lesson-type-room__room'><img draggable={false} className='lesson-type-room__image' src={GPS} alt="gps" /> {room}</p>}
+          <p className={ isDead ? "lesson-type-room__type disabled-font disabled-bg" :
+            "lesson-type-room__type" }>{lessonType}</p>
+          {room && <p className='lesson-type-room__room'>
+            <img 
+            draggable={false} 
+            className='lesson-type-room__image' 
+            src={isDead ? GPSLIGHT : GPS} 
+            alt="gps" /> {room}</p>}
         </div>
       </div>
-      <div className="lesson__attendance attendance">
+      <div className={"lesson__attendance attendance"}>
         <div className="attendance__container" >
           <div className='attendance__pseudo-body' onClick={handleClockClick} >
             <div 
-              className={toggleClock ? "attendance__body attendance__body_red pulse-clock-red" :
-              "attendance__body attendance__body_green" } >
+              className={
+                isDead ? "attendance__body attendance__body_red disabled-bg" : 
+                toggleClock ? "attendance__body attendance__body_red pulse-clock-red" :
+                "attendance__body attendance__body_green" 
+              } >
               <div className="attendance__icon attendance-icon">
                 <img
                   className="attendance-icon__image"
