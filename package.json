@@ -3,7 +3,8 @@
   "module": "index.js",
   "type": "module",
   "scripts": {
-    "start": "bun run index.js"
+    "start": "bun run index.js",
+    "compare-stuff": "bun run compare_stuff.js"
   },
   "devDependencies": {
     "bun-types": "latest"
