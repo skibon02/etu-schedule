@@ -28,6 +28,6 @@ CREATE TABLE schedule_objs (
 -- time_start + time_end + week_day + week_two unique for single group+generation
     time INTEGER NOT NULL, 
     week_day TEXT NOT NULL,
-    week_two BOOLEAN NOT NULL, -- false is week one
+    week_two BOOLEAN NOT NULL -- false is week one
 );
 
