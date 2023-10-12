@@ -1,5 +1,6 @@
 use std::env;
 
+use rocket::serde::json::Value;
 use rocket::{Rocket, Build, futures};
 use rocket::fairing::{self, AdHoc};
 use rocket::response::status::Created;
@@ -10,6 +11,9 @@ use rocket_db_pools::{sqlx, Database, Connection};
 use futures::{stream::TryStreamExt, future::TryFutureExt};
 
 use rocket::fs::FileServer;
+use rocket::response::content;
+
+pub mod etu_api;
 
 
 #[macro_use]
@@ -36,6 +40,19 @@ use rocket::response::Responder;
 #[options("/<path..>")]
 fn options_handler<'r>(path: Option<std::path::PathBuf>) -> impl Responder<'r, 'static> {
     Status::Ok
+}
+
+#[get("/scheduleObjs/group/<group>")]
+async fn get_group_schedule_objects(group: usize) -> Json<Value> {
+    let json = etu_api::get_schedule_objs_group(group).await;
+    let return_json = json[0]["scheduleObjects"].clone();
+    Json(return_json)
+}
+
+#[get("/groups")]
+async fn get_groups() -> Json<Value> {
+    let json = etu_api::get_groups_list().await;
+    json
 }
 
 async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
@@ -99,7 +116,7 @@ pub fn stage() -> AdHoc {
     AdHoc::on_ignite("SQLx Stage", |rocket| async {
         rocket.attach(Db::init())
             .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
-            .mount("/api", routes![
+            .mount("/api", routes![ get_group_schedule_objects,get_groups,
             options_handler])
     })
 }
