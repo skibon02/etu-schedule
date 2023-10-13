@@ -1,6 +1,6 @@
 // path to settings.json
 // C:\Users\acer\AppData\Roaming\Code\User
-// ширина моего окна - 1229 x 590
+// dimensions of my window: 1229 x 590
 
 @import "_nullstyle";
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;700&family=Poppins:wght@100;400&display=swap');
@@ -31,7 +31,6 @@
     background: #d60000f4;
   }
   50% {
-    // background: #f35151f4;
     background: #ff8f8ff4;
   }
   100% {
@@ -74,12 +73,38 @@
   font-weight: 400;
   line-height: 1.2em;
 }
+.header {
+  text-align: center;
+  margin-bottom: 10px;
+  &__button {
+    width: pxToEm(100px, );
+    height: pxToEm(35px, );
+    background: #fff;
+    padding: pxToEm(5px, );
+    text-transform: uppercase;
+    border-radius: pxToEm(5px, );
+    box-shadow: 0 0 pxToEm(5px, ) black;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+    &:last-child {
+      margin-right: 0;
+    }
+    &:hover {
+      background: #000;
+      color: #fff;
+    }
+    &:active {
+      box-shadow: 0 0 pxToEm(5px, ) #fff;
+    }
+  }
+}
 .schedule {
   width: 60%;
   max-width: 1000px;
   margin: 0 auto;
 }
 .day {
+  min-height: pxToEm(150px, );
   margin-bottom: pxToEm(20px);
   padding: pxToEm(10px, );
   border-radius: pxToEm(10px, );
@@ -105,7 +130,7 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 0.1px;
+        height: 0.5px;
         background: #0000004a;
       }
     }
@@ -140,7 +165,7 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: .1px;
+    height: .8px;
     background: #0000004a;
   }
 

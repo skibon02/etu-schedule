@@ -1,28 +1,60 @@
 import { useState, useRef, useEffect } from 'react';
 import { CSSTransition } from 'react-transition-group';
-import schedule from '../functions/schedule';
-import { getLessonTime, getSortedWeekSchedule, formatDate } from '../functions/handleTime';
 import CLOCK from './../../icons/icons8-clock.svg'
 import GPS from './../../icons/location-pin-svgrepo-com.svg'
 import GPSLIGHT from './../../icons/gpslite.svg'
+import makeSchedule from '../functions/handleTime';
+import scheduleObjects2 from '../functions/schedule';
+import knowTime from '../functions/knowTime';
+import { makeUsableSchedule, makeClockTime, makeCalendarTime } from '../functions/handleTime';
+
+const DAYS = ["Воскресенье", 'Понедельник', 'Вторник', 'Среда', "Четверг", "Пятница", "Суббота"]
 
 export default function App() {
-  const sortedWeekSchedule = getSortedWeekSchedule(schedule);
-  console.log(sortedWeekSchedule);
+  const [date, setDate] = useState(new Date());
+
+  console.log(makeSchedule(scheduleObjects2, date))
+
+  function handleNextWeek() {
+    setDate(new Date(date.getTime() + 24 * 60 * 60 * 1000 * 7));
+  }
+
+  function handlePrevWeek() {
+    setDate(new Date(date.getTime() - 24 * 60 * 60 * 1000 * 7));
+  }
   
 
   return (
     <div className="container">
-      <Week weekSchedule={sortedWeekSchedule} />
+      <div className="header">
+        <button className='header__button' onClick={handlePrevWeek}>previous</button> {' '}
+        <button className='header__button' onClick={handleNextWeek}>next</button> 
+      </div>
+      <Week weekSchedule={makeSchedule(scheduleObjects2, date)} />
     </div>
   )
   
 }
 
+
+
 function Week({weekSchedule}) {
   let week = [];
   for (let i = 0; i < weekSchedule.length; i++) {
-    if (weekSchedule[i].length !== 0) week.push(<Day key={i} daySchedule={weekSchedule[i]}/>);
+    if (weekSchedule[i][0] !== null) {
+      week.push(<Day key={i} daySchedule={weekSchedule[i]}/>)
+    } else {
+      week.push(
+        <div key={i} className="day">
+          <div className="day__date">
+            {makeCalendarTime(weekSchedule[i][1], DAYS)}
+          </div>
+          <div className="day__lessons">
+            so empty...
+          </div>
+        </div>
+      )
+    }
   }
 
   return (
@@ -33,16 +65,29 @@ function Week({weekSchedule}) {
 }
 
 function Day({daySchedule}) {
-  const date = formatDate(daySchedule[0].start);
+  let dayOfWeek = makeCalendarTime(daySchedule[0].date, DAYS)
+
   
   let lessons = [];
   for (let i = 0; i < daySchedule.length; i++) {
-    lessons.push(<Subject key={daySchedule[i].id} props={daySchedule[i]} />);
+    let usableSchedule = makeUsableSchedule(daySchedule[i]);
+
+    for (let j = usableSchedule.date.startIndex; j <= usableSchedule.date.endIndex; j++) {
+      lessons.push(
+        <Subject 
+          key={daySchedule[i].id + ' ' + j.toString()} 
+          props={usableSchedule} 
+          date={usableSchedule.date.date} 
+          i={j} 
+        />
+      );
+    }
   }
+
   return (
     <div className="day">
       <div className="day__date">
-        {date}
+        {dayOfWeek}
       </div>
       <div className="day__lessons">
         {lessons}
@@ -52,35 +97,49 @@ function Day({daySchedule}) {
 }
 
 
-function Subject({props}) {
+function Subject({props, i, date}) {
   const [toggleClock, setToggleClock] = useState(false);
   const [toggleMessage, setToggleMessage] = useState(false);
   const [timerId,  setTimerId] = useState(0);
-  const [isDead, setIsDead] = useState(false);
+  const [isDead, setIsDead] = useState(true);
 
-  const [lessonStart, lessonEnd] = getLessonTime(props.start, props.end);
+  let [lessonStart, lessonEnd, checkInDeadline] = knowTime(i, new Date(date));
+  lessonStart = makeClockTime(lessonStart);
+  lessonEnd = makeClockTime(lessonEnd);
   const lessonName = props.lesson.title;
   const lessonType = props.lesson.subjectType;
-  const room = props.room;
-  const checkInDeadline = new Date(props.checkInDeadline);
+  const roomName = props.lesson.displayName;
+  const roomNumber = props.lesson.number;
+
+  let teachers = [];
+  for (let i = 0; i < props.teachers.length; i++) {
+    let teacher = props.teachers[i];
+    teachers.push(
+      <div key={teacher.id} className="lesson__teacher">
+        {teacher.surname} {teacher.name} {teacher.midname}
+      </div>
+    );
+  }
+
 
   const checkTimeAndSetTheme = () => {
     const currentTime = new Date();
     let isLate = false;
     if (
       currentTime.getMonth() > checkInDeadline.getMonth() ||
-      currentTime.getDay() > checkInDeadline.getDay() ||
+      currentTime.getDate() > checkInDeadline.getDate() ||
 
-      (currentTime.getDay() === checkInDeadline.getDay() &&
+      (currentTime.getDate() === checkInDeadline.getDate() &&
       currentTime.getHours() > checkInDeadline.getHours()) ||
 
-      (currentTime.getDay() === checkInDeadline.getDay() &&
+      (currentTime.getDate() === checkInDeadline.getDate() &&
       currentTime.getHours() === checkInDeadline.getHours() &&
       currentTime.getMinutes > checkInDeadline.getMinutes)
     ) {
       isLate = true;
     } 
-    if (isLate) setIsDead(true);
+    if (isLate) setIsDead(true)
+    else setIsDead(false);
   };
 
   useEffect(() => {
@@ -92,17 +151,6 @@ function Subject({props}) {
 
     return () => clearInterval(intervalId);
   }, []);
-
-
-  let teachers = [];
-  for (let i = 0; i < props.teachers.length; i++) {
-    let teacher = props.teachers[i];
-    teachers.push(
-      <div key={teacher.id} className="lesson__teacher">
-        {teacher.surname} {teacher.name} {teacher.midname}
-      </div>
-    );
-  }
 
   function handleClockClick() {
     if (!isDead) {
@@ -147,12 +195,12 @@ function Subject({props}) {
         <div className="lesson__type-room lesson-type-room">
           <p className={ isDead ? "lesson-type-room__type disabled-font disabled-bg" :
             "lesson-type-room__type" }>{lessonType}</p>
-          {room && <p className='lesson-type-room__room'>
+          {roomName && <p className='lesson-type-room__room'>
             <img 
             draggable={false} 
             className='lesson-type-room__image' 
             src={isDead ? GPSLIGHT : GPS} 
-            alt="gps" /> {room}</p>}
+            alt="gps" /> {roomName}</p>}
         </div>
       </div>
       <div className={"lesson__attendance attendance"}>
