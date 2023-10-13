@@ -182,9 +182,17 @@ h1, h2, h3, h4, h5, h6 {
 
 .header {
   text-align: center;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   margin-bottom: 10px;
 }
 .header__button {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   width: 6.25em;
   height: 2.1875em;
   background: #fff;

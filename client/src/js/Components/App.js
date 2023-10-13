@@ -126,13 +126,23 @@ function Subject({props, i, date}) {
     const currentTime = new Date();
     let isLate = false;
     if (
-      currentTime.getMonth() > checkInDeadline.getMonth() ||
-      currentTime.getDate() > checkInDeadline.getDate() ||
+      currentTime.getFullYear() > checkInDeadline.getFullYear() ||
 
-      (currentTime.getDate() === checkInDeadline.getDate() &&
+      currentTime.getFullYear() === checkInDeadline.getFullYear() &&
+      currentTime.getMonth() > checkInDeadline.getMonth() ||
+
+      (currentTime.getFullYear() === checkInDeadline.getFullYear() &&
+      currentTime.getMonth() === checkInDeadline.getMonth() &&
+      currentTime.getDate() > checkInDeadline.getDate()) ||
+
+      (currentTime.getFullYear() === checkInDeadline.getFullYear() &&
+      currentTime.getMonth() === checkInDeadline.getMonth() &&
+      currentTime.getDate() === checkInDeadline.getDate() &&
       currentTime.getHours() > checkInDeadline.getHours()) ||
 
-      (currentTime.getDate() === checkInDeadline.getDate() &&
+      (currentTime.getFullYear() === checkInDeadline.getFullYear() &&
+      currentTime.getMonth() === checkInDeadline.getMonth() &&
+      currentTime.getDate() === checkInDeadline.getDate() &&
       currentTime.getHours() === checkInDeadline.getHours() &&
       currentTime.getMinutes > checkInDeadline.getMinutes)
     ) {

@@ -75,8 +75,10 @@
 }
 .header {
   text-align: center;
+  user-select: none;
   margin-bottom: 10px;
   &__button {
+    user-select: none;
     width: pxToEm(100px, );
     height: pxToEm(35px, );
     background: #fff;
