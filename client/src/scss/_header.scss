@@ -1,6 +1,7 @@
 $BORDER-COLOR: #fff;
 
 .header-hover {
+  cursor: pointer;
   &:hover {
     background: #fff;
     color: #0b2376;
@@ -30,7 +31,6 @@ $BORDER-COLOR: #fff;
   }
 
   &__week-button {
-    cursor: pointer;
     user-select: none;
     width: pxToEm(220px, );
     line-height: 1.9em;
@@ -119,4 +119,18 @@ $BORDER-COLOR: #fff;
 
 .nav__shitty-clock {
   width: pxToEm(30px);
+}
+
+@media screen and (max-width: 500px) {
+  .header-hover {
+    transition: all .5s ease !important;
+    &:hover {
+      background: #0b2376;
+      color: #fff;
+    }
+    &:active {
+      background: #fff;
+      color: #0b2376;
+    }
+  }
 }

@@ -60,7 +60,7 @@ export default function Header({date, setDate, active, setActive}) {
           <span className='nav__text'>Планирование</span>
         </div>
       </div>
-      <div className="header__week-buttons">
+      {active === 'schedule' && <div className="header__week-buttons">
         <div 
           className='header__week-button header-hover' onClick={handlePrevWeek}>
           Предыдущая неделя
@@ -74,7 +74,7 @@ export default function Header({date, setDate, active, setActive}) {
           <br />
           {clock}
         </div> */}
-      </div>
+      </div>}
     </div>
   )
 }

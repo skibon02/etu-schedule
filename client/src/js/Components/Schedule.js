@@ -45,7 +45,11 @@ function Week({weekSchedule}) {
             {makeCalendarTime(weekSchedule[i][1], DAYS)}
           </div>
           <div className="day__lessons">
-            so empty...
+            <div className='day__empty'>
+              <div className="day__empty-text">
+                so empty...
+              </div>
+            </div>
           </div>
         </div>
       )

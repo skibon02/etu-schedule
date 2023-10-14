@@ -79,6 +79,9 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: inherit;
 }
 
+.header-hover {
+  cursor: pointer;
+}
 .header-hover:hover {
   background: #fff;
   color: #0b2376;
@@ -107,7 +110,6 @@ h1, h2, h3, h4, h5, h6 {
   height: 3.125em;
 }
 .header__week-button {
-  cursor: pointer;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
@@ -199,6 +201,20 @@ h1, h2, h3, h4, h5, h6 {
   width: 1.875em;
 }
 
+@media screen and (max-width: 500px) {
+  .header-hover {
+    -webkit-transition: all 0.5s ease !important;
+    transition: all 0.5s ease !important;
+  }
+  .header-hover:hover {
+    background: #0b2376;
+    color: #fff;
+  }
+  .header-hover:active {
+    background: #fff;
+    color: #0b2376;
+  }
+}
 * {
   padding: 0;
   margin: 0;
@@ -389,10 +405,10 @@ body {
   width: 60%;
   max-width: 1000px;
   margin: 0 auto;
+  padding: 1.25em 0;
 }
 
 .day {
-  min-height: 9.375em;
   margin-bottom: 1.25em;
   padding: 0.625em;
   border-radius: 0.625em;
@@ -410,6 +426,23 @@ body {
   border-radius: 0.3125em;
   border-bottom: 0.8px solid rgba(0, 0, 0, 0.2901960784);
 }
+.day__empty {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  height: 6.25em;
+}
+.day__empty-text {
+  font-size: 3em;
+  color: #828282;
+}
+
 .lesson {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -631,6 +664,10 @@ body {
 @media screen and (max-width: 500px) {
   .container {
     font-size: 12px;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
   }
   .schedule {
     width: 95%;

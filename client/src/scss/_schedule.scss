@@ -63,9 +63,9 @@
   width: 60%;
   max-width: 1000px;
   margin: 0 auto;
+  padding: pxToEm(20px) 0;
 }
 .day {
-  min-height: pxToEm(150px, );
   margin-bottom: pxToEm(20px);
   padding: pxToEm(10px, );
   border-radius: pxToEm(10px, );
@@ -89,6 +89,18 @@
     }
 
     &__lesson {
+    }
+
+    &__empty {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: pxToEm(100px);
+    }
+
+    &__empty-text {
+      font-size: 3em;
+      color: #828282;
     }
 }
 .lesson {
@@ -313,6 +325,7 @@
 @media screen and (max-width: 500px) {
   .container {
     font-size: 12px;
+    user-select: none;
   }
   .schedule {
     width: 95%;
