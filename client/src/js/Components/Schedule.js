@@ -13,16 +13,22 @@ const DAYS = ["Воскресенье", 'Понедельник', 'Вторни�
 
 export default function Schedule() {
   const [date, setDate] = useState(new Date());
+  const [active, setActive] = useState('schedule');
 
   console.log(makeSchedule(scheduleObjects2, date))
   
   return (
     <div className="container">
-      <Header date={date} setDate={setDate} />
-      <Week weekSchedule={makeSchedule(scheduleObjects2, date)} />
+      <Header 
+        date={date} 
+        setDate={setDate} 
+        active={active} 
+        setActive={setActive}
+      />
+      {active === 'schedule' && <Week weekSchedule={makeSchedule(scheduleObjects2, date)} />}
+      {active === 'planning' && <div>123</div>}
     </div>
   )
-  
 }
 
 

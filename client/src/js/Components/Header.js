@@ -1,7 +1,7 @@
 import CALENDAR from './../../icons/calendar-pen.svg'
 import NAVCLOCK from './../../icons/clock-for-nav.svg'
 
-export default function Header({date, setDate}) {
+export default function Header({date, setDate, active, setActive}) {
   // const [clock, setClock] = useState(formatTime(new Date()));
 
   // useEffect(() => {
@@ -29,16 +29,31 @@ export default function Header({date, setDate}) {
   function handlePrevWeek() {
     setDate(new Date(date.getTime() - 24 * 60 * 60 * 1000 * 7));
   }
+
+  function handleScheduleClick() {
+    setActive('schedule');
+  }
+
+  function handlePlanningClick() {
+    setActive('planning');
+  }
+
   return (
     <div className="header">
       <div className="header__nav nav">
-        <div className="nav__item header-hover">
+        <div 
+          className="nav__item header-hover"
+          onClick={handleScheduleClick}
+        >
           <div className='nav__icon-container'>
             <img className='nav__icon nav__shitty-clock' src={NAVCLOCK} alt="calendar" />
           </div>
           <span className='nav__text'>Расписание</span>
         </div>
-        <div className="nav__item header-hover">
+        <div 
+          className="nav__item header-hover"
+          onClick={handlePlanningClick}
+        >
           <div className='nav__icon-container'>
             <img className='nav__icon' src={CALENDAR} alt="calendar" />
           </div>
