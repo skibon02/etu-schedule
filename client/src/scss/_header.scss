@@ -1,0 +1,122 @@
+$BORDER-COLOR: #fff;
+
+.header-hover {
+  &:hover {
+    background: #fff;
+    color: #0b2376;
+  }
+}
+
+.header {
+  font-size: 0.9em;
+  position: sticky;
+  overflow: hidden;
+  top: 0;
+  width: 100%;
+  background: #0b2376;
+  z-index: 1000;
+  border-bottom: .1px solid $BORDER-COLOR;
+  text-transform: uppercase;
+  color: #fff;
+
+  &__nav {
+  }
+
+  &__week-buttons {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    height: pxToEm(50px);
+  }
+
+  &__week-button {
+    cursor: pointer;
+    user-select: none;
+    width: pxToEm(220px, );
+    line-height: 1.9em;
+    text-align: center;
+    border-right: .1px solid $BORDER-COLOR;
+    padding: pxToEm(10px) 0;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+
+    &:first-child {
+      border-left: 1px solid $BORDER-COLOR;
+    }
+
+  }
+
+  &__time {
+  }
+}
+
+.header-time {
+  text-transform: none ;
+  position: absolute;
+  top: pxToEm(5px);
+  right: 0;
+  width: pxToEm(110px);
+  user-select: none;
+  cursor: default;
+
+  &__text {
+
+  }
+}
+
+.nav {
+  display: flex;
+  justify-content: center;
+  border-bottom: .1px solid $BORDER-COLOR;
+  height: pxToEm(50px);
+  
+  &__item {
+    width: pxToEm(220px);
+    border-right: .1px solid $BORDER-COLOR;
+    padding: pxToEm(10px) 0;
+    transition: all .3s ease;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: pxToEm(15px);
+
+    &:first-child {
+      border-left: .8px solid $BORDER-COLOR;
+    }
+
+    &:hover {
+      .nav__icon-container {
+        box-shadow: none;
+      }
+    }
+
+  }
+
+  &__text {
+  }
+
+  &__icon-container {
+    width: pxToEm(40px);
+    height: pxToEm(40px);
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 pxToEm(4px) #000;
+  }
+
+  &__icon {
+
+    &:first-child {
+    }
+
+    width: pxToEm(25px);
+  }
+}
+
+.nav__shitty-clock {
+  width: pxToEm(30px);
+}

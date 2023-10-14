@@ -79,6 +79,214 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: inherit;
 }
 
+.header-hover:hover {
+  background: #fff;
+  color: #0b2376;
+}
+
+.header {
+  font-size: 0.9em;
+  position: sticky;
+  overflow: hidden;
+  top: 0;
+  width: 100%;
+  background: #0b2376;
+  z-index: 1000;
+  border-bottom: 0.1px solid #fff;
+  text-transform: uppercase;
+  color: #fff;
+}
+.header__week-buttons {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  height: 3.125em;
+}
+.header__week-button {
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  width: 13.75em;
+  line-height: 1.9em;
+  text-align: center;
+  border-right: 0.1px solid #fff;
+  padding: 0.625em 0;
+  text-transform: uppercase;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+.header__week-button:first-child {
+  border-left: 1px solid #fff;
+}
+.header-time {
+  text-transform: none;
+  position: absolute;
+  top: 0.3125em;
+  right: 0;
+  width: 6.875em;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  cursor: default;
+}
+.nav {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  border-bottom: 0.1px solid #fff;
+  height: 3.125em;
+}
+.nav__item {
+  width: 13.75em;
+  border-right: 0.1px solid #fff;
+  padding: 0.625em 0;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 0.9375em;
+}
+.nav__item:first-child {
+  border-left: 0.8px solid #fff;
+}
+.nav__item:hover .nav__icon-container {
+  -webkit-box-shadow: none;
+          box-shadow: none;
+}
+.nav__icon-container {
+  width: 2.5em;
+  height: 2.5em;
+  border-radius: 50%;
+  background: #fff;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-shadow: inset 0 0 0.25em #000;
+          box-shadow: inset 0 0 0.25em #000;
+}
+.nav__icon {
+  width: 1.5625em;
+}
+.nav__shitty-clock {
+  width: 1.875em;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+*, *:before, *:after {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+:focus, :active {
+  outline: none;
+}
+
+a:focus, a:active {
+  outline: none;
+}
+
+nav, footer, header, aside {
+  display: block;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  font-size: 100%;
+  line-height: 1;
+  font-size: 14px;
+  -ms-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+input, button, textarea, a {
+  font-family: inherit;
+  color: inherit;
+  font-size: inherit;
+  font: inherit;
+  font-weight: inherit;
+}
+
+input::-ms-clear {
+  display: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+button::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+
+a, a:visited {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+ul li {
+  list-style: none;
+}
+
+img {
+  vertical-align: top;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.container {
+  font-family: "Poppins", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.2em;
+  position: relative;
+}
+
 @-webkit-keyframes show-message {
   0% {
     opacity: 0;
@@ -173,50 +381,6 @@ h1, h2, h3, h4, h5, h6 {
           animation: pulseClockGreen 3.5s infinite;
 }
 
-.container {
-  font-family: "Poppins", sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.2em;
-}
-
-.header {
-  text-align: center;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  margin-bottom: 10px;
-}
-.header__button {
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  width: 6.25em;
-  height: 2.1875em;
-  background: #fff;
-  padding: 0.3125em;
-  text-transform: uppercase;
-  border-radius: 0.3125em;
-  -webkit-box-shadow: 0 0 0.3125em black;
-          box-shadow: 0 0 0.3125em black;
-  margin-right: 10px;
-  -webkit-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-}
-.header__button:last-child {
-  margin-right: 0;
-}
-.header__button:hover {
-  background: #000;
-  color: #fff;
-}
-.header__button:active {
-  -webkit-box-shadow: 0 0 0.3125em #fff;
-          box-shadow: 0 0 0.3125em #fff;
-}
-
 .schedule {
   width: 60%;
   max-width: 1000px;
@@ -240,16 +404,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 1.2em;
   padding: 0.3125em;
   border-radius: 0.3125em;
-  position: relative;
-}
-.day__date::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 0.5px;
-  background: rgba(0, 0, 0, 0.2901960784);
+  border-bottom: 0.8px solid rgba(0, 0, 0, 0.2901960784);
 }
 .lesson {
   display: -webkit-box;
@@ -257,26 +412,18 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   gap: 0.625em;
   margin-bottom: 0.5em;
-  position: relative;
+  border-bottom: 0.8px solid rgba(0, 0, 0, 0.2901960784);
 }
 .lesson:last-child {
   margin-bottom: 0;
   padding-bottom: 0;
+  border: none;
 }
 .lesson:last-child::after {
   height: 0;
 }
 .lesson:last-child .lesson__info {
   padding-bottom: 0;
-}
-.lesson::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 0.8px;
-  background: rgba(0, 0, 0, 0.2901960784);
 }
 .lesson__info {
   -webkit-box-flex: 1;
@@ -443,10 +590,6 @@ h1, h2, h3, h4, h5, h6 {
 .attendance__message:hover {
   background: rgba(255, 77, 0, 0.6666666667);
 }
-.my-class {
-  opacity: 0.65;
-}
-
 .attendance-icon {
   display: -webkit-box;
   display: -ms-flexbox;

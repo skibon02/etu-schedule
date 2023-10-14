@@ -7,29 +7,18 @@ import makeSchedule from '../functions/handleTime';
 import scheduleObjects2 from '../functions/schedule';
 import knowTime from '../functions/knowTime';
 import { makeUsableSchedule, makeClockTime, makeCalendarTime } from '../functions/handleTime';
+import Header from './Header';
 
 const DAYS = ["Воскресенье", 'Понедельник', 'Вторник', 'Среда', "Четверг", "Пятница", "Суббота"]
 
-export default function App() {
+export default function Schedule() {
   const [date, setDate] = useState(new Date());
 
   console.log(makeSchedule(scheduleObjects2, date))
-
-  function handleNextWeek() {
-    setDate(new Date(date.getTime() + 24 * 60 * 60 * 1000 * 7));
-  }
-
-  function handlePrevWeek() {
-    setDate(new Date(date.getTime() - 24 * 60 * 60 * 1000 * 7));
-  }
   
-
   return (
     <div className="container">
-      <div className="header">
-        <button className='header__button' onClick={handlePrevWeek}>previous</button> {' '}
-        <button className='header__button' onClick={handleNextWeek}>next</button> 
-      </div>
+      <Header date={date} setDate={setDate} />
       <Week weekSchedule={makeSchedule(scheduleObjects2, date)} />
     </div>
   )
