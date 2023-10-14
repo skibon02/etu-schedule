@@ -10,31 +10,81 @@ import knowTime from '../functions/handleTime';
 import { makeUsableSchedule} from '../functions/parseSchedule';
 import { makeClockTime, makeCalendarTime } from '../functions/handleTime';
 import Header from './Header';
+import Groups from './Groups';
 
 const DAYS = ["Воскресенье", 'Понедельник', 'Вторник', 'Среда', "Четверг", "Пятница", "Суббота"]
 
 export default function Schedule() {
   const [date, setDate] = useState(new Date());
-  const [active, setActive] = useState('schedule');
+  const [group, setGroup] = useState(null);
+  const [groupSchedule, setGroupSchedule] = useState(null);
+  const [active, setActive] = useState('groups');
+  const [groupList, setGroupList] = useState(null);
 
-  console.log(makeSchedule(scheduleObjects2, date))
+  useEffect(() => {
+    async function getGroups() {
+      let response = await fetch('http://localhost:8000/api/groups');
+      let data = await response.json();
+      console.log(data);
+      
+      let groups = [];
+      for (let k of Object.keys(data)) {
+        groups.push({
+          ...data[k],
+          id: k
+        })
+      }
+
+      console.log(groups);
+
+      setGroupList(groups);
+    }
+    
+    getGroups();
+  }, []);
+
+  useEffect(() => {
+    if (group) {
+      async function getGroupSchedule() {
+        console.log(`http://localhost:8000/api/scheduleObjs/group/${group}`);
+        let response = await fetch(`http://localhost:8000/api/scheduleObjs/group/${group}`);
+        let data = await response.json();
+        console.log('Успешный фетч на шедул');
+        console.log(data);
+    
+        setGroupSchedule(data);
+      }
+
+      getGroupSchedule();
+    }
+
+  }, [group])
   
   return (
-    <div className="container">
-      <Header 
-        date={date} 
-        setDate={setDate} 
-        active={active} 
+    <div className='container'>
+      {group && <div className='under-header-box'></div>}
+      {(!groupSchedule && !group || active === 'groups') && 
+      <Groups 
+        setGroup={setGroup}
         setActive={setActive}
-      />
-      <div className='under-header-box'></div>
-      {active === 'schedule' && <Week weekSchedule={makeSchedule(scheduleObjects2, date)} />}
-      {active === 'planning' && <div>123</div>}
+        groupList={groupList}
+       />}
+      {groupSchedule && group &&
+        <>
+        <Header 
+          date={date} 
+          setDate={setDate} 
+          active={active} 
+          setActive={setActive}
+        />
+        {active === 'schedule' && <Week weekSchedule={makeSchedule(groupSchedule, date)} />}
+        {active === 'planning' && <div>123</div>}
+        </>
+      }
+      
     </div>
-  )
+  );
 }
-
-
 
 function Week({weekSchedule}) {
   let week = [];
@@ -103,7 +153,6 @@ function Subject({props, i, date}) {
   const [toggleClock, setToggleClock] = useState(false);
   const [toggleMessage, setToggleMessage] = useState(false);
   const [timerId,  setTimerId] = useState(0);
-  const [isDead, setIsDead] = useState(true);
 
   let [lessonStart, lessonEnd, checkInDeadline] = knowTime(i, new Date(date));
   lessonStart = makeClockTime(lessonStart);
@@ -123,7 +172,6 @@ function Subject({props, i, date}) {
       </div>
     );
   }
-
 
   const checkTimeAndSetTheme = () => {
     const currentTime = new Date();
@@ -151,15 +199,16 @@ function Subject({props, i, date}) {
     ) {
       isLate = true;
     } 
-    if (isLate) setIsDead(true)
-    else setIsDead(false);
+    return isLate;
   };
 
+  const [isDead, setIsDead] = useState(checkTimeAndSetTheme());
+
   useEffect(() => {
-    checkTimeAndSetTheme();
+    setIsDead(checkTimeAndSetTheme());
 
     const intervalId = setInterval(() => {
-      checkTimeAndSetTheme();
+      setIsDead(checkTimeAndSetTheme());
     }, 1000 * 60 * 1); // last number - number of minutes
 
     return () => clearInterval(intervalId);

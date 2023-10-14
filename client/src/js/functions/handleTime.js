@@ -108,3 +108,4 @@ export function makeClockTime(date) {
 export function makeCalendarTime(date, days) {
   return `${days[date.getDay()]} ${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`
 }
+

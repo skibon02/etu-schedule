@@ -1,5 +1,6 @@
 import CALENDAR from './../../icons/calendar-pen.svg'
 import NAVCLOCK from './../../icons/clock-for-nav.svg'
+import SEARCH from '../../icons/search-for-nav.svg'
 
 export default function Header({date, setDate, active, setActive}) {
   // const [clock, setClock] = useState(formatTime(new Date()));
@@ -38,13 +39,16 @@ export default function Header({date, setDate, active, setActive}) {
     setActive('planning');
   }
 
+  function handleGroupsClick() {
+    setActive('groups');
+  }
+
   return (
     <div className="header">
       <div className="header__nav nav">
         <div 
           className="nav__item header-hover"
-          onClick={handleScheduleClick}
-        >
+          onClick={handleScheduleClick} >
           <div className='nav__icon-container'>
             <img className='nav__icon nav__shitty-clock' src={NAVCLOCK} alt="calendar" />
           </div>
@@ -52,12 +56,19 @@ export default function Header({date, setDate, active, setActive}) {
         </div>
         <div 
           className="nav__item header-hover"
-          onClick={handlePlanningClick}
-        >
+          onClick={handlePlanningClick} >
           <div className='nav__icon-container'>
             <img className='nav__icon' src={CALENDAR} alt="calendar" />
           </div>
           <span className='nav__text'>Планирование</span>
+        </div>
+        <div 
+          className="nav__item header-hover"
+          onClick={handleGroupsClick} >
+          <div className='nav__icon-container'>
+            <img className='nav__icon' src={SEARCH} alt="calendar" />
+          </div>
+          <span className='nav__text'>Группы</span>
         </div>
       </div>
       {active === 'schedule' && <div className="header__week-buttons">
