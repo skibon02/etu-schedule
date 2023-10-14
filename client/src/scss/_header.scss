@@ -10,7 +10,7 @@ $BORDER-COLOR: #fff;
 
 .header {
   font-size: 0.9em;
-  position: sticky;
+  position: fixed;
   overflow: hidden;
   top: 0;
   width: 100%;
@@ -110,6 +110,8 @@ $BORDER-COLOR: #fff;
 
   &__icon {
     width: pxToEm(25px);
+    margin-right: pxToEm(-0.5px);
+    margin-top: pxToEm(-0.1px);
   }
 }
 

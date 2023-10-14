@@ -4,7 +4,7 @@
 // font-family: 'Poppins', sans-serif;
 
 body {
-  overflow: scroll;
+  overflow-y: scroll;
 }
  
 .container {
@@ -13,4 +13,8 @@ body {
   font-weight: 400;
   line-height: 1.2em;
   position: relative;
+}
+
+.under-header-box {
+  height: pxToEm(100px);
 }

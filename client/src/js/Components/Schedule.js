@@ -3,10 +3,12 @@ import { CSSTransition } from 'react-transition-group';
 import CLOCK from './../../icons/icons8-clock.svg'
 import GPS from './../../icons/location-pin-svgrepo-com.svg'
 import GPSLIGHT from './../../icons/gpslite.svg'
-import makeSchedule from '../functions/handleTime';
+import makeSchedule from '../functions/parseSchedule';
 import scheduleObjects2 from '../functions/schedule';
-import knowTime from '../functions/knowTime';
-import { makeUsableSchedule, makeClockTime, makeCalendarTime } from '../functions/handleTime';
+// import scheduleObjects2 from '../functions/mySchedule';
+import knowTime from '../functions/handleTime';
+import { makeUsableSchedule} from '../functions/parseSchedule';
+import { makeClockTime, makeCalendarTime } from '../functions/handleTime';
 import Header from './Header';
 
 const DAYS = ["Воскресенье", 'Понедельник', 'Вторник', 'Среда', "Четверг", "Пятница", "Суббота"]
@@ -25,6 +27,7 @@ export default function Schedule() {
         active={active} 
         setActive={setActive}
       />
+      <div className='under-header-box'></div>
       {active === 'schedule' && <Week weekSchedule={makeSchedule(scheduleObjects2, date)} />}
       {active === 'planning' && <div>123</div>}
     </div>

@@ -1,157 +1,99 @@
-const WEEK_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+// !!! @param date passing as new Date(date)
+function knowTime(i, date) {
+  date.setSeconds(0);
+  date.setMilliseconds(0);
 
-export function makeUsableSchedule(scheduleObject) {
+  let startTime = new Date(date);
+  let endTime = new Date(date);
+  let checkInDeadLine = new Date(date);
 
-  const lesson = scheduleObject.lesson;
+  switch (i) {
+    case 0:
+      startTime.setHours(8);
+      startTime.setMinutes(0);
 
-  const date = scheduleObject.date;
+      endTime.setHours(9);
+      endTime.setMinutes(30);
+      
+      checkInDeadLine.setHours(9);
+      checkInDeadLine.setMinutes(45);
+      break;
+    case 1:
+      startTime.setHours(9);
+      startTime.setMinutes(50);
 
-  const auditoriumReservation = lesson.auditoriumReservation;
-  const subject = lesson.subject;
-  const firstTeacher = lesson.teacher; 
-  const secondTeacher = lesson.secondTeacher;
-  
-  const reservationTime = auditoriumReservation.reservationTime;
-  const auditorium = auditoriumReservation.auditorium;
+      endTime.setHours(11);
+      endTime.setMinutes(20);
+      
+      checkInDeadLine.setHours(11);
+      checkInDeadLine.setMinutes(35);
+      break;
+    case 2:
+      startTime.setHours(11);
+      startTime.setMinutes(40);
 
-  const title = subject.title;
-  const subjectType = subject.subjectType;
+      endTime.setHours(13);
+      endTime.setMinutes(10);
+      
+      checkInDeadLine.setHours(13);
+      checkInDeadLine.setMinutes(25);
+      break;
+    case 3:
+      startTime.setHours(13);
+      startTime.setMinutes(40);
 
-  let teachers = [];
-  let firstTeacherId;
-  let firstTeacherName;
-  let firstTeacherSurname;
-  let firstTeacherMidame;
-  if (firstTeacher !== null) {
-    firstTeacherId = firstTeacher.id;
-    firstTeacherName = firstTeacher.name;
-    firstTeacherSurname = firstTeacher.surname;
-    firstTeacherMidame = firstTeacher.midname;
-    teachers.push({id: firstTeacherId, name: firstTeacherName, surname: firstTeacherSurname, midname: firstTeacherMidame});
+      endTime.setHours(15);
+      endTime.setMinutes(10);
+      
+      checkInDeadLine.setHours(15);
+      checkInDeadLine.setMinutes(25);
+      break;
+    case 4:
+      startTime.setHours(15);
+      startTime.setMinutes(30);
+
+      endTime.setHours(17);
+      endTime.setMinutes(0);
+      
+      checkInDeadLine.setHours(17);
+      checkInDeadLine.setMinutes(15);
+      break;
+    case 5:
+      startTime.setHours(17);
+      startTime.setMinutes(20);
+
+      endTime.setHours(18);
+      endTime.setMinutes(50);
+      
+      checkInDeadLine.setHours(19);
+      checkInDeadLine.setMinutes(5);
+      break;
+    case 6:
+      startTime.setHours(19);
+      startTime.setMinutes(5);
+
+      endTime.setHours(20);
+      endTime.setMinutes(35);
+      
+      checkInDeadLine.setHours(20);
+      checkInDeadLine.setMinutes(20);
+      break;
+    case 7:
+      startTime.setHours(20);
+      startTime.setMinutes(50);
+
+      endTime.setHours(22);
+      endTime.setMinutes(20);
+      
+      checkInDeadLine.setHours(22);
+      checkInDeadLine.setMinutes(35);
+      break;
   }
 
-  let secondTeacherId;
-  let secondTeacherName;
-  let secondTeacherSurname;
-  let secondTeacherMidame;
-  if (secondTeacher !== null) {
-    secondTeacherId = secondTeacher.id;
-    secondTeacherName = secondTeacher.name;
-    secondTeacherSurname = secondTeacher.surname;
-    secondTeacherMidame = secondTeacher.midname;
-    teachers.push({id: secondTeacherId, name: secondTeacherName, surname: secondTeacherSurname, midname: secondTeacherMidame});
-  }
-
-  const startTime = reservationTime.startTime;
-  const endTime = reservationTime.endTime;
-  const weekDay = reservationTime.weekDay;
-
-  let displayName;
-  let number;
-  if (auditorium !== null) {
-    displayName = auditorium.displayName;
-    number = auditorium.number;
-  }
-
-  return {
-    lesson: {
-      title: title,
-      subjectType: subjectType,
-      displayName: displayName,
-      number: number,
-    },
-    teachers: teachers,
-    date: {
-      startIndex: startTime % 10,
-      endIndex: endTime % 10,
-      weekDay: weekDay,
-      date: date,
-    },
-  }
-  
-
+  return [startTime, endTime, checkInDeadLine]
 }
 
-
-// returns week -> array of sheduleObjects relevant to parity of current week
-function parseWeek(scheduleObjects, weekParity) {
-  return scheduleObjects.filter((scheduleObject) => 
-    scheduleObject.lesson.auditoriumReservation.reservationTime.week === weekParity
-  );
-}
-
-
-/*
-  returns one day of week -> array of sorted (*) sheduleObjects 
-  (*) firstly it sorts week to get sheduleObjects relevant to dayOfWeek
-      secondly it sorts scheduleObjects in startTime order
-
-  @param {array} week
-  @param {string} dayOfWeek -> from WEEK_DAYS
-  @param {object} date -> new Date() - current date
-  @param {string} currentDayOfWeek -> from WEEK_DAYS
-
-  @returns {array} -> array of days, each day contains number of scheduleObject
-                      if day is empty -> i-th index will contain null
-*/
-function parseDays(week, dayOfWeek, date, currentDayOfWeek) {
-  if (week.some((scheduleObject) => 
-  scheduleObject.lesson.auditoriumReservation.reservationTime.weekDay === dayOfWeek)) 
-  {
-
-    return week.
-    filter((scheduleObject) => 
-    scheduleObject.lesson.auditoriumReservation.reservationTime.weekDay === dayOfWeek).
-    map((day) => ({
-      ...day,
-      date: new Date(date.getTime() - (24 * 60 * 60 * 1000) * (WEEK_DAYS.indexOf(currentDayOfWeek) - WEEK_DAYS.indexOf(dayOfWeek)))
-    })).
-    sort(sortScheduleByLesson);
-  } else {
-    return [null, new Date(date.getTime() - (24 * 60 * 60 * 1000) * (WEEK_DAYS.indexOf(currentDayOfWeek) - WEEK_DAYS.indexOf(dayOfWeek)))];
-  }
-}
-
-function sortScheduleByLesson(scheduleObjectI, scheduleObjectJ) {
-  return (
-      +scheduleObjectI.lesson.auditoriumReservation.reservationTime.startTime 
-      - 
-      +scheduleObjectJ.lesson.auditoriumReservation.reservationTime.startTime
-    );
-}
-
-export default function makeSchedule(scheduleObjects, date) {
-  let parity = isEvenWeek(date);
-  let currentDayOfWeek = WEEK_DAYS[date.getDay()];
-
-  const week = parseWeek(scheduleObjects, parity); // -> arr contain arr
-
-  let weekSchedule = [];
-  
-  for (let i = 1; i < 7; i++) {
-    weekSchedule.push(parseDays(week, WEEK_DAYS[i], date, currentDayOfWeek));
-  }
-  
-  return weekSchedule;
-}
-
-
-function isEvenWeek(date) {
-  const today = new Date(date);
-  const septemberFirst = new Date(today.getFullYear(), 7, 28); // September is month 8 (0-based index).
-
-  const daysDiff = Math.floor((today - septemberFirst) / (24 * 60 * 60 * 1000));
-  const weeksDiff = Math.floor(daysDiff / 7);
-
-
-  if (weeksDiff % 2 === 0) {
-    console.log('first');
-    return '1';
-  } else {
-    console.log('second');
-    return '2'
-  }
-}
+export default knowTime;
 
 export function makeClockTime(date) {
 
@@ -166,4 +108,3 @@ export function makeClockTime(date) {
 export function makeCalendarTime(date, days) {
   return `${days[date.getDay()]} ${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`
 }
-
