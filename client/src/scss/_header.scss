@@ -41,7 +41,7 @@ $BORDER-COLOR: #fff;
     transition: all 0.3s ease;
 
     &:first-child {
-      border-left: 1px solid $BORDER-COLOR;
+      border-left: .1px solid $BORDER-COLOR;
     }
 
   }
@@ -83,7 +83,7 @@ $BORDER-COLOR: #fff;
     gap: pxToEm(15px);
 
     &:first-child {
-      border-left: .8px solid $BORDER-COLOR;
+      border-left: .1px solid $BORDER-COLOR;
     }
 
     &:hover {
@@ -109,10 +109,6 @@ $BORDER-COLOR: #fff;
   }
 
   &__icon {
-
-    &:first-child {
-    }
-
     width: pxToEm(25px);
   }
 }
@@ -123,7 +119,7 @@ $BORDER-COLOR: #fff;
 
 @media screen and (max-width: 500px) {
   .header-hover {
-    transition: all .5s ease !important;
+    transition: all 0 ease !important;
     &:hover {
       background: #0b2376;
       color: #fff;

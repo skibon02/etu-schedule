@@ -124,7 +124,7 @@ h1, h2, h3, h4, h5, h6 {
   transition: all 0.3s ease;
 }
 .header__week-button:first-child {
-  border-left: 1px solid #fff;
+  border-left: 0.1px solid #fff;
 }
 .header-time {
   text-transform: none;
@@ -171,7 +171,7 @@ h1, h2, h3, h4, h5, h6 {
   gap: 0.9375em;
 }
 .nav__item:first-child {
-  border-left: 0.8px solid #fff;
+  border-left: 0.1px solid #fff;
 }
 .nav__item:hover .nav__icon-container {
   -webkit-box-shadow: none;
@@ -197,14 +197,15 @@ h1, h2, h3, h4, h5, h6 {
 .nav__icon {
   width: 1.5625em;
 }
+
 .nav__shitty-clock {
   width: 1.875em;
 }
 
 @media screen and (max-width: 500px) {
   .header-hover {
-    -webkit-transition: all 0.5s ease !important;
-    transition: all 0.5s ease !important;
+    -webkit-transition: all 0 ease !important;
+    transition: all 0 ease !important;
   }
   .header-hover:hover {
     background: #0b2376;

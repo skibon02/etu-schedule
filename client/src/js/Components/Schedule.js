@@ -107,8 +107,9 @@ function Subject({props, i, date}) {
   lessonEnd = makeClockTime(lessonEnd);
   const lessonName = props.lesson.title;
   const lessonType = props.lesson.subjectType;
-  const roomName = props.lesson.displayName;
-  const roomNumber = props.lesson.number;
+  // const roomName = props.lesson.displayName;
+  const roomName = props.lesson.number;
+  // const roomNumber = props.lesson.number;
 
   let teachers = [];
   for (let i = 0; i < props.teachers.length; i++) {
