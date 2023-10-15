@@ -161,10 +161,10 @@ h1, h2, h3, h4, h5, h6 {
 
 body {
   overflow-y: scroll;
+  font-family: "Poppins", sans-serif;
 }
 
 .container {
-  font-family: "Poppins", sans-serif;
   font-size: 16px;
   font-weight: 400;
   line-height: 1.2em;
@@ -775,6 +775,17 @@ h1, h2, h3, h4, h5, h6 {
 
 .groups {
   font-size: 1.2em;
+}
+.groups__loading {
+  display: block;
+  padding-top: 2.125em;
+}
+.groups__input-container {
+  position: fixed;
+  width: 100%;
+}
+.groups__items {
+  padding-top: 2.125em;
 }
 .groups__item {
   padding: 0.3125em;
