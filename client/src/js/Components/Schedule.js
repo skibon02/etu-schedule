@@ -101,12 +101,12 @@ export function Schedule() {
       case ConnectEvents.OneTapAuthEventsSDK.FULL_AUTH_NEEDED: //  = 'VKSDKOneTapAuthFullAuthNeeded'
       case ConnectEvents.OneTapAuthEventsSDK.PHONE_VALIDATION_NEEDED: // = 'VKSDKOneTapAuthPhoneValidationNeeded'
       case ConnectEvents.ButtonOneTapAuthEventsSDK.SHOW_LOGIN: // = 'VKSDKButtonOneTapAuthShowLogin'
-        return Connect.redirectAuth({ url: 'https://'+SERVER_HOST+'/authorize', state: 'nothing'}); // url - строка с url, на который будет произведён редирект после авторизации.
+        return Connect.redirectAuth({ url: 'https://'+SERVER_HOST+'/api/authorize', state: 'nothing'}); // url - строка с url, на который будет произведён редирект после авторизации.
         // state - состояние вашего приложение или любая произвольная строка, которая будет добавлена к url после авторизации.
       // Пользователь перешел по кнопке "Войти другим способом"
       case ConnectEvents.ButtonOneTapAuthEventsSDK.SHOW_LOGIN_OPTIONS: // = 'VKSDKButtonOneTapAuthShowLoginOptions'
         // Параметр url: ссылка для перехода после авторизации. Должен иметь https схему. Обязательный параметр.
-        return Connect.redirectAuth({ url: 'https://'+SERVER_HOST+'/authorize' });
+        return Connect.redirectAuth({ url: 'https://'+SERVER_HOST+'/api/authorize' });
     }
 
     return false;
