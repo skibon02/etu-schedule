@@ -36,7 +36,7 @@ export function Schedule() {
   useEffect(() => {
     async function getGroups() {
       try {
-        let response = await fetch('http://localhost:8000/api/groups');
+        let response = await fetch('/api/groups');
         if (!response.ok) {
           throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
         }
@@ -63,8 +63,8 @@ export function Schedule() {
   useEffect(() => {
     if (group) {
       async function getGroupSchedule() {
-        console.log(`http://localhost:8000/api/scheduleObjs/group/${group}`);
-        let response = await fetch(`http://localhost:8000/api/scheduleObjs/group/${group}`);
+        console.log(`/api/scheduleObjs/group/${group}`);
+        let response = await fetch(`/api/scheduleObjs/group/${group}`);
         let data = await response.json();
         console.log('Успешный фетч на шедул');
         console.log(data);
