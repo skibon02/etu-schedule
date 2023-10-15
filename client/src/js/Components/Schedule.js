@@ -12,6 +12,8 @@ import { makeClockTime, makeCalendarTime } from '../functions/handleTime';
 import Header from './Header';
 import Groups from './Groups';
 
+import myfetch from '../functions/myfetch';
+
 import { Config, Connect, ConnectEvents } from '@vkontakte/superappkit';
 
 // vk id штучка
@@ -36,9 +38,9 @@ export function Schedule() {
   useEffect(() => {
     async function getGroups() {
       try {
-        let response = await fetch('/api/groups');
+        let response = await myfetch('/api/groups');
         if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+          throw new Error(`Failed to myfetch: ${response.status} ${response.statusText}`);
         }
         let data = await response.json();
   
@@ -64,7 +66,7 @@ export function Schedule() {
     if (group) {
       async function getGroupSchedule() {
         console.log(`/api/scheduleObjs/group/${group}`);
-        let response = await fetch(`/api/scheduleObjs/group/${group}`);
+        let response = await myfetch(`/api/scheduleObjs/group/${group}`);
         let data = await response.json();
         console.log('Успешный фетч на шедул');
         console.log(data);
@@ -88,8 +90,10 @@ export function Schedule() {
 
     switch (type) {
       case ConnectEvents.OneTapAuthEventsSDK.LOGIN_SUCCESS: // = 'VKSDKOneTapAuthLoginSuccess'
+            alert('мегахорош, ты вошел в вк, ' + e.payload.user.first_name + " " + e.payload.user.last_name + " с вк айди " + e.payload.user.id)
         console.log(e);
         return false
+
       // Для этих событий нужно открыть полноценный VK ID чтобы
       // пользователь дорегистрировался или подтвердил телефон
       case ConnectEvents.OneTapAuthEventsSDK.FULL_AUTH_NEEDED: //  = 'VKSDKOneTapAuthFullAuthNeeded'
