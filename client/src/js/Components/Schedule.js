@@ -13,6 +13,7 @@ import Header from './Header';
 import Groups from './Groups';
 
 import myfetch from '../functions/myfetch';
+import { isdev } from '../functions/util';
 
 import { Config, Connect, ConnectEvents } from '@vkontakte/superappkit';
 
@@ -23,6 +24,7 @@ Config.init({
 
 const DAYS = ["Воскресенье", 'Понедельник', 'Вторник', 'Среда', "Четверг", "Пятница", "Суббота"]
 
+const SERVER_HOST = isdev() ? 'localhost' : '212.118.37.143'
 
 export function Schedule() {
   const [date, setDate] = useState(new Date());
@@ -90,7 +92,7 @@ export function Schedule() {
 
     switch (type) {
       case ConnectEvents.OneTapAuthEventsSDK.LOGIN_SUCCESS: // = 'VKSDKOneTapAuthLoginSuccess'
-            alert('мегахорош, ты вошел в вк, ' + e.payload.user.first_name + " " + e.payload.user.last_name + " с вк айди " + e.payload.user.id)
+        alert('мегахорош, ты вошел в вк, ' + e.payload.user.first_name + " " + e.payload.user.last_name + " с вк айди " + e.payload.user.id)
         console.log(e);
         return false
 
@@ -99,12 +101,12 @@ export function Schedule() {
       case ConnectEvents.OneTapAuthEventsSDK.FULL_AUTH_NEEDED: //  = 'VKSDKOneTapAuthFullAuthNeeded'
       case ConnectEvents.OneTapAuthEventsSDK.PHONE_VALIDATION_NEEDED: // = 'VKSDKOneTapAuthPhoneValidationNeeded'
       case ConnectEvents.ButtonOneTapAuthEventsSDK.SHOW_LOGIN: // = 'VKSDKButtonOneTapAuthShowLogin'
-        return Connect.redirectAuth({ url: 'https://localhost/auth/redirect', state: 'nothing'}); // url - строка с url, на который будет произведён редирект после авторизации.
+        return Connect.redirectAuth({ url: 'https://'+SERVER_HOST+'/authorize', state: 'nothing'}); // url - строка с url, на который будет произведён редирект после авторизации.
         // state - состояние вашего приложение или любая произвольная строка, которая будет добавлена к url после авторизации.
       // Пользователь перешел по кнопке "Войти другим способом"
       case ConnectEvents.ButtonOneTapAuthEventsSDK.SHOW_LOGIN_OPTIONS: // = 'VKSDKButtonOneTapAuthShowLoginOptions'
         // Параметр url: ссылка для перехода после авторизации. Должен иметь https схему. Обязательный параметр.
-        return Connect.redirectAuth({ url: 'https://localhost/auth/redirect' });
+        return Connect.redirectAuth({ url: 'https://'+SERVER_HOST+'/authorize' });
     }
 
     return false;
