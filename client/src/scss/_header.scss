@@ -9,7 +9,7 @@ $BORDER-COLOR: #fff;
 }
 
 .header {
-  font-size: 0.9em;
+  font-size: 0.85em;
   position: fixed;
   overflow: hidden;
   top: 0;
@@ -119,10 +119,7 @@ $BORDER-COLOR: #fff;
   width: pxToEm(30px);
 }
 
-@media screen and (max-width: 500px) {
-  .header {
-    font-size: 0.7em;
-  }
+@media screen and (max-width: 800px) {
   .header-hover {
     transition: all 0 ease !important;
     &:hover {
@@ -134,6 +131,12 @@ $BORDER-COLOR: #fff;
       color: #0b2376;
     }
   }
+}
+
+@media screen and (max-width: 500px) {
+  .header {
+    font-size: 0.7em;
+  }
   .nav {
     &__item {
       &:first-child {
@@ -143,5 +146,21 @@ $BORDER-COLOR: #fff;
         border-right: none;
       }
     }
+  }
+  .header {
+    &__week-button {
+      &:first-child {
+        border-left: none;
+      }
+      &:last-child {
+        border-right: none;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 350px) {
+  .header {
+    font-size: 0.65em;
   }
 }

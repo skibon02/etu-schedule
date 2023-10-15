@@ -8,6 +8,11 @@ export default function Header({date, setDate, active, setActive, setGroupSchedu
     setDate(new Date(date.getTime() + 24 * 60 * 60 * 1000 * 7));
   }
 
+  function handleCurrentWeek() {
+    let d = new Date();
+    setDate(d);
+  }
+
   function handlePrevWeek() {
     setDate(new Date(date.getTime() - 24 * 60 * 60 * 1000 * 7));
   }
@@ -57,11 +62,15 @@ export default function Header({date, setDate, active, setActive, setGroupSchedu
       {active === 'schedule' && <div className="header__week-buttons">
         <div 
           className='header__week-button header-hover' onClick={handlePrevWeek}>
-          Предыдущая неделя
+            К предыдущей неделе
+        </div> 
+        <div 
+          className='header__week-button header-hover' onClick={handleCurrentWeek}>
+          К текущей неделе
         </div> 
         <div 
           className='header__week-button header-hover' onClick={handleNextWeek}>
-            Следующая неделя
+            К следующей неделе
         </div> 
         {/* <div className="header__time header-time">
           <span className='header-time__text'>Дата и время:</span>

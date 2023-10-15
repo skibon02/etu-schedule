@@ -115,7 +115,9 @@ function parseDays(week, dayOfWeek, date, currentDayOfWeek) {
     })).
     sort(sortScheduleByLesson);
   } else {
-    return [null, new Date(date.getTime() - (24 * 60 * 60 * 1000) * (WEEK_DAYS.indexOf(currentDayOfWeek) - WEEK_DAYS.indexOf(dayOfWeek)))];
+    return [null, currentDayOfWeek !== 'SUN' ?
+    new Date(date.getTime() - (24 * 60 * 60 * 1000) * (WEEK_DAYS.indexOf(currentDayOfWeek) - WEEK_DAYS.indexOf(dayOfWeek))) :
+    new Date(date.getTime() - (24 * 60 * 60 * 1000) * (7 - WEEK_DAYS.indexOf(dayOfWeek)))];
   }
 }
 

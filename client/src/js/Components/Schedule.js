@@ -23,6 +23,8 @@ export function Schedule() {
   const [groupList, setGroupList] = useState(null);
   const [groupListError, setGroupListError] = useState(null);
   const [groupNumber, setGroupNumber] = useState(null);
+  let week1;
+  let week2;
 
   useEffect(() => {
     async function getGroups() {

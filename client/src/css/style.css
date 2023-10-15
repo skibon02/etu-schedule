@@ -189,7 +189,7 @@ body {
 }
 
 .header {
-  font-size: 0.9em;
+  font-size: 0.85em;
   position: fixed;
   overflow: hidden;
   top: 0;
@@ -305,10 +305,7 @@ body {
   width: 1.875em;
 }
 
-@media screen and (max-width: 500px) {
-  .header {
-    font-size: 0.7em;
-  }
+@media screen and (max-width: 800px) {
   .header-hover {
     -webkit-transition: all 0 ease !important;
     transition: all 0 ease !important;
@@ -321,11 +318,27 @@ body {
     background: #fff;
     color: #0b2376;
   }
+}
+@media screen and (max-width: 500px) {
+  .header {
+    font-size: 0.7em;
+  }
   .nav__item:first-child {
     border-left: none;
   }
   .nav__item:last-child {
     border-right: none;
+  }
+  .header__week-button:first-child {
+    border-left: none;
+  }
+  .header__week-button:last-child {
+    border-right: none;
+  }
+}
+@media screen and (max-width: 350px) {
+  .header {
+    font-size: 0.65em;
   }
 }
 @-webkit-keyframes show-message {
