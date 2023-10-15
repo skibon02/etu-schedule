@@ -1,7 +1,7 @@
 import { Schedule, DevSchedule } from "./Schedule";
 
 export default function App() {
-  const isDev = false;
+  const isDev = true;
 
   return (
     <>

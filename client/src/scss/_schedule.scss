@@ -63,15 +63,15 @@
   width: 60%;
   max-width: 1000px;
   margin: 0 auto;
-  padding: pxToEm(70px) 0 pxToEm(20px) 0;
+  padding: pxToEm(60px) 0 pxToEm(20px) 0;
 
   &__info {
   }
 }
 
 .schedule-info {
-  margin-bottom: pxToEm(10px);
-  border: .1px solid #0000004a;
+  margin-bottom: pxToEm(15px);
+  border: 1px solid #0000004a;
   border-radius: pxToEm(15px);
   text-align: center;
   padding: pxToEm(5px);
@@ -363,6 +363,7 @@
   }
   .schedule {
     width: 95%;
+    padding-top: pxToEm(50px);
   }
   .schedule-info {
     font-size: 0.95em;

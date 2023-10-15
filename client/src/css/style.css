@@ -425,11 +425,11 @@ body {
   width: 60%;
   max-width: 1000px;
   margin: 0 auto;
-  padding: 4.375em 0 1.25em 0;
+  padding: 3.75em 0 1.25em 0;
 }
 .schedule-info {
-  margin-bottom: 0.625em;
-  border: 0.1px solid rgba(0, 0, 0, 0.2901960784);
+  margin-bottom: 0.9375em;
+  border: 1px solid rgba(0, 0, 0, 0.2901960784);
   border-radius: 0.9375em;
   text-align: center;
   padding: 0.3125em;
@@ -713,6 +713,7 @@ body {
   }
   .schedule {
     width: 95%;
+    padding-top: 3.125em;
   }
   .schedule-info {
     font-size: 0.95em;
