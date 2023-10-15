@@ -7,7 +7,7 @@ import makeSchedule from '../functions/parseSchedule';
 import scheduleObjects2 from '../functions/schedule';
 // import scheduleObjects2 from '../functions/mySchedule';
 import knowTime from '../functions/handleTime';
-import { makeUsableSchedule} from '../functions/parseSchedule';
+import { makeUsableSchedule, isEvenWeek } from '../functions/parseSchedule';
 import { makeClockTime, makeCalendarTime } from '../functions/handleTime';
 import Header from './Header';
 import Groups from './Groups';
@@ -22,6 +22,7 @@ export function Schedule() {
   const [active, setActive] = useState('groups');
   const [groupList, setGroupList] = useState(null);
   const [groupListError, setGroupListError] = useState(null);
+  const [groupNumber, setGroupNumber] = useState(null);
 
   useEffect(() => {
     async function getGroups() {
@@ -71,12 +72,13 @@ export function Schedule() {
     <>
     {groupListError && <div>Server troubles: {groupListError}</div>}
     {!groupListError && <div className='container'>
-      {group && <div className='under-header-box'></div>}
+      {groupSchedule && <div className='under-header-box'></div>}
       {(!groupSchedule && !group || active === 'groups') && 
       <Groups 
         setGroup={setGroup}
         setActive={setActive}
         groupList={groupList}
+        setGroupNumber={setGroupNumber}
        />}
       {groupSchedule && group &&
         <>
@@ -85,8 +87,16 @@ export function Schedule() {
           setDate={setDate} 
           active={active} 
           setActive={setActive}
+          setGroupSchedule={setGroupSchedule}
+          setGroup={setGroup}
         />
-        {active === 'schedule' && <Week key={group.id} weekSchedule={makeSchedule(groupSchedule, date)} />}
+        {active === 'schedule' && 
+          <Week 
+            key={group.id} 
+            weekSchedule={makeSchedule(groupSchedule, date)}
+            groupNumber={groupNumber}
+            date={date} />
+        }
         {active === 'planning' && <div>123</div>}
         </>
       }
@@ -100,7 +110,6 @@ export function DevSchedule() {
   const [date, setDate] = useState(new Date());
   const [active, setActive] = useState('schedule');
 
-
   return (
     <>
     <div className='container'>
@@ -110,15 +119,42 @@ export function DevSchedule() {
           setDate={setDate} 
           active={active} 
           setActive={setActive}
+          setGroup={() => null}
+          setGroupSchedule={() => null}
         />
-        {active === 'schedule' && <Week weekSchedule={makeSchedule(scheduleObjects2, date)} />}
+        {active === 'schedule' && 
+          <Week 
+            weekSchedule={makeSchedule(scheduleObjects2, date)} 
+            groupNumber={'0303'}
+            date={date} />
+        }
         {active === 'planning' && <div>123</div>}
     </div>
     </>
   );
 }
 
-function Week({weekSchedule}) {
+function Week({weekSchedule, groupNumber, date}) {
+  const [clock, setClock] = useState(formatTime(new Date()));
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setClock(formatTime(new Date()));
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+  
+  function formatTime(date) {
+    const calendarDate = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    return [`${calendarDate}`, `${hours}:${minutes}:${seconds}`];
+  }
+
   let week = [];
   for (let i = 0; i < weekSchedule.length; i++) {
     if (weekSchedule[i][0] !== null) {
@@ -143,6 +179,11 @@ function Week({weekSchedule}) {
 
   return (
     <div className="schedule">
+      <div className='schedule__info schedule-info'>
+        <div className='schedule-info__group schedule-info__item'>Группа {groupNumber} </div>
+        <div className='schedule-info__date schedule-info__item'>Дата: {clock[0]}. Время: {clock[1]}</div>
+        <div className='schedule-info__week-parity schedule-info__item'>Неделя: {isEvenWeek(date)}</div>
+      </div>
       {week}
     </div>
     )

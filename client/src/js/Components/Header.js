@@ -2,26 +2,7 @@ import CALENDAR from './../../icons/calendar-pen.svg'
 import NAVCLOCK from './../../icons/clock-for-nav.svg'
 import SEARCH from '../../icons/search-for-nav.svg'
 
-export default function Header({date, setDate, active, setActive}) {
-  // const [clock, setClock] = useState(formatTime(new Date()));
-
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     setClock(formatTime(new Date()));
-  //   }, 1000);
-
-  //   return () => {
-  //     clearInterval(intervalId);
-  //   };
-  // }, []);
-  
-  // function formatTime(date) {
-  //   const calendarDate = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
-  //   const hours = date.getHours().toString().padStart(2, '0');
-  //   const minutes = date.getMinutes().toString().padStart(2, '0');
-  //   const seconds = date.getSeconds().toString().padStart(2, '0');
-  //   return `${calendarDate} ${hours}:${minutes}:${seconds}`;
-  // }
+export default function Header({date, setDate, active, setActive, setGroupSchedule, setGroup}) {
 
   function handleNextWeek() {
     setDate(new Date(date.getTime() + 24 * 60 * 60 * 1000 * 7));
@@ -41,6 +22,8 @@ export default function Header({date, setDate, active, setActive}) {
 
   function handleGroupsClick() {
     setActive('groups');
+    setGroupSchedule(null);
+    setGroup(null);
   }
 
   return (

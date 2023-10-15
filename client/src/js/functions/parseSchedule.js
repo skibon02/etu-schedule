@@ -14,8 +14,13 @@ export function makeUsableSchedule(scheduleObject) {
   const reservationTime = auditoriumReservation.reservationTime;
   const auditorium = auditoriumReservation.auditorium;
 
-  const title = subject.title;
+  let title = subject.title;
+  let shortTitle = subject.shortTitle;
   const subjectType = subject.subjectType;
+  let titleWords = title.split(' ');
+  for (let i = 0; i < titleWords.length; i++) {
+    title =  titleWords[i].length > 18 ? shortTitle : title;
+  }
 
   let teachers = [];
   let firstTeacherId;
@@ -104,7 +109,9 @@ function parseDays(week, dayOfWeek, date, currentDayOfWeek) {
     scheduleObject.lesson.auditoriumReservation.reservationTime.weekDay === dayOfWeek).
     map((day) => ({
       ...day,
-      date: new Date(date.getTime() - (24 * 60 * 60 * 1000) * (WEEK_DAYS.indexOf(currentDayOfWeek) - WEEK_DAYS.indexOf(dayOfWeek)))
+      date: currentDayOfWeek !== 'SUN' ?
+        new Date(date.getTime() - (24 * 60 * 60 * 1000) * (WEEK_DAYS.indexOf(currentDayOfWeek) - WEEK_DAYS.indexOf(dayOfWeek))) :
+        new Date(date.getTime() - (24 * 60 * 60 * 1000) * (7 - WEEK_DAYS.indexOf(dayOfWeek)))
     })).
     sort(sortScheduleByLesson);
   } else {
@@ -136,20 +143,18 @@ export default function makeSchedule(scheduleObjects, date) {
 }
 
 
-function isEvenWeek(date) {
+export function isEvenWeek(date) {
   const today = new Date(date);
-  const septemberFirst = new Date(today.getFullYear(), 7, 28); // September is month 8 (0-based index).
+  const firstWeek = new Date(today.getFullYear(), 7, 27); // (month 0-based index) 28 aug.
 
-  const daysDiff = Math.floor((today - septemberFirst) / (24 * 60 * 60 * 1000));
+  const daysDiff = Math.floor((today - firstWeek) / (24 * 60 * 60 * 1000));
   const weeksDiff = Math.floor(daysDiff / 7);
 
 
   if (weeksDiff % 2 === 0) {
-    console.log('first');
-    return '1';
+    return '2';
   } else {
-    console.log('second');
-    return '2'
+    return '1'
   }
 }
 

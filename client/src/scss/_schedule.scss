@@ -64,7 +64,38 @@
   max-width: 1000px;
   margin: 0 auto;
   padding: pxToEm(70px) 0 pxToEm(20px) 0;
+
+  &__info {
+  }
 }
+
+.schedule-info {
+  margin-bottom: pxToEm(10px);
+  border: .1px solid #0000004a;
+  border-radius: pxToEm(15px);
+  text-align: center;
+  padding: pxToEm(5px);
+  display: flex;
+  justify-content: center;
+  gap: pxToEm(10px);
+
+  &__item {
+  }
+
+  &__group {
+    margin-right: pxToEm(5px);
+  }
+
+  &__date {
+    text-align-last: left;
+    width: pxToEm(210px);
+  }
+
+  &__week-parity {
+
+  }
+}
+
 .day {
   margin-bottom: pxToEm(20px);
   padding: pxToEm(10px, );
@@ -108,6 +139,7 @@
   gap: pxToEm(10px);
   margin-bottom: pxToEm(8px);
   border-bottom: .8px solid #0000004a;
+  padding-bottom: pxToEm(8px);
 
   &:last-child {
     margin-bottom: 0;
@@ -126,7 +158,7 @@
       flex: 1;
 
       border-radius: pxToEm(10px);
-      padding: pxToEm(20px) pxToEm(20px, ) pxToEm(20px, ) 0;
+      padding: pxToEm(8px) pxToEm(20px, ) pxToEm(0px, ) 0;
 
       display: flex;
     }
@@ -159,7 +191,9 @@
     }
 
     &__teacher {
-      margin-bottom: pxToEm(5px);
+      &:nth-child(2) {
+        margin-top: pxToEm(5px);
+      }
     }
 
     &__type-room {
@@ -329,5 +363,8 @@
   }
   .schedule {
     width: 95%;
+  }
+  .schedule-info {
+    font-size: 0.95em;
   }
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import SEARCH from '../../icons/search.svg'
 
-export default function Groups({setGroup, setActive, groupList}) {
+export default function Groups({setGroup, setActive, groupList, setGroupNumber}) {
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef(null);
 
@@ -32,15 +32,16 @@ export default function Groups({setGroup, setActive, groupList}) {
         .filter((group) => 
           group.number.indexOf(inputValue) === 0
         )
-        .map((item) => (
+        .map((group) => (
           <div 
             className='groups__item'
-            key={item.id}
+            key={group.id}
             onClick={() => {
-              setGroup(item.id);
+              setGroup(group.id);
+              setGroupNumber(group.number);
               setActive('schedule');
             }}>
-              {item.number}
+              {group.number}
           </div>
         ))}
       </div>

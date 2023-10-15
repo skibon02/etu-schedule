@@ -427,7 +427,28 @@ body {
   margin: 0 auto;
   padding: 4.375em 0 1.25em 0;
 }
-
+.schedule-info {
+  margin-bottom: 0.625em;
+  border: 0.1px solid rgba(0, 0, 0, 0.2901960784);
+  border-radius: 0.9375em;
+  text-align: center;
+  padding: 0.3125em;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  gap: 0.625em;
+}
+.schedule-info__group {
+  margin-right: 0.3125em;
+}
+.schedule-info__date {
+  -moz-text-align-last: left;
+       text-align-last: left;
+  width: 13.125em;
+}
 .day {
   margin-bottom: 1.25em;
   padding: 0.625em;
@@ -470,6 +491,7 @@ body {
   gap: 0.625em;
   margin-bottom: 0.5em;
   border-bottom: 0.8px solid rgba(0, 0, 0, 0.2901960784);
+  padding-bottom: 0.5em;
 }
 .lesson:last-child {
   margin-bottom: 0;
@@ -487,7 +509,7 @@ body {
       -ms-flex: 1;
           flex: 1;
   border-radius: 0.625em;
-  padding: 1.25em 1.25em 1.25em 0;
+  padding: 0.5em 1.25em 0em 0;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -510,8 +532,8 @@ body {
   font-weight: 700;
   margin-bottom: 0.3125em;
 }
-.lesson__teacher {
-  margin-bottom: 0.3125em;
+.lesson__teacher:nth-child(2) {
+  margin-top: 0.3125em;
 }
 .lesson__type-room {
   margin-left: auto;
@@ -691,6 +713,9 @@ body {
   }
   .schedule {
     width: 95%;
+  }
+  .schedule-info {
+    font-size: 0.95em;
   }
 }
 * {
