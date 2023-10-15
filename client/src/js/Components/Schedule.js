@@ -14,34 +14,41 @@ import Groups from './Groups';
 
 const DAYS = ["Воскресенье", 'Понедельник', 'Вторник', 'Среда', "Четверг", "Пятница", "Суббота"]
 
-export default function Schedule() {
+
+export function Schedule() {
   const [date, setDate] = useState(new Date());
   const [group, setGroup] = useState(null);
   const [groupSchedule, setGroupSchedule] = useState(null);
   const [active, setActive] = useState('groups');
   const [groupList, setGroupList] = useState(null);
+  const [groupListError, setGroupListError] = useState(null);
 
   useEffect(() => {
     async function getGroups() {
-      let response = await fetch('http://localhost:8000/api/groups');
-      let data = await response.json();
-      console.log(data);
-      
-      let groups = [];
-      for (let k of Object.keys(data)) {
-        groups.push({
-          ...data[k],
-          id: k
-        })
+      try {
+        let response = await fetch('http://localhost:8000/api/groups');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+        }
+        let data = await response.json();
+  
+        let groups = [];
+        for (let k of Object.keys(data)) {
+          groups.push({
+            ...data[k],
+            id: k
+          });
+        }
+  
+        setGroupList(groups);
+      } catch (error) {
+        setGroupListError(error.message);
       }
-
-      console.log(groups);
-
-      setGroupList(groups);
     }
-    
+  
     getGroups();
   }, []);
+  
 
   useEffect(() => {
     if (group) {
@@ -61,7 +68,9 @@ export default function Schedule() {
   }, [group])
   
   return (
-    <div className='container'>
+    <>
+    {groupListError && <div>Server troubles: {groupListError}</div>}
+    {!groupListError && <div className='container'>
       {group && <div className='under-header-box'></div>}
       {(!groupSchedule && !group || active === 'groups') && 
       <Groups 
@@ -77,12 +86,35 @@ export default function Schedule() {
           active={active} 
           setActive={setActive}
         />
-        {active === 'schedule' && <Week weekSchedule={makeSchedule(groupSchedule, date)} />}
+        {active === 'schedule' && <Week key={group.id} weekSchedule={makeSchedule(groupSchedule, date)} />}
         {active === 'planning' && <div>123</div>}
         </>
       }
       
+    </div>}
+    </>
+  );
+}
+
+export function DevSchedule() {
+  const [date, setDate] = useState(new Date());
+  const [active, setActive] = useState('schedule');
+
+
+  return (
+    <>
+    <div className='container'>
+      <div className='under-header-box'></div>
+        <Header 
+          date={date} 
+          setDate={setDate} 
+          active={active} 
+          setActive={setActive}
+        />
+        {active === 'schedule' && <Week weekSchedule={makeSchedule(scheduleObjects2, date)} />}
+        {active === 'planning' && <div>123</div>}
     </div>
+    </>
   );
 }
 

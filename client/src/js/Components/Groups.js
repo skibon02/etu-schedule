@@ -1,14 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import SEARCH from '../../icons/search.svg'
 
 export default function Groups({setGroup, setActive, groupList}) {
   const [inputValue, setInputValue] = useState('');
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    inputRef.current.focus();
+  }, []);
   
   return (
     <div className='groups'>
       <div className='groups__input-container'>
         <div className='groups__input groups-input'>
           <input 
+            ref={inputRef}
             className='groups-input__input'
             type="text"
             value={inputValue}
