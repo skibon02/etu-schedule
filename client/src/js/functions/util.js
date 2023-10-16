@@ -4,4 +4,8 @@ function isdev() {
     return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 }
 
-export {isdev}
+function simulateFetches() {
+    return !process.env.NODE_ENV || process.env.SIMULATE_FETCHES === 'true';
+}
+
+export {isdev, simulateFetches}
