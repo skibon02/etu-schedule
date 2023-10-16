@@ -1,9 +1,8 @@
-use std::env;
+use std::{env, fs};
 
 use rocket::serde::json::Value;
 use rocket::{Rocket, Build, futures};
 use rocket::fairing::{self, AdHoc};
-use rocket::response::status::Created;
 use rocket::serde::{Serialize, Deserialize, json::Json};
 
 use rocket_db_pools::{sqlx, Database, Connection};
@@ -11,7 +10,7 @@ use rocket_db_pools::{sqlx, Database, Connection};
 use futures::{stream::TryStreamExt, future::TryFutureExt};
 
 use rocket::fs::FileServer;
-use rocket::response::content;
+use rocket::response::{content, Redirect};
 
 pub mod etu_api;
 
@@ -34,7 +33,7 @@ struct Post {
     text: String,
 }
 
-use rocket::http::Status;
+use rocket::http::{Status, Cookie, CookieJar};
 use rocket::response::Responder;
 
 #[options("/<path..>")]
@@ -53,6 +52,12 @@ async fn get_group_schedule_objects(group: usize) -> Json<Value> {
 async fn get_groups() -> Json<Value> {
     let json = etu_api::get_groups_list().await;
     json
+}
+
+#[get("/authorize")]
+async fn authorize(cookie: &CookieJar<'_>) -> Redirect {
+    cookie.add_private(Cookie::new("token", "123"));
+    Redirect::to("/")
 }
 
 async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
@@ -91,11 +96,35 @@ impl Fairing for CORS {
     }
 }
 
+use rand::Rng;
+
 #[launch]
-fn rocket() -> _ {
+async fn rocket() -> _ {
 
 
     let args: Vec<String> = env::args().collect();
+
+    match fs::read_to_string("secret_key.txt") {
+        Ok(key) => {
+            env::set_var("ROCKET_SECRET_KEY", key);
+        }
+        Err(_) => {
+            println!("No secret key found, generating one");
+            let key = rocket::tokio::time::timeout(
+                std::time::Duration::from_secs(5),
+                rocket::tokio::task::spawn_blocking(|| {
+                    let mut rng = rand::thread_rng();
+                    let key: [u8; 32] = rng.gen();
+                    base64::encode(&key)
+                }),
+            )
+            .await
+            .unwrap()
+            .unwrap();
+            fs::write("secret_key.txt", &key).unwrap();
+            env::set_var("ROCKET_SECRET_KEY", key);
+        }
+    }
 
     let with_client = args.contains(&"--with-client".to_string());
     let rocket = rocket::build()
@@ -116,7 +145,7 @@ pub fn stage() -> AdHoc {
     AdHoc::on_ignite("SQLx Stage", |rocket| async {
         rocket.attach(Db::init())
             .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
-            .mount("/api", routes![ get_group_schedule_objects,get_groups,
+            .mount("/api", routes![ get_group_schedule_objects,get_groups, authorize,
             options_handler])
     })
 }

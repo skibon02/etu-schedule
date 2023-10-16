@@ -3,6 +3,13 @@ import ReactDOM from 'react-dom/client';
 import './css/style.css';
 import App from './js/Components/App';
 import reportWebVitals from './reportWebVitals';
+import {backendHost} from './js/functions/util'
+
+// redirect to backend if we're on the authorize page
+if (window.location.pathname === '/api/authorize') {
+    window.location.href = backendHost + '/api/authorize';
+}
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

@@ -1,11 +1,11 @@
-import {isdev, simulateFetches} from './util'
+import {isdev, simulateFetches, backendHost} from './util'
 import {groups_request_example, schedule_request_example} from './mock_data' 
 import process from 'process'
 
 async function myfetch(path, param = {}) {
     let initialPath = path;
+    path = backendHost + path;
     if (isdev()) {
-        path = 'https://localhost:5443' + path;
         console.log('dev fetch to ' + path)
     }
     else {
