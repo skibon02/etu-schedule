@@ -5,7 +5,7 @@ function isdev() {
 }
 
 let simulateFetches = (function () {
-    return !process.env.NODE_ENV || process.env.SIMULATE_FETCHES === 'true';
+    return !process.env.NODE_ENV || process.env.REACT_APP_SIMULATE_FETCHES === 'true';
 })()
 
 export {isdev, simulateFetches}

@@ -7,7 +7,7 @@ $BORDER-COLOR: #828282;
 
   &__loading {
     display: block;
-    padding-top: pxToEm(34px);
+    padding-top: pxToEm(25px);
   }
 
   &__input-container {
@@ -57,7 +57,16 @@ $BORDER-COLOR: #828282;
 @media screen and (max-width: 500px) {
   .groups {
     font-size: 1.7em;
-  }.groups-input {
+
+    &__loading {
+      padding-top: pxToEm(30px);
+    }
+
+    &__items {
+      padding-top: pxToEm(27px);
+    }
+  }
+  .groups-input {
     position: relative;
     border-bottom: 2px solid $BORDER-COLOR;
     font-size: 0.8em;

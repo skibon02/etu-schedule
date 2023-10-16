@@ -845,7 +845,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .groups__loading {
   display: block;
-  padding-top: 2.125em;
+  padding-top: 1.5625em;
 }
 .groups__input-container {
   position: fixed;
@@ -886,6 +886,12 @@ h1, h2, h3, h4, h5, h6 {
 @media screen and (max-width: 500px) {
   .groups {
     font-size: 1.7em;
+  }
+  .groups__loading {
+    padding-top: 1.875em;
+  }
+  .groups__items {
+    padding-top: 1.6875em;
   }
   .groups-input {
     position: relative;

@@ -1,4 +1,4 @@
-import { Schedule, DevSchedule } from "./Schedule";
+import { Schedule } from "./Schedule";
 
 export default function App() {
 
