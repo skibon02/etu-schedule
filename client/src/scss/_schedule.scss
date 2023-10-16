@@ -63,10 +63,16 @@
   width: 60%;
   max-width: 1000px;
   margin: 0 auto;
-  padding: pxToEm(60px) 0 pxToEm(20px) 0;
+  padding: 0 0 pxToEm(20px) 0;
 
   &__info {
   }
+}
+
+.schedule-info-container {
+  width: 60%;
+  margin: 0 auto;
+  padding-top: pxToEm(60px);
 }
 
 .schedule-info {
@@ -342,7 +348,9 @@
 @media screen and (max-width: 1000px) {
   .schedule {
     width: calc(100% - 80px);
-    margin: 0 auto;
+  }
+  .schedule-info-container {
+    width: calc(100% - 80px);
   }
 }
 
@@ -363,7 +371,11 @@
   }
   .schedule {
     width: 95%;
-    padding-top: pxToEm(50px);
+  }
+  .schedule-info-container {
+    font-size: 0.95em;
+    padding-top: pxToEm(45px);
+    width: 95%;
   }
   .schedule-info {
     font-size: 0.95em;

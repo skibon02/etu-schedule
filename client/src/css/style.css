@@ -454,8 +454,14 @@ body {
   width: 60%;
   max-width: 1000px;
   margin: 0 auto;
-  padding: 3.75em 0 1.25em 0;
+  padding: 0 0 1.25em 0;
 }
+.schedule-info-container {
+  width: 60%;
+  margin: 0 auto;
+  padding-top: 3.75em;
+}
+
 .schedule-info {
   margin-bottom: 0.9375em;
   border: 1px solid rgba(0, 0, 0, 0.2901960784);
@@ -721,7 +727,9 @@ body {
 @media screen and (max-width: 1000px) {
   .schedule {
     width: calc(100% - 80px);
-    margin: 0 auto;
+  }
+  .schedule-info-container {
+    width: calc(100% - 80px);
   }
 }
 @media screen and (max-width: 700px) {
@@ -742,7 +750,11 @@ body {
   }
   .schedule {
     width: 95%;
-    padding-top: 3.125em;
+  }
+  .schedule-info-container {
+    font-size: 0.95em;
+    padding-top: 2.8125em;
+    width: 95%;
   }
   .schedule-info {
     font-size: 0.95em;

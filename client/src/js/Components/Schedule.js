@@ -146,11 +146,16 @@ export function Schedule() {
           setGroup={setGroup}
         />
         {active === 'schedule' && 
+          <>
+          <div className='schedule-info-container'>
+            <Clock
+              groupNumber={groupNumber}
+              date={date} />
+          </div>
           <Week 
             key={group.id} 
-            weekSchedule={makeSchedule(groupSchedule, date)}
-            groupNumber={groupNumber}
-            date={date} />
+            weekSchedule={makeSchedule(groupSchedule, date)} />
+          </>
         }
         {active === 'planning' && <div>123</div>}
         </>
@@ -161,27 +166,38 @@ export function Schedule() {
   );
 }
 
-function Week({weekSchedule, groupNumber, date}) {
-  // const [clock, setClock] = useState(formatTime(new Date()));
+function Clock({groupNumber, date}) {
+  const [clock, setClock] = useState(formatTime(new Date()));
 
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     setClock(formatTime(new Date()));
-  //   }, 1000);
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setClock(formatTime(new Date()));
+    }, 1000);
 
-  //   return () => {
-  //     clearInterval(intervalId);
-  //   };
-  // }, []);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
   
-  // function formatTime(date) {
-  //   const calendarDate = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
-  //   const hours = date.getHours().toString().padStart(2, '0');
-  //   const minutes = date.getMinutes().toString().padStart(2, '0');
-  //   const seconds = date.getSeconds().toString().padStart(2, '0');
-  //   return [`${calendarDate}`, `${hours}:${minutes}:${seconds}`];
-  // }
+  function formatTime(date) {
+    const calendarDate = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    return [`${calendarDate}`, `${hours}:${minutes}:${seconds}`];
+  }
 
+  return (
+    <div className='schedule__info schedule-info'>
+      <div className='schedule-info__group schedule-info__item'>Группа: {groupNumber}</div>
+      <div className='schedule-info__date schedule-info__item'>Дата: {clock[0]}. Время: {clock[1]}</div>
+      <div className='schedule-info__week-parity schedule-info__item'>Неделя: {isEvenWeek(date)}</div>
+    </div>
+  )
+
+}
+
+function Week({weekSchedule}) {
   let week = [];
   for (let i = 0; i < weekSchedule.length; i++) {
     if (weekSchedule[i][0] !== null) {
@@ -206,11 +222,6 @@ function Week({weekSchedule, groupNumber, date}) {
 
   return (
     <div className="schedule">
-      {/* <div className='schedule__info schedule-info'>
-        <div className='schedule-info__group schedule-info__item'>Группа: {groupNumber}</div>
-        <div className='schedule-info__date schedule-info__item'>Дата: {clock[0]}. Время: {clock[1]}</div>
-        <div className='schedule-info__week-parity schedule-info__item'>Неделя: {isEvenWeek(date)}</div>
-      </div> */}
       {week}
     </div>
     )
@@ -229,7 +240,6 @@ function Day({daySchedule}) {
         <Subject 
           key={daySchedule[i].id + ' ' + j.toString()} 
           props={usableSchedule} 
-          date={usableSchedule.date.date} 
           i={j} 
         />
       );
@@ -249,12 +259,12 @@ function Day({daySchedule}) {
 }
 
 
-function Subject({props, i, date}) {
+function Subject({props, i}) {
   const [toggleClock, setToggleClock] = useState(false);
   const [toggleMessage, setToggleMessage] = useState(false);
   const [timerId,  setTimerId] = useState(0);
 
-  let [lessonStart, lessonEnd, checkInDeadline] = knowTime(i, new Date(date));
+  let [lessonStart, lessonEnd, checkInDeadline] = knowTime(i, new Date(props.date.date));
   lessonStart = makeClockTime(lessonStart);
   lessonEnd = makeClockTime(lessonEnd);
   const lessonName = props.lesson.title;
@@ -312,7 +322,7 @@ function Subject({props, i, date}) {
     }, 1000 * 60 * 1); // last number - number of minutes
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [props.date.date]);
 
   function handleClockClick() {
     if (!isDead) {
