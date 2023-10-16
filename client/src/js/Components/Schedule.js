@@ -4,8 +4,8 @@ import CLOCK from './../../icons/icons8-clock.svg'
 import GPS from './../../icons/location-pin-svgrepo-com.svg'
 import GPSLIGHT from './../../icons/gpslite.svg'
 import makeSchedule from '../functions/parseSchedule';
-import scheduleObjects2 from '../functions/schedule';
-// import scheduleObjects2 from '../functions/mySchedule';
+// import scheduleObjects2 from '../functions/schedule';
+import scheduleObjects2 from '../functions/mySchedule';
 import knowTime from '../functions/handleTime';
 import { makeUsableSchedule, isEvenWeek } from '../functions/parseSchedule';
 import { makeClockTime, makeCalendarTime } from '../functions/handleTime';
