@@ -458,6 +458,7 @@ body {
 }
 .schedule-info-container {
   width: 60%;
+  max-width: 1000px;
   margin: 0 auto;
   padding-top: 3.75em;
 }
@@ -753,7 +754,7 @@ body {
   }
   .schedule-info-container {
     font-size: 0.95em;
-    padding-top: 2.8125em;
+    padding-top: 3.125em;
     width: 95%;
   }
   .schedule-info {

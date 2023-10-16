@@ -148,7 +148,7 @@ export function Schedule() {
         {active === 'schedule' && 
           <>
           <div className='schedule-info-container'>
-            <Clock
+            <WeekHeader
               groupNumber={groupNumber}
               date={date} />
           </div>
@@ -166,7 +166,7 @@ export function Schedule() {
   );
 }
 
-function Clock({groupNumber, date}) {
+function WeekHeader({groupNumber, date}) {
   const [clock, setClock] = useState(formatTime(new Date()));
 
   useEffect(() => {
