@@ -1,12 +1,37 @@
-import {isdev} from './util'
+import {isdev, simulateFetches} from './util'
+import {groups_request_example, schedule_request_example} from './mock_data' 
+import process from 'process'
+
 async function myfetch(path, param = {}) {
+    let initialPath = path;
     if (isdev()) {
         path = 'https://localhost:5443' + path;
         console.log('dev fetch to ' + path)
-        return fetch( path, param);
     }
     else {
         console.log('prod fetch to ' + path)
+    }
+
+    if (simulateFetches) {
+        console.log('Using mock instead of real fetch...');
+        return Promise.resolve({
+            json: async () => {
+                if (/\/api\/groups/.test(initialPath)) {
+                    console.log ('returning groups list')
+                    return groups_request_example;
+                }
+                if (/\/api\/scheduleObjs\/group\/\d+/.test(initialPath)) {
+                    console.log('returning schedule for 0303')
+                    return schedule_request_example;
+                }
+                console.log('Not found handler for mock request!')
+            },
+            ok: true,
+            status: 200,
+            statusText: "OK",
+        });
+    }
+    else {
         return fetch(path, param);
     }
 }
