@@ -19,7 +19,7 @@ export function makeUsableSchedule(scheduleObject) {
   const subjectType = subject.subjectType;
   let titleWords = title.split(' ');
   for (let i = 0; i < titleWords.length; i++) {
-    title =  titleWords[i].length > 18 ? shortTitle : title;
+    title =  titleWords[i].length > 16 ? shortTitle : title;
   }
 
   let teachers = [];

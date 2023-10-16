@@ -9,8 +9,7 @@ export default function Header({date, setDate, active, setActive, setGroupSchedu
   }
 
   function handleCurrentWeek() {
-    let d = new Date();
-    setDate(d);
+    setDate(new Date());
   }
 
   function handlePrevWeek() {

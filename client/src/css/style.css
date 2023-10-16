@@ -172,12 +172,12 @@ body {
 }
 
 .under-header-box {
-  height: 2.8125em;
+  height: 3.125em;
 }
 
 @media screen and (max-width: 500px) {
   .under-header-box {
-    height: 2.0625em;
+    height: 3.75em;
   }
 }
 .header-hover {
@@ -189,7 +189,7 @@ body {
 }
 
 .header {
-  font-size: 0.85em;
+  font-size: 0.85 em;
   position: fixed;
   overflow: hidden;
   top: 0;
@@ -211,10 +211,20 @@ body {
   height: 3.125em;
 }
 .header__week-button {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
+  height: 100%;
   width: 13.75em;
   line-height: 1.9em;
   text-align: center;
@@ -323,16 +333,22 @@ body {
   .header {
     font-size: 0.7em;
   }
-  .nav__item:first-child {
-    border-left: none;
-  }
-  .nav__item:last-child {
-    border-right: none;
+  .header__week-buttons {
+    height: 4.375em;
   }
   .header__week-button:first-child {
     border-left: none;
   }
   .header__week-button:last-child {
+    border-right: none;
+  }
+  .nav {
+    height: 4.375em;
+  }
+  .nav__item:first-child {
+    border-left: none;
+  }
+  .nav__item:last-child {
     border-right: none;
   }
 }
@@ -460,7 +476,7 @@ body {
 .schedule-info__date {
   -moz-text-align-last: left;
        text-align-last: left;
-  width: 13.125em;
+  width: 13.75em;
 }
 .day {
   margin-bottom: 1.25em;
@@ -824,7 +840,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
 }
 .groups__items {
-  padding-top: 2.125em;
+  padding-top: 1.5625em;
 }
 .groups__item {
   padding: 0.3125em;
@@ -841,14 +857,38 @@ h1, h2, h3, h4, h5, h6 {
 .groups-input {
   position: relative;
   border-bottom: 2px solid #828282;
+  font-size: 0.8em;
 }
 .groups-input__input {
   padding: 0.3125em;
   width: 100%;
+  font-size: 1.2em;
 }
 .groups-input__icon {
   position: absolute;
   top: 0.21875em;
-  left: 0.3125em;
+  left: 0.4375em;
   width: 1.5625em;
+}
+
+@media screen and (max-width: 500px) {
+  .groups {
+    font-size: 1.7em;
+  }
+  .groups-input {
+    position: relative;
+    border-bottom: 2px solid #828282;
+    font-size: 0.8em;
+  }
+  .groups-input__input {
+    font-size: 1.1em;
+    padding: 0.1875em 0.3125em;
+    width: 100%;
+  }
+  .groups-input__icon {
+    position: absolute;
+    top: 0.1875em;
+    left: 0.375em;
+    width: 1.625em;
+  }
 }

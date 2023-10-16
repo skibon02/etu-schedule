@@ -9,7 +9,7 @@ $BORDER-COLOR: #fff;
 }
 
 .header {
-  font-size: 0.85em;
+  font-size: 0.85 em;
   position: fixed;
   overflow: hidden;
   top: 0;
@@ -31,7 +31,11 @@ $BORDER-COLOR: #fff;
   }
 
   &__week-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     user-select: none;
+    height: 100%;
     width: pxToEm(220px, );
     line-height: 1.9em;
     text-align: center;
@@ -136,9 +140,10 @@ $BORDER-COLOR: #fff;
 @media screen and (max-width: 500px) {
   .header {
     font-size: 0.7em;
-  }
-  .nav {
-    &__item {
+    &__week-buttons {
+      height: pxToEm(70px);
+    }
+    &__week-button {
       &:first-child {
         border-left: none;
       }
@@ -147,8 +152,9 @@ $BORDER-COLOR: #fff;
       }
     }
   }
-  .header {
-    &__week-button {
+  .nav {
+    height: pxToEm(70px);
+    &__item {
       &:first-child {
         border-left: none;
       }

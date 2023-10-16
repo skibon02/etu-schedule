@@ -4,8 +4,6 @@ import CLOCK from './../../icons/icons8-clock.svg'
 import GPS from './../../icons/location-pin-svgrepo-com.svg'
 import GPSLIGHT from './../../icons/gpslite.svg'
 import makeSchedule from '../functions/parseSchedule';
-// import scheduleObjects2 from '../functions/schedule';
-import scheduleObjects2 from '../functions/mySchedule';
 import knowTime from '../functions/handleTime';
 import { makeUsableSchedule, isEvenWeek } from '../functions/parseSchedule';
 import { makeClockTime, makeCalendarTime } from '../functions/handleTime';
@@ -163,59 +161,31 @@ export function Schedule() {
   );
 }
 
-export function DevSchedule() {
-  const [date, setDate] = useState(new Date());
-  const [active, setActive] = useState('schedule');
-
-  return (
-    <>
-    <div className='container'>
-      <div className='under-header-box'></div>
-        <Header 
-          date={date} 
-          setDate={setDate} 
-          active={active} 
-          setActive={setActive}
-          setGroup={() => null}
-          setGroupSchedule={() => null}
-        />
-        {active === 'schedule' && 
-          <Week 
-            weekSchedule={makeSchedule(scheduleObjects2, date)} 
-            groupNumber={'0303'}
-            date={date} />
-        }
-        {active === 'planning' && <div>123</div>}
-    </div>
-    </>
-  );
-}
-
 function Week({weekSchedule, groupNumber, date}) {
-  const [clock, setClock] = useState(formatTime(new Date()));
+  // const [clock, setClock] = useState(formatTime(new Date()));
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setClock(formatTime(new Date()));
-    }, 1000);
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     setClock(formatTime(new Date()));
+  //   }, 1000);
 
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
+  //   return () => {
+  //     clearInterval(intervalId);
+  //   };
+  // }, []);
   
-  function formatTime(date) {
-    const calendarDate = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0');
-    return [`${calendarDate}`, `${hours}:${minutes}:${seconds}`];
-  }
+  // function formatTime(date) {
+  //   const calendarDate = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+  //   const hours = date.getHours().toString().padStart(2, '0');
+  //   const minutes = date.getMinutes().toString().padStart(2, '0');
+  //   const seconds = date.getSeconds().toString().padStart(2, '0');
+  //   return [`${calendarDate}`, `${hours}:${minutes}:${seconds}`];
+  // }
 
   let week = [];
   for (let i = 0; i < weekSchedule.length; i++) {
     if (weekSchedule[i][0] !== null) {
-      week.push(<Day key={i} daySchedule={weekSchedule[i]}/>)
+      week.push(<Day key={i} daySchedule={weekSchedule[i]}  />)
     } else {
       week.push(
         <div key={i} className="day">
@@ -236,11 +206,11 @@ function Week({weekSchedule, groupNumber, date}) {
 
   return (
     <div className="schedule">
-      <div className='schedule__info schedule-info'>
+      {/* <div className='schedule__info schedule-info'>
         <div className='schedule-info__group schedule-info__item'>Группа: {groupNumber}</div>
         <div className='schedule-info__date schedule-info__item'>Дата: {clock[0]}. Время: {clock[1]}</div>
         <div className='schedule-info__week-parity schedule-info__item'>Неделя: {isEvenWeek(date)}</div>
-      </div>
+      </div> */}
       {week}
     </div>
     )

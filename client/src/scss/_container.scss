@@ -16,11 +16,11 @@ body {
 }
 
 .under-header-box {
-  height: pxToEm(45px);
+  height: pxToEm(50px);
 }
 
 @media screen and (max-width: 500px) {
   .under-header-box {
-    height: pxToEm(33px);
+    height: pxToEm(60px);
   }
 }

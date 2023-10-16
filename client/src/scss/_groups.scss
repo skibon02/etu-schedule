@@ -19,7 +19,7 @@ $BORDER-COLOR: #828282;
   }
 
   &__items {
-    padding-top: pxToEm(34px);
+    padding-top: pxToEm(25px);
   }
 
   &__item {
@@ -38,16 +38,41 @@ $BORDER-COLOR: #828282;
 .groups-input {
   position: relative;
   border-bottom: 2px solid $BORDER-COLOR;
+  font-size: 0.8em;
 
   &__input {
     padding: pxToEm(5px);
     width: 100%;
+    font-size: 1.2em;
   }
 
   &__icon {
     position: absolute;
     top: pxToEm(3.5px);
-    left: pxToEm(5px);
+    left: pxToEm(7px);
     width: pxToEm(25px);
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .groups {
+    font-size: 1.7em;
+  }.groups-input {
+    position: relative;
+    border-bottom: 2px solid $BORDER-COLOR;
+    font-size: 0.8em;
+  
+    &__input {
+      font-size: 1.1em;
+      padding: pxToEm(3px) pxToEm(5px);
+      width: 100%;
+    }
+  
+    &__icon {
+      position: absolute;
+      top: pxToEm(3px);
+      left: pxToEm(6px);
+      width: pxToEm(26px);
+    }
   }
 }
