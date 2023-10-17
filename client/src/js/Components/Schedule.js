@@ -25,102 +25,131 @@ const DAYS = ["Воскресенье", 'Понедельник', 'Вторни�
 const SERVER_HOST = currentHost;
 
 export function Schedule() {
-  const [date, setDate] = useState(new Date());
-  const [group, setGroup] = useState(null);
-  const [groupSchedule, setGroupSchedule] = useState(null);
-  const [active, setActive] = useState('groups');
-  const [groupList, setGroupList] = useState(null);
-  const [groupListError, setGroupListError] = useState(null);
-  const [groupNumber, setGroupNumber] = useState(null);
-  let week1;
-  let week2;
+    const [date, setDate] = useState(new Date());
+    const [group, setGroup] = useState(null);
+    const [groupSchedule, setGroupSchedule] = useState(null);
+    const [active, setActive] = useState('groups');
+    const [groupList, setGroupList] = useState(null);
+    const [groupListError, setGroupListError] = useState(null);
+    const [groupNumber, setGroupNumber] = useState(null);
+    let week1;
+    let week2;
 
-  useEffect(() => {
-    async function getGroups() {
-      try {
-        let response = await myfetch('/api/groups');
-        if (!response.ok) {
-          throw new Error(`Failed to myfetch: ${response.status} ${response.statusText}`);
+    const [authData, setAuthData] = useState(null);
+    useEffect(() => {
+        async function getGroups() {
+            try {
+                let response = await myfetch('/api/groups');
+                if (!response.ok) {
+                    throw new Error(`Failed to myfetch: ${response.status} ${response.statusText}`);
+                }
+                let data = await response.json();
+
+                let groups = [];
+                for (let k of Object.keys(data)) {
+                    groups.push({
+                        ...data[k],
+                        id: k
+                    });
+                }
+
+                setGroupList(groups);
+            } catch (error) {
+                setGroupListError(error.message);
+            }
         }
-        let data = await response.json();
-  
-        let groups = [];
-        for (let k of Object.keys(data)) {
-          groups.push({
-            ...data[k],
-            id: k
-          });
-        }
-  
-        setGroupList(groups);
-      } catch (error) {
-        setGroupListError(error.message);
-      }
-    }
-  
-    getGroups();
-  }, []);
-  
 
-  useEffect(() => {
-    if (group) {
-      async function getGroupSchedule() {
-        console.log(`/api/scheduleObjs/group/${group}`);
-        let response = await myfetch(`/api/scheduleObjs/group/${group}`);
-        let data = await response.json();
-        console.log('Успешный фетч на шедул');
-        console.log(data);
-    
-        setGroupSchedule(data);
-      }
+        getGroups();
+    }, []);
 
-      getGroupSchedule();
-    }
-
-  }, [group])
-
- const [oneTapButton, setOneTapButton] = useState(Connect.buttonOneTapAuth({
-  // Обязательный параметр в который нужно добавить обработчик событий приходящих из SDK
-  callback: function(e) {
-    const type = e.type;
-
-    if (!type) {
-      return false;
-    }
-
-    switch (type) {
-      case ConnectEvents.OneTapAuthEventsSDK.LOGIN_SUCCESS: // = 'VKSDKOneTapAuthLoginSuccess'
-        alert('мегахорош, ты вошел в вк, ' + e.payload.user.first_name + " " + e.payload.user.last_name + " с вк айди " + e.payload.user.id)
-        console.log(e);
-        return false
-
-      // Для этих событий нужно открыть полноценный VK ID чтобы
-      // пользователь дорегистрировался или подтвердил телефон
-      case ConnectEvents.OneTapAuthEventsSDK.FULL_AUTH_NEEDED: //  = 'VKSDKOneTapAuthFullAuthNeeded'
-      case ConnectEvents.OneTapAuthEventsSDK.PHONE_VALIDATION_NEEDED: // = 'VKSDKOneTapAuthPhoneValidationNeeded'
-      case ConnectEvents.ButtonOneTapAuthEventsSDK.SHOW_LOGIN: // = 'VKSDKButtonOneTapAuthShowLogin'
-        return Connect.redirectAuth({ url: SERVER_HOST+'/api/authorize', state: 'nothing'}); // url - строка с url, на который будет произведён редирект после авторизации.
-        // state - состояние вашего приложение или любая произвольная строка, которая будет добавлена к url после авторизации.
-      // Пользователь перешел по кнопке "Войти другим способом"
-      case ConnectEvents.ButtonOneTapAuthEventsSDK.SHOW_LOGIN_OPTIONS: // = 'VKSDKButtonOneTapAuthShowLoginOptions'
-        // Параметр url: ссылка для перехода после авторизации. Должен иметь https схему. Обязательный параметр.
-        return Connect.redirectAuth({ url: SERVER_HOST+'/api/authorize' });
-    }
-
-    return false;
-  },
-  // Не обязательный параметр с настройками отображения OneTap
-  options: {
-    showAlternativeLogin: false, // Отображение кнопки "Войти другим способом"
-    displayMode: 'name_phone', // Режим отображения кнопки 'default' | 'name_phone' | 'phone_name'
-    buttonStyles: {
-      borderRadius: 8, // Радиус скругления кнопок
-    },
-  },
-}));
 
     useEffect(() => {
-        document.body.appendChild(oneTapButton.getFrame())
+        if (group) {
+            async function getGroupSchedule() {
+                console.log(`/api/scheduleObjs/group/${group}`);
+                let response = await myfetch(`/api/scheduleObjs/group/${group}`);
+                let data = await response.json();
+                console.log('Успешный фетч на шедул');
+                console.log(data);
+
+                setGroupSchedule(data);
+            }
+
+            getGroupSchedule();
+        }
+
+    }, [group])
+
+
+    useEffect(() => {
+        const vkAuthRedirectURL = '/api/authorize';
+        if (authData) {
+            myfetch(vkAuthRedirectURL, {
+                credentials: 'include',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify({
+                    silent_token: authData.token,
+                    uuid: authData.uuid,
+                })
+            });
+        }
+    },[authData])
+
+    useEffect(() => {
+        const vkAuthRedirectURL = SERVER_HOST+'/api/auth/redirect';
+        const vkOneTapButton = Connect.buttonOneTapAuth({
+            // Обязательный параметр в который нужно добавить обработчик событий приходящих из SDK
+            callback: function(e) {
+                const type = e.type;
+
+                if (!type) {
+                    return false;
+                }
+
+                switch (type) {
+                    case ConnectEvents.OneTapAuthEventsSDK.LOGIN_SUCCESS: // = 'VKSDKOneTapAuthLoginSuccess'
+                        // Пользователь успешно авторизовался
+
+                        console.log('мегахорош, ты вошел через вк, ' + e.payload.user.first_name + " " + e.payload.user.last_name + " с вк айди " + e.payload.user.id)
+                        console.log('> by Github Copilot: небойся ошибок, они не страшны')
+                        
+                        // redirect
+                        setAuthData(e.payload)
+                        return false
+
+                        // Для этих событий нужно открыть полноценный VK ID чтобы
+                        // пользователь дорегистрировался или подтвердил телефон
+                    case ConnectEvents.OneTapAuthEventsSDK.FULL_AUTH_NEEDED: //  = 'VKSDKOneTapAuthFullAuthNeeded'
+                    case ConnectEvents.OneTapAuthEventsSDK.PHONE_VALIDATION_NEEDED: // = 'VKSDKOneTapAuthPhoneValidationNeeded'
+                    case ConnectEvents.ButtonOneTapAuthEventsSDK.SHOW_LOGIN: // = 'VKSDKButtonOneTapAuthShowLogin'
+                        return Connect.redirectAuth({ url: vkAuthRedirectURL, state: 'from_vk_page'}); // url - строка с url, на который будет произведён редирект после авторизации.
+                            // state - состояние вашего приложение или любая произвольная строка, которая будет добавлена к url после авторизации.
+                            // Пользователь перешел по кнопке "Войти другим способом"
+                    case ConnectEvents.ButtonOneTapAuthEventsSDK.SHOW_LOGIN_OPTIONS: // = 'VKSDKButtonOneTapAuthShowLoginOptions'
+                        // Параметр url: ссылка для перехода после авторизации. Должен иметь https схему. Обязательный параметр.
+                            return Connect.redirectAuth({ url: vkAuthRedirectURL });
+                }
+
+                return false;
+            },
+            // Не обязательный параметр с настройками отображения OneTap
+            options: {
+                showAlternativeLogin: true, // Отображение кнопки "Войти другим способом"
+                displayMode: 'name_phone', // Режим отображения кнопки 'default' | 'name_phone' | 'phone_name'
+                buttonStyles: {
+                    borderRadius: 8, // Радиус скругления кнопок
+                },
+            },
+        });
+
+        document.body.appendChild(vkOneTapButton.getFrame())
+
+        return () => {
+            document.body.removeChild(vkOneTapButton.getFrame())
+        }
     }, []);
  
   return (
