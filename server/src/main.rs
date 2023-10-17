@@ -1,19 +1,17 @@
-use std::{env, fs};
+use std::sync::{OnceLock, Arc};
+use std::{fs, env};
 
-use rocket::serde::json::Value;
-use rocket::{Rocket, Build, futures};
+use rocket::{Rocket, Build, futures, Config};
 use rocket::fairing::{self, AdHoc};
-use rocket::serde::{Serialize, Deserialize, json::Json};
 
 use rocket_db_pools::{sqlx, Database, Connection};
 
-use futures::{stream::TryStreamExt, future::TryFutureExt};
-
 use rocket::fs::FileServer;
-use rocket::response::{content, Redirect};
 
 pub mod etu_api;
+pub mod vk_api;
 
+pub mod routes;
 
 #[macro_use]
 extern crate rocket;
@@ -24,40 +22,12 @@ struct Db(sqlx::SqlitePool);
 
 type Result<T, E = rocket::response::Debug<sqlx::Error>> = std::result::Result<T, E>;
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
-#[serde(crate = "rocket::serde")]
-struct Post {
-    #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
-    id: Option<i64>,
-    title: String,
-    text: String,
-}
-
-use rocket::http::{Status, Cookie, CookieJar};
+use rocket::http::Status;
 use rocket::response::Responder;
 
 #[options("/<path..>")]
 fn options_handler<'r>(path: Option<std::path::PathBuf>) -> impl Responder<'r, 'static> {
     Status::Ok
-}
-
-#[get("/scheduleObjs/group/<group>")]
-async fn get_group_schedule_objects(group: usize) -> Json<Value> {
-    let json = etu_api::get_schedule_objs_group(group).await;
-    let return_json = json[0]["scheduleObjects"].clone();
-    Json(return_json)
-}
-
-#[get("/groups")]
-async fn get_groups() -> Json<Value> {
-    let json = etu_api::get_groups_list().await;
-    json
-}
-
-#[get("/authorize")]
-async fn authorize(cookie: &CookieJar<'_>) -> Redirect {
-    cookie.add_private(Cookie::new("token", "123"));
-    Redirect::to("/")
 }
 
 async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
@@ -89,24 +59,70 @@ impl Fairing for CORS {
     }
 
     async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
-        response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
-        response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, OPTIONS"));
-        response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
-        response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
+        let request_origin = _request.headers().get_one("Origin");
+
+        println!("request_origin: {:?}", request_origin);
+
+        if request_origin.is_none() {
+            return;
+        }
+
+        let allowed_origins = ["https://localhost", "https://212.118.37.143"];
+
+        allowed_origins.iter().map(|origin| {
+            response.set_header(Header::new("Access-Control-Allow-Origin", origin.clone()));
+            response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, OPTIONS"));
+            response.set_header(Header::new("Access-Control-Allow-Headers", "Content-Type"));
+            response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
+            Some(origin)
+        }).next();
     }
 }
 
 use rand::Rng;
+use vk_api::VK_SERVICE_TOKEN;
+
+#[derive(Debug, Clone)]
+enum FrontendPort {
+    Same,
+    Https,
+    Custom(u16),
+}
+
+static FRONTEND_PORT: OnceLock<FrontendPort> = OnceLock::new();
 
 #[launch]
 async fn rocket() -> _ {
-
-
     let args: Vec<String> = env::args().collect();
+    let mut figment = rocket::Config::figment();
+
+    let rocket_config: Config = figment.extract().unwrap();
+
+    let isProductionBuild = rocket_config.profile.is_custom() && rocket_config.profile == "prod";
+    if isProductionBuild {
+        // running profile prod
+        FRONTEND_PORT.set(FrontendPort::Same).unwrap();
+    }
+    else {
+        // dev server, port is different
+        FRONTEND_PORT.set(FrontendPort::Https).unwrap();
+    }
+
+    // check vk service key
+    match fs::read_to_string("vk_service_token.txt") {
+        Ok(key) => {
+            debug!(" > VK: service key found");
+            VK_SERVICE_TOKEN.set(Arc::try_from(key).unwrap()).unwrap();
+        }
+        Err(_) => {
+            error!("No vk service key found! Create vk_service_token.txt file with service key inside");
+            std::process::exit(1);
+        }
+    }
 
     match fs::read_to_string("secret_key.txt") {
         Ok(key) => {
-            env::set_var("ROCKET_SECRET_KEY", key);
+            figment = figment.merge(("secret_key", key));
         }
         Err(_) => {
             println!("No secret key found, generating one");
@@ -122,14 +138,17 @@ async fn rocket() -> _ {
             .unwrap()
             .unwrap();
             fs::write("secret_key.txt", &key).unwrap();
-            env::set_var("ROCKET_SECRET_KEY", key);
+            figment = figment.merge(("secret_key", key));
         }
     }
 
     let with_client = args.contains(&"--with-client".to_string());
-    let rocket = rocket::build()
-        .attach(stage())
-        .attach(CORS);
+    let mut rocket = rocket::custom(figment)
+        .attach(stage());
+
+    if !isProductionBuild {
+        rocket = rocket.attach(CORS);
+    }
 
     if with_client {
         rocket.mount("/", FileServer::from("../client/build"))
@@ -143,9 +162,11 @@ async fn rocket() -> _ {
 
 pub fn stage() -> AdHoc {
     AdHoc::on_ignite("SQLx Stage", |rocket| async {
+
+        let mut routes = routes::get_api_routes();
+        routes.append(&mut routes![options_handler]);
         rocket.attach(Db::init())
             .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
-            .mount("/api", routes![ get_group_schedule_objects,get_groups, authorize,
-            options_handler])
+            .mount("/api", routes)
     })
 }
