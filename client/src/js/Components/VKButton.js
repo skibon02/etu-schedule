@@ -48,7 +48,6 @@ export default function VkButton() {
                 switch (type) {
                     case ConnectEvents.OneTapAuthEventsSDK.LOGIN_SUCCESS: // = 'VKSDKOneTapAuthLoginSuccess'
                         // Пользователь успешно авторизовался
-
                         console.log('мегахорош, ты вошел через вк, ' + e.payload.user.first_name + " " + e.payload.user.last_name + " с вк айди " + e.payload.user.id)
                         console.log('> by Github Copilot: небойся ошибок, они не страшны')
 
@@ -73,7 +72,7 @@ export default function VkButton() {
             },
             // Не обязательный параметр с настройками отображения OneTap
             options: {
-                showAlternativeLogin: true, // Отображение кнопки "Войти другим способом"
+                showAlternativeLogin: false, // Отображение кнопки "Войти другим способом"
                 displayMode: 'name_phone', // Режим отображения кнопки 'default' | 'name_phone' | 'phone_name'
                 buttonStyles: {
                     borderRadius: 8, // Радиус скругления кнопок
