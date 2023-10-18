@@ -1,4 +1,5 @@
 $BORDER-COLOR: #fff;
+$HALF-HEIGHT: 70px;
 
 .header-hover {
   cursor: pointer;
@@ -9,8 +10,10 @@ $BORDER-COLOR: #fff;
 }
 
 .header {
-  font-size: 0.85 em;
+  font-size: 0.75em;
+  font-weight: 700;
   position: fixed;
+  flex-direction: column;
   overflow: hidden;
   top: 0;
   width: 100%;
@@ -19,6 +22,7 @@ $BORDER-COLOR: #fff;
   border-bottom: .1px solid $BORDER-COLOR;
   text-transform: uppercase;
   color: #fff;
+  display: flex;
 
   &__nav {
   }
@@ -27,13 +31,14 @@ $BORDER-COLOR: #fff;
     position: relative;
     display: flex;
     justify-content: center;
-    height: pxToEm(50px);
+    height: pxToEm($HALF-HEIGHT);
   }
 
   &__week-button {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
     user-select: none;
     height: 100%;
     width: pxToEm(220px, );
@@ -72,19 +77,19 @@ $BORDER-COLOR: #fff;
   display: flex;
   justify-content: center;
   border-bottom: .1px solid $BORDER-COLOR;
-  height: pxToEm(50px);
+  height: pxToEm($HALF-HEIGHT);
   
   &__item {
-    width: pxToEm(220px);
+    width: pxToEm(165px);
     border-right: .1px solid $BORDER-COLOR;
-    padding: pxToEm(10px) 0;
     transition: all .3s ease;
     cursor: pointer;
     user-select: none;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: pxToEm(15px);
+    flex-direction: column;
+    // gap: pxToEm(5px);
 
     &:first-child {
       border-left: .1px solid $BORDER-COLOR;
@@ -95,7 +100,8 @@ $BORDER-COLOR: #fff;
         box-shadow: none;
       }
     }
-
+    & p {
+    }
   }
 
   &__text {
@@ -140,10 +146,16 @@ $BORDER-COLOR: #fff;
 @media screen and (max-width: 500px) {
   .header {
     font-size: 0.7em;
+    top: auto;
+    bottom: 0;
+    border-bottom: none;
+    border-top: .1px solid $BORDER-COLOR;
+
     &__week-buttons {
       height: pxToEm(70px);
     }
     &__week-button {
+      order: 1;
       &:first-child {
         border-left: none;
       }
@@ -153,6 +165,8 @@ $BORDER-COLOR: #fff;
     }
   }
   .nav {
+    border-top: .1px solid $BORDER-COLOR;
+    order: 2;
     height: pxToEm(70px);
     &__item {
       &:first-child {

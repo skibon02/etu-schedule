@@ -19,8 +19,26 @@ body {
   height: pxToEm(50px);
 }
 
+.under-header-box-mobile {
+  height: pxToEm(0px);
+}
+
+@media screen and (max-width: 700px) {
+  .container {
+    font-size: 14px;
+  }
+}
+
+
 @media screen and (max-width: 500px) {
+  .container {
+    font-size: 12px;
+    user-select: none;
+  }
   .under-header-box {
-    height: pxToEm(60px);
+    height: pxToEm(15px);
+  }
+  .under-header-box-mobile {
+    height: pxToEm(80px);
   }
 }

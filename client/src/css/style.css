@@ -175,9 +175,28 @@ body {
   height: 3.125em;
 }
 
+.under-header-box-mobile {
+  height: 0em;
+}
+
+@media screen and (max-width: 700px) {
+  .container {
+    font-size: 14px;
+  }
+}
 @media screen and (max-width: 500px) {
+  .container {
+    font-size: 12px;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+  }
   .under-header-box {
-    height: 3.75em;
+    height: 0.9375em;
+  }
+  .under-header-box-mobile {
+    height: 5em;
   }
 }
 .header-hover {
@@ -189,8 +208,13 @@ body {
 }
 
 .header {
-  font-size: 0.85 em;
+  font-size: 0.75em;
+  font-weight: 700;
   position: fixed;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
   overflow: hidden;
   top: 0;
   width: 100%;
@@ -199,6 +223,9 @@ body {
   border-bottom: 0.1px solid #fff;
   text-transform: uppercase;
   color: #fff;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
 }
 .header__week-buttons {
   position: relative;
@@ -208,7 +235,7 @@ body {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
-  height: 3.125em;
+  height: 4.375em;
 }
 .header__week-button {
   display: -webkit-box;
@@ -220,6 +247,10 @@ body {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
@@ -257,12 +288,11 @@ body {
       -ms-flex-pack: center;
           justify-content: center;
   border-bottom: 0.1px solid #fff;
-  height: 3.125em;
+  height: 4.375em;
 }
 .nav__item {
-  width: 13.75em;
+  width: 10.3125em;
   border-right: 0.1px solid #fff;
-  padding: 0.625em 0;
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
   cursor: pointer;
@@ -279,7 +309,10 @@ body {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
-  gap: 0.9375em;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
 }
 .nav__item:first-child {
   border-left: 0.1px solid #fff;
@@ -332,9 +365,18 @@ body {
 @media screen and (max-width: 500px) {
   .header {
     font-size: 0.7em;
+    top: auto;
+    bottom: 0;
+    border-bottom: none;
+    border-top: 0.1px solid #fff;
   }
   .header__week-buttons {
     height: 4.375em;
+  }
+  .header__week-button {
+    -webkit-box-ordinal-group: 2;
+        -ms-flex-order: 1;
+            order: 1;
   }
   .header__week-button:first-child {
     border-left: none;
@@ -343,6 +385,10 @@ body {
     border-right: none;
   }
   .nav {
+    border-top: 0.1px solid #fff;
+    -webkit-box-ordinal-group: 3;
+        -ms-flex-order: 2;
+            order: 2;
     height: 4.375em;
   }
   .nav__item:first-child {
@@ -734,31 +780,27 @@ body {
   }
 }
 @media screen and (max-width: 700px) {
-  .container {
-    font-size: 14px;
-  }
   .lesson__time {
     width: 3.75em;
   }
 }
 @media screen and (max-width: 500px) {
-  .container {
-    font-size: 12px;
-    -webkit-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
-  }
   .schedule {
     width: 95%;
   }
   .schedule-info-container {
     font-size: 0.95em;
-    padding-top: 3.125em;
+    padding-top: 0em;
     width: 95%;
   }
   .schedule-info {
     font-size: 0.95em;
+  }
+  .attendance__body_red:hover {
+    background: rgba(214, 0, 0, 0.9568627451);
+  }
+  .attendance__body_green:hover {
+    background: #2DB694;
   }
 }
 * {

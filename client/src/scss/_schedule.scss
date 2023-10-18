@@ -356,9 +356,6 @@
 }
 
 @media screen and (max-width: 700px) {
-  .container {
-    font-size: 14px;
-  }
   .lesson {
     &__time {
       width: pxToEm(60px, );
@@ -366,19 +363,29 @@
   }
 }
 @media screen and (max-width: 500px) {
-  .container {
-    font-size: 12px;
-    user-select: none;
-  }
   .schedule {
     width: 95%;
   }
   .schedule-info-container {
     font-size: 0.95em;
-    padding-top: pxToEm(50px);
+    padding-top: pxToEm(0px);
     width: 95%;
   }
   .schedule-info {
     font-size: 0.95em;
+  }
+  .attendance {
+    &__body {
+      &_red {
+        &:hover{
+          background: #d60000f4;
+        }
+      }
+      &_green {
+        &:hover {
+          background: #2DB694;
+        }
+      }
+    }
   }
 }

@@ -1,3 +1,4 @@
+
 import CALENDAR from './../../icons/calendar-pen.svg'
 import NAVCLOCK from './../../icons/clock-for-nav.svg'
 import SEARCH from '../../icons/search-for-nav.svg'
@@ -22,6 +23,10 @@ export default function Header({date, setDate, active, setActive, setGroupSchedu
 
   function handlePlanningClick() {
     setActive('planning');
+  }
+
+  function handleVKClick() {
+    setActive('vk');
   }
 
   function handleGroupsClick() {
@@ -57,6 +62,14 @@ export default function Header({date, setDate, active, setActive, setGroupSchedu
           </div>
           <span className='nav__text'>Группы</span>
         </div>
+        <div 
+          className="nav__item header-hover"
+          onClick={handleVKClick} >
+          <div className='nav__icon-container'>
+            <img className='nav__icon' src={SEARCH} alt="calendar" />
+          </div>
+          <span className='nav__text'>ВК</span>
+        </div>
       </div>
       {active === 'schedule' && <div className="header__week-buttons">
         <div 
@@ -71,11 +84,6 @@ export default function Header({date, setDate, active, setActive, setGroupSchedu
           className='header__week-button header-hover' onClick={handleNextWeek}>
             К следующей неделе
         </div> 
-        {/* <div className="header__time header-time">
-          <span className='header-time__text'>Дата и время:</span>
-          <br />
-          {clock}
-        </div> */}
       </div>}
     </div>
   )

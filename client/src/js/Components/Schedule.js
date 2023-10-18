@@ -9,20 +9,10 @@ import { makeUsableSchedule, isEvenWeek } from '../functions/parseSchedule';
 import { makeClockTime, makeCalendarTime } from '../functions/handleTime';
 import Header from './Header';
 import Groups from './Groups';
+import VKButton from './VKButton';
 
 import myfetch from '../functions/myfetch';
-import { isdev, currentHost } from '../functions/util';
-
-import { Config, Connect, ConnectEvents } from '@vkontakte/superappkit';
-
-// vk id штучка
-Config.init({
-  appId: 51771477, // идентификатор приложения
-});
-
 const DAYS = ["Воскресенье", 'Понедельник', 'Вторник', 'Среда', "Четверг", "Пятница", "Суббота"]
-
-const SERVER_HOST = currentHost;
 
 export function Schedule() {
   const [date, setDate] = useState(new Date());
@@ -32,8 +22,6 @@ export function Schedule() {
   const [groupList, setGroupList] = useState(null);
   const [groupListError, setGroupListError] = useState(null);
   const [groupNumber, setGroupNumber] = useState(null);
-  let week1;
-  let week2;
 
   useEffect(() => {
     async function getGroups() {
@@ -79,49 +67,6 @@ export function Schedule() {
 
   }, [group])
 
- const [oneTapButton, setOneTapButton] = useState(Connect.buttonOneTapAuth({
-  // Обязательный параметр в который нужно добавить обработчик событий приходящих из SDK
-  callback: function(e) {
-    const type = e.type;
-
-    if (!type) {
-      return false;
-    }
-
-    switch (type) {
-      case ConnectEvents.OneTapAuthEventsSDK.LOGIN_SUCCESS: // = 'VKSDKOneTapAuthLoginSuccess'
-        alert('мегахорош, ты вошел в вк, ' + e.payload.user.first_name + " " + e.payload.user.last_name + " с вк айди " + e.payload.user.id)
-        console.log(e);
-        return false
-
-      // Для этих событий нужно открыть полноценный VK ID чтобы
-      // пользователь дорегистрировался или подтвердил телефон
-      case ConnectEvents.OneTapAuthEventsSDK.FULL_AUTH_NEEDED: //  = 'VKSDKOneTapAuthFullAuthNeeded'
-      case ConnectEvents.OneTapAuthEventsSDK.PHONE_VALIDATION_NEEDED: // = 'VKSDKOneTapAuthPhoneValidationNeeded'
-      case ConnectEvents.ButtonOneTapAuthEventsSDK.SHOW_LOGIN: // = 'VKSDKButtonOneTapAuthShowLogin'
-        return Connect.redirectAuth({ url: SERVER_HOST+'/api/authorize', state: 'nothing'}); // url - строка с url, на который будет произведён редирект после авторизации.
-        // state - состояние вашего приложение или любая произвольная строка, которая будет добавлена к url после авторизации.
-      // Пользователь перешел по кнопке "Войти другим способом"
-      case ConnectEvents.ButtonOneTapAuthEventsSDK.SHOW_LOGIN_OPTIONS: // = 'VKSDKButtonOneTapAuthShowLoginOptions'
-        // Параметр url: ссылка для перехода после авторизации. Должен иметь https схему. Обязательный параметр.
-        return Connect.redirectAuth({ url: SERVER_HOST+'/api/authorize' });
-    }
-
-    return false;
-  },
-  // Не обязательный параметр с настройками отображения OneTap
-  options: {
-    showAlternativeLogin: false, // Отображение кнопки "Войти другим способом"
-    displayMode: 'name_phone', // Режим отображения кнопки 'default' | 'name_phone' | 'phone_name'
-    buttonStyles: {
-      borderRadius: 8, // Радиус скругления кнопок
-    },
-  },
-}));
-
-    useEffect(() => {
-        document.body.appendChild(oneTapButton.getFrame())
-    }, []);
  
   return (
     <>
@@ -158,6 +103,8 @@ export function Schedule() {
           </>
         }
         {active === 'planning' && <div>123</div>}
+        {active === 'vk' && <VKButton />}
+        {groupSchedule && <div className='under-header-box-mobile'></div>}
         </>
       }
       
@@ -286,27 +233,7 @@ function Subject({props, i}) {
   const checkTimeAndSetTheme = () => {
     const currentTime = new Date();
     let isLate = false;
-    if (
-      currentTime.getFullYear() > checkInDeadline.getFullYear() ||
-
-      currentTime.getFullYear() === checkInDeadline.getFullYear() &&
-      currentTime.getMonth() > checkInDeadline.getMonth() ||
-
-      (currentTime.getFullYear() === checkInDeadline.getFullYear() &&
-      currentTime.getMonth() === checkInDeadline.getMonth() &&
-      currentTime.getDate() > checkInDeadline.getDate()) ||
-
-      (currentTime.getFullYear() === checkInDeadline.getFullYear() &&
-      currentTime.getMonth() === checkInDeadline.getMonth() &&
-      currentTime.getDate() === checkInDeadline.getDate() &&
-      currentTime.getHours() > checkInDeadline.getHours()) ||
-
-      (currentTime.getFullYear() === checkInDeadline.getFullYear() &&
-      currentTime.getMonth() === checkInDeadline.getMonth() &&
-      currentTime.getDate() === checkInDeadline.getDate() &&
-      currentTime.getHours() === checkInDeadline.getHours() &&
-      currentTime.getMinutes > checkInDeadline.getMinutes)
-    ) {
+    if (currentTime > checkInDeadline) {   
       isLate = true;
     } 
     return isLate;
@@ -322,7 +249,7 @@ function Subject({props, i}) {
     }, 1000 * 60 * 1); // last number - number of minutes
 
     return () => clearInterval(intervalId);
-  }, [props.date.date]);
+  }, [checkInDeadline]);
 
   function handleClockClick() {
     if (!isDead) {
