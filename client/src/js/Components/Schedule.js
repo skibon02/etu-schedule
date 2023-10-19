@@ -5,8 +5,8 @@ import GPS from './../../icons/location-pin-svgrepo-com.svg'
 import GPSLIGHT from './../../icons/gpslite.svg'
 import makeSchedule from '../functions/parseSchedule';
 import knowTime from '../functions/handleTime';
-import { makeUsableSchedule, isEvenWeek } from '../functions/parseSchedule';
-import { makeClockTime, makeCalendarTime } from '../functions/handleTime';
+import { makeUsableSchedule} from '../functions/parseSchedule';
+import { makeClockTime, makeCalendarTime, isEvenWeek  } from '../functions/handleTime';
 import Header from './Header';
 import Groups from './Groups';
 import VKButton from './VKButton';
@@ -47,7 +47,7 @@ export function Schedule() {
     }
   
     getGroups();
-  }, []);
+  }, []); // groupList
   
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export function Schedule() {
         console.log(`/api/scheduleObjs/group/${group}`);
         let response = await myfetch(`/api/scheduleObjs/group/${group}`);
         let data = await response.json();
-        console.log('Успешный фетч на шедул');
+        console.log('successful fetch on Schedule');
         console.log(data);
     
         setGroupSchedule(data);
@@ -65,7 +65,7 @@ export function Schedule() {
       getGroupSchedule();
     }
 
-  }, [group])
+  }, [group]) // groupSchedule
 
  
   return (
@@ -89,6 +89,7 @@ export function Schedule() {
           setActive={setActive}
           setGroupSchedule={setGroupSchedule}
           setGroup={setGroup}
+          weekNumber={makeSchedule(groupSchedule, date)[1]}
         />
         {active === 'schedule' && 
           <>
@@ -99,7 +100,8 @@ export function Schedule() {
           </div>
           <Week 
             key={group.id} 
-            weekSchedule={makeSchedule(groupSchedule, date)} />
+            weekSchedule={makeSchedule(groupSchedule, date)[0]}
+            weekNumber={makeSchedule(groupSchedule, date)[1]} />
           </>
         }
         {active === 'planning' && <div>123</div>}
@@ -138,13 +140,13 @@ function WeekHeader({groupNumber, date}) {
     <div className='schedule__info schedule-info'>
       <div className='schedule-info__group schedule-info__item'>Группа: {groupNumber}</div>
       <div className='schedule-info__date schedule-info__item'>Дата: {clock[0]}. Время: {clock[1]}</div>
-      <div className='schedule-info__week-parity schedule-info__item'>Неделя: {isEvenWeek(date)}</div>
+      <div className='schedule-info__week-parity schedule-info__item'>Неделя: {isEvenWeek(date)[0]}</div>
     </div>
   )
 
 }
 
-function Week({weekSchedule}) {
+function Week({weekSchedule, weekNumber}) {
   let week = [];
   for (let i = 0; i < weekSchedule.length; i++) {
     if (weekSchedule[i][0] !== null) {
@@ -166,9 +168,12 @@ function Week({weekSchedule}) {
       )
     }
   }
+  console.log('Week Number is:');
+  console.log(weekNumber);
 
   return (
     <div className="schedule">
+      {/* <div>week number is {weekNumber}</div> */}
       {week}
     </div>
     )

@@ -1,3 +1,6 @@
+import { isEvenWeek } from "./handleTime";
+
+
 const WEEK_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 export function makeUsableSchedule(scheduleObject) {
@@ -21,6 +24,7 @@ export function makeUsableSchedule(scheduleObject) {
   for (let i = 0; i < titleWords.length; i++) {
     title =  titleWords[i].length > 16 ? shortTitle : title;
   }
+  title = titleWords.length > 6 ? shortTitle : title
 
   let teachers = [];
   let firstTeacherId;
@@ -130,7 +134,7 @@ function sortScheduleByLesson(scheduleObjectI, scheduleObjectJ) {
 }
 
 export default function makeSchedule(scheduleObjects, date) {
-  let parity = isEvenWeek(date);
+  let [parity, weekNumber] = isEvenWeek(date);
   let currentDayOfWeek = WEEK_DAYS[date.getDay()];
 
   const week = parseWeek(scheduleObjects, parity); // -> arr contain arr
@@ -141,23 +145,9 @@ export default function makeSchedule(scheduleObjects, date) {
     weekSchedule.push(parseDays(week, WEEK_DAYS[i], date, currentDayOfWeek));
   }
   
-  return weekSchedule;
+  return [weekSchedule, weekNumber];
 }
 
 
-export function isEvenWeek(date) {
-  const today = new Date(date);
-  const firstWeek = new Date(today.getFullYear(), 7, 27); // (month 0-based index) 28 aug.
-
-  const daysDiff = Math.floor((today - firstWeek) / (24 * 60 * 60 * 1000));
-  const weeksDiff = Math.floor(daysDiff / 7);
-
-
-  if (weeksDiff % 2 === 0) {
-    return '1';
-  } else {
-    return '2'
-  }
-}
 
 

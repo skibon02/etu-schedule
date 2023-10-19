@@ -2,11 +2,14 @@
 import CALENDAR from './../../icons/calendar-pen.svg'
 import NAVCLOCK from './../../icons/clock-for-nav.svg'
 import SEARCH from '../../icons/search-for-nav.svg'
+import VK from '../../icons/vk-for-nav.svg'
 
-export default function Header({date, setDate, active, setActive, setGroupSchedule, setGroup}) {
+export default function Header({date, setDate, active, setActive, setGroupSchedule, setGroup, weekNumber}) {
 
   function handleNextWeek() {
-    setDate(new Date(date.getTime() + 24 * 60 * 60 * 1000 * 7));
+    if (weekNumber < 17) {
+      setDate(new Date(date.getTime() + 24 * 60 * 60 * 1000 * 7));
+    }
   }
 
   function handleCurrentWeek() {
@@ -14,7 +17,9 @@ export default function Header({date, setDate, active, setActive, setGroupSchedu
   }
 
   function handlePrevWeek() {
-    setDate(new Date(date.getTime() - 24 * 60 * 60 * 1000 * 7));
+    if (weekNumber > 0) {
+      setDate(new Date(date.getTime() - 24 * 60 * 60 * 1000 * 7));
+    }
   }
 
   function handleScheduleClick() {
@@ -66,7 +71,7 @@ export default function Header({date, setDate, active, setActive, setGroupSchedu
           className="nav__item header-hover"
           onClick={handleVKClick} >
           <div className='nav__icon-container'>
-            <img className='nav__icon' src={SEARCH} alt="calendar" />
+            <img className='nav__icon nav__shitty-vk' src={VK} alt="calendar" />
           </div>
           <span className='nav__text'>ВК</span>
         </div>

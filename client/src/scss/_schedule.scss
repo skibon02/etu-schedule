@@ -373,9 +373,13 @@
   }
   .schedule-info {
     font-size: 0.95em;
+    margin-top: pxToEm(10px);  
   }
   .attendance {
     &__body {
+      &:hover {
+        box-shadow: 0 0 pxToEm(7px, ) black;
+      }
       &_red {
         &:hover{
           background: #d60000f4;

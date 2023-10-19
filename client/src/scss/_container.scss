@@ -16,7 +16,7 @@ body {
 }
 
 .under-header-box {
-  height: pxToEm(50px);
+  height: pxToEm(70px);
 }
 
 .under-header-box-mobile {
@@ -36,9 +36,9 @@ body {
     user-select: none;
   }
   .under-header-box {
-    height: pxToEm(15px);
+    height: pxToEm(0px);
   }
   .under-header-box-mobile {
-    height: pxToEm(80px);
+    height: pxToEm(100px);
   }
 }

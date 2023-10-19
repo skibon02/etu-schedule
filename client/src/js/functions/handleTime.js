@@ -109,3 +109,18 @@ export function makeCalendarTime(date, days) {
   return `${days[date.getDay()]} ${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`
 }
 
+
+export function isEvenWeek(date) {
+  const today = new Date(date);
+  const firstWeek = new Date(today.getFullYear(), 7, 27); // (month 0-based index) 28 aug.
+
+  const daysDiff = Math.floor((today - firstWeek) / (24 * 60 * 60 * 1000));
+  const weeksDiff = Math.floor(daysDiff / 7);
+
+
+  if (weeksDiff % 2 === 0) {
+    return ['1', weeksDiff];
+  } else {
+    return ['2', weeksDiff];
+  }
+}

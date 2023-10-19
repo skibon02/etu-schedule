@@ -172,7 +172,7 @@ body {
 }
 
 .under-header-box {
-  height: 3.125em;
+  height: 4.375em;
 }
 
 .under-header-box-mobile {
@@ -193,10 +193,10 @@ body {
             user-select: none;
   }
   .under-header-box {
-    height: 0.9375em;
+    height: 0em;
   }
   .under-header-box-mobile {
-    height: 5em;
+    height: 6.25em;
   }
 }
 .header-hover {
@@ -235,7 +235,7 @@ body {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
-  height: 4.375em;
+  height: 4.6875em;
 }
 .header__week-button {
   display: -webkit-box;
@@ -288,7 +288,7 @@ body {
       -ms-flex-pack: center;
           justify-content: center;
   border-bottom: 0.1px solid #fff;
-  height: 4.375em;
+  height: 4.6875em;
 }
 .nav__item {
   width: 10.3125em;
@@ -348,6 +348,10 @@ body {
   width: 1.875em;
 }
 
+.nav__shitty-vk {
+  margin-left: -0.125em;
+}
+
 @media screen and (max-width: 800px) {
   .header-hover {
     -webkit-transition: all 0 ease !important;
@@ -371,7 +375,7 @@ body {
     border-top: 0.1px solid #fff;
   }
   .header__week-buttons {
-    height: 4.375em;
+    height: 5em;
   }
   .header__week-button {
     -webkit-box-ordinal-group: 2;
@@ -386,10 +390,11 @@ body {
   }
   .nav {
     border-top: 0.1px solid #fff;
+    border-bottom: none;
     -webkit-box-ordinal-group: 3;
         -ms-flex-order: 2;
             order: 2;
-    height: 4.375em;
+    height: 5em;
   }
   .nav__item:first-child {
     border-left: none;
@@ -795,6 +800,11 @@ body {
   }
   .schedule-info {
     font-size: 0.95em;
+    margin-top: 0.625em;
+  }
+  .attendance__body:hover {
+    -webkit-box-shadow: 0 0 0.4375em black;
+            box-shadow: 0 0 0.4375em black;
   }
   .attendance__body_red:hover {
     background: rgba(214, 0, 0, 0.9568627451);
