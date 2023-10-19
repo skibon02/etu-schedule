@@ -20,10 +20,39 @@ extern crate rocket;
 #[database("sqlx")]
 struct Db(sqlx::SqlitePool);
 
-type Result<T, E = rocket::response::Debug<sqlx::Error>> = std::result::Result<T, E>;
 
 use rocket::http::Status;
 use rocket::response::Responder;
+
+use chrono::Local;
+use colored::*;
+
+fn loglevel_formatter(level: &log::Level) -> ColoredString {
+    match level {
+        log::Level::Error => level.to_string().bright_white().on_red().bold(),
+        log::Level::Warn => level.to_string().yellow().bold(),
+        log::Level::Info => level.to_string().green(),
+        log::Level::Debug => level.to_string().blue(),
+        log::Level::Trace => level.to_string().dimmed(),
+    }
+}
+
+fn setup_logger() -> Result<(), fern::InitError> {
+    fern::Dispatch::new()
+        .format(|out, message, record| {
+            out.finish(format_args!(
+                "[{} {}] {}",
+                Local::now().format("%Y-%m-%d %H:%M:%S").to_string().bright_purple(),
+                loglevel_formatter(&record.level()),
+                message
+            ))
+        })
+        .level(log::LevelFilter::Trace)
+        .chain(std::io::stdout())
+        .chain(fern::log_file("output.log")?)
+        .apply()?;
+    Ok(())
+}
 
 #[options("/<path..>")]
 fn options_handler<'r>(path: Option<std::path::PathBuf>) -> impl Responder<'r, 'static> {
@@ -61,7 +90,7 @@ impl Fairing for CORS {
     async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
         let request_origin = _request.headers().get_one("Origin");
 
-        println!("request_origin: {:?}", request_origin);
+        debug!(" > CORS: request_origin: {:?}", request_origin);
 
         if request_origin.is_none() {
             return;
@@ -93,19 +122,30 @@ static FRONTEND_PORT: OnceLock<FrontendPort> = OnceLock::new();
 
 #[launch]
 async fn rocket() -> _ {
+    setup_logger().unwrap();
     let args: Vec<String> = env::args().collect();
     let mut figment = rocket::Config::figment();
 
     let rocket_config: Config = figment.extract().unwrap();
+    trace!("trace test");
+    debug!("debug test");
+    info!("info test");
+    warn!("warn test");
+    error!("error test");
 
+    info!("ROCKET CONFIG:");
+    info!("> is custom profile: {}", rocket_config.profile.is_custom());
+    info!("> profile: {}", rocket_config.profile);
     let isProductionBuild = rocket_config.profile.is_custom() && rocket_config.profile == "prod";
     if isProductionBuild {
         // running profile prod
         FRONTEND_PORT.set(FrontendPort::Same).unwrap();
+        info!(" > running profile prod");
     }
     else {
         // dev server, port is different
         FRONTEND_PORT.set(FrontendPort::Https).unwrap();
+        info!(" > running profile dev");
     }
 
     // check vk service key
@@ -122,10 +162,11 @@ async fn rocket() -> _ {
 
     match fs::read_to_string("secret_key.txt") {
         Ok(key) => {
+            debug!(" > Secret key found");
             figment = figment.merge(("secret_key", key));
         }
         Err(_) => {
-            println!("No secret key found, generating one");
+            warn!("No secret key found, generating one");
             let key = rocket::tokio::time::timeout(
                 std::time::Duration::from_secs(5),
                 rocket::tokio::task::spawn_blocking(|| {
@@ -143,6 +184,7 @@ async fn rocket() -> _ {
     }
 
     let with_client = args.contains(&"--with-client".to_string());
+    info!(" > with client: {}", with_client);
     let mut rocket = rocket::custom(figment)
         .attach(stage());
 

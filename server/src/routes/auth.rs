@@ -17,7 +17,7 @@ fn deauth(cookie: &CookieJar) -> Status {
 fn check_auth(cookie: &CookieJar) -> String {
     match cookie.get_private("token") {
         Some(token) => {
-            println!("user's token is: {}", token);
+            println!(" > AUTH: user's token is: {}", token);
             "true".to_string()
         }
         None => "false".to_string(),
@@ -62,7 +62,6 @@ async fn auth_redirect (cookie: &CookieJar<'_>, host: &Host<'_>, payload: Json<A
             Redirect::to(format!("https://{}", host))
         }
         FrontendPort::Https => {
-            println!("https");
             Redirect::to(format!("https://{}:443", host.domain()))
         }
         FrontendPort::Custom(port) => {
@@ -80,8 +79,8 @@ struct AuthParams {
 
 #[post("/authorize", data="<auth_params>")]
 async fn authorize(cookie: &CookieJar<'_>, auth_params: Json<AuthParams>) -> Status {
-    println!("silent_token: {:?}", auth_params.silent_token);
-    println!("uuid: {:?}", auth_params.uuid);
+    debug!(" > AUTH: silent_token: {:?}", auth_params.silent_token);
+    debug!(" > AUTH: uuid: {:?}", auth_params.uuid);
 
     process_auth(cookie, &auth_params.silent_token, &auth_params.uuid).await;
 
@@ -91,9 +90,9 @@ async fn authorize(cookie: &CookieJar<'_>, auth_params: Json<AuthParams>) -> Sta
 
 async fn process_auth(cookie: &CookieJar<'_>,token: &str, uuid: &str) {
     let auth_info = crate::vk_api::exchange_access_token(token, uuid).await;
-    println!("access_token: {}", auth_info.0);
+    debug!("access_token: {}", auth_info.0);
 
-    println!("adding token to cookie...");
+    debug!("adding token to cookie...");
     cookie.add_private(Cookie::new("token", auth_info.1));
 }
 

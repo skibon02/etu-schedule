@@ -7,6 +7,11 @@ edition = "2021"
 
 [dependencies]
 base64 = "0.21.4"
+chrono = "0.4.31"
+colored = "2.0.4"
+fern = "0.6.2"
+lazy_static = "1.4.0"
+log = "0.4.20"
 rand = "0.8.5"
 reqwest = { version = "0.11.22", features = ["json"] }
 rocket = { version = "=0.5.0-rc.3", features = ["json", "tls", "secrets"] }

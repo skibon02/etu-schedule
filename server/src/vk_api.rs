@@ -22,7 +22,7 @@ async fn get_user_info(access_token: &str) -> String {
         .unwrap();
 
     let json: Value = response.json().await.unwrap();
-    println!("get_user_info response: {:?}", json);
+    debug!("> VK: get_user_info response: {:?}", json);
     let user_id = json["response"][0]["id"].as_u64().unwrap();
     user_id.to_string()
 }
@@ -43,7 +43,7 @@ pub async fn exchange_access_token(silent_token: &str, uuid: &str) -> (String, S
 
 
     let json: Value = response.json().await.unwrap();
-    println!("exchange_access_token response: {:?}", json);
+    debug!(" > VK: exchange_access_token response: {:?}", json);
     let access_token = json["response"]["access_token"].as_str().unwrap();
 
     let user_id = get_user_info(access_token).await;
