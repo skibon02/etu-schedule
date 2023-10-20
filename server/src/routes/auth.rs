@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use rocket::{Route, http::{CookieJar, uri::Host, Status, Cookie}, response::Redirect, form::{Form, Strict}, serde::json::Json};
 use serde_derive::Deserialize;
 
-use crate::{FRONTEND_PORT, FrontendPort};
+use crate::{FRONTEND_PORT, FrontendPort, models::users};
 
 
 #[post("/auth/deauth")]
@@ -17,7 +17,7 @@ fn deauth(cookie: &CookieJar) -> Status {
 fn check_auth(cookie: &CookieJar) -> String {
     match cookie.get_private("token") {
         Some(token) => {
-            println!(" > AUTH: user's token is: {}", token);
+            println!("> AUTH: user's token is: {}", token);
             "true".to_string()
         }
         None => "false".to_string(),
@@ -79,8 +79,8 @@ struct AuthParams {
 
 #[post("/authorize", data="<auth_params>")]
 async fn authorize(cookie: &CookieJar<'_>, auth_params: Json<AuthParams>) -> Status {
-    debug!(" > AUTH: silent_token: {:?}", auth_params.silent_token);
-    debug!(" > AUTH: uuid: {:?}", auth_params.uuid);
+    debug!("> AUTH: silent_token: {:?}", auth_params.silent_token);
+    debug!("> AUTH: uuid: {:?}", auth_params.uuid);
 
     process_auth(cookie, &auth_params.silent_token, &auth_params.uuid).await;
 
@@ -91,6 +91,11 @@ async fn authorize(cookie: &CookieJar<'_>, auth_params: Json<AuthParams>) -> Sta
 async fn process_auth(cookie: &CookieJar<'_>,token: &str, uuid: &str) {
     let auth_info = crate::vk_api::exchange_access_token(token, uuid).await;
     debug!("access_token: {}", auth_info.0);
+
+    if users::create_user(&auth_info.1).await.is_err() {
+        error!("Failed to create user");
+        return;
+    }
 
     debug!("adding token to cookie...");
     cookie.add_private(Cookie::new("token", auth_info.1));

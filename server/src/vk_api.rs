@@ -27,6 +27,7 @@ async fn get_user_info(access_token: &str) -> String {
     user_id.to_string()
 }
 
+/// Gives access token and user id
 pub async fn exchange_access_token(silent_token: &str, uuid: &str) -> (String, String) {
 
     let response: Response = reqwest::Client::new()
@@ -43,7 +44,7 @@ pub async fn exchange_access_token(silent_token: &str, uuid: &str) -> (String, S
 
 
     let json: Value = response.json().await.unwrap();
-    debug!(" > VK: exchange_access_token response: {:?}", json);
+    debug!("> VK: exchange_access_token response: {:?}", json);
     let access_token = json["response"]["access_token"].as_str().unwrap();
 
     let user_id = get_user_info(access_token).await;

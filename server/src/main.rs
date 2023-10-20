@@ -1,10 +1,9 @@
 use std::sync::{OnceLock, Arc};
 use std::{fs, env};
 
-use rocket::{Rocket, Build, futures, Config};
+use models::Db;
+use rocket::{Rocket, Build, Config};
 use rocket::fairing::{self, AdHoc};
-
-use rocket_db_pools::{sqlx, Database, Connection};
 
 use rocket::fs::FileServer;
 
@@ -13,12 +12,10 @@ pub mod vk_api;
 
 pub mod routes;
 
+pub mod models;
+
 #[macro_use]
 extern crate rocket;
-
-#[derive(Database)]
-#[database("sqlx")]
-struct Db(sqlx::SqlitePool);
 
 
 use rocket::http::Status;
@@ -90,7 +87,7 @@ impl Fairing for CORS {
     async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
         let request_origin = _request.headers().get_one("Origin");
 
-        debug!(" > CORS: request_origin: {:?}", request_origin);
+        debug!("> CORS: request_origin: {:?}", request_origin);
 
         if request_origin.is_none() {
             return;
@@ -109,6 +106,7 @@ impl Fairing for CORS {
 }
 
 use rand::Rng;
+use rocket_db_pools::Database;
 use vk_api::VK_SERVICE_TOKEN;
 
 #[derive(Debug, Clone)]
@@ -127,31 +125,26 @@ async fn rocket() -> _ {
     let mut figment = rocket::Config::figment();
 
     let rocket_config: Config = figment.extract().unwrap();
-    trace!("trace test");
-    debug!("debug test");
-    info!("info test");
-    warn!("warn test");
-    error!("error test");
 
     info!("ROCKET CONFIG:");
     info!("> is custom profile: {}", rocket_config.profile.is_custom());
     info!("> profile: {}", rocket_config.profile);
-    let isProductionBuild = rocket_config.profile.is_custom() && rocket_config.profile == "prod";
-    if isProductionBuild {
+    let is_production_build = rocket_config.profile.is_custom() && rocket_config.profile == "prod";
+    if is_production_build {
         // running profile prod
         FRONTEND_PORT.set(FrontendPort::Same).unwrap();
-        info!(" > running profile prod");
+        info!("> running profile prod");
     }
     else {
         // dev server, port is different
         FRONTEND_PORT.set(FrontendPort::Https).unwrap();
-        info!(" > running profile dev");
+        info!("> running profile dev");
     }
 
     // check vk service key
     match fs::read_to_string("vk_service_token.txt") {
         Ok(key) => {
-            debug!(" > VK: service key found");
+            debug!("> VK: service key found");
             VK_SERVICE_TOKEN.set(Arc::try_from(key).unwrap()).unwrap();
         }
         Err(_) => {
@@ -162,7 +155,7 @@ async fn rocket() -> _ {
 
     match fs::read_to_string("secret_key.txt") {
         Ok(key) => {
-            debug!(" > Secret key found");
+            debug!("> Secret key found");
             figment = figment.merge(("secret_key", key));
         }
         Err(_) => {
@@ -184,11 +177,11 @@ async fn rocket() -> _ {
     }
 
     let with_client = args.contains(&"--with-client".to_string());
-    info!(" > with client: {}", with_client);
+    info!("> with client: {}", with_client);
     let mut rocket = rocket::custom(figment)
         .attach(stage());
 
-    if !isProductionBuild {
+    if !is_production_build {
         rocket = rocket.attach(CORS);
     }
 
