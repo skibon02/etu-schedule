@@ -29,7 +29,6 @@ async fn get_user_info(access_token: &str) -> String {
 
 /// Gives access token and user id
 pub async fn exchange_access_token(silent_token: &str, uuid: &str) -> (String, String) {
-
     let response: Response = reqwest::Client::new()
         .get("https://api.vk.com/method/auth.exchangeSilentAuthToken")
         .query(&[

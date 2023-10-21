@@ -145,7 +145,7 @@ async fn rocket() -> _ {
     match fs::read_to_string("vk_service_token.txt") {
         Ok(key) => {
             debug!("> VK: service key found");
-            VK_SERVICE_TOKEN.set(Arc::try_from(key).unwrap()).unwrap();
+            VK_SERVICE_TOKEN.set(Arc::try_from(key.trim()).unwrap()).unwrap();
         }
         Err(_) => {
             error!("No vk service key found! Create vk_service_token.txt file with service key inside");

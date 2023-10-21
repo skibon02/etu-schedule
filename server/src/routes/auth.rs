@@ -1,9 +1,10 @@
 use std::path::PathBuf;
 
 use rocket::{Route, http::{CookieJar, uri::Host, Status, Cookie}, response::Redirect, form::{Form, Strict}, serde::json::Json};
+use rocket_db_pools::Connection;
 use serde_derive::Deserialize;
 
-use crate::{FRONTEND_PORT, FrontendPort, models::users};
+use crate::{FRONTEND_PORT, FrontendPort, models::{users, Db}};
 
 
 #[post("/auth/deauth")]
@@ -48,14 +49,14 @@ struct AuthRedirectParams {
 }
 
 #[get("/auth/redirect?<payload>")]
-async fn auth_redirect (cookie: &CookieJar<'_>, host: &Host<'_>, payload: Json<AuthRedirectParams>) -> Redirect {
+async fn auth_redirect (db: Connection<Db>, cookie: &CookieJar<'_>, host: &Host<'_>, payload: Json<AuthRedirectParams>) -> Redirect {
     let token = payload.token.clone();
     let uuid = payload.uuid.clone();
 
     assert_eq!(payload.auth, 1);
     assert_eq!(payload._type, "silent_token");
 
-    process_auth(cookie, &token, &uuid).await;
+    process_auth(db, cookie, &token, &uuid).await;
 
     match FRONTEND_PORT.get().unwrap() {
         FrontendPort::Same => {
@@ -78,27 +79,28 @@ struct AuthParams {
 }
 
 #[post("/authorize", data="<auth_params>")]
-async fn authorize(cookie: &CookieJar<'_>, auth_params: Json<AuthParams>) -> Status {
+async fn authorize(db: Connection<Db>, cookie: &CookieJar<'_>, auth_params: Json<AuthParams>) -> Status {
     debug!("> AUTH: silent_token: {:?}", auth_params.silent_token);
     debug!("> AUTH: uuid: {:?}", auth_params.uuid);
 
-    process_auth(cookie, &auth_params.silent_token, &auth_params.uuid).await;
+    process_auth(db, cookie, &auth_params.silent_token, &auth_params.uuid).await;
 
     Status::Ok
 }
 
 
-async fn process_auth(cookie: &CookieJar<'_>,token: &str, uuid: &str) {
+async fn process_auth(db: Connection<Db>, cookie: &CookieJar<'_>,token: &str, uuid: &str) {
     let auth_info = crate::vk_api::exchange_access_token(token, uuid).await;
-    debug!("access_token: {}", auth_info.0);
 
-    if users::create_user(&auth_info.1).await.is_err() {
+    if users::create_user(db, &auth_info.1).await.is_err() {
         error!("Failed to create user");
         return;
     }
 
     debug!("adding token to cookie...");
+
     cookie.add_private(Cookie::new("token", auth_info.1));
+    cookie.add_private(Cookie::new("token2", auth_info.0));
 }
 
 
