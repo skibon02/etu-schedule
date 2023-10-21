@@ -3,7 +3,6 @@ use serde_json::Value;
 
 use crate::etu_api;
 
-
 #[get("/scheduleObjs/group/<group>")]
 async fn get_group_schedule_objects(group: usize) -> Json<Value> {
     let json = etu_api::get_schedule_objs_group(group).await;
