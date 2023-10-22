@@ -99,7 +99,7 @@ struct UserInfoResponse {
 impl From<UserInfo> for UserInfoResponse {
     fn from(value: UserInfo) -> Self {
         UserInfoResponse {
-            user_id: value.auth.user_id,
+            user_id: value.vk_id.to_string(),
             first_name: value.first_name,
             last_name: value.last_name,
             profile_photo_url: value.profile_photo_url,
@@ -210,15 +210,12 @@ fn parse_auth_info(inp: serde_json::Value) -> UserInfo {
     UserInfo {
         first_name: inp["first_name"].as_str().unwrap_or("").to_owned(),
         last_name: inp["last_name"].as_str().unwrap_or("").to_owned(),
-        auth: AuthorizeInfo {
-            access_token: None,
-            user_id: inp["id"].as_number().unwrap().to_string(),
-        },
+        vk_id: inp["id"].as_u64().unwrap_or_default() as u32,
         birthdate: inp["bdate"].as_str().unwrap_or("").to_owned(),
         profile_photo_url: inp["photo_200"].as_str().unwrap_or("").to_owned(),
         sex: inp["sex"].as_u64().unwrap_or_default() as u8, // you might want to handle this unwrap in a way that fits your app's error handling
-        created_datetime: None,
-        last_vk_fetch_datetime: None,
+        creation_date_time: None,
+        last_vk_fetch_date_time: None,
     }
 }
 async fn process_auth(db: Connection<Db>, cookie: &CookieJar<'_>, token: &str, uuid: &str) -> Result<(), AuthorizeError> {
