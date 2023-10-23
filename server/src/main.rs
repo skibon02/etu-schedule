@@ -1,14 +1,14 @@
 use std::sync::{Arc, OnceLock};
 use std::{env, fs};
 
+use api::vk_api;
 use models::Db;
 use rocket::fairing::{self, AdHoc};
 use rocket::{Build, Config, Rocket};
 
 use rocket::fs::FileServer;
 
-pub mod etu_api;
-pub mod vk_api;
+pub mod api;
 
 pub mod routes;
 

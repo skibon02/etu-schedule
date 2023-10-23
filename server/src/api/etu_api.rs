@@ -32,7 +32,7 @@ struct Output {
 
 pub async fn get_schedule_objs_group(group: usize) -> Json<Value> {
     let url = format!(
-        "{}objects/publicated?withSubjectCode=true&withURL=true&groups={}",
+        "{}objects/594?withSubjectCode=true&withURL=true&groups={}",
         BASE_URL_SCHEDULE,
         group
     );
@@ -43,7 +43,7 @@ pub async fn get_schedule_objs_group(group: usize) -> Json<Value> {
 }
 
 pub async fn get_groups_list() -> Json<Value> {
-    let url = format!("{}dicts/groups?scheduleId=publicated&withFaculty=false&withSemesterSeasons=false&withFlows=false", BASE_URL_GENERAL);
+    let url = format!("{}dicts/groups?scheduleId=594&withFaculty=false&withSemesterSeasons=false&withFlows=false", BASE_URL_GENERAL);
     let response = reqwest::get(&url).await.unwrap();
     let body = response.text().await.unwrap();
 
@@ -66,3 +66,4 @@ pub async fn get_groups_list() -> Json<Value> {
     let value = serde_json::to_value(output_data).unwrap();
     Json(value)
 }
+
