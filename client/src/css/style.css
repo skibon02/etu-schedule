@@ -187,10 +187,6 @@ body {
 @media screen and (max-width: 500px) {
   .container {
     font-size: 12px;
-    -webkit-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
   }
   .under-header-box {
     height: 0em;
