@@ -225,6 +225,8 @@ async function ask() {
     "\t3) get 0303 schedule\n" +
     "\t4) get 3311 schedule\n" +
     "\t5) get 3388 schedule\n" +
+    "\t6) get 0491/1 schedule\n" +
+    "\t7) get 0491/2 schedule\n" +
     "\t9) exit\n", async (input_raw) => {
         let input = input_raw.split(" ")
 
@@ -245,6 +247,12 @@ async function ask() {
                 break;
             case "5":
                 await get_group_schedule(4365);
+                break;
+            case "6":
+                await get_group_schedule(4457);
+                break;
+            case "7":
+                await get_group_schedule(4691);
                 break;
 
             case "9": 
