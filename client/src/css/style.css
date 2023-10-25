@@ -172,7 +172,7 @@ body {
 }
 
 .under-header-box {
-  height: 4.375em;
+  height: 3.4375em;
 }
 
 .under-header-box-mobile {
@@ -195,6 +195,15 @@ body {
     height: 6.25em;
   }
 }
+.header-active {
+  background: #fff;
+  color: #0b2376;
+}
+.header-active .nav__icon-container {
+  -webkit-box-shadow: none;
+          box-shadow: none;
+}
+
 .header-hover {
   cursor: pointer;
 }
@@ -507,7 +516,7 @@ body {
   width: 60%;
   max-width: 1000px;
   margin: 0 auto;
-  padding-top: 3.75em;
+  padding-top: 4.375em;
 }
 
 .schedule-info {
@@ -934,13 +943,13 @@ h1, h2, h3, h4, h5, h6 {
 
 @media screen and (max-width: 500px) {
   .groups {
-    font-size: 1.7em;
+    font-size: 2em;
   }
   .groups__loading {
     padding-top: 1.875em;
   }
   .groups__items {
-    padding-top: 1.6875em;
+    padding-top: 1.375em;
   }
   .groups-input {
     position: relative;
@@ -954,8 +963,87 @@ h1, h2, h3, h4, h5, h6 {
   }
   .groups-input__icon {
     position: absolute;
-    top: 0.1875em;
-    left: 0.375em;
-    width: 1.625em;
+    top: 0.125em;
+    left: 0.5em;
+    width: 1.5em;
   }
+}
+* {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+*, *:before, *:after {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+:focus, :active {
+  outline: none;
+}
+
+a:focus, a:active {
+  outline: none;
+}
+
+nav, footer, header, aside {
+  display: block;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  font-size: 100%;
+  line-height: 1;
+  font-size: 14px;
+  -ms-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+input, button, textarea, a {
+  font-family: inherit;
+  color: inherit;
+  font-size: inherit;
+  font: inherit;
+  font-weight: inherit;
+}
+
+input::-ms-clear {
+  display: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+button::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+
+a, a:visited {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+ul li {
+  list-style: none;
+}
+
+img {
+  vertical-align: top;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: inherit;
 }

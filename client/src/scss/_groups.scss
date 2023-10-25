@@ -13,12 +13,14 @@ $BORDER-COLOR: #828282;
   &__input-container {
     position: fixed;
     width: 100%;
+    // top: pxToEm(45px);
   }
 
   &__input {  
   }
 
   &__items {
+    // padding-top: pxToEm(70px);
     padding-top: pxToEm(25px);
   }
 
@@ -56,14 +58,14 @@ $BORDER-COLOR: #828282;
 
 @media screen and (max-width: 500px) {
   .groups {
-    font-size: 1.7em;
+    font-size: 2em;
 
     &__loading {
       padding-top: pxToEm(30px);
     }
 
     &__items {
-      padding-top: pxToEm(27px);
+      padding-top: pxToEm(22px);
     }
   }
   .groups-input {
@@ -79,9 +81,9 @@ $BORDER-COLOR: #828282;
   
     &__icon {
       position: absolute;
-      top: pxToEm(3px);
-      left: pxToEm(6px);
-      width: pxToEm(26px);
+      top: pxToEm(2px);
+      left: pxToEm(8px);
+      width: pxToEm(24px);
     }
   }
 }

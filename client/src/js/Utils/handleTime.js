@@ -1,5 +1,5 @@
 // !!! @param date passing as new Date(date)
-function knowTime(i, date) {
+function knowSubjectTime(i, date) {
   date.setSeconds(0);
   date.setMilliseconds(0);
 
@@ -93,9 +93,7 @@ function knowTime(i, date) {
   return [startTime, endTime, checkInDeadLine]
 }
 
-export default knowTime;
-
-export function makeClockTime(date) {
+function makeClockTime(date) {
 
   const hours = date.getHours();
   const minutes = date.getMinutes();
@@ -105,12 +103,11 @@ export function makeClockTime(date) {
   return formattedTime;
 }
 
-export function makeCalendarTime(date, days) {
+function makeCalendarTime(date, days) {
   return `${days[date.getDay()]} ${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`
 }
 
-
-export function isEvenWeek(date) {
+function isEvenWeek(date) {
   const today = new Date(date);
   const firstWeek = new Date(today.getFullYear(), 7, 27); // (month 0-based index) 28 aug.
 
@@ -123,4 +120,20 @@ export function isEvenWeek(date) {
   } else {
     return ['2', weeksDiff];
   }
+}
+
+function weekHeaderTime(date) {
+  const calendarDate = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const seconds = date.getSeconds().toString().padStart(2, '0');
+  return [`${calendarDate}`, `${hours}:${minutes}:${seconds}`];
+}
+
+export {
+  knowSubjectTime, 
+  isEvenWeek,
+  makeCalendarTime,
+  makeClockTime,
+  weekHeaderTime,
 }

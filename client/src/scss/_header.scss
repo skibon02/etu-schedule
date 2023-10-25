@@ -1,6 +1,15 @@
 $BORDER-COLOR: #fff;
 $HALF-HEIGHT: 75px;
 
+.header-active {
+  background: #fff;
+  color: #0b2376;
+  .nav__icon-container {
+    box-shadow: none;
+  }
+  
+}
+
 .header-hover {
   cursor: pointer;
   &:hover {
@@ -99,8 +108,6 @@ $HALF-HEIGHT: 75px;
       .nav__icon-container {
         box-shadow: none;
       }
-    }
-    & p {
     }
   }
 

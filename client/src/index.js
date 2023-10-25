@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './css/style.css';
-import App from './js/Components/App';
+import App from './js/App/App';
 import reportWebVitals from './reportWebVitals';
-import {backendHost} from './js/functions/util'
+import { backendHost } from './js/Fetches/util';
 
 // redirect to backend if we're on the authorize page
 if (window.location.pathname === '/api/auth/redirect') {

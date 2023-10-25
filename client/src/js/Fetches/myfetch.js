@@ -1,6 +1,5 @@
 import {isdev, simulateFetches, backendHost} from './util'
 import {groups_request_example, schedule_request_example} from './mock_data' 
-import process from 'process'
 
 async function myfetch(path, param = {}) {
     let initialPath = path;

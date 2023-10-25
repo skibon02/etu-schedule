@@ -14,14 +14,16 @@ import VKButton from './VKButton';
 import myfetch from '../functions/myfetch';
 const DAYS = ["Воскресенье", 'Понедельник', 'Вторник', 'Среда', "Четверг", "Пятница", "Суббота"]
 
-export function Schedule() {
+export function Pages() {
   const [date, setDate] = useState(new Date());
-  const [group, setGroup] = useState(null);
-  const [groupSchedule, setGroupSchedule] = useState(null);
   const [active, setActive] = useState('groups');
+
   const [groupList, setGroupList] = useState(null);
   const [groupListError, setGroupListError] = useState(null);
+  
+  const [group, setGroup] = useState(null);
   const [groupNumber, setGroupNumber] = useState(null);
+  const [groupSchedule, setGroupSchedule] = useState(null);
 
   useEffect(() => {
     async function getGroups() {
@@ -48,18 +50,20 @@ export function Schedule() {
   
     getGroups();
   }, []); // groupList
-  
 
   useEffect(() => {
     if (group) {
       async function getGroupSchedule() {
         console.log(`/api/scheduleObjs/group/${group}`);
+        setGroupSchedule(null);
         let response = await myfetch(`/api/scheduleObjs/group/${group}`);
         let data = await response.json();
         console.log('successful fetch on Schedule');
         console.log(data);
     
         setGroupSchedule(data);
+        // window.localStorage.setItem('userPref', data);
+        // alert(window.localStorage.getItem('userPref'))
       }
 
       getGroupSchedule();
@@ -99,7 +103,7 @@ export function Schedule() {
               date={date} />
           </div>
           <Week 
-            key={group.id} 
+            key={group} 
             weekSchedule={makeSchedule(groupSchedule, date)[0]}
             weekNumber={makeSchedule(groupSchedule, date)[1]} />
           </>
@@ -147,27 +151,31 @@ function WeekHeader({groupNumber, date}) {
 }
 
 function Week({weekSchedule, weekNumber}) {
-  let week = [];
-  for (let i = 0; i < weekSchedule.length; i++) {
-    if (weekSchedule[i][0] !== null) {
-      week.push(<Day key={i} daySchedule={weekSchedule[i]}  />)
-    } else {
-      week.push(
-        <div key={i} className="day">
-          <div className="day__date">
-            {makeCalendarTime(weekSchedule[i][1], DAYS)}
-          </div>
-          <div className="day__lessons">
-            <div className='day__empty'>
-              <div className="day__empty-text">
-                so empty...
+  const [week, setWeek] = useState([]);
+  useEffect(() => {
+    let initinalWeek = []
+    for (let i = 0; i < weekSchedule.length; i++) {
+      if (weekSchedule[i][0] !== null) {
+        initinalWeek.push(<Day key={i} daySchedule={weekSchedule[i]}  />)
+      } else {
+        initinalWeek.push(
+          <div key={i} className="day">
+            <div className="day__date">
+              {makeCalendarTime(weekSchedule[i][1], DAYS)}
+            </div>
+            <div className="day__lessons">
+              <div className='day__empty'>
+                <div className="day__empty-text">
+                  so empty...
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )
+        )
+      }
     }
-  }
+    setWeek(initinalWeek);
+  }, [weekSchedule]);
   console.log('Week Number is:');
   console.log(weekNumber);
 
@@ -209,7 +217,6 @@ function Day({daySchedule}) {
     </div>
   )
 }
-
 
 function Subject({props, i}) {
   const [toggleClock, setToggleClock] = useState(false);

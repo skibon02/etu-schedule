@@ -1,4 +1,4 @@
-import { isEvenWeek } from "./handleTime";
+import { isEvenWeek } from "../handleTime";
 
 
 const WEEK_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
@@ -63,19 +63,15 @@ export function makeUsableSchedule(scheduleObject) {
   }
 
   return {
-    lesson: {
-      title: title,
-      subjectType: subjectType,
-      displayName: displayName,
-      number: number,
-    },
+    title: title,
+    subjectType: subjectType,
+    displayName: displayName,
+    number: number,
     teachers: teachers,
-    date: {
-      startIndex: startTime % 10,
-      endIndex: endTime % 10,
-      weekDay: weekDay,
-      date: date,
-    },
+    startIndex: startTime % 10,
+    endIndex: endTime % 10,
+    weekDay: weekDay,
+    date: date,
   }
   
 

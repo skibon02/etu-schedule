@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
-
-import { isdev, currentHost } from '../functions/util';
-
-import { Config, Connect, ConnectEvents } from '@vkontakte/superappkit';
-import myfetch from "../functions/myfetch";
-
+import { Config } from '@vkontakte/superappkit';
+import myfetch from '../../Fetches/myfetch';
+import { Connect, ConnectEvents } from '@vkontakte/superappkit';
+import { isdev, currentHost } from '../../Fetches/util';
 
 // vk id штучка
 Config.init({
@@ -80,14 +78,17 @@ export default function VkButton() {
             },
         });
 
-        document.body.appendChild(vkOneTapButton.getFrame())
+        const vkElementDiv = document.getElementById("vk");
+        vkElementDiv.appendChild(vkOneTapButton.getFrame())
+        // document.body.appendChild(vkOneTapButton.getFrame())
 
         return () => {
-            document.body.removeChild(vkOneTapButton.getFrame())
+            vkElementDiv.removeChild(vkOneTapButton.getFrame())
+            // document.body.removeChild(vkOneTapButton.getFrame())
         }
     }, []);
 
     return (
-        <div id="vk"></div>
+        <div id="vk" className='vk'></div>
     )
 }

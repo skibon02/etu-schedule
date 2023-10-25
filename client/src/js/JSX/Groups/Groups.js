@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import SEARCH from '../../icons/search.svg'
+import SEARCH from '../../../icons/search.svg'
+import * as handlers from '../../Handlers/Groups/handlers'
 
-export default function Groups({setGroup, setActive, groupList, setGroupNumber}) {
+export default function Groups({setGroupId, setActive, groupList, setGroupNumber}) {
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef(null);
 
@@ -19,7 +20,7 @@ export default function Groups({setGroup, setActive, groupList, setGroupNumber})
             type="text"
             value={inputValue}
             placeholder='       Номер группы'
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => handlers.onInputChange(setInputValue, e.target.value)}
           />
           {!inputValue && <img src={SEARCH} alt="" className='groups-input__icon'/>}
         </div>
@@ -37,9 +38,13 @@ export default function Groups({setGroup, setActive, groupList, setGroupNumber})
             className='groups__item'
             key={group.id}
             onClick={() => {
-              setGroup(group.id);
-              setGroupNumber(group.number);
-              setActive('schedule');
+              handlers.onGroupClick(
+                setGroupId,
+                setGroupNumber,
+                setActive,
+                group.id,
+                group.number
+                )
             }}>
               {group.number}
           </div>
