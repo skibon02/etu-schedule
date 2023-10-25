@@ -70,7 +70,7 @@ export default function VkButton() {
             },
             // Не обязательный параметр с настройками отображения OneTap
             options: {
-                showAlternativeLogin: true, // Отображение кнопки "Войти другим способом"
+                showAlternativeLogin: false, // Отображение кнопки "Войти другим способом"
                 displayMode: 'name_phone', // Режим отображения кнопки 'default' | 'name_phone' | 'phone_name'
                 buttonStyles: {
                     borderRadius: 8, // Радиус скругления кнопок

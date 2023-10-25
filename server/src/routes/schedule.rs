@@ -1,7 +1,7 @@
 use rocket::{serde::json::Json, Route};
 use serde_json::Value;
 
-use crate::etu_api;
+use crate::api::etu_api;
 
 #[get("/scheduleObjs/group/<group>")]
 async fn get_group_schedule_objects(group: usize) -> Json<Value> {
