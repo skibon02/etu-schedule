@@ -26,12 +26,14 @@ async function getGroupList(setGroupList, setGroupListError) {
   if (groupId) {
     async function getSchedule() {
       console.log(`/api/scheduleObjs/group/${groupId}`);
-      setGroupSchedule(null);
+      // setGroupSchedule(null);
       let response = await myfetch(`/api/scheduleObjs/group/${groupId}`);
       let data = await response.json();
-      console.log('successful fetch on Schedule');
+      console.log('successful fetch on Schedule\nresponse.json():');
       console.log(data);
-  
+      console.log('response.body:');
+      console.log(response.body);
+      
       setGroupSchedule(data);
       // window.localStorage.setItem('userPref', data);
       // alert(window.localStorage.getItem('userPref'))

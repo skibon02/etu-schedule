@@ -44,7 +44,7 @@ export default function Groups({setGroupId, setActive, groupList, setGroupNumber
                 setActive,
                 group.id,
                 group.number
-                )
+                );
             }}>
               {group.number}
           </div>

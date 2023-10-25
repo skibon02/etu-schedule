@@ -2,8 +2,8 @@ function onInputChange(setInputValue, value) {
   setInputValue(value);
 }
 
-function onGroupClick(setGroup, setGroupNumber, setActive, id, number) {
-  setGroup(id);
+function onGroupClick(setGroupId, setGroupNumber, setActive, id, number) {
+  setGroupId(id);
   setGroupNumber(number);
   setActive('schedule');
 }
