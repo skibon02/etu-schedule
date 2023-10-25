@@ -2,7 +2,7 @@ export function NavButton({active, activeName, imageSrc, text, handleClick}) {
   return (
     <div 
       className={active === activeName ? 
-        "nav__item header-hover header-active" :
+        "nav__item header-active" :
         "nav__item header-hover"}
         onClick={handleClick} >
       <div className='nav__icon-container'>

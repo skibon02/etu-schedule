@@ -36,7 +36,7 @@ export default function Header({date, setDate, active, setActive, setGroupSchedu
         />
         <NavButton
           active={active}
-          activeName={'pofile'}
+          activeName={'profile'}
           imageSrc={VK}
           text={'Профиль'}
           handleClick={() => handlers.handleProfileClick(setActive)}

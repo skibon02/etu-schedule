@@ -2,10 +2,10 @@ $BORDER-COLOR: #fff;
 $HALF-HEIGHT: 75px;
 
 .header-active {
-  background: #fff;
-  color: #0b2376;
+  background: #fff !important;
+  color: #0b2376 !important;
   .nav__icon-container {
-    box-shadow: none;
+    box-shadow: none !important;
   }
   
 }
@@ -176,7 +176,7 @@ $HALF-HEIGHT: 75px;
   }
   .nav {
     border-top: .1px solid $BORDER-COLOR;
-  border-bottom: none;
+    border-bottom: none;
     order: 2;
     height: pxToEm(80px);
     &__item {
