@@ -44,22 +44,22 @@ pub async fn create_user(mut con: Connection<Db>, user_info: UserInfo) -> anyhow
         .map(|_| ())
 }
 
-pub async fn get_user_info(mut con: Connection<Db>, id: &str) -> anyhow::Result<UserInfo> {
+pub async fn get_user_info(mut con: Connection<Db>, id: u32) -> anyhow::Result<UserInfo> {
     let res = sqlx::query_as(
         "SELECT * FROM users WHERE vk_id = ?",
     )
-        .bind(id.parse::<u32>().unwrap())
+        .bind(id)
         .fetch_one(con.acquire().await?).await?;
 
     Ok(res)
 }
 
-pub async fn user_exists(mut con: Connection<Db>, id: &str) -> anyhow::Result<bool> {
+pub async fn user_exists(mut con: Connection<Db>, id: u32) -> anyhow::Result<bool> {
     let res = sqlx::query(
         "SELECT vk_id FROM users WHERE vk_id = ?",
     )
-        .bind(id.parse::<u32>().unwrap())
+        .bind(id)
         .fetch_one(con.acquire().await?).await?;
 
-    Ok(res.get::<u32, _>("vk_id") == id.parse::<u32>().unwrap())
+    Ok(res.get::<u32, _>("vk_id") == id)
 }

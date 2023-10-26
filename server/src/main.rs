@@ -14,6 +14,9 @@ pub mod routes;
 
 pub mod models;
 
+#[path="etu-data-model/mod.rs"]
+pub mod etu_data_model;
+
 #[macro_use]
 extern crate rocket;
 

@@ -3,31 +3,23 @@ use std::collections::HashMap;
 use rocket::serde::json::{Json, Value};
 use serde::{Deserialize, Serialize};
 
+use crate::models::groups::GroupsModel;
+
 const BASE_URL_SCHEDULE: &str = "https://digital.etu.ru/api/schedule/";
 const BASE_URL_ATTENDANCE: &str = "https://digital.etu.ru/api/attendance/";
 const BASE_URL_GENERAL: &str = "https://digital.etu.ru/api/general/";
 
 #[derive(Deserialize, Debug)]
-struct Input {
+struct GroupsOriginal {
     fullNumber: String,
-    id: usize,
+    id: u32,
     number: String,
-    course: usize,
     studyingType: String,
     educationLevel: String,
-    departmentId: usize,
-    specialtyId: usize,
-}
-
-#[derive(Serialize, Debug)]
-struct Output {
-    fullNumber: String,
-    number: String,
-    course: usize,
-    studyingType: String,
-    educationLevel: String,
-    departmentId: usize,
-    specialtyId: usize,
+    departmentId: u32,
+    specialtyId: u32,
+    startYear: u16,
+    endYear: u16,
 }
 
 pub async fn get_schedule_objs_group(group: usize) -> Json<Value> {
@@ -47,18 +39,19 @@ pub async fn get_groups_list() -> Json<Value> {
     let response = reqwest::get(&url).await.unwrap();
     let body = response.text().await.unwrap();
 
-    let input_data = serde_json::from_str::<Vec<Input>>(&body).unwrap();
+    let input_data = serde_json::from_str::<Vec<GroupsOriginal>>(&body).unwrap();
     let mut output_data = HashMap::new();
 
     for item in input_data {
-        let output = Output {
-            fullNumber: item.fullNumber,
+        let output = GroupsModel {
+            group_id: item.id,
             number: item.number,
-            course: item.course,
-            studyingType: item.studyingType,
-            educationLevel: item.educationLevel,
-            departmentId: item.departmentId,
-            specialtyId: item.specialtyId,
+            studying_type: item.studyingType,
+            education_level: item.educationLevel,
+            start_year: item.startYear,
+            end_year: item.endYear,
+            department_id: item.departmentId,
+            specialty_id: item.specialtyId,
         };
         output_data.insert(item.id.to_string(), output);
     }

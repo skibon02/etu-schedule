@@ -27,8 +27,8 @@ impl<'r> FromRequest<'r> for UserInfo {
         let db_con = req.guard::<Connection<Db>>().await.unwrap();
         match (req.cookies().get_private("token"), req.cookies().get_private("token2")) {
             (Some(token), Some(_)) => {
-                let user_id = token.value().to_string();
-                let user_info = users::get_user_info(db_con, &user_id).await;
+                let user_id = token.value().to_string().parse::<u32>().unwrap();
+                let user_info = users::get_user_info(db_con, user_id).await;
                 match user_info {
                     Ok(user_info) => request::Outcome::Success(user_info),
                     Err(e) => {
@@ -54,14 +54,14 @@ impl<'r> FromRequest<'r> for AuthorizeInfo {
         let db_con = req.guard::<Connection<Db>>().await.unwrap();
         match (req.cookies().get_private("token"), req.cookies().get_private("token2")) {
             (Some(token), Some(token2)) => {
-                let user_id = token.value().to_string();
+                let user_id = token.value().to_string().parse::<u32>().unwrap();
                 let access_token = token2.value().to_string();
-                if !users::user_exists(db_con, &user_id).await.unwrap_or(false) {
+                if !users::user_exists(db_con, user_id).await.unwrap_or(false) {
                     return request::Outcome::Forward(());
                 }
                 request::Outcome::Success(AuthorizeInfo {
                     access_token: Some(access_token),
-                    user_id,
+                    user_id: user_id.to_string(),
                 })
             }
             _ => {
