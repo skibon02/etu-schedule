@@ -106,8 +106,13 @@ pub async fn get_schedule_objs_group(group: usize) -> Vec<GroupScheduleOriginal>
     );
     let response = reqwest::get(&url).await.unwrap();
     let body = response.text().await.unwrap();
-    let value: Vec<GroupScheduleOriginal> = serde_json::from_str(&body).unwrap();
-    value
+
+    parse_schedule_objs_group(body).unwrap()
+}
+
+fn parse_schedule_objs_group(data: String) -> anyhow::Result<Vec<GroupScheduleOriginal>> {
+    let value: Vec<GroupScheduleOriginal> = serde_json::from_str(&data)?;
+    Ok(value)
 }
 
 pub async fn get_groups_list() -> BTreeMap<u32, GroupsModel> {
@@ -115,7 +120,12 @@ pub async fn get_groups_list() -> BTreeMap<u32, GroupsModel> {
     let response = reqwest::get(&url).await.unwrap();
     let body = response.text().await.unwrap();
 
-    let input_data: Vec<GroupsOriginal> = serde_json::from_str(&body).unwrap();
+    parse_groups(body).unwrap()
+}
+
+fn parse_groups(data: String) -> anyhow::Result<BTreeMap<u32, GroupsModel>> {
+
+    let input_data: Vec<GroupsOriginal> = serde_json::from_str(&data)?;
     let mut output_data = BTreeMap::new();
 
     for item in input_data {
@@ -132,6 +142,58 @@ pub async fn get_groups_list() -> BTreeMap<u32, GroupsModel> {
         output_data.insert(item.id, output);
     }
 
-    output_data
+    Ok(output_data)
 }
 
+
+
+
+#[cfg(test)]
+mod tests {
+    use crate::api::etu_api::{parse_groups, parse_schedule_objs_group};
+
+    #[test]
+    fn parse_groups_wrong_format() -> anyhow::Result<()> {
+        let groups = String::from( "[{}]");
+
+        if parse_groups(groups).is_err() {
+            Ok(())
+        } else {
+            Err(anyhow::anyhow!("Error"))
+        }
+    }
+
+    #[test]
+    fn parse_groups_test() -> anyhow::Result<()> {
+        // load from file "groups_response_test.txt"
+        let schedule_objs = std::fs::read_to_string("test_data/groups_response_test.txt")?;
+
+        let res = parse_groups(schedule_objs)?;
+
+        println!("Parsed {} objects", res.len());
+
+        Ok(())
+    }
+    #[test]
+    fn parse_schedule_very_big_test() -> anyhow::Result<()> {
+        // load from file "whole_semester_schedule_test.txt"
+        let schedule_objs = std::fs::read_to_string("test_data/whole_semester_schedule_test.txt")?;
+
+        let res = parse_schedule_objs_group(schedule_objs)?;
+
+        println!("Parsed {} objects", res.len());
+
+        Ok(())
+    }
+    #[test]
+    fn parse_schedule_0303_test() -> anyhow::Result<()> {
+        // load from file "0303_schedule_test.txt"
+        let schedule_objs = std::fs::read_to_string("test_data/0303_schedule_test.txt")?;
+
+        let res = parse_schedule_objs_group(schedule_objs)?;
+
+        println!("Parsed {} objects", res.len());
+
+        Ok(())
+    }
+}

@@ -8,10 +8,8 @@ use rocket_db_pools::Connection;
 use serde_derive::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
-use crate::{
-    models::{users::{self, AuthorizeInfo, UserInfo}, Db},
-    FrontendPort, FRONTEND_PORT,
-};
+use crate::{FRONTEND_PORT, FrontendPort, models::{users::{self, AuthorizeInfo, UserInfo}, Db}};
+use crate::api::vk_api;
 
 #[post("/auth/deauth")]
 fn deauth(cookie: &CookieJar) -> Status {
@@ -219,9 +217,9 @@ fn parse_auth_info(inp: serde_json::Value) -> UserInfo {
     }
 }
 async fn process_auth(db: Connection<Db>, cookie: &CookieJar<'_>, token: &str, uuid: &str) -> Result<(), AuthorizeError> {
-    let access_token = crate::vk_api::exchange_access_token(token, uuid).await;
+    let access_token =  vk_api::exchange_access_token(token, uuid).await;
 
-    let user_info = crate::vk_api::users_get(&access_token, "photo_200,sex,bdate").await.ok_or(AuthorizeError::FailedVkRequest)?;
+    let user_info = vk_api::users_get(&access_token, "photo_200,sex,bdate").await.ok_or(AuthorizeError::FailedVkRequest)?;
     info!("VK user: {:?}", user_info);
     let auth_info = (access_token, user_info["id"].to_string());
     let user_info = parse_auth_info(user_info.into_inner());

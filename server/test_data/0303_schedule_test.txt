@@ -1,0 +1,2581 @@
+[
+    {
+        "fullNumber": "0303",
+        "id": 4362,
+        "number": "0303",
+        "studentCount": 0,
+        "course": 4,
+        "semester": 8,
+        "index": null,
+        "studyingType": "оч",
+        "educationLevel": "бак",
+        "alienId": 22183,
+        "studyYears": "2023-2024",
+        "startYear": 2020,
+        "endYear": 2024,
+        "departmentId": 14,
+        "rootId": null,
+        "specialtyId": 92,
+        "semesterSeasons": [
+            {
+                "id": 11,
+                "season": "autumn",
+                "year": 2023,
+                "startDate": "2023-08-28T00:00:00.000Z",
+                "endDate": "2024-02-04T00:00:00.000Z",
+                "GroupSemesterSeason": {
+                    "semesterStart": "2023-09-01T00:00:00.000Z",
+                    "semesterEnd": "2023-12-29T00:00:00.000Z",
+                    "examStart": "2024-01-09T00:00:00.000Z",
+                    "examEnd": "2024-01-29T00:00:00.000Z",
+                    "createdAt": "2023-05-02T12:54:55.299Z",
+                    "updatedAt": "2023-10-02T10:15:07.095Z",
+                    "deletedAt": null,
+                    "groupId": 4362,
+                    "semesterSeasonId": 11
+                }
+            }
+        ],
+        "groupSets": [
+            {
+                "id": 478,
+                "title": "ФКТИ_4_1МОЭВМ+САПР+ВТ",
+                "GroupInSet": {
+                    "index": 0
+                }
+            }
+        ],
+        "scheduleObjects": [
+            {
+                "groupId": 4362,
+                "id": 9474903,
+                "lessonId": 9492082,
+                "comment": "",
+                "form": "standard",
+                "block": "[Нет]",
+                "url": null,
+                "lesson": {
+                    "id": 9492082,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534121,
+                        "type": "schedule",
+                        "description": "\"Военно-морская подготовка\" (Лек), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:08.276Z",
+                        "auditoriumNumber": null,
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9474903,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544342,
+                            "startTime": 101,
+                            "endTime": 1104,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "FRI",
+                            "week": "1"
+                        },
+                        "auditorium": null
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 51946,
+                        "title": "Военно-морская подготовка",
+                        "englishTitle": null,
+                        "shortTitle": "ВМП",
+                        "subjectType": "Лек",
+                        "controlType": null,
+                        "semester": 7,
+                        "alienId": 0,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 65,
+                            "title": "Военный учебный центр",
+                            "longTitle": null,
+                            "type": "military"
+                        }
+                    },
+                    "teacher": null,
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9474906,
+                "lessonId": 9492085,
+                "comment": "",
+                "form": "standard",
+                "block": "[Нет]",
+                "url": null,
+                "lesson": {
+                    "id": 9492085,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534124,
+                        "type": "schedule",
+                        "description": "\"Военно-морская подготовка\" (Лек), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:08.311Z",
+                        "auditoriumNumber": null,
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9474906,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544345,
+                            "startTime": 101,
+                            "endTime": 1104,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "FRI",
+                            "week": "2"
+                        },
+                        "auditorium": null
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 51946,
+                        "title": "Военно-морская подготовка",
+                        "englishTitle": null,
+                        "shortTitle": "ВМП",
+                        "subjectType": "Лек",
+                        "controlType": null,
+                        "semester": 7,
+                        "alienId": 0,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 65,
+                            "title": "Военный учебный центр",
+                            "longTitle": null,
+                            "type": "military"
+                        }
+                    },
+                    "teacher": null,
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475126,
+                "lessonId": 9492305,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.О.27",
+                "url": null,
+                "lesson": {
+                    "id": 9492305,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534344,
+                        "type": "schedule",
+                        "description": "\"Криптография и защита информации\" (Лек), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:11.155Z",
+                        "auditoriumNumber": "1229",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475126,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544565,
+                            "startTime": 102,
+                            "endTime": 1102,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "WED",
+                            "week": "1"
+                        },
+                        "auditorium": {
+                            "displayName": "1229",
+                            "number": "1229",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48596,
+                        "title": "Криптография и защита информации",
+                        "englishTitle": null,
+                        "shortTitle": "КрЗащИнф",
+                        "subjectType": "Лек",
+                        "controlType": "ЗчО",
+                        "semester": 7,
+                        "alienId": 423,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 58,
+                            "title": "каф.ИБ",
+                            "longTitle": "Кафедра информационная безопасность",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Племянников А.К.",
+                        "isTeacher": true,
+                        "id": 541,
+                        "surname": "Племянников",
+                        "name": "Александр",
+                        "midname": "Кимович",
+                        "phone": null,
+                        "birthday": "1957-03-07",
+                        "roles": [
+                            "worker",
+                            "teacher",
+                            "departmentDispatcher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра информационной безопасности (доцент кандидат наук)",
+                            "Кафедра информационной безопасности (специалист по учебно-методической работе)"
+                        ],
+                        "position": "Доцент (каф.ИБ)",
+                        "degree": "Кандидат наук",
+                        "rank": "Доцент",
+                        "email": "akplemyannikov@etu.ru",
+                        "alienId": 1068,
+                        "groupId": null,
+                        "personalNumber": "00027604",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475219,
+                "lessonId": 9492398,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.09",
+                "url": null,
+                "lesson": {
+                    "id": 9492398,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534437,
+                        "type": "schedule",
+                        "description": "\"Маркетинг\" (Лек), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:12.344Z",
+                        "auditoriumNumber": "5427",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475219,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544658,
+                            "startTime": 101,
+                            "endTime": 1101,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "WED",
+                            "week": "2"
+                        },
+                        "auditorium": {
+                            "displayName": "5427",
+                            "number": "5427",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 47297,
+                        "title": "Маркетинг",
+                        "englishTitle": null,
+                        "shortTitle": "Маркетинг",
+                        "subjectType": "Лек",
+                        "controlType": "ЗчО",
+                        "semester": 7,
+                        "alienId": 459,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 8,
+                            "title": "каф.ИМ",
+                            "longTitle": "Кафедра инновационного менеджмента",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Фомина И.Г.",
+                        "isTeacher": true,
+                        "id": 1211,
+                        "surname": "Фомина",
+                        "name": "Ирина",
+                        "midname": "Германовна",
+                        "phone": null,
+                        "birthday": "1990-01-16",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра инновационного менеджмента (старший преподаватель)",
+                            "Служба качества образовательной деятельности (специалист по учебно-методической работе 1 категории)"
+                        ],
+                        "position": "Старший преподаватель (каф.ИМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": "igfomina@etu.ru",
+                        "alienId": 361,
+                        "groupId": null,
+                        "personalNumber": "00026940",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475224,
+                "lessonId": 9492403,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.09",
+                "url": null,
+                "lesson": {
+                    "id": 9492403,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534442,
+                        "type": "schedule",
+                        "description": "\"Маркетинг\" (Лек), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:12.405Z",
+                        "auditoriumNumber": "5427",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475224,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544663,
+                            "startTime": 101,
+                            "endTime": 1101,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "WED",
+                            "week": "1"
+                        },
+                        "auditorium": {
+                            "displayName": "5427",
+                            "number": "5427",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 47297,
+                        "title": "Маркетинг",
+                        "englishTitle": null,
+                        "shortTitle": "Маркетинг",
+                        "subjectType": "Лек",
+                        "controlType": "ЗчО",
+                        "semester": 7,
+                        "alienId": 459,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 8,
+                            "title": "каф.ИМ",
+                            "longTitle": "Кафедра инновационного менеджмента",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Фомина И.Г.",
+                        "isTeacher": true,
+                        "id": 1211,
+                        "surname": "Фомина",
+                        "name": "Ирина",
+                        "midname": "Германовна",
+                        "phone": null,
+                        "birthday": "1990-01-16",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра инновационного менеджмента (старший преподаватель)",
+                            "Служба качества образовательной деятельности (специалист по учебно-методической работе 1 категории)"
+                        ],
+                        "position": "Старший преподаватель (каф.ИМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": "igfomina@etu.ru",
+                        "alienId": 361,
+                        "groupId": null,
+                        "personalNumber": "00026940",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475228,
+                "lessonId": 9492407,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.О.26",
+                "url": null,
+                "lesson": {
+                    "id": 9492407,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534446,
+                        "type": "schedule",
+                        "description": "\"Безопасность жизнедеятельности\" (Лек), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:12.452Z",
+                        "auditoriumNumber": "5423",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475228,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544667,
+                            "startTime": 102,
+                            "endTime": 1102,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "MON",
+                            "week": "2"
+                        },
+                        "auditorium": {
+                            "displayName": "5423",
+                            "number": "5423",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 46322,
+                        "title": "Безопасность жизнедеятельности",
+                        "englishTitle": null,
+                        "shortTitle": "БЖД",
+                        "subjectType": "Лек",
+                        "controlType": "ЗчО",
+                        "semester": 7,
+                        "alienId": 110,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 39,
+                            "title": "каф.БЖД",
+                            "longTitle": "Кафедра безопасности жизнедеятельности",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Иванов А.Н.",
+                        "isTeacher": true,
+                        "id": 230,
+                        "surname": "Иванов",
+                        "name": "Александр",
+                        "midname": "Николаевич",
+                        "phone": null,
+                        "birthday": "1987-05-26",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра безопасности жизнедеятельности (доцент кандидат наук)"
+                        ],
+                        "position": "Доцент (каф.БЖД)",
+                        "degree": "Кандидат наук",
+                        "rank": null,
+                        "email": "anivanov@etu.ru",
+                        "alienId": 688,
+                        "groupId": null,
+                        "personalNumber": "00020746",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475331,
+                "lessonId": 9492510,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.11",
+                "url": null,
+                "lesson": {
+                    "id": 9492510,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534549,
+                        "type": "schedule",
+                        "description": "\"Введение в нереляционные системы управления базами данных\" (Лаб), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:13.743Z",
+                        "auditoriumNumber": "5415",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475331,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544770,
+                            "startTime": 103,
+                            "endTime": 1103,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "WED",
+                            "week": "1"
+                        },
+                        "auditorium": {
+                            "displayName": "5415",
+                            "number": "5415",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48576,
+                        "title": "Введение в нереляционные системы управления базами данных",
+                        "englishTitle": null,
+                        "shortTitle": "ВвНСУБД",
+                        "subjectType": "Лаб",
+                        "controlType": null,
+                        "semester": 7,
+                        "alienId": 2935,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Заславский М.М.",
+                        "isTeacher": true,
+                        "id": 443,
+                        "surname": "Заславский",
+                        "name": "Марк",
+                        "midname": "Маркович",
+                        "phone": null,
+                        "birthday": "1991-09-11",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра математического обеспечения и применения ЭВМ (доцент кандидат наук)",
+                            "Международный инновационный институт искусственного интеллекта, кибербезопасности и коммуникаций им. А.С. Попова (директор)",
+                            "Лаборатория автономных транспортных систем (ведущий научный сотрудник кандидат наук)"
+                        ],
+                        "position": "Ассистент (каф.МОЭВМ), Доцент (каф.МОЭВМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": "mmzaslavskii@etu.ru",
+                        "alienId": 2257,
+                        "groupId": null,
+                        "personalNumber": "00030145",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475332,
+                "lessonId": 9492511,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.11",
+                "url": null,
+                "lesson": {
+                    "id": 9492511,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534550,
+                        "type": "schedule",
+                        "description": "\"Введение в нереляционные системы управления базами данных\" (Лаб), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:13.754Z",
+                        "auditoriumNumber": "5415",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475332,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544771,
+                            "startTime": 103,
+                            "endTime": 1103,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "WED",
+                            "week": "2"
+                        },
+                        "auditorium": {
+                            "displayName": "5415",
+                            "number": "5415",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48576,
+                        "title": "Введение в нереляционные системы управления базами данных",
+                        "englishTitle": null,
+                        "shortTitle": "ВвНСУБД",
+                        "subjectType": "Лаб",
+                        "controlType": null,
+                        "semester": 7,
+                        "alienId": 2935,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Заславский М.М.",
+                        "isTeacher": true,
+                        "id": 443,
+                        "surname": "Заславский",
+                        "name": "Марк",
+                        "midname": "Маркович",
+                        "phone": null,
+                        "birthday": "1991-09-11",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра математического обеспечения и применения ЭВМ (доцент кандидат наук)",
+                            "Международный инновационный институт искусственного интеллекта, кибербезопасности и коммуникаций им. А.С. Попова (директор)",
+                            "Лаборатория автономных транспортных систем (ведущий научный сотрудник кандидат наук)"
+                        ],
+                        "position": "Ассистент (каф.МОЭВМ), Доцент (каф.МОЭВМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": "mmzaslavskii@etu.ru",
+                        "alienId": 2257,
+                        "groupId": null,
+                        "personalNumber": "00030145",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475333,
+                "lessonId": 9492512,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.О.27",
+                "url": null,
+                "lesson": {
+                    "id": 9492512,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534551,
+                        "type": "schedule",
+                        "description": "\"Криптография и защита информации\" (Пр), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:13.766Z",
+                        "auditoriumNumber": "2113",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475333,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544772,
+                            "startTime": 102,
+                            "endTime": 1102,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "TUE",
+                            "week": "1"
+                        },
+                        "auditorium": {
+                            "displayName": "2113",
+                            "number": "2113",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48597,
+                        "title": "Криптография и защита информации",
+                        "englishTitle": null,
+                        "shortTitle": "КрЗащИнф",
+                        "subjectType": "Пр",
+                        "controlType": null,
+                        "semester": 7,
+                        "alienId": 423,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 58,
+                            "title": "каф.ИБ",
+                            "longTitle": "Кафедра информационная безопасность",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Племянников А.К.",
+                        "isTeacher": true,
+                        "id": 541,
+                        "surname": "Племянников",
+                        "name": "Александр",
+                        "midname": "Кимович",
+                        "phone": null,
+                        "birthday": "1957-03-07",
+                        "roles": [
+                            "worker",
+                            "teacher",
+                            "departmentDispatcher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра информационной безопасности (доцент кандидат наук)",
+                            "Кафедра информационной безопасности (специалист по учебно-методической работе)"
+                        ],
+                        "position": "Доцент (каф.ИБ)",
+                        "degree": "Кандидат наук",
+                        "rank": "Доцент",
+                        "email": "akplemyannikov@etu.ru",
+                        "alienId": 1068,
+                        "groupId": null,
+                        "personalNumber": "00027604",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475334,
+                "lessonId": 9492513,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.О.27",
+                "url": null,
+                "lesson": {
+                    "id": 9492513,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534552,
+                        "type": "schedule",
+                        "description": "\"Криптография и защита информации\" (Лаб), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:13.781Z",
+                        "auditoriumNumber": "2113",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475334,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544773,
+                            "startTime": 103,
+                            "endTime": 1103,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "TUE",
+                            "week": "2"
+                        },
+                        "auditorium": {
+                            "displayName": "2113",
+                            "number": "2113",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48598,
+                        "title": "Криптография и защита информации",
+                        "englishTitle": null,
+                        "shortTitle": "КрЗащИнф",
+                        "subjectType": "Лаб",
+                        "controlType": null,
+                        "semester": 7,
+                        "alienId": 423,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 58,
+                            "title": "каф.ИБ",
+                            "longTitle": "Кафедра информационная безопасность",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Племянников А.К.",
+                        "isTeacher": true,
+                        "id": 541,
+                        "surname": "Племянников",
+                        "name": "Александр",
+                        "midname": "Кимович",
+                        "phone": null,
+                        "birthday": "1957-03-07",
+                        "roles": [
+                            "worker",
+                            "teacher",
+                            "departmentDispatcher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра информационной безопасности (доцент кандидат наук)",
+                            "Кафедра информационной безопасности (специалист по учебно-методической работе)"
+                        ],
+                        "position": "Доцент (каф.ИБ)",
+                        "degree": "Кандидат наук",
+                        "rank": "Доцент",
+                        "email": "akplemyannikov@etu.ru",
+                        "alienId": 1068,
+                        "groupId": null,
+                        "personalNumber": "00027604",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475391,
+                "lessonId": 9492570,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.11",
+                "url": null,
+                "lesson": {
+                    "id": 9492570,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534609,
+                        "type": "schedule",
+                        "description": "\"Введение в нереляционные системы управления базами данных\" (Лек), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:14.545Z",
+                        "auditoriumNumber": "5230",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475391,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544830,
+                            "startTime": 103,
+                            "endTime": 1103,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "MON",
+                            "week": "1"
+                        },
+                        "auditorium": {
+                            "displayName": "5230",
+                            "number": "5230",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48575,
+                        "title": "Введение в нереляционные системы управления базами данных",
+                        "englishTitle": null,
+                        "shortTitle": "ВвНСУБД",
+                        "subjectType": "Лек",
+                        "controlType": "ЗчО",
+                        "semester": 7,
+                        "alienId": 2935,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Заславский М.М.",
+                        "isTeacher": true,
+                        "id": 443,
+                        "surname": "Заславский",
+                        "name": "Марк",
+                        "midname": "Маркович",
+                        "phone": null,
+                        "birthday": "1991-09-11",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра математического обеспечения и применения ЭВМ (доцент кандидат наук)",
+                            "Международный инновационный институт искусственного интеллекта, кибербезопасности и коммуникаций им. А.С. Попова (директор)",
+                            "Лаборатория автономных транспортных систем (ведущий научный сотрудник кандидат наук)"
+                        ],
+                        "position": "Ассистент (каф.МОЭВМ), Доцент (каф.МОЭВМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": "mmzaslavskii@etu.ru",
+                        "alienId": 2257,
+                        "groupId": null,
+                        "personalNumber": "00030145",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475395,
+                "lessonId": 9492574,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.11",
+                "url": null,
+                "lesson": {
+                    "id": 9492574,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534613,
+                        "type": "schedule",
+                        "description": "\"Введение в нереляционные системы управления базами данных\" (Лек), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:14.589Z",
+                        "auditoriumNumber": "5230",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475395,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544834,
+                            "startTime": 103,
+                            "endTime": 1103,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "MON",
+                            "week": "2"
+                        },
+                        "auditorium": {
+                            "displayName": "5230",
+                            "number": "5230",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48575,
+                        "title": "Введение в нереляционные системы управления базами данных",
+                        "englishTitle": null,
+                        "shortTitle": "ВвНСУБД",
+                        "subjectType": "Лек",
+                        "controlType": "ЗчО",
+                        "semester": 7,
+                        "alienId": 2935,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Заславский М.М.",
+                        "isTeacher": true,
+                        "id": 443,
+                        "surname": "Заславский",
+                        "name": "Марк",
+                        "midname": "Маркович",
+                        "phone": null,
+                        "birthday": "1991-09-11",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра математического обеспечения и применения ЭВМ (доцент кандидат наук)",
+                            "Международный инновационный институт искусственного интеллекта, кибербезопасности и коммуникаций им. А.С. Попова (директор)",
+                            "Лаборатория автономных транспортных систем (ведущий научный сотрудник кандидат наук)"
+                        ],
+                        "position": "Ассистент (каф.МОЭВМ), Доцент (каф.МОЭВМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": "mmzaslavskii@etu.ru",
+                        "alienId": 2257,
+                        "groupId": null,
+                        "personalNumber": "00030145",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475412,
+                "lessonId": 9492591,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.10",
+                "url": null,
+                "lesson": {
+                    "id": 9492591,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534630,
+                        "type": "schedule",
+                        "description": "\"Основы подготовки научных публикаций\" (Лек), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:14.789Z",
+                        "auditoriumNumber": "5230",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475412,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544851,
+                            "startTime": 104,
+                            "endTime": 1104,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "MON",
+                            "week": "1"
+                        },
+                        "auditorium": {
+                            "displayName": "5230",
+                            "number": "5230",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48588,
+                        "title": "Основы подготовки научных публикаций",
+                        "englishTitle": null,
+                        "shortTitle": "ОПНП",
+                        "subjectType": "Лек",
+                        "controlType": "ЗчО",
+                        "semester": 7,
+                        "alienId": 3106,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Заславский М.М.",
+                        "isTeacher": true,
+                        "id": 443,
+                        "surname": "Заславский",
+                        "name": "Марк",
+                        "midname": "Маркович",
+                        "phone": null,
+                        "birthday": "1991-09-11",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра математического обеспечения и применения ЭВМ (доцент кандидат наук)",
+                            "Международный инновационный институт искусственного интеллекта, кибербезопасности и коммуникаций им. А.С. Попова (директор)",
+                            "Лаборатория автономных транспортных систем (ведущий научный сотрудник кандидат наук)"
+                        ],
+                        "position": "Ассистент (каф.МОЭВМ), Доцент (каф.МОЭВМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": "mmzaslavskii@etu.ru",
+                        "alienId": 2257,
+                        "groupId": null,
+                        "personalNumber": "00030145",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475424,
+                "lessonId": 9492603,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.ДВ.04.02",
+                "url": null,
+                "lesson": {
+                    "id": 9492603,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534642,
+                        "type": "schedule",
+                        "description": "\"Параллельные алгоритмы\" (Пр), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:14.928Z",
+                        "auditoriumNumber": null,
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475424,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544863,
+                            "startTime": 105,
+                            "endTime": 1105,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "TUE",
+                            "week": "1"
+                        },
+                        "auditorium": null
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48642,
+                        "title": "Параллельные алгоритмы",
+                        "englishTitle": null,
+                        "shortTitle": "ПарАлг",
+                        "subjectType": "Пр",
+                        "controlType": null,
+                        "semester": 7,
+                        "alienId": 920,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Сергеева Е.И.",
+                        "isTeacher": true,
+                        "id": 2688,
+                        "surname": "Сергеева",
+                        "name": "Елена",
+                        "midname": "Игоревна",
+                        "phone": "",
+                        "birthday": "1989-01-14",
+                        "roles": [
+                            "teacher"
+                        ],
+                        "workDepartments": null,
+                        "position": "Ассистент (каф.МОЭВМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": null,
+                        "alienId": 2868,
+                        "groupId": null,
+                        "personalNumber": "00204996",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475428,
+                "lessonId": 9492607,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.ДВ.04.02",
+                "url": null,
+                "lesson": {
+                    "id": 9492607,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534646,
+                        "type": "schedule",
+                        "description": "\"Параллельные алгоритмы\" (Пр), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:14.979Z",
+                        "auditoriumNumber": null,
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475428,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544867,
+                            "startTime": 105,
+                            "endTime": 1105,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "TUE",
+                            "week": "2"
+                        },
+                        "auditorium": null
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48642,
+                        "title": "Параллельные алгоритмы",
+                        "englishTitle": null,
+                        "shortTitle": "ПарАлг",
+                        "subjectType": "Пр",
+                        "controlType": null,
+                        "semester": 7,
+                        "alienId": 920,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Сергеева Е.И.",
+                        "isTeacher": true,
+                        "id": 2688,
+                        "surname": "Сергеева",
+                        "name": "Елена",
+                        "midname": "Игоревна",
+                        "phone": "",
+                        "birthday": "1989-01-14",
+                        "roles": [
+                            "teacher"
+                        ],
+                        "workDepartments": null,
+                        "position": "Ассистент (каф.МОЭВМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": null,
+                        "alienId": 2868,
+                        "groupId": null,
+                        "personalNumber": "00204996",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475444,
+                "lessonId": 9492623,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.ДВ.04.01",
+                "url": null,
+                "lesson": {
+                    "id": 9492623,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534662,
+                        "type": "schedule",
+                        "description": "\"Цифровая обработка сигналов\" (Пр), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:15.166Z",
+                        "auditoriumNumber": "3410",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475444,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544883,
+                            "startTime": 105,
+                            "endTime": 1105,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "TUE",
+                            "week": "1"
+                        },
+                        "auditorium": {
+                            "displayName": "3410",
+                            "number": "3410",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48584,
+                        "title": "Цифровая обработка сигналов",
+                        "englishTitle": null,
+                        "shortTitle": "ЦОС",
+                        "subjectType": "Пр",
+                        "controlType": null,
+                        "semester": 7,
+                        "alienId": 1584,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Сучков А.И.",
+                        "isTeacher": true,
+                        "id": 579,
+                        "surname": "Сучков",
+                        "name": "Андрей",
+                        "midname": "Игоревич",
+                        "phone": "",
+                        "birthday": "1996-03-26",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра математического обеспечения и применения ЭВМ (ассистент)",
+                            "Кафедра \"Алгоритмическая математика\" (ассистент)"
+                        ],
+                        "position": "Ассистент (каф.МОЭВМ), Ассистент (каф.АМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": "aisuchkov@etu.ru",
+                        "alienId": 2543,
+                        "groupId": null,
+                        "personalNumber": "00032336",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475456,
+                "lessonId": 9492635,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.ДВ.04.01",
+                "url": null,
+                "lesson": {
+                    "id": 9492635,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534674,
+                        "type": "schedule",
+                        "description": "\"Цифровая обработка сигналов\" (Пр), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:15.311Z",
+                        "auditoriumNumber": "3410",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475456,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544895,
+                            "startTime": 105,
+                            "endTime": 1105,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "TUE",
+                            "week": "2"
+                        },
+                        "auditorium": {
+                            "displayName": "3410",
+                            "number": "3410",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48584,
+                        "title": "Цифровая обработка сигналов",
+                        "englishTitle": null,
+                        "shortTitle": "ЦОС",
+                        "subjectType": "Пр",
+                        "controlType": null,
+                        "semester": 7,
+                        "alienId": 1584,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Сучков А.И.",
+                        "isTeacher": true,
+                        "id": 579,
+                        "surname": "Сучков",
+                        "name": "Андрей",
+                        "midname": "Игоревич",
+                        "phone": "",
+                        "birthday": "1996-03-26",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра математического обеспечения и применения ЭВМ (ассистент)",
+                            "Кафедра \"Алгоритмическая математика\" (ассистент)"
+                        ],
+                        "position": "Ассистент (каф.МОЭВМ), Ассистент (каф.АМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": "aisuchkov@etu.ru",
+                        "alienId": 2543,
+                        "groupId": null,
+                        "personalNumber": "00032336",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475463,
+                "lessonId": 9492642,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.О.28",
+                "url": null,
+                "lesson": {
+                    "id": 9492642,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534681,
+                        "type": "schedule",
+                        "description": "\"Проектирование человеко-машинного интерфейса\" (Лек), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:15.393Z",
+                        "auditoriumNumber": "3410",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475463,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544902,
+                            "startTime": 104,
+                            "endTime": 1104,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "MON",
+                            "week": "2"
+                        },
+                        "auditorium": {
+                            "displayName": "3410",
+                            "number": "3410",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48636,
+                        "title": "Проектирование человеко-машинного интерфейса",
+                        "englishTitle": null,
+                        "shortTitle": "ПрЧМИ",
+                        "subjectType": "Лек",
+                        "controlType": "Экз",
+                        "semester": 7,
+                        "alienId": 1039,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Калишенко Е.Л.",
+                        "isTeacher": true,
+                        "id": 451,
+                        "surname": "Калишенко",
+                        "name": "Евгений",
+                        "midname": "Леонидович",
+                        "phone": null,
+                        "birthday": "1987-01-10",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра математического обеспечения и применения ЭВМ (старший преподаватель)"
+                        ],
+                        "position": "Старший преподаватель (каф.МОЭВМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": "elkalishenko@etu.ru",
+                        "alienId": 884,
+                        "groupId": null,
+                        "personalNumber": "00026288",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475470,
+                "lessonId": 9492649,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.О.28",
+                "url": null,
+                "lesson": {
+                    "id": 9492649,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534688,
+                        "type": "schedule",
+                        "description": "\"Проектирование человеко-машинного интерфейса\" (Пр), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:15.477Z",
+                        "auditoriumNumber": "3410",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475470,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544909,
+                            "startTime": 105,
+                            "endTime": 1105,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "MON",
+                            "week": "2"
+                        },
+                        "auditorium": {
+                            "displayName": "3410",
+                            "number": "3410",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48637,
+                        "title": "Проектирование человеко-машинного интерфейса",
+                        "englishTitle": null,
+                        "shortTitle": "ПрЧМИ",
+                        "subjectType": "Пр",
+                        "controlType": null,
+                        "semester": 7,
+                        "alienId": 1039,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Яцык А.А.",
+                        "isTeacher": true,
+                        "id": 3584,
+                        "surname": "Яцык",
+                        "name": "Ангелина",
+                        "midname": "Андреевна",
+                        "phone": "",
+                        "birthday": "1994-02-18",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра математического обеспечения и применения ЭВМ (ассистент)"
+                        ],
+                        "position": "Ассистент (каф.МОЭВМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": "aaiatsyk@etu.ru",
+                        "alienId": null,
+                        "groupId": null,
+                        "personalNumber": "00205119",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475482,
+                "lessonId": 9492661,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.10",
+                "url": null,
+                "lesson": {
+                    "id": 9492661,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534700,
+                        "type": "schedule",
+                        "description": "\"Основы подготовки научных публикаций\" (Пр), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:15.625Z",
+                        "auditoriumNumber": "3409",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475482,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544921,
+                            "startTime": 105,
+                            "endTime": 1105,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "MON",
+                            "week": "1"
+                        },
+                        "auditorium": {
+                            "displayName": "3409",
+                            "number": "3409",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48589,
+                        "title": "Основы подготовки научных публикаций",
+                        "englishTitle": null,
+                        "shortTitle": "ОПНП",
+                        "subjectType": "Пр",
+                        "controlType": null,
+                        "semester": 7,
+                        "alienId": 3106,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Заславский М.М.",
+                        "isTeacher": true,
+                        "id": 443,
+                        "surname": "Заславский",
+                        "name": "Марк",
+                        "midname": "Маркович",
+                        "phone": null,
+                        "birthday": "1991-09-11",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра математического обеспечения и применения ЭВМ (доцент кандидат наук)",
+                            "Международный инновационный институт искусственного интеллекта, кибербезопасности и коммуникаций им. А.С. Попова (директор)",
+                            "Лаборатория автономных транспортных систем (ведущий научный сотрудник кандидат наук)"
+                        ],
+                        "position": "Ассистент (каф.МОЭВМ), Доцент (каф.МОЭВМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": "mmzaslavskii@etu.ru",
+                        "alienId": 2257,
+                        "groupId": null,
+                        "personalNumber": "00030145",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475514,
+                "lessonId": 9492693,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.О.26",
+                "url": null,
+                "lesson": {
+                    "id": 9492693,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534732,
+                        "type": "schedule",
+                        "description": "\"Безопасность жизнедеятельности\" (Пр), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:16.013Z",
+                        "auditoriumNumber": "5134",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475514,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544953,
+                            "startTime": 103,
+                            "endTime": 1103,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "TUE",
+                            "week": "1"
+                        },
+                        "auditorium": {
+                            "displayName": "5134",
+                            "number": "5134",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 47301,
+                        "title": "Безопасность жизнедеятельности",
+                        "englishTitle": null,
+                        "shortTitle": "БЖД",
+                        "subjectType": "Пр",
+                        "controlType": null,
+                        "semester": 7,
+                        "alienId": 110,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 39,
+                            "title": "каф.БЖД",
+                            "longTitle": "Кафедра безопасности жизнедеятельности",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Трусов А.А.",
+                        "isTeacher": true,
+                        "id": 1394,
+                        "surname": "Трусов",
+                        "name": "Александр",
+                        "midname": "Александрович",
+                        "phone": "+79991876414",
+                        "birthday": "1985-08-15",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра безопасности жизнедеятельности (заведующий лабораторией)",
+                            "Кафедра безопасности жизнедеятельности (ассистент)"
+                        ],
+                        "position": "Ассистент (каф.БЖД)",
+                        "degree": null,
+                        "rank": null,
+                        "email": "aatrusov@etu.ru",
+                        "alienId": 2641,
+                        "groupId": null,
+                        "personalNumber": "00019211",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475529,
+                "lessonId": 9492708,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.О.26",
+                "url": null,
+                "lesson": {
+                    "id": 9492708,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534747,
+                        "type": "schedule",
+                        "description": "\"Безопасность жизнедеятельности\" (Лаб), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:16.257Z",
+                        "auditoriumNumber": "5135",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475529,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9544968,
+                            "startTime": 102,
+                            "endTime": 1102,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "TUE",
+                            "week": "2"
+                        },
+                        "auditorium": {
+                            "displayName": "5135",
+                            "number": "5135",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 46323,
+                        "title": "Безопасность жизнедеятельности",
+                        "englishTitle": null,
+                        "shortTitle": "БЖД",
+                        "subjectType": "Лаб",
+                        "controlType": null,
+                        "semester": 7,
+                        "alienId": 110,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 39,
+                            "title": "каф.БЖД",
+                            "longTitle": "Кафедра безопасности жизнедеятельности",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Демидович О.В.",
+                        "isTeacher": true,
+                        "id": 216,
+                        "surname": "Демидович",
+                        "name": "Ольга",
+                        "midname": "Васильевна",
+                        "phone": null,
+                        "birthday": "1948-06-01",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра безопасности жизнедеятельности (старший преподаватель)",
+                            "Кафедра безопасности жизнедеятельности (специалист по учебно-методической работе 2 категории)"
+                        ],
+                        "position": "Старший преподаватель (каф.БЖД)",
+                        "degree": null,
+                        "rank": null,
+                        "email": "ovdemidovich@etu.ru",
+                        "alienId": 684,
+                        "groupId": null,
+                        "personalNumber": "90002079",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475613,
+                "lessonId": 9492792,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.09",
+                "url": null,
+                "lesson": {
+                    "id": 9492792,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534831,
+                        "type": "schedule",
+                        "description": "\"Маркетинг\" (Пр), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:18.946Z",
+                        "auditoriumNumber": "2404",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475613,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9545052,
+                            "startTime": 102,
+                            "endTime": 1102,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "WED",
+                            "week": "2"
+                        },
+                        "auditorium": {
+                            "displayName": "2404",
+                            "number": "2404",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 47298,
+                        "title": "Маркетинг",
+                        "englishTitle": null,
+                        "shortTitle": "Маркетинг",
+                        "subjectType": "Пр",
+                        "controlType": null,
+                        "semester": 7,
+                        "alienId": 459,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 8,
+                            "title": "каф.ИМ",
+                            "longTitle": "Кафедра инновационного менеджмента",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Петрова А.К.",
+                        "isTeacher": true,
+                        "id": 1196,
+                        "surname": "Петрова",
+                        "name": "Айгуль",
+                        "midname": "Камиловна",
+                        "phone": "+79817786778",
+                        "birthday": "1972-10-10",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра инновационного менеджмента (старший преподаватель)"
+                        ],
+                        "position": "Старший преподаватель (каф.ИМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": "akpetrova@etu.ru",
+                        "alienId": 2191,
+                        "groupId": null,
+                        "personalNumber": "00028213",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9475657,
+                "lessonId": 9492836,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.О.26",
+                "url": null,
+                "lesson": {
+                    "id": 9492836,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9534875,
+                        "type": "schedule",
+                        "description": "\"Безопасность жизнедеятельности\" (Лек), группа 0303",
+                        "updatedAt": "2023-10-27T12:54:19.698Z",
+                        "auditoriumNumber": "5423",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9475657,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9545096,
+                            "startTime": 102,
+                            "endTime": 1102,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "MON",
+                            "week": "1"
+                        },
+                        "auditorium": {
+                            "displayName": "5423",
+                            "number": "5423",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 46322,
+                        "title": "Безопасность жизнедеятельности",
+                        "englishTitle": null,
+                        "shortTitle": "БЖД",
+                        "subjectType": "Лек",
+                        "controlType": "ЗчО",
+                        "semester": 7,
+                        "alienId": 110,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 39,
+                            "title": "каф.БЖД",
+                            "longTitle": "Кафедра безопасности жизнедеятельности",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Иванов А.Н.",
+                        "isTeacher": true,
+                        "id": 230,
+                        "surname": "Иванов",
+                        "name": "Александр",
+                        "midname": "Николаевич",
+                        "phone": null,
+                        "birthday": "1987-05-26",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра безопасности жизнедеятельности (доцент кандидат наук)"
+                        ],
+                        "position": "Доцент (каф.БЖД)",
+                        "degree": "Кандидат наук",
+                        "rank": null,
+                        "email": "anivanov@etu.ru",
+                        "alienId": 688,
+                        "groupId": null,
+                        "personalNumber": "00020746",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9479059,
+                "lessonId": 9496238,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.ДВ.04.02",
+                "url": null,
+                "lesson": {
+                    "id": 9496238,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9538277,
+                        "type": "schedule",
+                        "description": "\"Параллельные алгоритмы\" (Лек), группа 0303",
+                        "updatedAt": "2023-10-27T12:55:05.400Z",
+                        "auditoriumNumber": null,
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9479059,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9548498,
+                            "startTime": 104,
+                            "endTime": 1104,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "TUE",
+                            "week": "1"
+                        },
+                        "auditorium": null
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48641,
+                        "title": "Параллельные алгоритмы",
+                        "englishTitle": null,
+                        "shortTitle": "ПарАлг",
+                        "subjectType": "Лек",
+                        "controlType": "Экз",
+                        "semester": 7,
+                        "alienId": 920,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Татаринов Ю.С.",
+                        "isTeacher": true,
+                        "id": 581,
+                        "surname": "Татаринов",
+                        "name": "Юрий",
+                        "midname": "Станиславович",
+                        "phone": null,
+                        "birthday": "1956-05-09",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра математического обеспечения и применения ЭВМ (доцент кандидат наук)"
+                        ],
+                        "position": "Доцент (каф.МОЭВМ)",
+                        "degree": "Кандидат наук",
+                        "rank": "Доцент",
+                        "email": "ystatarinov@etu.ru",
+                        "alienId": 903,
+                        "groupId": null,
+                        "personalNumber": "98001135",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": {
+                        "initials": "Сергеева Е.И.",
+                        "isTeacher": true,
+                        "id": 2688,
+                        "surname": "Сергеева",
+                        "name": "Елена",
+                        "midname": "Игоревна",
+                        "phone": "",
+                        "birthday": "1989-01-14",
+                        "roles": [
+                            "teacher"
+                        ],
+                        "workDepartments": null,
+                        "position": "Ассистент (каф.МОЭВМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": null,
+                        "alienId": 2868,
+                        "groupId": null,
+                        "personalNumber": "00204996",
+                        "isEmailNotif": true
+                    }
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9479060,
+                "lessonId": 9496239,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.ДВ.04.02",
+                "url": null,
+                "lesson": {
+                    "id": 9496239,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9538278,
+                        "type": "schedule",
+                        "description": "\"Параллельные алгоритмы\" (Лек), группа 0303",
+                        "updatedAt": "2023-10-27T12:55:05.425Z",
+                        "auditoriumNumber": null,
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9479060,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9548499,
+                            "startTime": 104,
+                            "endTime": 1104,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "TUE",
+                            "week": "2"
+                        },
+                        "auditorium": null
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48641,
+                        "title": "Параллельные алгоритмы",
+                        "englishTitle": null,
+                        "shortTitle": "ПарАлг",
+                        "subjectType": "Лек",
+                        "controlType": "Экз",
+                        "semester": 7,
+                        "alienId": 920,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Татаринов Ю.С.",
+                        "isTeacher": true,
+                        "id": 581,
+                        "surname": "Татаринов",
+                        "name": "Юрий",
+                        "midname": "Станиславович",
+                        "phone": null,
+                        "birthday": "1956-05-09",
+                        "roles": [
+                            "worker",
+                            "teacher"
+                        ],
+                        "workDepartments": [
+                            "Кафедра математического обеспечения и применения ЭВМ (доцент кандидат наук)"
+                        ],
+                        "position": "Доцент (каф.МОЭВМ)",
+                        "degree": "Кандидат наук",
+                        "rank": "Доцент",
+                        "email": "ystatarinov@etu.ru",
+                        "alienId": 903,
+                        "groupId": null,
+                        "personalNumber": "98001135",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": {
+                        "initials": "Сергеева Е.И.",
+                        "isTeacher": true,
+                        "id": 2688,
+                        "surname": "Сергеева",
+                        "name": "Елена",
+                        "midname": "Игоревна",
+                        "phone": "",
+                        "birthday": "1989-01-14",
+                        "roles": [
+                            "teacher"
+                        ],
+                        "workDepartments": null,
+                        "position": "Ассистент (каф.МОЭВМ)",
+                        "degree": null,
+                        "rank": null,
+                        "email": null,
+                        "alienId": 2868,
+                        "groupId": null,
+                        "personalNumber": "00204996",
+                        "isEmailNotif": true
+                    }
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9479063,
+                "lessonId": 9496242,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.ДВ.04.01",
+                "url": null,
+                "lesson": {
+                    "id": 9496242,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9538281,
+                        "type": "schedule",
+                        "description": "\"Цифровая обработка сигналов\" (Лек), группа 0303",
+                        "updatedAt": "2023-10-27T12:55:05.459Z",
+                        "auditoriumNumber": "3425",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9479063,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9548502,
+                            "startTime": 104,
+                            "endTime": 1104,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "TUE",
+                            "week": "1"
+                        },
+                        "auditorium": {
+                            "displayName": "3425",
+                            "number": "3425",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48583,
+                        "title": "Цифровая обработка сигналов",
+                        "englishTitle": null,
+                        "shortTitle": "ЦОС",
+                        "subjectType": "Лек",
+                        "controlType": "Экз",
+                        "semester": 7,
+                        "alienId": 1584,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Середа А.И.",
+                        "isTeacher": true,
+                        "id": 562,
+                        "surname": "Середа",
+                        "name": "Альгирдас-Владимир",
+                        "midname": "Игнатьевич",
+                        "phone": null,
+                        "birthday": "1951-02-01",
+                        "roles": [
+                            "teacher"
+                        ],
+                        "workDepartments": null,
+                        "position": "Профессор (каф.МОЭВМ)",
+                        "degree": "Доктор наук",
+                        "rank": "Профессор",
+                        "email": "aisereda@etu.ru",
+                        "alienId": 898,
+                        "groupId": null,
+                        "personalNumber": "00028138",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            },
+            {
+                "groupId": 4362,
+                "id": 9479064,
+                "lessonId": 9496243,
+                "comment": "",
+                "form": "standard",
+                "block": "Б1.В.ДВ.04.01",
+                "url": null,
+                "lesson": {
+                    "id": 9496243,
+                    "newTeacherDateStart": null,
+                    "newTeacherDateEnd": null,
+                    "newAudDateStart": null,
+                    "newAudDateEnd": null,
+                    "isVacant": false,
+                    "byHours1": false,
+                    "byHours2": false,
+                    "groupNumber": "0303",
+                    "auditoriumReservation": {
+                        "id": 9538282,
+                        "type": "schedule",
+                        "description": "\"Цифровая обработка сигналов\" (Лек), группа 0303",
+                        "updatedAt": "2023-10-27T12:55:05.473Z",
+                        "auditoriumNumber": "3425",
+                        "examId": null,
+                        "scheduleId": 602,
+                        "scheduleObjectId": 9479064,
+                        "examObjectId": null,
+                        "reservationTime": {
+                            "id": 9548503,
+                            "startTime": 104,
+                            "endTime": 1104,
+                            "startDate": "2023-09-01",
+                            "endDate": "2023-12-29",
+                            "repeat": null,
+                            "weekDay": "TUE",
+                            "week": "2"
+                        },
+                        "auditorium": {
+                            "displayName": "3425",
+                            "number": "3425",
+                            "alias": null
+                        }
+                    },
+                    "newAuditoriumReservation": null,
+                    "newTeacher": null,
+                    "subject": {
+                        "id": 48583,
+                        "title": "Цифровая обработка сигналов",
+                        "englishTitle": null,
+                        "shortTitle": "ЦОС",
+                        "subjectType": "Лек",
+                        "controlType": "Экз",
+                        "semester": 7,
+                        "alienId": 1584,
+                        "studyYears": "2023-2024",
+                        "department": {
+                            "id": 14,
+                            "title": "каф.МОЭВМ",
+                            "longTitle": "Кафедра математического обеспечения и применения ЭВМ",
+                            "type": "normal"
+                        }
+                    },
+                    "teacher": {
+                        "initials": "Середа А.И.",
+                        "isTeacher": true,
+                        "id": 562,
+                        "surname": "Середа",
+                        "name": "Альгирдас-Владимир",
+                        "midname": "Игнатьевич",
+                        "phone": null,
+                        "birthday": "1951-02-01",
+                        "roles": [
+                            "teacher"
+                        ],
+                        "workDepartments": null,
+                        "position": "Профессор (каф.МОЭВМ)",
+                        "degree": "Доктор наук",
+                        "rank": "Профессор",
+                        "email": "aisereda@etu.ru",
+                        "alienId": 898,
+                        "groupId": null,
+                        "personalNumber": "00028138",
+                        "isEmailNotif": true
+                    },
+                    "secondTeacher": null
+                }
+            }
+        ]
+    }
+]
