@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Config } from '@vkontakte/superappkit';
-import { vkAuthRedirectURL, oneTapButton } from '../../Fetches/Profile/VKButton';
+import { vkAuthRedirectURL, oneTapButton } from '../../FxFetches/Profile/VKButton';
 
 // vk id штучка
 Config.init({

@@ -22,10 +22,8 @@ function handlePlanningClick(setActive) {
   setActive('planning');
 }
 
-function handleGroupsClick(setActive, setGroup, setGroupSchedule) {
+function handleGroupsClick(setActive) {
   setActive('groups');
-  setGroupSchedule(null);
-  setGroup(null);
 }
 
 function handleProfileClick(setActive) {

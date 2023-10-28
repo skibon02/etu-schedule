@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Config } from '@vkontakte/superappkit';
-import myfetch from '../../Fetches/myfetch';
+import myfetch from '../../FxFetches/myfetch';
 import { Connect, ConnectEvents } from '@vkontakte/superappkit';
-import { isdev, currentHost } from '../../Fetches/util';
+import { isdev, currentHost } from '../../FxFetches/util';
 
 // vk id штучка
 Config.init({

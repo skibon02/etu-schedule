@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import SEARCH from '../../../icons/search.svg'
 import * as handlers from '../../Handlers/Groups/handlers'
+import React from 'react';
+import { useNavigate } from 'react-router-dom'
 
-export default function Groups({setGroupId, setActive, groupList, setGroupNumber}) {
+export default function Groups({setGroupId, setActive, groupList, setGroupNumber, setGroupSchedule}) {
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     inputRef.current.focus();
@@ -43,8 +46,10 @@ export default function Groups({setGroupId, setActive, groupList, setGroupNumber
                 setGroupNumber,
                 setActive,
                 group.id,
-                group.number
+                group.number,
+                setGroupSchedule
                 );
+                navigate('/schedule')
             }}>
               {group.number}
           </div>

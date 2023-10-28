@@ -164,6 +164,10 @@ body {
   font-family: "Poppins", sans-serif;
 }
 
+.a {
+  height: 0 !important;
+}
+
 .container {
   font-size: 16px;
   font-weight: 400;
@@ -293,9 +297,10 @@ body {
       -ms-flex-pack: center;
           justify-content: center;
   border-bottom: 0.1px solid #fff;
-  height: 4.6875em;
+  height: 4.6875em !important;
 }
 .nav__item {
+  height: 4.6875em !important;
   width: 10.3125em;
   border-right: 0.1px solid #fff;
   -webkit-transition: all 0.3s ease;
@@ -399,7 +404,6 @@ body {
     -webkit-box-ordinal-group: 3;
         -ms-flex-order: 2;
             order: 2;
-    height: 5em;
   }
   .nav__item:first-child {
     border-left: none;

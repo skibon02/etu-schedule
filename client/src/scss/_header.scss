@@ -86,9 +86,10 @@ $HALF-HEIGHT: 75px;
   display: flex;
   justify-content: center;
   border-bottom: .1px solid $BORDER-COLOR;
-  height: pxToEm($HALF-HEIGHT);
+  height: pxToEm(calc($HALF-HEIGHT)) !important;
   
   &__item {
+    height: pxToEm(calc($HALF-HEIGHT)) !important;
     width: pxToEm(165px);
     border-right: .1px solid $BORDER-COLOR;
     transition: all .3s ease;
@@ -178,7 +179,7 @@ $HALF-HEIGHT: 75px;
     border-top: .1px solid $BORDER-COLOR;
     border-bottom: none;
     order: 2;
-    height: pxToEm(80px);
+    // height: $HALF-HEIGHT;
     &__item {
       &:first-child {
         border-left: none;
