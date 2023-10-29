@@ -211,8 +211,8 @@ body {
   .under-planning-thead-box {
     height: 0;
   }
-  .under-header-box-mobile {
-    height: 8.75em;
+  .under-planning-thead-box-mobile {
+    height: 2.1875em;
   }
 }
 .header-active {
