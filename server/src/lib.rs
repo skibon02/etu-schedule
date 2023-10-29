@@ -5,10 +5,15 @@ pub mod models;
 #[macro_use]
 extern crate rocket;
 
+use rocket::data::FromData;
 use rocket::fairing::{AdHoc, Fairing, Info, Kind};
+use rocket::http::hyper::request;
+use rocket::outcome::Outcome;
+use rocket::request::FromRequest;
 use rocket::{Build, Config, fairing, Request, Response, Rocket, tokio};
 use rocket::http::{Header, Status};
 use crate::models::Db;
+use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use std::{env, fs};
 
@@ -66,6 +71,34 @@ impl Fairing for CORS {
     }
 }
 
+pub struct DocumentRequest;
+
+#[async_trait]
+impl<'r> FromRequest<'r> for DocumentRequest {
+    type Error = ();
+
+    async fn from_request(req: &'r Request<'_>) -> rocket::request::Outcome<Self, Self::Error> { 
+        let path = req.uri().path();
+        // info!("{}", path);
+        if path == "/" {
+            return rocket::request::Outcome::Forward(());
+        }
+        let fir_seg = path.segments().next().unwrap();
+        if fir_seg == "static" {
+            return rocket::request::Outcome::Forward(());
+        }
+        if fir_seg.find('.').is_some() {
+            return rocket::request::Outcome::Forward(());
+        }
+        rocket::request::Outcome::Success(DocumentRequest)
+    }
+}
+
+#[get("/<path..>", rank=5)]
+async fn frontend_redirect(path: PathBuf, document: DocumentRequest) -> Redirect {
+    Redirect::to(uri!("/"))
+}
+
 pub fn stage() -> AdHoc {
     AdHoc::on_ignite("SQLx Stage", |rocket| async {
         let mut routes = routes::get_api_routes();
@@ -74,6 +107,7 @@ pub fn stage() -> AdHoc {
             .attach(Db::init())
             .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
             .mount("/api", routes)
+            .mount("/", routes![frontend_redirect])
     })
 }
 
@@ -81,7 +115,7 @@ pub fn stage() -> AdHoc {
 use chrono::Local;
 use colored::*;
 use rand::Rng;
-use rocket::response::Responder;
+use rocket::response::{Responder, Redirect};
 use rocket_db_pools::Database;
 use crate::api::vk_api::VK_SERVICE_TOKEN;
 
@@ -195,13 +229,14 @@ pub fn run() -> Rocket<Build> {
     }
 
     if with_client {
-        rocket.mount("/", FileServer::from("../client/build"))
+        rocket
+            .mount("/", FileServer::from("../client/build"))
     } else {
         rocket
     }
 }
 
 #[options("/<_path..>")]
-fn options_handler<'r>(_path: Option<std::path::PathBuf>) -> impl Responder<'r, 'static> {
+fn options_handler<'r>(_path: Option<PathBuf>) -> impl Responder<'r, 'static> {
     Status::Ok
 }
