@@ -10,6 +10,8 @@ import Schedule from '../../JSX/Schedule/Schedule'
 import makeSchedule from "../../Utils/Schedule/parseSchedule";
 import { setActiveByLocation } from "../../FxFetches/Pages/SetActiveByLocation";
 // import makeSchedule from "@src/js/Utils/Schedule/parseSchedule.js";
+import { getWeekNumber } from "../../Utils/handleTime";
+import Planning from "../Planning/Planning";
 
 export function Pages() {
   const [date, setDate] = useState(new Date());
@@ -69,7 +71,7 @@ export function Pages() {
               setActive={setActive}
               setGroupSchedule={setGroupSchedule}
               setGroupId={setGroupId}
-              weekNumber={makeSchedule(groupSchedule, date)[1]}
+              weekNumber={getWeekNumber(date)}
             />
           }
           <Routes>
@@ -82,16 +84,18 @@ export function Pages() {
                 key={groupId} 
                 date={date}
                 groupSchedule={groupSchedule}
-                groupNumber={groupNumber} />
+                groupNumber={groupNumber}
+                active={active} />
               } />
             }
             {active === 'planning' && 
               <Route
                 path="/planning"
                 element={
-                  <React.Fragment>
-                    <div>123</div>
-                  </React.Fragment >
+                  <Planning 
+                  groupNumber={groupNumber}
+                  groupSchedule={groupSchedule}
+                  active={active} />
                 }
               />
             }

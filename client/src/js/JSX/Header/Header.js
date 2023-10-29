@@ -14,40 +14,40 @@ export default function Header({date, setDate, active, setActive, weekNumber}) {
   return (
     <div className="header">
       <div className="header__nav nav">
-        <NavLink to='schedule' className='a'>
+        <NavLink to='schedule' className={active === 'schedule' ? 
+        "nav__item header-active" :
+        "nav__item header-hover"}>
           <NavButton
-            active={active}
-            activeName={'schedule'}
             imageSrc={NAVCLOCK}
             text={'Расписание'}
-            handleClick={() => handlers.handleScheduleClick(setActive)}
+            onClick={() => handlers.handleScheduleClick(setActive)}
           />
         </NavLink>
-        <NavLink to='planning' className='a'>
+        <NavLink to='planning' className={active === 'planning' ? 
+        "nav__item header-active" :
+        "nav__item header-hover"}>
           <NavButton
-            active={active}
-            activeName={'planning'}
             imageSrc={CALENDAR}
             text={'Планирование'}
-            handleClick={() => handlers.handlePlanningClick(setActive)}
+            onClick={() => handlers.handlePlanningClick(setActive)}
           />
         </NavLink>
-        <NavLink to='/' className='a'>
+        <NavLink to='/' className={active === 'groups' ? 
+        "nav__item header-active" :
+        "nav__item header-hover"}>
           <NavButton
-            active={active}
-            activeName={'groups'}
             imageSrc={SEARCH}
             text={'Группы'}
-            handleClick={() => handlers.handleGroupsClick(setActive)}
+            onClick={() => handlers.handleGroupsClick(setActive)}
           />
         </NavLink>
-        <NavLink to='profile' className='a'>
+        <NavLink to='profile' className={active === 'profile' ? 
+        "nav__item header-active" :
+        "nav__item header-hover"}>
           <NavButton
-            active={active}
-            activeName={'profile'}
             imageSrc={VK}
             text={'Профиль'}
-            handleClick={() => handlers.handleProfileClick(setActive)}
+            onClick={() => handlers.handleProfileClick(setActive)}
           />
         </NavLink>
       </div>

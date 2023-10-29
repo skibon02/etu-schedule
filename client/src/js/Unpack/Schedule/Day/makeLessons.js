@@ -1,6 +1,6 @@
 import { makeUsableSchedule } from "../../../Utils/Schedule/parseSchedule";
 
-export function makeLessons(daySchedule, Subject) {
+export function makeLessons(daySchedule, Subject, active) {
   let lessons = [];
   for (let i = 0; i < daySchedule.length; i++) {
     let usableSchedule = makeUsableSchedule(daySchedule[i]);
@@ -11,6 +11,7 @@ export function makeLessons(daySchedule, Subject) {
           key={daySchedule[i].id + ' ' + j.toString()} 
           subjectData={usableSchedule} 
           orderNumber={j} 
+          active={active}
         />
       );
     }

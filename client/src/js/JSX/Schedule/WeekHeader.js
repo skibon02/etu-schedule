@@ -1,7 +1,7 @@
 import { weekHeaderTime, isEvenWeek } from "../../Utils/handleTime";
 import { useState, useEffect } from "react";
 
-export function WeekHeader({groupNumber, date}) {
+export function WeekHeader({groupNumber, date, active}) {
   const [clock, setClock] = useState(weekHeaderTime(new Date()));
 
   useEffect(() => {
@@ -16,10 +16,12 @@ export function WeekHeader({groupNumber, date}) {
   
 
   return (
+    <>
     <div className='schedule__info schedule-info'>
       <div className='schedule-info__group schedule-info__item'>Группа: {groupNumber}</div>
-      <div className='schedule-info__date schedule-info__item'>Дата: {clock[0]}. Время: {clock[1]}</div>
-      <div className='schedule-info__week-parity schedule-info__item'>Неделя: {isEvenWeek(date)[0]}</div>
+      {active === 'schedule' && <div className='schedule-info__date schedule-info__item'>Дата: {clock[0]}. Время: {clock[1]}</div>}
+      <div className='schedule-info__week-parity schedule-info__item'>Неделя: {isEvenWeek(date)}</div>
     </div>
+    </>
   )
 }

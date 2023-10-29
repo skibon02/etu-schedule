@@ -10,6 +10,7 @@ body {
 
 .a {
   height: 0 !important;
+  display: inline-block;
 }
  
 .container {
@@ -17,6 +18,7 @@ body {
   font-weight: 400;
   line-height: 1.2em;
   position: relative;
+  min-height: 100vh;
 }
 
 .under-header-box {
@@ -24,6 +26,14 @@ body {
 }
 
 .under-header-box-mobile {
+  height: pxToEm(0px);
+}
+
+.under-planning-thead-box {
+  height: pxToEm(50px);
+}
+
+.under-planning-thead-box-mobile {
   height: pxToEm(0px);
 }
 
@@ -43,5 +53,11 @@ body {
   }
   .under-header-box-mobile {
     height: pxToEm(100px);
+  }
+  .under-planning-thead-box {
+    height: 0;
+  }
+  .under-header-box-mobile {
+    height: pxToEm(140px);
   }
 }

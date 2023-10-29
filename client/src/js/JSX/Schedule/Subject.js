@@ -5,9 +5,10 @@ import { makeClockTime, knowSubjectTime } from "../../Utils/handleTime";
 import { useState, useEffect } from "react";
 import GPSLIGHT from '../../../icons/gpslite.svg'
 import GPS from '../../../icons/location-pin-svgrepo-com.svg'
-import CLOCK from '../../../icons/icons8-clock.svg'
+import Attendance from "./Attendance";
+import PlanningSwitch from "../Planning/PlanningSwitch";
 
-export function Subject({subjectData, orderNumber}) {
+export function Subject({subjectData, orderNumber, active}) {
   const [toggleClock, setToggleClock] = useState(false);
   const [toggleMessage, setToggleMessage] = useState(false);
   const [timerId,  setTimerId] = useState(0);
@@ -33,19 +34,19 @@ export function Subject({subjectData, orderNumber}) {
   }, [checkInDeadline]);
 
   return (
-    <div className={isDead ? 
+    <div className={active === 'schedule' && isDead ? 
       "day__lesson lesson disabled-font" : 
       "day__lesson lesson"}>
       <div className="lesson__info">
         <div className="lesson__time">
           <div className={
-            isDead ? 
+            active === 'schedule' && isDead ? 
             "lesson__start disabled-font" :
             "lesson__start"}>
             {makeClockTime(lessonStart)}
           </div>
           <div className={
-            isDead ? 
+            active === 'schedule' && isDead ? 
             "lesson__end disabled-font" :
             "lesson__end"}>
             {makeClockTime(lessonEnd)}
@@ -60,7 +61,7 @@ export function Subject({subjectData, orderNumber}) {
           </div>
         </div>
         <div className="lesson__type-room lesson-type-room">
-          <p className={ isDead ? 
+          <p className={active === 'schedule' &&  isDead ? 
             "lesson-type-room__type disabled-font disabled-bg" :
             "lesson-type-room__type" }>
               {lessonType}
@@ -70,53 +71,24 @@ export function Subject({subjectData, orderNumber}) {
             <img 
               draggable={false} 
               className='lesson-type-room__image' 
-              src={isDead ? GPSLIGHT : GPS} 
+              src={active === 'schedule' && isDead ? GPSLIGHT : GPS} 
               alt="gps" /> {roomName}
           </p>}
         </div>
       </div>
-      <div className={"lesson__attendance attendance"}>
-        <div className="attendance__container" >
-          <div 
-            className='attendance__pseudo-body' 
-            onClick={() => handlers.handleClockClick(
-              isDead,
-              timerId,
-              setToggleClock,
-              setToggleMessage,
-              toggleClock,
-              setTimerId
-            )} >
-            <div 
-              className={
-                isDead ? 
-                "attendance__body attendance__body_red disabled-bg" : 
-                toggleClock ? 
-                "attendance__body attendance__body_red pulse-clock-red" :
-                "attendance__body attendance__body_green" 
-              } >
-              <div className="attendance__icon attendance-icon">
-                <img
-                  className="attendance-icon__image"
-                  src={CLOCK}
-                  alt="ico"
-                  draggable="false"
-                />
-              </div>
-            </div>
-          </div>
-          {toggleClock && toggleMessage &&
-            <div 
-              className="attendance__message message"
-              onClick={() => handlers.handleMessageClick(
-                isDead,
-                setToggleMessage
-              )} >
-              Изменение актуально только для этой недели
-            </div> 
-          }
-        </div>
-      </div>
+      {active === 'schedule' ?
+        <Attendance 
+        isDead={isDead}
+        timerId={timerId}
+        setTimerId={setTimerId}
+        toggleClock={toggleClock}
+        setToggleClock={setToggleClock}
+        toggleMessage={toggleMessage}
+        setToggleMessage={setToggleMessage}
+        />
+      :
+      <PlanningSwitch />
+      }
     </div>
   )
 }

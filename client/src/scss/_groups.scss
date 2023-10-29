@@ -37,6 +37,7 @@ $BORDER-COLOR: #828282;
   }
 }
 
+
 .groups-input {
   position: relative;
   border-bottom: 2px solid $BORDER-COLOR;
@@ -53,6 +54,14 @@ $BORDER-COLOR: #828282;
     top: pxToEm(3.5px);
     left: pxToEm(7px);
     width: pxToEm(25px);
+  }
+}
+
+@-moz-document url-prefix() {
+  .groups-input {
+    &__input {
+      padding: pxToEm(2px);
+    }
   }
 }
 

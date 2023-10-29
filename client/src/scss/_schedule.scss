@@ -370,10 +370,10 @@
     font-size: 0.95em;
     padding-top: pxToEm(0px);
     width: 95%;
+    margin-top: pxToEm(15px); 
   }
   .schedule-info {
-    font-size: 0.95em;
-    margin-top: pxToEm(10px);  
+    font-size: 0.95em; 
   }
   .attendance {
     &__body {

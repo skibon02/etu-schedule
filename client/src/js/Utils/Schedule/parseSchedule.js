@@ -1,4 +1,4 @@
-import { isEvenWeek } from "../handleTime";
+import { isEvenWeek, getWeekNumber } from "../handleTime";
 
 
 const WEEK_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
@@ -130,7 +130,7 @@ function sortScheduleByLesson(scheduleObjectI, scheduleObjectJ) {
 }
 
 export default function makeSchedule(scheduleObjects, date) {
-  let [parity, weekNumber] = isEvenWeek(date);
+  let parity = isEvenWeek(date);
   let currentDayOfWeek = WEEK_DAYS[date.getDay()];
 
   const week = parseWeek(scheduleObjects, parity); // -> arr contain arr
@@ -141,7 +141,7 @@ export default function makeSchedule(scheduleObjects, date) {
     weekSchedule.push(parseDays(week, WEEK_DAYS[i], date, currentDayOfWeek));
   }
   
-  return [weekSchedule, weekNumber];
+  return weekSchedule;
 }
 
 

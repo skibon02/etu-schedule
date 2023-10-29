@@ -1,15 +1,15 @@
 import { makeCalendarTime } from "../../../Utils/handleTime";
 
-export function makeWeek(weekSchedule, Day, DAYS) {
+export function makeWeek(weekSchedule, Day, DAYS, active) {
   let week = [];
   for (let i = 0; i < weekSchedule.length; i++) {
     if (weekSchedule[i][0] !== null) {
-      week.push(<Day key={i} daySchedule={weekSchedule[i]}  />)
+      week.push(<Day key={i} daySchedule={weekSchedule[i]} active={active}  />)
     } else {
       week.push(
         <div key={i} className="day">
           <div className="day__date">
-            {makeCalendarTime(weekSchedule[i][1], DAYS)}
+            {makeCalendarTime(weekSchedule[i][1], DAYS).slice(0, -5)}
           </div>
           <div className="day__lessons">
             <div className='day__empty'>

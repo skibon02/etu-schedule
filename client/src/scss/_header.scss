@@ -41,6 +41,7 @@ $HALF-HEIGHT: 75px;
     display: flex;
     justify-content: center;
     height: pxToEm($HALF-HEIGHT);
+    border-top: .1px solid #fff;
   }
 
   &__week-button {
@@ -63,33 +64,19 @@ $HALF-HEIGHT: 75px;
     }
 
   }
-
-  &__time {
-  }
 }
 
-.header-time {
-  text-transform: none ;
-  position: absolute;
-  top: pxToEm(5px);
-  right: 0;
-  width: pxToEm(110px);
-  user-select: none;
-  cursor: default;
-
-  &__text {
-
-  }
-}
 
 .nav {
   display: flex;
   justify-content: center;
-  border-bottom: .1px solid $BORDER-COLOR;
-  height: pxToEm(calc($HALF-HEIGHT)) !important;
+  // border-bottom: .1px solid $BORDER-COLOR;
+  height: pxToEm($HALF-HEIGHT) !important;
   
   &__item {
-    height: pxToEm(calc($HALF-HEIGHT)) !important;
+    // height: pxToEm($HALF-HEIGHT) !important;
+    height: 100%;
+    color: #fff;
     width: pxToEm(165px);
     border-right: .1px solid $BORDER-COLOR;
     transition: all .3s ease;
@@ -160,7 +147,7 @@ $HALF-HEIGHT: 75px;
     top: auto;
     bottom: 0;
     border-bottom: none;
-    border-top: .1px solid $BORDER-COLOR;
+    // border-top: .1px solid $BORDER-COLOR;
 
     &__week-buttons {
       height: pxToEm(80px);
@@ -182,10 +169,11 @@ $HALF-HEIGHT: 75px;
     // height: $HALF-HEIGHT;
     &__item {
       &:first-child {
-        border-left: none;
+        // border-left: .1px solid #fff;
       }
       &:last-child {
-        border-right: none;
+        // border-right: .1px solid #fff;
+        // border-left: none;
       }
     }
   }

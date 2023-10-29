@@ -116,10 +116,20 @@ function isEvenWeek(date) {
 
 
   if (weeksDiff % 2 === 0) {
-    return ['1', weeksDiff];
+    return '1';
   } else {
-    return ['2', weeksDiff];
+    return '2';
   }
+}
+
+function getWeekNumber(date) {
+  const today = new Date(date);
+  const firstWeek = new Date(today.getFullYear(), 7, 27); // (month 0-based index) 28 aug.
+
+  const daysDiff = Math.floor((today - firstWeek) / (24 * 60 * 60 * 1000));
+  const weeksDiff = Math.floor(daysDiff / 7);
+
+  return weeksDiff
 }
 
 function weekHeaderTime(date) {
@@ -136,4 +146,5 @@ export {
   makeCalendarTime,
   makeClockTime,
   weekHeaderTime,
+  getWeekNumber
 }
