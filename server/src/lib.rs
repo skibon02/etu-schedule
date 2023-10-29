@@ -17,7 +17,7 @@ use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use std::{env, fs};
 
-use rocket::fs::FileServer;
+use rocket::fs::{FileServer, NamedFile};
 
 
 #[path="data-merges/mod.rs"]
@@ -95,8 +95,10 @@ impl<'r> FromRequest<'r> for DocumentRequest {
 }
 
 #[get("/<path..>", rank=5)]
-async fn frontend_redirect(path: PathBuf, document: DocumentRequest) -> Redirect {
-    Redirect::to(uri!("/"))
+async fn frontend_page(path: PathBuf, document: DocumentRequest) -> Option<NamedFile> {
+    let mut path = PathBuf::from("../client/build");
+    path.push("index.html");
+    NamedFile::open(path).await.ok()
 }
 
 pub fn stage() -> AdHoc {
@@ -107,7 +109,7 @@ pub fn stage() -> AdHoc {
             .attach(Db::init())
             .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
             .mount("/api", routes)
-            .mount("/", routes![frontend_redirect])
+            .mount("/", routes![frontend_page])
     })
 }
 
