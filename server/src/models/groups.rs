@@ -4,8 +4,22 @@ use sqlx::{Acquire, Row};
 use super::Db;
 use serde_derive::Serialize;
 
+#[derive(Serialize, Debug, sqlx::FromRow, PartialEq, Clone)]
+pub struct FacultyModel {
+    pub faculty_id: u32,
+    pub title: String,
+}
+#[derive(Serialize, Debug, sqlx::FromRow, PartialEq, Clone)]
+pub struct DepartmentModel {
+    pub department_id: u32,
+    pub title: String,
+    pub long_title: String,
+    #[serde(rename = "type")]
+    pub department_type: String,
+    pub faculty_id: u32,
+}
 
-#[derive(Serialize, Debug, sqlx::FromRow)]
+#[derive(Serialize, Debug, sqlx::FromRow, PartialEq, Clone)]
 pub struct GroupsModel {
     pub group_id: u32,
     pub number: String,

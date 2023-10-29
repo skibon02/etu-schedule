@@ -10,6 +10,21 @@ const BASE_URL_ATTENDANCE: &str = "https://digital.etu.ru/api/attendance/";
 const BASE_URL_GENERAL: &str = "https://digital.etu.ru/api/general/";
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
+pub struct FacultyOriginal {
+    pub id: u32,
+    pub title: String,
+}
+#[derive(Deserialize, Debug, Clone, Serialize)]
+pub struct DepartmentOriginal {
+    pub id: u32,
+    pub title: String,
+    pub longTitle: String,
+    #[serde(rename = "type")]
+    pub _type: String,
+    pub faculty: FacultyOriginal
+}
+
+#[derive(Deserialize, Debug, Clone, Serialize)]
 pub struct GroupsOriginal {
     fullNumber: String,
     id: u32,
@@ -20,6 +35,7 @@ pub struct GroupsOriginal {
     specialtyId: u32,
     startYear: u16,
     endYear: u16,
+    department: DepartmentOriginal
 }
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
@@ -115,15 +131,15 @@ fn parse_schedule_objs_group(data: String) -> anyhow::Result<Vec<GroupScheduleOr
     Ok(value)
 }
 
-pub async fn get_groups_list() -> BTreeMap<u32, GroupsModel> {
-    let url = format!("{}dicts/groups?scheduleId=594&withFaculty=false&withSemesterSeasons=false&withFlows=false", BASE_URL_GENERAL);
+pub async fn get_groups_list() -> BTreeMap<u32, (GroupsModel, DepartmentOriginal)> {
+    let url = format!("{}dicts/groups?scheduleId=594&withFaculty=true&withSemesterSeasons=false&withFlows=false", BASE_URL_GENERAL);
     let response = reqwest::get(&url).await.unwrap();
     let body = response.text().await.unwrap();
 
     parse_groups(body).unwrap()
 }
 
-fn parse_groups(data: String) -> anyhow::Result<BTreeMap<u32, GroupsModel>> {
+fn parse_groups(data: String) -> anyhow::Result<BTreeMap<u32, (GroupsModel, DepartmentOriginal)>> {
 
     let input_data: Vec<GroupsOriginal> = serde_json::from_str(&data)?;
     let mut output_data = BTreeMap::new();
@@ -139,7 +155,8 @@ fn parse_groups(data: String) -> anyhow::Result<BTreeMap<u32, GroupsModel>> {
             department_id: item.departmentId,
             specialty_id: item.specialtyId,
         };
-        output_data.insert(item.id, output);
+        let department = item.department;
+        output_data.insert(item.id, (output, department));
     }
 
     Ok(output_data)

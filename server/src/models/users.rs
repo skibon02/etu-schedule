@@ -38,7 +38,7 @@ pub async fn create_user(mut con: Connection<Db>, user_info: UserInfo) -> anyhow
         .bind(user_info.last_name)
         .bind(user_info.sex)
         .bind(user_info.birthdate)
-        .execute(con.acquire().await?)
+        .execute(&mut **con)
         .await
         .map_err(|e| anyhow::anyhow!("Error creating user: {}", e))
         .map(|_| ())
@@ -49,7 +49,7 @@ pub async fn get_user_info(mut con: Connection<Db>, id: u32) -> anyhow::Result<U
         "SELECT * FROM users WHERE vk_id = ?",
     )
         .bind(id)
-        .fetch_one(con.acquire().await?).await?;
+        .fetch_one(&mut **con).await?;
 
     Ok(res)
 }
@@ -59,7 +59,7 @@ pub async fn user_exists(mut con: Connection<Db>, id: u32) -> anyhow::Result<boo
         "SELECT vk_id FROM users WHERE vk_id = ?",
     )
         .bind(id)
-        .fetch_one(con.acquire().await?).await?;
+        .fetch_one(&mut **con).await?;
 
     Ok(res.get::<u32, _>("vk_id") == id)
 }
