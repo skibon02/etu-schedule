@@ -20,7 +20,7 @@ pub struct DepartmentModel {
 }
 
 #[derive(Serialize, Debug, sqlx::FromRow, PartialEq, Clone)]
-pub struct GroupsModel {
+pub struct GroupModel {
     pub group_id: u32,
     pub number: String,
     pub studying_type: String,
@@ -31,7 +31,7 @@ pub struct GroupsModel {
     pub specialty_id: u32,
 }
 
-pub async fn get_groups(mut con: Connection<Db>) -> anyhow::Result<Vec<GroupsModel>> {
+pub async fn get_groups(mut con: Connection<Db>) -> anyhow::Result<Vec<GroupModel>> {
     let res = sqlx::query_as(
         "SELECT * FROM groups",
     )
@@ -40,7 +40,7 @@ pub async fn get_groups(mut con: Connection<Db>) -> anyhow::Result<Vec<GroupsMod
     Ok(res)
 }
 
-pub async fn get_group(mut con: Connection<Db>, group_id: u32) -> anyhow::Result<GroupsModel> {
+pub async fn get_group(mut con: Connection<Db>, group_id: u32) -> anyhow::Result<GroupModel> {
     let res = sqlx::query_as(
         "SELECT * FROM groups WHERE group_id = ?",
     )

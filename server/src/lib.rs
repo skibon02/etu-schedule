@@ -131,7 +131,6 @@ use rocket_db_pools::Database;
 use sqlx::{Pool, Sqlite, SqlitePool};
 use crate::api::etu_api;
 use crate::api::vk_api::VK_SERVICE_TOKEN;
-use crate::data_merges::groups;
 
 
 fn loglevel_formatter(level: &log::Level) -> ColoredString {
@@ -260,7 +259,7 @@ async fn periodic_task(mut con: Db) {
     loop {
         info!("Running periodic task!");
         let new_groups = etu_api::get_groups_list().await;
-        groups::process_merge(&new_groups, &mut con.acquire().await.unwrap()).await.unwrap();
+        data_merges::groups::groups_merge(&new_groups, &mut con.acquire().await.unwrap()).await.unwrap();
 
 
 

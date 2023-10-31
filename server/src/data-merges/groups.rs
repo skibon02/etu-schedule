@@ -2,24 +2,18 @@ use std::collections::BTreeMap;
 use rocket_db_pools::Connection;
 use sqlx::{Acquire, Sqlite, SqliteConnection};
 use sqlx::pool::PoolConnection;
-use crate::api::etu_api::{DepartmentOriginal, FacultyOriginal};
-use crate::models::Db;
+use crate::api::etu_api::{DepartmentOriginal, FacultyOriginal, GroupOriginal};
+use crate::models::{Db, MergeResult};
 
-use crate::models::groups::{DepartmentModel, FacultyModel, GroupsModel};
+use crate::models::groups::{DepartmentModel, FacultyModel, GroupModel};
 
 
-pub async fn process_merge_faculty(faculty: FacultyOriginal, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
-    let mut modified = false;
-    let id = faculty.id;
+async fn faculty_single_merge(faculty: FacultyModel, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<MergeResult> {
+    let id = faculty.faculty_id;
     let row : Option<FacultyModel> = sqlx::query_as("SELECT * FROM faculties WHERE faculty_id = ?")
         .bind(id)
         .fetch_optional(&mut **con)
         .await?;
-
-    let faculty = FacultyModel {
-        faculty_id: faculty.id,
-        title: faculty.title,
-    };
 
     if let Some(row) = row {
         if row != faculty {
@@ -29,8 +23,10 @@ pub async fn process_merge_faculty(faculty: FacultyOriginal, con: &mut PoolConne
                 .bind(&faculty.faculty_id)
                 .execute(&mut **con)
                 .await?;
-            modified = true;
+            return Ok(MergeResult::Updated);
         }
+
+        return Ok(MergeResult::NotModified);
     }
     else {
         info!("MERGE::FACULTIES \tNew faculty: {} with title {}", id, faculty.title);
@@ -39,32 +35,19 @@ pub async fn process_merge_faculty(faculty: FacultyOriginal, con: &mut PoolConne
             .bind(&faculty.title)
             .execute(&mut **con)
             .await?;
-        modified = true;
+        return Ok(MergeResult::Inserted);
     }
-    if modified {
-        info!("MERGE::FACULTIES \tFaculties merge done with modifications");
-    }
-    else {
-        info!("MERGE::FACULTIES \tFaculties merge done without modifications");
-    }
-    Ok(())
 }
-pub async fn process_merge_department(department: DepartmentOriginal, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
-    let mut modified = false;
-    let id = department.id;
+async fn department_single_merge(department: DepartmentModel, faculty: Option<&FacultyModel>, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<MergeResult> {
+    let id = department.department_id;
     let row : Option<DepartmentModel> = sqlx::query_as("SELECT * FROM departments WHERE department_id = ?")
         .bind(id)
         .fetch_optional(&mut *con)
         .await?;
 
-    process_merge_faculty(department.faculty.clone(), &mut *con).await?;
-    let department = DepartmentModel {
-        department_id: department.id,
-        title: department.title,
-        long_title: department.longTitle,
-        department_type: department._type,
-        faculty_id: department.faculty.id,
-    };
+    if let Some(faculty) = faculty {
+        faculty_single_merge(faculty.clone(), &mut *con).await?;
+    }
 
     if let Some(row) = row {
         if row != department {
@@ -77,8 +60,10 @@ pub async fn process_merge_department(department: DepartmentOriginal, con: &mut 
                 .bind(&department.department_id)
                 .execute(&mut *con)
                 .await?;
-            modified = true;
+            return Ok(MergeResult::Updated);
         }
+
+        return Ok(MergeResult::NotModified);
     }
     else {
         info!("MERGE::DEPARTMENTS \tNew department: {} with title {}", id, department.title);
@@ -90,51 +75,25 @@ pub async fn process_merge_department(department: DepartmentOriginal, con: &mut 
             .bind(&department.faculty_id)
             .execute(con)
             .await?;
-        modified = true;
+        return Ok(MergeResult::Inserted)
     }
-    if modified {
-        info!("MERGE::DEPARTMENTS \tDepartments merge done with modifications");
-    }
-    else {
-        info!("MERGE::DEPARTMENTS \tDepartments merge done without modifications");
-    }
-    Ok(())
 }
 
-pub async fn process_merge(groups: &BTreeMap<u32, (GroupsModel, DepartmentOriginal)>, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
+async fn group_single_merge(group: &GroupModel, department: Option<&DepartmentModel>, faculty: Option<&FacultyModel>, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<MergeResult> {
+    let id = group.group_id;
+    let row : Option<GroupModel> = sqlx::query_as("SELECT * FROM groups WHERE group_id = ?")
+        .bind(id)
+        .fetch_optional(&mut *con)
+        .await?;
 
-    let start = std::time::Instant::now();
-    let mut modified = false;
-    for (_, (group, department)) in groups.iter() {
-        let id = group.group_id;
-        let row : Option<GroupsModel> = sqlx::query_as("SELECT * FROM groups WHERE group_id = ?")
-            .bind(id)
-            .fetch_optional(&mut *con)
-            .await?;
+    if Some(department) = department {
+        department_single_merge(department.clone(), faculty, &mut *con).await?;
+    }
 
-        process_merge_department(department.clone(), &mut *con).await?;
-
-        if let Some(row) = row {
-            if row != *group {
-                info!("MERGE::GROUPS \tUpdating group {} with number {}: \n old: {:?}, new: {:?}", id, group.number, row, *group);
-                sqlx::query("UPDATE groups SET number = ?, studying_type = ?, education_level = ?, start_year = ?, end_year = ?, department_id = ?, specialty_id = ? WHERE group_id = ?")
-                    .bind(&group.number)
-                    .bind(&group.studying_type)
-                    .bind(&group.education_level)
-                    .bind(&group.start_year)
-                    .bind(&group.end_year)
-                    .bind(&group.department_id)
-                    .bind(&group.specialty_id)
-                    .bind(&group.group_id)
-                    .execute(&mut *con)
-                    .await?;
-                modified = true;
-            }
-        }
-        else {
-            info!("MERGE::GROUPS \tNew group: {} with number {}", id, group.number);
-            sqlx::query("INSERT INTO groups (group_id, number, studying_type, education_level, start_year, end_year, department_id, specialty_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-                .bind(&group.group_id)
+    if let Some(row) = row {
+        if row != *group {
+            info!("MERGE::GROUPS \tUpdating group {} with number {}: \n old: {:?}, new: {:?}", id, group.number, row, *group);
+            sqlx::query("UPDATE groups SET number = ?, studying_type = ?, education_level = ?, start_year = ?, end_year = ?, department_id = ?, specialty_id = ? WHERE group_id = ?")
                 .bind(&group.number)
                 .bind(&group.studying_type)
                 .bind(&group.education_level)
@@ -142,8 +101,42 @@ pub async fn process_merge(groups: &BTreeMap<u32, (GroupsModel, DepartmentOrigin
                 .bind(&group.end_year)
                 .bind(&group.department_id)
                 .bind(&group.specialty_id)
-                .execute(&mut **con)
+                .bind(&group.group_id)
+                .execute(&mut *con)
                 .await?;
+            return Ok(MergeResult::Updated);
+        }
+        else {
+            return Ok(MergeResult::NotModified);
+        }
+    }
+    else {
+        info!("MERGE::GROUPS \tNew group: {} with number {}", id, group.number);
+        sqlx::query("INSERT INTO groups (group_id, number, studying_type, education_level, start_year, end_year, department_id, specialty_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+            .bind(&group.group_id)
+            .bind(&group.number)
+            .bind(&group.studying_type)
+            .bind(&group.education_level)
+            .bind(&group.start_year)
+            .bind(&group.end_year)
+            .bind(&group.department_id)
+            .bind(&group.specialty_id)
+            .execute(&mut **con)
+            .await?;
+        return Ok(MergeResult::Inserted);
+    }
+}
+
+pub async fn groups_merge(groups: &Vec<GroupOriginal>, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
+    let start = std::time::Instant::now();
+    let mut modified = false;
+    for group in groups.iter() {
+        let group_model = group.as_model();
+        let department_model = group.department.as_model();
+        let faculty_model = group.department.faculty.as_model();
+        let res = group_single_merge(group, Some(&department_model), Some(&faculty_model), con).await.unwrap();
+
+        if let MergeResult::Updated | MergeResult::Inserted = res {
             modified = true;
         }
     }

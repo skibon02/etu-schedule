@@ -3,7 +3,7 @@ use std::collections::{HashMap, BTreeMap};
 use rocket::serde::json::{Json, Value};
 use serde::{Deserialize, Serialize};
 
-use crate::models::groups::GroupsModel;
+use crate::models::groups::{DepartmentModel, FacultyModel, GroupModel};
 
 const BASE_URL_SCHEDULE: &str = "https://digital.etu.ru/api/schedule/";
 const BASE_URL_ATTENDANCE: &str = "https://digital.etu.ru/api/attendance/";
@@ -13,6 +13,15 @@ const BASE_URL_GENERAL: &str = "https://digital.etu.ru/api/general/";
 pub struct FacultyOriginal {
     pub id: u32,
     pub title: String,
+}
+
+impl FacultyOriginal {
+    pub fn as_model(&self) -> FacultyModel {
+        FacultyModel {
+            faculty_id: self.id,
+            title: self.title.clone(),
+        }
+    }
 }
 #[derive(Deserialize, Debug, Clone, Serialize)]
 pub struct DepartmentOriginal {
@@ -24,18 +33,45 @@ pub struct DepartmentOriginal {
     pub faculty: FacultyOriginal
 }
 
+impl DepartmentOriginal {
+    pub fn as_model(&self) -> DepartmentModel {
+        DepartmentModel {
+            department_id: self.id,
+            title: self.title.clone(),
+            long_title: self.longTitle.clone(),
+            department_type: self._type.clone(),
+            faculty_id: self.faculty.id,
+        }
+    }
+}
+
 #[derive(Deserialize, Debug, Clone, Serialize)]
-pub struct GroupsOriginal {
-    fullNumber: String,
-    id: u32,
-    number: String,
-    studyingType: String,
-    educationLevel: String,
-    departmentId: u32,
-    specialtyId: u32,
-    startYear: u16,
-    endYear: u16,
-    department: DepartmentOriginal
+pub struct GroupOriginal {
+    pub fullNumber: String,
+    pub id: u32,
+    pub number: String,
+    pub studyingType: String,
+    pub educationLevel: String,
+    pub departmentId: u32,
+    pub specialtyId: u32,
+    pub startYear: u16,
+    pub endYear: u16,
+    pub department: DepartmentOriginal
+}
+
+impl GroupOriginal {
+    pub fn as_model(&self) -> GroupModel {
+        GroupModel {
+            group_id: self.id,
+            number: self.number.clone(),
+            studying_type: self.studyingType.clone(),
+            education_level: self.educationLevel.clone(),
+            start_year: self.startYear,
+            end_year: self.endYear,
+            department_id: self.departmentId,
+            specialty_id: self.specialtyId,
+        }
+    }
 }
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
@@ -131,7 +167,7 @@ fn parse_schedule_objs_group(data: String) -> anyhow::Result<Vec<GroupScheduleOr
     Ok(value)
 }
 
-pub async fn get_groups_list() -> BTreeMap<u32, (GroupsModel, DepartmentOriginal)> {
+pub async fn get_groups_list() -> Vec<GroupOriginal> {
     let url = format!("{}dicts/groups?scheduleId=594&withFaculty=true&withSemesterSeasons=false&withFlows=false", BASE_URL_GENERAL);
     let response = reqwest::get(&url).await.unwrap();
     let body = response.text().await.unwrap();
@@ -139,27 +175,10 @@ pub async fn get_groups_list() -> BTreeMap<u32, (GroupsModel, DepartmentOriginal
     parse_groups(body).unwrap()
 }
 
-fn parse_groups(data: String) -> anyhow::Result<BTreeMap<u32, (GroupsModel, DepartmentOriginal)>> {
+fn parse_groups(data: String) -> anyhow::Result<Vec<GroupOriginal>> {
+    let input_data: Vec<GroupOriginal> = serde_json::from_str(&data)?;
 
-    let input_data: Vec<GroupsOriginal> = serde_json::from_str(&data)?;
-    let mut output_data = BTreeMap::new();
-
-    for item in input_data {
-        let output = GroupsModel {
-            group_id: item.id,
-            number: item.number,
-            studying_type: item.studyingType,
-            education_level: item.educationLevel,
-            start_year: item.startYear,
-            end_year: item.endYear,
-            department_id: item.departmentId,
-            specialty_id: item.specialtyId,
-        };
-        let department = item.department;
-        output_data.insert(item.id, (output, department));
-    }
-
-    Ok(output_data)
+    Ok(input_data)
 }
 
 
