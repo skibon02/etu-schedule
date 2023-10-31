@@ -119,6 +119,7 @@ use colored::*;
 use rand::Rng;
 use rocket::response::{Responder, Redirect};
 use rocket_db_pools::Database;
+use sqlx::SqlitePool;
 use crate::api::vk_api::VK_SERVICE_TOKEN;
 
 
@@ -224,17 +225,41 @@ pub fn run() -> Rocket<Build> {
 
     let with_client = args.contains(&"--with-client".to_string());
     info!("> with client: {}", with_client);
-    let mut rocket = rocket::custom(figment).attach(stage());
+    let mut rocket = rocket::custom(figment)
+        .attach(stage());
 
     if !is_production_build {
         rocket = rocket.attach(CORS);
     }
+
+    // let pool = tokio::block_on(async {SqlitePool::connect("sqlite::memory:").await.unwrap()});
+
+    // Launch periodic task after Rocket ignition but before blocking on Rocket's server
+    // let db_ref = rocket.state::<Db>().unwrap().clone();
+    // tokio::spawn(periodic_task(db_ref));
 
     if with_client {
         rocket
             .mount("/", FileServer::from("../client/build"))
     } else {
         rocket
+    }
+}
+
+async fn periodic_task(pool: &SqlitePool) {
+    // For demonstration, use a loop with a delay
+    loop {
+        info!("Running periodic task!");
+
+        let groups_count: u32 = sqlx::query_scalar("SELECT COUNT(*) FROM groups")
+            .fetch_one(pool)
+            .await
+            .unwrap();
+
+        info!("Groups count: {}", groups_count);
+
+        tokio::time::sleep(tokio::time::Duration::from_secs(2)).await
+
     }
 }
 
