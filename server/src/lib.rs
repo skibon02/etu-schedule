@@ -113,14 +113,25 @@ pub fn stage() -> AdHoc {
     })
 }
 
+pub fn bg_worker() -> AdHoc {
+    AdHoc::on_liftoff("Background Worker", |rocket| Box::pin(async {
+        // Launch periodic task after Rocket ignition but before blocking on Rocket's server
+        let db_ref = rocket.state::<Db>().unwrap().clone();
+        tokio::task::spawn(async move {
+            periodic_task(db_ref).await;
+        });
+    }))
+}
 
 use chrono::Local;
 use colored::*;
 use rand::Rng;
 use rocket::response::{Responder, Redirect};
 use rocket_db_pools::Database;
-use sqlx::SqlitePool;
+use sqlx::{Pool, Sqlite, SqlitePool};
+use crate::api::etu_api;
 use crate::api::vk_api::VK_SERVICE_TOKEN;
+use crate::data_merges::groups;
 
 
 fn loglevel_formatter(level: &log::Level) -> ColoredString {
@@ -226,7 +237,8 @@ pub fn run() -> Rocket<Build> {
     let with_client = args.contains(&"--with-client".to_string());
     info!("> with client: {}", with_client);
     let mut rocket = rocket::custom(figment)
-        .attach(stage());
+        .attach(stage())
+        .attach(bg_worker());
 
     if !is_production_build {
         rocket = rocket.attach(CORS);
@@ -234,9 +246,6 @@ pub fn run() -> Rocket<Build> {
 
     // let pool = tokio::block_on(async {SqlitePool::connect("sqlite::memory:").await.unwrap()});
 
-    // Launch periodic task after Rocket ignition but before blocking on Rocket's server
-    // let db_ref = rocket.state::<Db>().unwrap().clone();
-    // tokio::spawn(periodic_task(db_ref));
 
     if with_client {
         rocket
@@ -246,19 +255,18 @@ pub fn run() -> Rocket<Build> {
     }
 }
 
-async fn periodic_task(pool: &SqlitePool) {
+async fn periodic_task(mut con: Db) {
     // For demonstration, use a loop with a delay
     loop {
+
+
         info!("Running periodic task!");
+        let new_groups = etu_api::get_groups_list().await;
+        groups::process_merge(&new_groups, &mut con.acquire().await.unwrap()).await.unwrap();
 
-        let groups_count: u32 = sqlx::query_scalar("SELECT COUNT(*) FROM groups")
-            .fetch_one(pool)
-            .await
-            .unwrap();
 
-        info!("Groups count: {}", groups_count);
 
-        tokio::time::sleep(tokio::time::Duration::from_secs(2)).await
+        tokio::time::sleep(tokio::time::Duration::from_secs(60)).await
 
     }
 }

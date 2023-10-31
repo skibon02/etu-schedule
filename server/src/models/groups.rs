@@ -31,7 +31,7 @@ pub struct GroupsModel {
     pub specialty_id: u32,
 }
 
-pub async fn get_gropus(mut con: Connection<Db>) -> anyhow::Result<Vec<GroupsModel>> {
+pub async fn get_groups(mut con: Connection<Db>) -> anyhow::Result<Vec<GroupsModel>> {
     let res = sqlx::query_as(
         "SELECT * FROM groups",
     )

@@ -1,13 +1,14 @@
 use std::collections::BTreeMap;
 use rocket_db_pools::Connection;
-use sqlx::{Acquire, SqliteConnection};
+use sqlx::{Acquire, Sqlite, SqliteConnection};
+use sqlx::pool::PoolConnection;
 use crate::api::etu_api::{DepartmentOriginal, FacultyOriginal};
 use crate::models::Db;
 
 use crate::models::groups::{DepartmentModel, FacultyModel, GroupsModel};
 
 
-pub async fn process_merge_faculty(faculty: FacultyOriginal, con: &mut Connection<Db>) -> anyhow::Result<()> {
+pub async fn process_merge_faculty(faculty: FacultyOriginal, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
     let mut modified = false;
     let id = faculty.id;
     let row : Option<FacultyModel> = sqlx::query_as("SELECT * FROM faculties WHERE faculty_id = ?")
@@ -48,12 +49,12 @@ pub async fn process_merge_faculty(faculty: FacultyOriginal, con: &mut Connectio
     }
     Ok(())
 }
-pub async fn process_merge_department(department: DepartmentOriginal, con: &mut Connection<Db>) -> anyhow::Result<()> {
+pub async fn process_merge_department(department: DepartmentOriginal, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
     let mut modified = false;
     let id = department.id;
     let row : Option<DepartmentModel> = sqlx::query_as("SELECT * FROM departments WHERE department_id = ?")
         .bind(id)
-        .fetch_optional(con.acquire().await?)
+        .fetch_optional(&mut *con)
         .await?;
 
     process_merge_faculty(department.faculty.clone(), &mut *con).await?;
@@ -74,7 +75,7 @@ pub async fn process_merge_department(department: DepartmentOriginal, con: &mut 
                 .bind(&department.department_type)
                 .bind(&department.faculty_id)
                 .bind(&department.department_id)
-                .execute(con.acquire().await?)
+                .execute(&mut *con)
                 .await?;
             modified = true;
         }
@@ -87,7 +88,7 @@ pub async fn process_merge_department(department: DepartmentOriginal, con: &mut 
             .bind(&department.long_title)
             .bind(&department.department_type)
             .bind(&department.faculty_id)
-            .execute(con.acquire().await?)
+            .execute(con)
             .await?;
         modified = true;
     }
@@ -100,7 +101,7 @@ pub async fn process_merge_department(department: DepartmentOriginal, con: &mut 
     Ok(())
 }
 
-pub async fn process_merge(groups: &BTreeMap<u32, (GroupsModel, DepartmentOriginal)>, mut con: Connection<Db>) -> anyhow::Result<()> {
+pub async fn process_merge(groups: &BTreeMap<u32, (GroupsModel, DepartmentOriginal)>, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
 
     let start = std::time::Instant::now();
     let mut modified = false;
@@ -108,10 +109,10 @@ pub async fn process_merge(groups: &BTreeMap<u32, (GroupsModel, DepartmentOrigin
         let id = group.group_id;
         let row : Option<GroupsModel> = sqlx::query_as("SELECT * FROM groups WHERE group_id = ?")
             .bind(id)
-            .fetch_optional(&mut **con)
+            .fetch_optional(&mut *con)
             .await?;
 
-        process_merge_department(department.clone(), &mut con).await?;
+        process_merge_department(department.clone(), &mut *con).await?;
 
         if let Some(row) = row {
             if row != *group {
@@ -125,7 +126,7 @@ pub async fn process_merge(groups: &BTreeMap<u32, (GroupsModel, DepartmentOrigin
                     .bind(&group.department_id)
                     .bind(&group.specialty_id)
                     .bind(&group.group_id)
-                    .execute(&mut **con)
+                    .execute(&mut *con)
                     .await?;
                 modified = true;
             }
