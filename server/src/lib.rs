@@ -258,15 +258,13 @@ pub fn run() -> Rocket<Build> {
 async fn periodic_task(mut con: Db) {
     // For demonstration, use a loop with a delay
     loop {
-
-
         info!("Running periodic task!");
         let new_groups = etu_api::get_groups_list().await;
         groups::process_merge(&new_groups, &mut con.acquire().await.unwrap()).await.unwrap();
 
 
 
-        tokio::time::sleep(tokio::time::Duration::from_secs(60)).await
+        tokio::time::sleep(tokio::time::Duration::from_secs(60*10)).await
 
     }
 }
