@@ -28,8 +28,8 @@ export function Pages() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getGroupList(setGroupList, setGroupListError);
     navigate('/');
+    getGroupList(setGroupList, setGroupListError);
   }, []);
 
   useEffect(() => {
