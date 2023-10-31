@@ -45,11 +45,12 @@ pub async fn create_user(mut con: Connection<Db>, user_info: UserInfo) -> anyhow
 }
 
 pub async fn get_user_info(mut con: Connection<Db>, id: u32) -> anyhow::Result<UserInfo> {
-    let res = sqlx::query_as(
+    let res = sqlx::query_as::<_, UserInfo>(
         "SELECT * FROM users WHERE vk_id = ?",
     )
         .bind(id)
-        .fetch_one(&mut **con).await?;
+        .fetch_optional(&mut **con).await?.ok_or(anyhow::anyhow!("User not found"))?;
+
 
     Ok(res)
 }
