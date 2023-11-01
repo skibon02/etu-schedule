@@ -49,7 +49,12 @@ export default function Profile({vkData, setVkData}) {
         </div>
         {isAuthorized &&
           <div className="profile__choose-group-message">
-            Теперь сайт может запомнить твой выбор при указании номера группы. Перейди во вкладку "Группы" и убедись!
+            Теперь сайт может запомнить твой выбор при указании номера группы. Перейди во вкладку "Группы" и убедись! 
+            {window.localStorage.getItem("groupNumber") !== null ? 
+            <p>Сейчас номер выбранной группы: {window.localStorage.getItem("groupNumber")}.</p>
+            :
+            <p>Сейчас ты не выбрал группу.</p>
+            }
           </div>
         }
         {isAuthorized && <div className="profile__reauth">Ты можешь авторизоваться ещё раз, мы не запрещаем</div>}
