@@ -31,12 +31,10 @@ export default function Groups({setGroupId, setActive, groupList, setGroupNumber
           {!inputValue && <img src={SEARCH} alt="" className='groups-input__icon'/>}
           {isAuthorized &&
             <>
-            <div className='groups__checkbox-container'>
-              <label>
-                <input type="checkbox" className='groups__checkbox' checked={isChecked} onChange={() => setIsChecked(!isChecked)} /> {' '} 
-                <span className="groups__checkbox-description">запомнить мой выбор</span>
-              </label>
-            </div>
+            <label className='groups__checkbox-container'>
+              <input type="checkbox" className='groups__checkbox' checked={isChecked} onChange={() => setIsChecked(!isChecked)} /> {' '} 
+              <span className="groups__checkbox-description">запомнить мой выбор</span>
+            </label>
             </>
           }
         </div>
