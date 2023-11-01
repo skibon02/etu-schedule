@@ -165,9 +165,9 @@ async fn auth_redirect(
     }
 
     match FRONTEND_PORT.get().unwrap() {
-        FrontendPort::Same => Redirect::to(format!("https://{}{}", host, optional_query)),
-        FrontendPort::Https => Redirect::to(format!("https://{}:443{}", host.domain(), optional_query)),
-        FrontendPort::Custom(port) => Redirect::to(format!("https://{}:{}{}", host.domain(), port, optional_query)),
+        FrontendPort::Same => Redirect::to(format!("https://{}/profile{}", host, optional_query)),
+        FrontendPort::Https => Redirect::to(format!("https://{}:443/profile{}", host.domain(), optional_query)),
+        FrontendPort::Custom(port) => Redirect::to(format!("https://{}:{}/profile{}", host.domain(), port, optional_query)),
     }
 }
 
