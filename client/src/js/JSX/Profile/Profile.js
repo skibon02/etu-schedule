@@ -51,9 +51,9 @@ export default function Profile({vkData, setVkData}) {
           <div className="profile__choose-group-message">
             Теперь сайт может запомнить твой выбор при указании номера группы. Перейди во вкладку "Группы" и убедись! 
             {window.localStorage.getItem("groupNumber") !== null ? 
-            <p>Сейчас номер выбранной группы: {window.localStorage.getItem("groupNumber")}.</p>
+            <p>Сейчас номер постоянной группы: {window.localStorage.getItem("groupNumber")}.</p>
             :
-            <p>Сейчас ты не выбрал группу.</p>
+            <p>Сейчас ты не выбрал постоянную группу.</p>
             }
           </div>
         }
