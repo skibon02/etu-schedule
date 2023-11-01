@@ -32,8 +32,10 @@ export default function Groups({setGroupId, setActive, groupList, setGroupNumber
           {isAuthorized &&
             <>
             <div className='groups__checkbox-container'>
-              <input type="checkbox" className='groups__checkbox' checked={isChecked} onChange={() => setIsChecked(!isChecked)} /> {' '} 
-              <span className="groups__checkbox-description">запомнить мой выбор</span>
+              <label>
+                <input type="checkbox" className='groups__checkbox' checked={isChecked} onChange={() => setIsChecked(!isChecked)} /> {' '} 
+                <span className="groups__checkbox-description">запомнить мой выбор</span>
+              </label>
             </div>
             </>
           }
