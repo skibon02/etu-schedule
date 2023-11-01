@@ -9,7 +9,11 @@ export function makeWeek(weekSchedule, Day, DAYS, active) {
       week.push(
         <div key={i} className="day">
           <div className="day__date">
-            {makeCalendarTime(weekSchedule[i][1], DAYS).slice(0, -5)}
+            {active === 'planning' ? 
+            makeCalendarTime(weekSchedule[i][1], DAYS).slice(0, -5)
+            :
+            makeCalendarTime(weekSchedule[i][1], DAYS)
+            }
           </div>
           <div className="day__lessons">
             <div className='day__empty'>

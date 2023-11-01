@@ -3,13 +3,9 @@ import React from "react";
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { getGroupList, getGroupSchedule, getVkData } from "../../FxFetches/Pages/Fetches";
 import Groups from "../../JSX/Groups/Groups";
-// import VkButton from "../../JSX/Profile/VKButton";
-// import VkButton from "../../JSX/Profile/VKButton_old_v";
 import Header from "../../JSX/Header/Header";
 import Schedule from '../../JSX/Schedule/Schedule'
-// import makeSchedule from "../../Utils/Schedule/parseSchedule";
 import { setActiveByLocation } from "../../FxFetches/Pages/SetActiveByLocation";
-// import makeSchedule from "@src/js/Utils/Schedule/parseSchedule.js";
 import { getWeekNumber } from "../../Utils/handleTime";
 import Planning from "../Planning/Planning";
 import Profile from "../Profile/Profile";
@@ -33,11 +29,10 @@ export function Pages() {
   useEffect(() => {
     getVkData(setVkData);
     if (window.localStorage.getItem("groupId") !== null) {
-      setGroupId(window.localStorage.getItem("groupId"))
-      setGroupNumber(window.localStorage.getItem("groupNumber"))
-      // navigate('/schedule');
+      setGroupId(window.localStorage.getItem("groupId"));
+      setGroupNumber(window.localStorage.getItem("groupNumber"));
     } else {
-      navigate('/groups');
+      navigate('/profile');
     }
     if (location.pathname === '/') {
       navigate('/schedule')
@@ -61,49 +56,39 @@ export function Pages() {
     <div className='container'>
       {active !== 'groups' && active !== 'profile' && <div className='under-header-box'></div>}
       <Routes>
-        {(!groupSchedule && !groupId || active === 'groups') && 
         <Route path="/">
-          <Route 
-            path="/groups"
-            element={
-            <Groups 
-              setGroupId={setGroupId}
-              setActive={setActive}
-              groupList={groupList}
-              setGroupNumber={setGroupNumber}
-              setGroupSchedule={setGroupSchedule}
-              vkData={vkData}
-              groupSchedule={groupSchedule} />} />
-        </Route>
-        }
-      </Routes>
-        {groupSchedule && groupId &&
-        <>
-          {(active !== 'groups' || active === 'groups') &&
-            <Header 
-              date={date} 
-              setDate={setDate} 
-              active={active} 
-              setActive={setActive}
-              setGroupSchedule={setGroupSchedule}
-              setGroupId={setGroupId}
-              weekNumber={getWeekNumber(date)}
-            />
+          {(!vkData.is_authorized || active === 'profile') &&
+            <Route path="/profile" element={
+              <Profile
+                vkData={vkData}
+                setVkData={setVkData} />
+            } />
           }
-          <Routes>
-          <>
-          <Route path="/">
-            {active === 'schedule' && 
-            <Route 
-              path="/schedule"
-              element={
+        </Route>
+      </Routes>
+      {vkData.is_authorized &&
+        <Header 
+          date={date} 
+          setDate={setDate} 
+          active={active} 
+          setActive={setActive}
+          setGroupSchedule={setGroupSchedule}
+          setGroupId={setGroupId}
+          weekNumber={getWeekNumber(date)}
+          groupSchedule={groupSchedule} />
+      }
+      <Routes>
+        {vkData.is_authorized &&
+         <Route path="/">
+            {active === 'schedule' &&
+              <Route path="/schedule" element={
                 <Schedule 
-                key={groupId} 
-                date={date}
-                groupSchedule={groupSchedule}
-                groupNumber={groupNumber}
-                active={active} />
-              } />
+                  key={groupId} 
+                  date={date}
+                  groupSchedule={groupSchedule}
+                  groupNumber={groupNumber}
+                  active={active} />
+                } />
             }
             {active === 'planning' && 
               <Route
@@ -113,27 +98,26 @@ export function Pages() {
                   groupNumber={groupNumber}
                   groupSchedule={groupSchedule}
                   active={active} />
-                }
-              />
+                } />
             }
-            {active === 'profile' && 
+            {active === 'groups' && 
               <Route 
-                path="/profile"
+                path="/groups"
                 element={
-                  <Profile
-                    vkData={vkData}
-                    setVkData={setVkData} />
-                }
-              />
+                <Groups 
+                  setGroupId={setGroupId}
+                  setActive={setActive}
+                  groupList={groupList}
+                  setGroupNumber={setGroupNumber}
+                  setGroupSchedule={setGroupSchedule}
+                  vkData={vkData}
+                  groupSchedule={groupSchedule} />
+                } />
             }
           </Route>
-          </>
-          </Routes>
-        </>
         }
-      {groupSchedule && active !== 'profile' &&
-        <div className='under-header-box-mobile'></div>
-      }
+      </Routes>
+      {active !== 'profile' && <div className='under-header-box-mobile'></div>}
     </div>}
     </>
   )

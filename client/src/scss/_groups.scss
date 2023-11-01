@@ -8,12 +8,17 @@ $BORDER-COLOR: #828282;
   &__loading {
     display: block;
     padding-top: pxToEm(25px);
+    &_header {
+      padding-top: pxToEm(70px);
+    }
   }
 
   &__input-container {
     position: fixed;
     width: 100%;
-    // top: pxToEm(45px);
+    &_header {
+      top: pxToEm(45px);
+    }
   }
 
   &__input {  
@@ -24,8 +29,10 @@ $BORDER-COLOR: #828282;
   }
 
   &__items {
-    // padding-top: pxToEm(70px);
     padding-top: pxToEm(25px);
+    &_header {
+      padding-top: pxToEm(70px);
+    }
   }
 
   &__item {
@@ -90,12 +97,28 @@ $BORDER-COLOR: #828282;
   .groups {
     font-size: 2em;
 
+    &__input-container {
+      &_header {
+        top: 0;
+      }
+    }
+
     &__loading {
-      padding-top: pxToEm(30px);
+      padding-top: pxToEm(26px);
+      &_header {
+        padding-top: pxToEm(26px);
+      }
     }
 
     &__items {
       padding-top: pxToEm(26px);
+      &_header {
+        padding-top: pxToEm(26px);
+      }
+    }
+
+    &__checkbox-description {
+      margin-bottom: pxToEm(4px);
     }
   }
   .groups-input {

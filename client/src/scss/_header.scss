@@ -154,12 +154,6 @@ $HALF-HEIGHT: 75px;
     }
     &__week-button {
       order: 1;
-      &:first-child {
-        border-left: none;
-      }
-      &:last-child {
-        border-right: none;
-      }
     }
   }
   .nav {

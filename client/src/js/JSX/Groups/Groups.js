@@ -5,7 +5,7 @@ import * as handlers from '../../Handlers/Groups/handlers'
 import React from 'react';
 import { useNavigate } from 'react-router-dom'
 
-export default function Groups({setGroupId, setActive, groupList, setGroupNumber, setGroupSchedule, vkData}) {
+export default function Groups({setGroupId, setActive, groupList, setGroupNumber, setGroupSchedule, vkData, groupSchedule}) {
   const [inputValue, setInputValue] = useState('');
   const [isChecked, setIsChecked] = useState(false);
   const inputRef = useRef(null);
@@ -18,7 +18,7 @@ export default function Groups({setGroupId, setActive, groupList, setGroupNumber
   
   return (
     <div className='groups'>
-      <div className='groups__input-container'>
+      <div className={isAuthorized ? 'groups__input-container groups__input-container_header' : ' groups__input-container'}>
         <div className='groups__input groups-input'>
           <input 
             ref={inputRef}
@@ -42,9 +42,9 @@ export default function Groups({setGroupId, setActive, groupList, setGroupNumber
         </div>
       </div>
       {isAuthorized && <div className='groups__under-checkbox-box'></div>}
-      {!groupList && <span className='groups__loading'>Загрузка...</span>}
+      {!groupList && <span className={isAuthorized ? 'groups__loading groups__loading_header' : 'groups__loading'}>Загрузка...</span>}
       
-      <div className='groups__items'>
+      <div className={isAuthorized ? 'groups__items groups__items_header' : 'groups__items'}>
         {groupList && groupList
         .filter((group) => 
           group.number.indexOf(inputValue) === 0

@@ -6,7 +6,7 @@ $MB: 20px;
 
 .profile-container {
   // height: calc(100vh - pxToEm(55px));
-  height: 100vh;
+  min-height: 100vh;
   padding-top: pxToEm(70px);
   background: linear-gradient(354deg, rgba(240,180,180,1) 0%, rgba(236,204,240,1) 38%, rgba(214,226,134,1) 100%);
 }
@@ -21,7 +21,6 @@ $MB: 20px;
   font-size: 1.5em;
 
   &__image-container {
-
   }
 
   &__image {
@@ -64,7 +63,10 @@ $MB: 20px;
   }
 
   &__undefined-name {
+  }
 
+  &__access-denied {
+    margin-bottom: pxToEm($MB);
   }
 
   &__status {
@@ -100,7 +102,19 @@ $MB: 20px;
 }
 
 .vk {
-  width: pxToEm(480px);
+  width: pxToEm(400px);
+  position: relative;
+}
+
+.vk-loading {
+  position: absolute;
+  z-index: -10000;
+  width: 100%;
+  height: 100%;
+
+  &__message {
+    padding-top: pxToEm(40px);
+  }
 }
 
 @media screen and (max-width: 700px) {
@@ -123,12 +137,25 @@ $MB: 20px;
       margin-bottom: pxToEm(15px);
     }
 
+    &__access-denied {
+      font-size: 1.5em;
+      margin-bottom: pxToEm(10px);
+      line-height: 1.2em;
+    }
+
     &__reauth {
+      font-size: 1.5em;
+      margin-bottom: pxToEm(10px);
+      line-height: 1.2em;
+    }
+
+    &__choose-group-message {
+      line-height: 1.2em;
       font-size: 1.5em;
       margin-bottom: pxToEm(10px);
     }
   }
-  
+
   .status {
     font-size: 1.5em;
     margin-bottom: pxToEm(15px);

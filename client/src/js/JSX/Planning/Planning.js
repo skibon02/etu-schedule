@@ -6,6 +6,13 @@ import { PlanningButton } from "./PlanningButton"
 
 export default function Planning({groupSchedule, groupNumber, active}) {
   const [weekParity, setWeekParity] = useState(1);
+  if (!groupSchedule) {
+    return (
+      <div className="no-schedule">
+        <div className="no-schedule__text">Выбери группу во вкладке "Группы"</div>
+      </div>
+    )
+  }
 
   const weekSchedule1 = makeSchedule(groupSchedule, new Date('2023-09-01'));
   const weekSchedule2 = makeSchedule(groupSchedule, new Date(new Date('2023-09-01').getTime() + 1000 * 60 * 60 * 24 * 7));

@@ -59,6 +59,19 @@
   animation: pulseClockGreen 3.5s infinite;
 }
 
+.no-schedule {
+  padding-top: 40vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &__text {
+    text-align: center;
+    font-size: 5em;
+    color: #828282; 
+    line-height: 1em;
+  }
+}
+
 .schedule {
   width: 60%;
   max-width: 1000px;
@@ -363,6 +376,9 @@
   }
 }
 @media screen and (max-width: 500px) {
+  .no-schedule {
+    padding-top: 25vh;
+  }
   .schedule {
     width: 95%;
   }

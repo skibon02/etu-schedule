@@ -14,14 +14,16 @@ const SERVER_HOST = currentHost;
 
 
 export default function VkButton({setVkData}) {
-
     const [authData, setAuthData] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+
     useEffect(() => {
         async function Fetches() {
             await VladFetch();
-             setTimeout(() => {
+            setTimeout(() => {
                 getVkData(setVkData);
-             }, 3000);
+                setIsLoading(false);
+            }, 3000);
         }
 
         async function VladFetch() {
@@ -42,7 +44,7 @@ export default function VkButton({setVkData}) {
         }
 
         Fetches();
-    },[authData])
+    }, [authData])
 
     useEffect(() => {
         const vkAuthRedirectURL = SERVER_HOST+'/api/auth/redirect';
@@ -92,6 +94,9 @@ export default function VkButton({setVkData}) {
 
         const vkElementDiv = document.getElementById("vk");
         vkElementDiv.appendChild(vkOneTapButton.getFrame())
+        vkElementDiv.onClick = () => {
+            setIsLoading(true);
+        }
         // document.body.appendChild(vkOneTapButton.getFrame())
 
         return () => {
@@ -101,6 +106,12 @@ export default function VkButton({setVkData}) {
     }, []);
 
     return (
-        <div id="vk" className='vk'></div>
+        <>
+        <div id="vk" className='vk'>
+            <div className="vk-loading">
+                {isLoading && <div className="vk-loading__message" onClick={() => alert(123)}>Загрузка...</div>}
+            </div>
+        </div>
+        </>
     )
 }

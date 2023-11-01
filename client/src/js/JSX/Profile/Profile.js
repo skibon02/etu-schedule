@@ -28,13 +28,14 @@ export default function Profile({vkData, setVkData}) {
           :
           <div className="profile__user-name">
             <div className="profile__name-false profile__name">
-              Имя 
+              Пользователь
             </div>
             <div className="profile__name-false profile__name">
-              Фамилия
+              Неизвестен
             </div>
           </div>
         }
+        {!isAuthorized && <div className="profile__access-denied">Мы не повзолим пользоваться сайтом без авторизации!</div>}
         <div className="profile__status status">
           {isAuthorized ? 
             <div className="status__true">

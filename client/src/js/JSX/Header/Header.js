@@ -10,12 +10,12 @@ import { ScheduleButton } from './ScheduleButton'
 
 import * as handlers from '../../Handlers/Header/handlers'
 
-export default function Header({date, setDate, active, setActive, weekNumber}) {
+export default function Header({date, setDate, active, setActive, weekNumber, groupSchedule}) {
 
   return (
     <div className="header">
       <div className="header__nav nav">
-        <NavLink to='schedule' className={active === 'schedule' ? 
+        <NavLink to='/schedule' className={active === 'schedule' ? 
         "nav__item header-active" :
         "nav__item header-hover"}>
           <NavButton
@@ -24,7 +24,7 @@ export default function Header({date, setDate, active, setActive, weekNumber}) {
             onClick={() => handlers.handleScheduleClick(setActive)}
           />
         </NavLink>
-        <NavLink to='planning' className={active === 'planning' ? 
+        <NavLink to='/planning' className={active === 'planning' ? 
         "nav__item header-active" :
         "nav__item header-hover"}>
           <NavButton
@@ -33,7 +33,7 @@ export default function Header({date, setDate, active, setActive, weekNumber}) {
             onClick={() => handlers.handlePlanningClick(setActive)}
           />
         </NavLink>
-        <NavLink to='/' className={active === 'groups' ? 
+        <NavLink to='/groups' className={active === 'groups' ? 
         "nav__item header-active" :
         "nav__item header-hover"}>
           <NavButton
@@ -42,7 +42,7 @@ export default function Header({date, setDate, active, setActive, weekNumber}) {
             onClick={() => handlers.handleGroupsClick(setActive)}
           />
         </NavLink>
-        <NavLink to='profile' className={active === 'profile' ? 
+        <NavLink to='/profile' className={active === 'profile' ? 
         "nav__item header-active" :
         "nav__item header-hover"}>
           <NavButton
@@ -52,7 +52,7 @@ export default function Header({date, setDate, active, setActive, weekNumber}) {
           />
         </NavLink>
       </div>
-      {active === 'schedule' && 
+      {active === 'schedule' && groupSchedule &&
       <div className="header__week-buttons">
         <ScheduleButton 
           text={'К предыдущей неделе'} 
