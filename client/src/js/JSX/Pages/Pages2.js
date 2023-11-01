@@ -1,15 +1,14 @@
 import { Fragment, useEffect, useState } from "react";
-import React from "react";
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { getGroupList, getGroupSchedule, getVkData } from "../../FxFetches/Pages/Fetches";
+import { getVkData, getGroupSchedule } from "../../FxFetches/Pages/Fetches";
+import { routingFx } from "../../FxFetches/Pages/RoutingFx";
+import { setActiveByLocation } from "../../FxFetches/Pages/SetActiveByLocation";
+import { getWeekNumber } from "../../Utils/handleTime";
 import Groups from "../../JSX/Groups/Groups";
 import Header from "../../JSX/Header/Header";
 import Schedule from '../../JSX/Schedule/Schedule'
-import { setActiveByLocation } from "../../FxFetches/Pages/SetActiveByLocation";
-import { getWeekNumber } from "../../Utils/handleTime";
 import Planning from "../Planning/Planning";
 import Profile from "../Profile/Profile";
-import { routingFx } from "../../FxFetches/Pages/RoutingFx";
 
 export function Pages() {
   const [date, setDate] = useState(new Date());
@@ -44,9 +43,15 @@ export function Pages() {
   }, [vkData]);
 
   useEffect(() => {
+    getGroupSchedule(groupId, setGroupSchedule);
+    console.log('group id:');
+    console.log(groupId);
+  }, [groupId])
+
+  useEffect(() => {
     setActiveByLocation(location, setActive)
   }, [location]);
-  
+
   if (vkData) {
     return (
       <>
