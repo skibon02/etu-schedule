@@ -34,8 +34,11 @@ export function Pages() {
     } else {
       navigate('/profile');
     }
-    if (location.pathname === '/') {
+    if (location.pathname === '/' && vkData.is_authorized) {
       navigate('/schedule')
+    }
+    if (location.pathname === '/' && !vkData.is_authorized) {
+      navigate('/profile')
     }
     getGroupList(setGroupList, setGroupListError);
   }, []);
