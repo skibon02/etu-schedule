@@ -16,7 +16,7 @@ export function Pages() {
 
   const [groupList, setGroupList] = useState(null);
   const [groupListError, setGroupListError] = useState(null);
-  
+
   const [groupId, setGroupId] = useState(null);
   const [groupNumber, setGroupNumber] = useState(null);
   const [groupSchedule, setGroupSchedule] = useState(null);

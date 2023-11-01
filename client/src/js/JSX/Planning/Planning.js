@@ -3,10 +3,11 @@ import Schedule from "../Schedule/Schedule";
 import makeSchedule from "../../Utils/Schedule/parseSchedule"
 import { PlanningButton } from "./PlanningButton"
 import NoSchedule from "../Schedule/NoSchedule";
+import { isEvenWeek } from "../../Utils/handleTime";
 
 
 export default function Planning({groupSchedule, groupNumber, active}) {
-  const [weekParity, setWeekParity] = useState(1);
+  const [weekParity, setWeekParity] = useState(isEvenWeek(new Date));
   if (!groupSchedule) {
     return (
       <NoSchedule groupNumber={groupNumber} />
@@ -20,15 +21,15 @@ export default function Planning({groupSchedule, groupNumber, active}) {
     <>  
     <div className='planning-header'>
       <PlanningButton
-        parity={1}
+        parity={'1'}
         selectedParity={weekParity}
         text={'Первая неделя'}
-        handleClick={() => setWeekParity(1)} />
+        handleClick={() => setWeekParity('1')} />
       <PlanningButton
-        parity={2}
+        parity={'2'}
         selectedParity={weekParity}
         text={'Вторая неделя'}
-        handleClick={() => setWeekParity(2)} />
+        handleClick={() => setWeekParity('2')} />
     </div>
 
     <div className="planning-thead">
@@ -44,13 +45,13 @@ export default function Planning({groupSchedule, groupNumber, active}) {
     
     {active === 'planning' && <div className="under-planning-thead-box"></div>}
 
-    {weekParity === 1 &&
+    {weekParity === '1' &&
     <Schedule 
       groupSchedule={weekSchedule1} 
       groupNumber={groupNumber} 
       active={active} 
       date={new Date('2023-09-01')} />}
-    {weekParity === 2 &&
+    {weekParity === '2' &&
     <Schedule 
       groupSchedule={weekSchedule2} 
       groupNumber={groupNumber} 

@@ -24,6 +24,19 @@ async function myfetch(path, param = {}) {
                     console.log('returning schedule for 0303')
                     return schedule_request_example;
                 }
+                if (initialPath === '/api/auth/check') {
+                    console.log('returning mock for auth check');
+                    return {is_authorized: false}
+                }
+                if (initialPath === '/api/auth/data') {
+                    console.log('returning mock vkData');
+                    return {
+                        first_name: "Денис",
+                        is_authorized: true,
+                        last_name: "Шарпинский",
+                        profile_photo_url: "https://images.dog.ceo/breeds/pinscher-miniature/n02107312_867.jpg"
+                    }
+                }
                 console.log('Not found handler for mock request!')
             },
             ok: true,
