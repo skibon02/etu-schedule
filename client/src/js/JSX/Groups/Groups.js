@@ -5,12 +5,11 @@ import * as handlers from '../../Handlers/Groups/handlers'
 import React from 'react';
 import { useNavigate } from 'react-router-dom'
 
-export default function Groups({setGroupId, setActive, groupList, setGroupNumber, setGroupSchedule, vkData, groupSchedule}) {
+export default function Groups({setGroupId, setActive, groupList, setGroupNumber, setGroupSchedule}) {
   const [inputValue, setInputValue] = useState('');
   const [isChecked, setIsChecked] = useState(false);
   const inputRef = useRef(null);
   const navigate = useNavigate();
-  const isAuthorized = vkData.is_authorized;
 
   useEffect(() => {
     inputRef.current.focus();
@@ -18,7 +17,7 @@ export default function Groups({setGroupId, setActive, groupList, setGroupNumber
   
   return (
     <div className='groups'>
-      <div className={isAuthorized ? 'groups__input-container groups__input-container_header' : ' groups__input-container'}>
+      <div className='groups__input-container groups__input-container_header'>
         <div className='groups__input groups-input'>
           <input 
             ref={inputRef}
@@ -29,7 +28,6 @@ export default function Groups({setGroupId, setActive, groupList, setGroupNumber
             onChange={(e) => handlers.onInputChange(setInputValue, e.target.value)}
           />
           {!inputValue && <img src={SEARCH} alt="" className='groups-input__icon'/>}
-          {isAuthorized &&
             <>
             <div className='groups__checkbox-container'>
               <label className='groups__checkbox-label'>
@@ -38,13 +36,12 @@ export default function Groups({setGroupId, setActive, groupList, setGroupNumber
               </label>
             </div>
             </>
-          }
         </div>
       </div>
-      {isAuthorized && <div className='groups__under-checkbox-box'></div>}
-      {!groupList && <span className={isAuthorized ? 'groups__loading groups__loading_header' : 'groups__loading'}>Загрузка...</span>}
+      <div className='groups__under-checkbox-box'></div>
+      {!groupList && <span className='groups__loading groups__loading_header'>Загрузка...</span>}
       
-      <div className={isAuthorized ? 'groups__items groups__items_header' : 'groups__items'}>
+      <div className='groups__items groups__items_header'>
         {groupList && groupList
         .filter((group) => 
           group.number.indexOf(inputValue) === 0
