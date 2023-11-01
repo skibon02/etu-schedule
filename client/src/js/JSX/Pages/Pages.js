@@ -35,7 +35,7 @@ export function Pages() {
     if (window.localStorage.getItem("groupId") !== null) {
       setGroupId(window.localStorage.getItem("groupId"))
       setGroupNumber(window.localStorage.getItem("groupNumber"))
-      navigate('/schedule');
+      // navigate('/schedule');
     } else {
       navigate('/');
     }
