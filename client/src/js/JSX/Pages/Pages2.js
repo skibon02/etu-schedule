@@ -46,12 +46,7 @@ export function Pages() {
   useEffect(() => {
     setActiveByLocation(location, setActive)
   }, [location]);
-
-  useEffect(() => {
-    console.log(groupId);
-    getGroupSchedule(groupId, setGroupSchedule)
-  }, [groupId]);
-
+  
   if (vkData) {
     return (
       <>
