@@ -31,7 +31,7 @@ async function getVkData(setVkData) {
 }
 
 
- function getGroupSchedule(groupId, setGroupSchedule) {
+function getGroupSchedule(groupId, setGroupSchedule) {
   if (groupId) {
     async function getSchedule() {
       console.log(`/api/scheduleObjs/group/${groupId}`);
@@ -50,7 +50,8 @@ async function getVkData(setVkData) {
 
     getSchedule();
   }
- }
+}
+
 
 export {
   getGroupList,

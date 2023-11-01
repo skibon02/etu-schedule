@@ -9,6 +9,7 @@ import { setActiveByLocation } from "../../FxFetches/Pages/SetActiveByLocation";
 import { getWeekNumber } from "../../Utils/handleTime";
 import Planning from "../Planning/Planning";
 import Profile from "../Profile/Profile";
+import { routingFx } from "../../FxFetches/Pages/RoutingFx";
 
 export function Pages() {
   const [date, setDate] = useState(new Date());
@@ -31,17 +32,15 @@ export function Pages() {
   }, []);
 
   useEffect(() => {
-    if (window.localStorage.getItem("groupId") !== null) {
-      setGroupId(window.localStorage.getItem("groupId"));
-      setGroupNumber(window.localStorage.getItem("groupNumber"));
-    }
-    if (location.pathname === '/' && vkData && vkData.is_authorized) {
-      navigate('/schedule')
-    }
-    if (location.pathname === '/' && vkData  && !vkData.is_authorized) {
-      navigate('/profile')
-    }
-    getGroupList(setGroupList, setGroupListError);
+    routingFx(
+      location.pathname,
+      vkData,
+      setGroupList,
+      setGroupListError,
+      navigate,
+      setGroupId,
+      setGroupNumber
+    )
   }, [vkData]);
 
   useEffect(() => {
