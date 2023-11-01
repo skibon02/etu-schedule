@@ -1,7 +1,8 @@
 import CALENDAR from './../../../icons/calendar-pen.svg'
 import NAVCLOCK from './../../../icons/clock-for-nav.svg'
-import SEARCH from '../../../icons/search-for-nav.svg'
-import VK from '../../../icons/vk-for-nav.svg'
+import SEARCH from '../../../icons/search_2-for-nav.svg'
+// import VK from '../../../icons/vk-for-nav.svg'
+import VK from '../../../icons/profile.svg'
 import { NavLink } from 'react-router-dom'
 
 import { NavButton } from './NavButton'
