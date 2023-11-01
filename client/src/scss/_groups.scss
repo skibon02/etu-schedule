@@ -49,6 +49,7 @@ $BORDER-COLOR: #828282;
     font-size: 1.2em;
     display: inline-block;
     margin-bottom: pxToEm(2px);
+    user-select: none;
   }
 
   &__under-checkbox-box {
