@@ -9,6 +9,7 @@ function onGroupClick(setGroupId, setGroupNumber, setActive, id, number, setGrou
   setActive('schedule');
   if (isChecked) {
     window.localStorage.setItem("groupId", id)
+    window.localStorage.setItem("groupNumber", number)
   }
 }
 

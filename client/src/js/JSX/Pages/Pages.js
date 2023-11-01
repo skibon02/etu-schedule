@@ -34,6 +34,7 @@ export function Pages() {
     getVkData(setVkData);
     if (window.localStorage.getItem("groupId") !== null) {
       setGroupId(window.localStorage.getItem("groupId"))
+      setGroupNumber(window.localStorage.getItem("groupNumber"))
       navigate('/schedule');
     } else {
       navigate('/');
