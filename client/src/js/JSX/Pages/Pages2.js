@@ -27,23 +27,22 @@ export function Pages() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function auth() {
-      await getVkData(setVkData);
-      if (window.localStorage.getItem("groupId") !== null) {
-        setGroupId(window.localStorage.getItem("groupId"));
-        setGroupNumber(window.localStorage.getItem("groupNumber"));
-      }
-      if (location.pathname === '/' && vkData.is_authorized) {
-        navigate('/schedule')
-      }
-      if (location.pathname === '/' && !vkData.is_authorized) {
-        navigate('/profile')
-      }
-      getGroupList(setGroupList, setGroupListError);
-    }
-
-    auth();
+    getVkData(setVkData);
   }, []);
+
+  useEffect(() => {
+    if (window.localStorage.getItem("groupId") !== null) {
+      setGroupId(window.localStorage.getItem("groupId"));
+      setGroupNumber(window.localStorage.getItem("groupNumber"));
+    }
+    if (location.pathname === '/' && vkData && vkData.is_authorized) {
+      navigate('/schedule')
+    }
+    if (location.pathname === '/' && vkData  && !vkData.is_authorized) {
+      navigate('/profile')
+    }
+    getGroupList(setGroupList, setGroupListError);
+  }, [vkData]);
 
   useEffect(() => {
     setActiveByLocation(location, setActive)
