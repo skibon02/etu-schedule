@@ -4,6 +4,7 @@ import myfetch from '../../FxFetches/myfetch';
 import { Connect, ConnectEvents } from '@vkontakte/superappkit';
 import { isdev, currentHost } from '../../FxFetches/util';
 import { getVkData } from '../../FxFetches/Pages/Fetches';
+import { useNavigate } from 'react-router-dom';
 
 // vk id штучка
 Config.init({
@@ -16,35 +17,45 @@ const SERVER_HOST = currentHost;
 export default function VkButton({setVkData}) {
     const [authData, setAuthData] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    console.log('rerender!');
+
+    useEffect(() => {
+        console.log('updating vkdata, isloading:');
+        console.log(isLoading);
+        getVkData(setVkData);
+    }, [isLoading]);
 
     useEffect(() => {
         async function Fetches() {
+            console.log('start LOADING AUTHORIZE');
             await VladFetch();
-            setTimeout(() => {
-                getVkData(setVkData);
-                setIsLoading(false);
-            }, 3000);
-        }
-
-        async function VladFetch() {
-            const vkAuthRedirectURL = '/api/authorize';
-            if (authData) {
-                myfetch(vkAuthRedirectURL, {
-                    credentials: 'include',
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json;charset=utf-8'
-                    },
-                    body: JSON.stringify({
-                        silent_token: authData.token,
-                        uuid: authData.uuid,
-                    })
-                });
-            }
+            // setTimeout(() => {
+            //     getVkData(setVkData);
+            //     setIsLoading(false);
+            // }, 3000);
+            console.log('LOADING AUTHORIZE finished');
+            setIsLoading(!isLoading);
         }
 
         Fetches();
     }, [authData])
+
+    async function VladFetch() {
+        const vkAuthRedirectURL = '/api/authorize';
+        if (authData) {
+            await myfetch(vkAuthRedirectURL, {
+                credentials: 'include',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify({
+                    silent_token: authData.token,
+                    uuid: authData.uuid,
+                })
+            });
+        }
+    }
 
     useEffect(() => {
         const vkAuthRedirectURL = SERVER_HOST+'/api/auth/redirect';
@@ -108,9 +119,9 @@ export default function VkButton({setVkData}) {
     return (
         <>
         <div id="vk" className='vk'>
-            <div className="vk-loading">
+            {/* <div className="vk-loading">
                 {isLoading && <div className="vk-loading__message" onClick={() => alert(123)}>Загрузка...</div>}
-            </div>
+            </div> */}
         </div>
         </>
     )

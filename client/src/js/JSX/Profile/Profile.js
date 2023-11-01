@@ -57,8 +57,8 @@ export default function Profile({vkData, setVkData}) {
             }
           </div>
         }
-        {isAuthorized && <div className="profile__reauth">Ты можешь авторизоваться ещё раз, мы не запрещаем</div>}
-        <VKButton_old_v setVkData={setVkData} />
+        {/* {isAuthorized && <div className="profile__reauth">Ты можешь авторизоваться ещё раз, мы не запрещаем</div>} */}
+        {!isAuthorized && <VKButton_old_v setVkData={setVkData} />}
       </div>
     </div>
     </>
