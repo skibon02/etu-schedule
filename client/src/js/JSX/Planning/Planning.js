@@ -2,15 +2,14 @@ import { useState } from "react";
 import Schedule from "../Schedule/Schedule";
 import makeSchedule from "../../Utils/Schedule/parseSchedule"
 import { PlanningButton } from "./PlanningButton"
+import NoSchedule from "../Schedule/NoSchedule";
 
 
 export default function Planning({groupSchedule, groupNumber, active}) {
   const [weekParity, setWeekParity] = useState(1);
   if (!groupSchedule) {
     return (
-      <div className="no-schedule">
-        <div className="no-schedule__text">Выбери группу во вкладке "Группы"</div>
-      </div>
+      <NoSchedule groupNumber={groupNumber} />
     )
   }
 

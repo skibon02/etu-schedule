@@ -21,26 +21,28 @@ export function Pages() {
   const [groupNumber, setGroupNumber] = useState(null);
   const [groupSchedule, setGroupSchedule] = useState(null);
 
-  const [vkData, setVkData] = useState({is_authorized: false});
+  const [vkData, setVkData] = useState();
 
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    getVkData(setVkData);
-    if (window.localStorage.getItem("groupId") !== null) {
-      setGroupId(window.localStorage.getItem("groupId"));
-      setGroupNumber(window.localStorage.getItem("groupNumber"));
-    } else {
-      navigate('/profile');
+    async function auth() {
+      await getVkData(setVkData);
+      if (window.localStorage.getItem("groupId") !== null) {
+        setGroupId(window.localStorage.getItem("groupId"));
+        setGroupNumber(window.localStorage.getItem("groupNumber"));
+      }
+      if (location.pathname === '/' && vkData.is_authorized) {
+        navigate('/schedule')
+      }
+      if (location.pathname === '/' && !vkData.is_authorized) {
+        navigate('/profile')
+      }
+      getGroupList(setGroupList, setGroupListError);
     }
-    if (location.pathname === '/' && vkData.is_authorized) {
-      navigate('/schedule')
-    }
-    if (location.pathname === '/' && !vkData.is_authorized) {
-      navigate('/profile')
-    }
-    getGroupList(setGroupList, setGroupListError);
+
+    auth();
   }, []);
 
   useEffect(() => {
@@ -52,76 +54,78 @@ export function Pages() {
     getGroupSchedule(groupId, setGroupSchedule)
   }, [groupId]);
 
-  return (
-    <>
-    {groupListError && <div>Server troubles: {groupListError}</div>}
-    {!groupListError && 
-    <div className='container'>
-      {active !== 'groups' && active !== 'profile' && <div className='under-header-box'></div>}
-      <Routes>
-        <Route path="/">
-          {(!vkData.is_authorized || active === 'profile') &&
-            <Route path="/profile" element={
-              <Profile
-                vkData={vkData}
-                setVkData={setVkData} />
-            } />
-          }
-        </Route>
-      </Routes>
-      {vkData.is_authorized &&
-        <Header 
-          date={date} 
-          setDate={setDate} 
-          active={active} 
-          setActive={setActive}
-          setGroupSchedule={setGroupSchedule}
-          setGroupId={setGroupId}
-          weekNumber={getWeekNumber(date)}
-          groupSchedule={groupSchedule} />
-      }
-      <Routes>
-        {vkData.is_authorized &&
-         <Route path="/">
-            {active === 'schedule' &&
-              <Route path="/schedule" element={
-                <Schedule 
-                  key={groupId} 
-                  date={date}
-                  groupSchedule={groupSchedule}
-                  groupNumber={groupNumber}
-                  active={active} />
-                } />
-            }
-            {active === 'planning' && 
-              <Route
-                path="/planning"
-                element={
-                  <Planning 
-                  groupNumber={groupNumber}
-                  groupSchedule={groupSchedule}
-                  active={active} />
-                } />
-            }
-            {active === 'groups' && 
-              <Route 
-                path="/groups"
-                element={
-                <Groups 
-                  setGroupId={setGroupId}
-                  setActive={setActive}
-                  groupList={groupList}
-                  setGroupNumber={setGroupNumber}
-                  setGroupSchedule={setGroupSchedule}
+  if (vkData) {
+    return (
+      <>
+      {groupListError && <div>Server troubles: {groupListError}</div>}
+      {!groupListError && 
+      <div className='container'>
+        {active !== 'groups' && active !== 'profile' && <div className='under-header-box'></div>}
+        <Routes>
+          <Route path="/">
+            {(!vkData.is_authorized || active === 'profile') &&
+              <Route path="/profile" element={
+                <Profile
                   vkData={vkData}
-                  groupSchedule={groupSchedule} />
-                } />
+                  setVkData={setVkData} />
+              } />
             }
           </Route>
+        </Routes>
+        {vkData.is_authorized &&
+          <Header 
+            date={date} 
+            setDate={setDate} 
+            active={active} 
+            setActive={setActive}
+            setGroupSchedule={setGroupSchedule}
+            setGroupId={setGroupId}
+            weekNumber={getWeekNumber(date)}
+            groupSchedule={groupSchedule} />
         }
-      </Routes>
-      {active !== 'profile' && <div className='under-header-box-mobile'></div>}
-    </div>}
-    </>
-  )
+        <Routes>
+          {vkData.is_authorized &&
+          <Route path="/">
+              {active === 'schedule' &&
+                <Route path="/schedule" element={
+                  <Schedule 
+                    key={groupId} 
+                    date={date}
+                    groupSchedule={groupSchedule}
+                    groupNumber={groupNumber}
+                    active={active} />
+                  } />
+              }
+              {active === 'planning' && 
+                <Route
+                  path="/planning"
+                  element={
+                    <Planning 
+                    groupNumber={groupNumber}
+                    groupSchedule={groupSchedule}
+                    active={active} />
+                  } />
+              }
+              {active === 'groups' && 
+                <Route 
+                  path="/groups"
+                  element={
+                  <Groups 
+                    setGroupId={setGroupId}
+                    setActive={setActive}
+                    groupList={groupList}
+                    setGroupNumber={setGroupNumber}
+                    setGroupSchedule={setGroupSchedule}
+                    vkData={vkData}
+                    groupSchedule={groupSchedule} />
+                  } />
+              }
+            </Route>
+          }
+        </Routes>
+        {active !== 'profile' && <div className='under-header-box-mobile'></div>}
+      </div>}
+      </>
+    )
+  }
 }
