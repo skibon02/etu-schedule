@@ -142,7 +142,7 @@ struct AuthRedirectParams {
     uuid: String,
     hash: String,
     #[serde(rename = "loadExternalUsers")]
-    load_external_users: bool,
+    load_external_users: Option<bool>,
 }
 
 #[get("/auth/redirect?<payload>")]

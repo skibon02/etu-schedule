@@ -130,23 +130,23 @@ async function run()
     }
 
     fillLessonID(g0303)
-    fillLessonID(g0304)
+    // fillLessonID(g0304)
     fillSchedID(g0303)
-    fillSchedID(g0304)
+    // fillSchedID(g0304)
     fillSubjID(g0303)
-    fillSubjID(g0304)
+    // fillSubjID(g0304)
     fillAlienID(g0303)
-    fillAlienID(g0304)
+    // fillAlienID(g0304)
 
     fillTeacherID(g0303)
-    fillTeacherID(g0304)
+    // fillTeacherID(g0304)
     fillTeacherAlienID(g0303)
-    fillTeacherAlienID(g0304)
+    // fillTeacherAlienID(g0304)
 
     fillAuditoriumReservationID(g0303)
-    fillAuditoriumReservationID(g0304)
+    // fillAuditoriumReservationID(g0304)
     fillAuditoriumReservTimeID(g0303)
-    fillAuditoriumReservTimeID(g0304)
+    // fillAuditoriumReservTimeID(g0304)
 
 
     console.log("LessonIDcnt: ")
