@@ -3,6 +3,7 @@ import { Config } from '@vkontakte/superappkit';
 import myfetch from '../../FxFetches/myfetch';
 import { Connect, ConnectEvents } from '@vkontakte/superappkit';
 import { isdev, currentHost } from '../../FxFetches/util';
+import { getVkData } from '../../FxFetches/Pages/Fetches';
 
 // vk id штучка
 Config.init({
@@ -12,24 +13,35 @@ Config.init({
 const SERVER_HOST = currentHost;
 
 
-export default function VkButton() {
+export default function VkButton({setVkData}) {
 
     const [authData, setAuthData] = useState(null);
     useEffect(() => {
-        const vkAuthRedirectURL = '/api/authorize';
-        if (authData) {
-            myfetch(vkAuthRedirectURL, {
-                credentials: 'include',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json;charset=utf-8'
-                },
-                body: JSON.stringify({
-                    silent_token: authData.token,
-                    uuid: authData.uuid,
-                })
-            });
+        async function Fetches() {
+            await VladFetch();
+             setTimeout(() => {
+                getVkData(setVkData);
+             }, 3000);
         }
+
+        async function VladFetch() {
+            const vkAuthRedirectURL = '/api/authorize';
+            if (authData) {
+                myfetch(vkAuthRedirectURL, {
+                    credentials: 'include',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify({
+                        silent_token: authData.token,
+                        uuid: authData.uuid,
+                    })
+                });
+            }
+        }
+
+        Fetches();
     },[authData])
 
     useEffect(() => {

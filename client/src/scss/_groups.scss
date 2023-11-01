@@ -19,6 +19,10 @@ $BORDER-COLOR: #828282;
   &__input {  
   }
 
+  &__checkbox-container {
+    background: #fff;
+  }
+
   &__items {
     // padding-top: pxToEm(70px);
     padding-top: pxToEm(25px);
@@ -33,7 +37,23 @@ $BORDER-COLOR: #828282;
     &:hover {
       box-shadow: inset 0 0 pxToEm(5px) $BORDER-COLOR;
     }
+  }
 
+  &__checkbox {
+    margin-left: pxToEm(10px);
+    width: pxToEm(15px);
+    height: pxToEm(15px);
+  }
+
+  &__checkbox-description {
+    font-size: 1.2em;
+    display: inline-block;
+    margin-bottom: pxToEm(2px);
+  }
+
+  &__under-checkbox-box {
+    width: 100%;
+    height: pxToEm(17px);
   }
 }
 

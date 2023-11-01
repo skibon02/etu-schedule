@@ -912,6 +912,9 @@ h1, h2, h3, h4, h5, h6 {
   position: fixed;
   width: 100%;
 }
+.groups__checkbox-container {
+  background: #fff;
+}
 .groups__items {
   padding-top: 1.5625em;
 }
@@ -925,6 +928,20 @@ h1, h2, h3, h4, h5, h6 {
 .groups__item:hover {
   -webkit-box-shadow: inset 0 0 0.3125em #828282;
           box-shadow: inset 0 0 0.3125em #828282;
+}
+.groups__checkbox {
+  margin-left: 0.625em;
+  width: 0.9375em;
+  height: 0.9375em;
+}
+.groups__checkbox-description {
+  font-size: 1.2em;
+  display: inline-block;
+  margin-bottom: 0.125em;
+}
+.groups__under-checkbox-box {
+  width: 100%;
+  height: 1.0625em;
 }
 
 .groups-input {
@@ -1056,6 +1073,108 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: inherit;
 }
 
+.profile-container {
+  height: 100vh;
+  padding-top: 4.375em;
+  background: linear-gradient(354deg, rgb(240, 180, 180) 0%, rgb(236, 204, 240) 38%, rgb(214, 226, 134) 100%);
+}
+
+.profile {
+  line-height: 1em;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  text-align: center;
+  padding-top: 1.25em;
+  font-size: 1.5em;
+}
+.profile__image {
+  border-radius: 50%;
+  width: 9.375em;
+  margin-bottom: 1.25em;
+}
+.profile__false-image {
+  margin-right: -0.3125em;
+}
+.profile__user-name {
+  font-weight: 700;
+  margin-bottom: 1.25em;
+  border-radius: 0.625em;
+  padding: 0.3125em 1.25em 0.3125em;
+  border-bottom: 1px solid #000;
+  border-top: 1px solid #000;
+}
+.profile__name {
+  margin-bottom: 0.3125em;
+}
+.profile__name:last-child {
+  margin-bottom: 0;
+}
+.profile__choose-group-message {
+  font-size: 0.9em;
+  margin-bottom: 1.25em;
+}
+.profile__reauth {
+  font-size: 0.9em;
+  margin-bottom: 0.625em;
+}
+
+.status {
+  font-size: 0.9em;
+  margin-bottom: 1.25em;
+  color: #fff;
+}
+.status__false {
+  padding: 0.625em 1.25em;
+  border-radius: 0.625em;
+  background: rgba(214, 0, 0, 0.9568627451);
+}
+.status__true {
+  padding: 0.625em 1.25em;
+  border-radius: 0.625em;
+  background: #2DB694;
+}
+
+.vk {
+  width: 30em;
+}
+
+@media screen and (max-width: 700px) {
+  .vk {
+    width: 21.875em;
+  }
+}
+@media screen and (max-width: 500px) {
+  .profile-container {
+    padding-top: 0;
+  }
+  .profile {
+    padding-top: 1.25em;
+    font-size: 1em;
+  }
+  .profile__user-name {
+    font-size: 1.5em;
+    margin-bottom: 0.9375em;
+  }
+  .profile__reauth {
+    font-size: 1.5em;
+    margin-bottom: 0.625em;
+  }
+  .status {
+    font-size: 1.5em;
+    margin-bottom: 0.9375em;
+  }
+  .vk {
+    width: 25em;
+  }
+}
 * {
   padding: 0;
   margin: 0;

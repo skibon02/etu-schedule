@@ -6,6 +6,7 @@ async function myfetch(path, param = {}) {
     path = backendHost + path;
     if (isdev()) {
         console.log('dev fetch to ' + path)
+        param.credentials = "include";
     }
     else {
         console.log('prod fetch to ' + path)

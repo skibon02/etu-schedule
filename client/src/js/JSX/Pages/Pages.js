@@ -1,10 +1,10 @@
 import { Fragment, useEffect, useState } from "react";
 import React from "react";
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { getGroupList, getGroupSchedule } from "../../FxFetches/Pages/Group";
+import { getGroupList, getGroupSchedule, getVkData } from "../../FxFetches/Pages/Fetches";
 import Groups from "../../JSX/Groups/Groups";
 // import VkButton from "../../JSX/Profile/VKButton";
-import VkButton from "../../JSX/Profile/VKButton_old_v";
+// import VkButton from "../../JSX/Profile/VKButton_old_v";
 import Header from "../../JSX/Header/Header";
 import Schedule from '../../JSX/Schedule/Schedule'
 // import makeSchedule from "../../Utils/Schedule/parseSchedule";
@@ -12,6 +12,7 @@ import { setActiveByLocation } from "../../FxFetches/Pages/SetActiveByLocation";
 // import makeSchedule from "@src/js/Utils/Schedule/parseSchedule.js";
 import { getWeekNumber } from "../../Utils/handleTime";
 import Planning from "../Planning/Planning";
+import Profile from "../Profile/Profile";
 
 export function Pages() {
   const [date, setDate] = useState(new Date());
@@ -24,11 +25,19 @@ export function Pages() {
   const [groupNumber, setGroupNumber] = useState(null);
   const [groupSchedule, setGroupSchedule] = useState(null);
 
+  const [vkData, setVkData] = useState({is_authorized: false});
+
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate('/');
+    getVkData(setVkData);
+    if (window.localStorage.getItem("groupId") !== null) {
+      setGroupId(window.localStorage.getItem("groupId"))
+      navigate('/schedule');
+    } else {
+      navigate('/');
+    }
     getGroupList(setGroupList, setGroupListError);
   }, []);
 
@@ -46,7 +55,7 @@ export function Pages() {
     {groupListError && <div>Server troubles: {groupListError}</div>}
     {!groupListError && 
     <div className='container'>
-      {active !== 'groups' && <div className='under-header-box'></div>}
+      {active !== 'groups' && active !== 'profile' && <div className='under-header-box'></div>}
       <Routes>
         {(!groupSchedule && !groupId || active === 'groups') && 
         <Route 
@@ -57,7 +66,8 @@ export function Pages() {
             setActive={setActive}
             groupList={groupList}
             setGroupNumber={setGroupNumber}
-            setGroupSchedule={setGroupSchedule} />} />
+            setGroupSchedule={setGroupSchedule}
+            vkData={vkData} />} />
           
         }
       </Routes>
@@ -103,7 +113,9 @@ export function Pages() {
               <Route 
                 path="/profile"
                 element={
-                  <VkButton />
+                  <Profile
+                    vkData={vkData}
+                    setVkData={setVkData} />
                 }
               />
             }
@@ -111,7 +123,7 @@ export function Pages() {
           </Routes>
         </>
         }
-      {groupSchedule && 
+      {groupSchedule && active !== 'profile' &&
         <div className='under-header-box-mobile'></div>
       }
     </div>}
