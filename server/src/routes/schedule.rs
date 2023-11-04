@@ -7,12 +7,10 @@ use crate::{api::etu_api::{self, ScheduleObjectOriginal}, models::groups::GroupM
 use crate::models::Db;
 
 #[get("/scheduleObjs/group/<group>")]
-async fn get_group_schedule_objects(group: usize) -> Json<Vec<ScheduleObjectOriginal>> {
+async fn get_group_schedule_objects(group: u32) -> Option<Json<Vec<ScheduleObjectOriginal>>> {
     let sched_objects = etu_api::get_schedule_objs_group(group).await;
-    if sched_objects.is_empty() {
-        return Json(vec![]);
-    }
-    Json(sched_objects[0].scheduleObjects.clone())
+
+    Some(Json(sched_objects?.scheduleObjects))
 }
 
 #[get("/groups")]

@@ -16,6 +16,7 @@ use crate::models::Db;
 use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use std::{env, fs};
+use std::collections::BTreeMap;
 
 use rocket::fs::{FileServer, NamedFile};
 
@@ -131,6 +132,8 @@ use rocket_db_pools::Database;
 use sqlx::{Pool, Sqlite, SqlitePool};
 use crate::api::etu_api;
 use crate::api::vk_api::VK_SERVICE_TOKEN;
+use crate::models::groups::DepartmentModel;
+use crate::models::schedule::{ScheduleObjModel, SubjectModel};
 
 
 fn loglevel_formatter(level: &log::Level) -> ColoredString {
@@ -262,6 +265,21 @@ async fn periodic_task(mut con: Db) {
         data_merges::groups::groups_merge(&new_groups, &mut con.acquire().await.unwrap()).await.unwrap();
 
 
+        let group_id = 4362u32;
+        let sched_objs = etu_api::get_schedule_objs_group(group_id).await.unwrap();
+        let mut sched_objs_models: Vec<ScheduleObjModel> = Vec::new();
+        let mut subjects: BTreeMap<u32, SubjectModel> = BTreeMap::new();
+        let mut departments: Vec<DepartmentModel> = Vec::new();
+        for sched_obj_orig in sched_objs.scheduleObjects {
+            sched_objs_models.append(&mut sched_obj_orig.clone().into());
+            subjects.insert(sched_obj_orig.lesson.subject.id, sched_obj_orig.lesson.subject.clone().into());
+            departments.push(sched_obj_orig.lesson.subject.department.into());
+        }
+        for department in departments {
+            data_merges::groups::department_single_merge(department, None, &mut con.acquire().await.unwrap()).await.unwrap();
+        }
+        data_merges::subjects::subjects_merge(&subjects, &mut con.acquire().await.unwrap()).await.unwrap();
+        data_merges::schedule::schedule_objs_merge(group_id, &sched_objs_models, &mut con.acquire().await.unwrap()).await.unwrap();
 
         tokio::time::sleep(tokio::time::Duration::from_secs(60*10)).await
 

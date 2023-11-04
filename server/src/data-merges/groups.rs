@@ -37,7 +37,7 @@ async fn faculty_single_merge(faculty: FacultyModel, con: &mut PoolConnection<Sq
         return Ok(MergeResult::Inserted);
     }
 }
-async fn department_single_merge(department: DepartmentModel, faculty: Option<&FacultyModel>, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<MergeResult> {
+pub async fn department_single_merge(department: DepartmentModel, faculty: Option<&FacultyModel>, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<MergeResult> {
     let id = department.department_id;
     let row : Option<DepartmentModel> = sqlx::query_as("SELECT * FROM departments WHERE department_id = ?")
         .bind(id)
@@ -52,7 +52,8 @@ async fn department_single_merge(department: DepartmentModel, faculty: Option<&F
     }
 
     if let Some(row) = row {
-        if row != department {
+        // do not update if faculty is None
+        if (faculty.is_some() || row.faculty_id == department.faculty_id) && row != department {
             info!("MERGE::DEPARTMENTS \tUpdating department {} with title {}: \n old: {:?}, new: {:?}", id, department.title, row, department);
             sqlx::query("UPDATE departments SET title = ?, long_title = ?, department_type = ?, faculty_id = ? WHERE department_id = ?")
                 .bind(&department.title)

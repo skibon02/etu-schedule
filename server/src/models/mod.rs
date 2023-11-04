@@ -1,5 +1,6 @@
 pub mod users;
 pub mod groups;
+pub mod schedule;
 
 use rocket_db_pools::{sqlx, Database};
 
