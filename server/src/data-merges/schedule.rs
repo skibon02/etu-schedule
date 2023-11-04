@@ -51,11 +51,10 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
 
     //try to link by schedule_obj_id or get_lesson_pos
     for input_sched_obj in &input_schedule_objs {
-        debug!("Searching link for input schedule object: {:?}", input_sched_obj);
+        debug!("Searching link for input schedule object: {}", input_sched_obj.last_known_orig_sched_obj_id);
         let mut found = false;
         for existing_sched_obj in &mut existing_sched_objs {
-            if input_sched_obj.last_known_orig_sched_obj_id == existing_sched_obj.last_known_orig_sched_obj_id
-                || input_sched_obj.get_lesson_pos() == existing_sched_obj.get_lesson_pos() {
+            if input_sched_obj.get_lesson_pos() == existing_sched_obj.get_lesson_pos() {
 
                 if input_sched_obj.last_known_orig_sched_obj_id == existing_sched_obj.last_known_orig_sched_obj_id {
                     debug!("Linked by last_known_orig_sched_obj_id");
@@ -153,7 +152,7 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
         }
         if !found {
             // invalidate old sched_obj (update gen_id)
-            debug!("Invalidating old schedule object: {:?}", existing_sched_obj);
+            debug!("Invalidating old schedule object: {}", existing_sched_obj.last_known_orig_sched_obj_id);
 
             let new_gen_id = last_gen_id + 1;
             create_new_gen(con, new_gen_id).await?;
@@ -198,12 +197,13 @@ pub async fn schedule_objs_merge(group_id: u32, schedule_objs: &Vec<ScheduleObjM
             }
         }
 
-        if !modified {
-            debug!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for subject id {} finished with no changes!", subj_id);
+        if modified {
+            info!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for subject id {} finished:\tmodified!", subj_id);
+            any_modified = true;
         }
         else {
-            debug!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for subject id {} finished with changes!", subj_id);
-            any_modified = true;
+
+            info!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for subject id {} finished:\tno changes!", subj_id);
         }
     }
 
@@ -213,7 +213,7 @@ pub async fn schedule_objs_merge(group_id: u32, schedule_objs: &Vec<ScheduleObjM
     else {
         info!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for group id {} finished with no changes! Keeping last generation", group_id);
     }
-    info!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for group id {} finished in {:?}", group_id, start.elapsed());
+    info!("MERGE::SCHEDULE_OBJ_GROUP Merging sched obj group took {:?}", start.elapsed());
 
     Ok(())
 }
