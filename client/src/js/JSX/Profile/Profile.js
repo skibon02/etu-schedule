@@ -8,7 +8,7 @@ import { makeFullNameEnabledDV, makeFullGroupNumberDV } from "../../Utils/Profil
 import { fullGroupNumberDVFx, fullNameEnabledDVFx } from "../../FxFetches/Profile/SelectFetches";
 import DeAuthButton from "./DeAuthButton";
 
-export default function Profile({vkData, setVkData, groupList, setGroupSchedule}) {
+export default function Profile({vkData, setVkData, groupList, setGroupSchedule, setGroupNumber, setGroupId, setGroupList}) {
   const [fullNameEnabledDV, setFullNameEnabledDV] = useState(makeFullNameEnabledDV());
   const [fullGroupNumberDV, setFullGroupNumberDV] = useState(makeFullGroupNumberDV());
   
@@ -50,7 +50,14 @@ export default function Profile({vkData, setVkData, groupList, setGroupSchedule}
             </div>
           </div>
           {!isAuthorized && <VKButton_old_v setVkData={setVkData} />}
-          {isAuthorized && <DeAuthButton setVkData={setVkData} />}
+          {isAuthorized && 
+            <DeAuthButton 
+            setVkData={setVkData}
+            setGroupSchedule={setGroupSchedule}
+            setGroupId={setGroupId}
+            setGroupNumber={setGroupNumber}
+            setGroupList={setGroupList} />
+          }
         </div>
       </div>
       {isAuthorized &&

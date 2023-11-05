@@ -68,7 +68,10 @@ export function Pages() {
                   vkData={vkData}
                   setVkData={setVkData}
                   groupList={groupList}
-                  setGroupSchedule={setGroupSchedule} />
+                  setGroupSchedule={setGroupSchedule}
+                  setGroupId={setGroupId}
+                  setGroupNumber={setGroupNumber}
+                  setGroupList={setGroupList} />
               } />
             }
           </Route>
