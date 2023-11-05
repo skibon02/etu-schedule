@@ -1,15 +1,19 @@
 function fullNameEnabledDVFx(setFullNameEnabledDV) {
-  setFullNameEnabledDV({
-    value: window.localStorage.getItem('fullNameEnabledValue'), 
-    label: window.localStorage.getItem('fullNameEnabledLabel')
-  })
+  if (window.localStorage.getItem('fullNameEnabledValue') !== null) {
+    setFullNameEnabledDV({
+      value: window.localStorage.getItem('fullNameEnabledValue'), 
+      label: window.localStorage.getItem('fullNameEnabledLabel')
+    })
+  }
 }
 
-function fullGroupNumberDVFx(setFullGroupNumberDV) {
-  setFullGroupNumberDV({
-    value: window.localStorage.getItem('groupId'), 
-    label: window.localStorage.getItem('groupNumber')
-  })
+function fullGroupNumberDVFx(setFullGroupNumberDV) { 
+  if (window.localStorage.getItem('groupNumber') !== null) {
+    setFullGroupNumberDV({
+      value: window.localStorage.getItem('groupId'), 
+      label: window.localStorage.getItem('groupNumber')
+    })
+  }
 }
 
 

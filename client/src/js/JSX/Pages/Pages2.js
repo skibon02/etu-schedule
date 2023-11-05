@@ -38,7 +38,8 @@ export function Pages() {
       setGroupListError,
       navigate,
       setGroupId,
-      setGroupNumber
+      setGroupNumber,
+      groupNumber
     )
   }, [vkData, window.localStorage.getItem('groupNumber')]);
 
@@ -66,7 +67,8 @@ export function Pages() {
                 <Profile
                   vkData={vkData}
                   setVkData={setVkData}
-                  groupList={groupList} />
+                  groupList={groupList}
+                  setGroupSchedule={setGroupSchedule} />
               } />
             }
           </Route>
@@ -105,24 +107,10 @@ export function Pages() {
                     active={active} />
                   } />
               }
-              {active === 'groups' && 
-                <Route 
-                  path="/groups"
-                  element={
-                  <Groups 
-                    setGroupId={setGroupId}
-                    setActive={setActive}
-                    groupList={groupList}
-                    setGroupNumber={setGroupNumber}
-                    setGroupSchedule={setGroupSchedule}
-                    vkData={vkData}
-                    groupSchedule={groupSchedule} />
-                  } />
-              }
             </Route>
           }
         </Routes>
-        {active !== 'profile' && <div className='under-header-box-mobile'></div>}
+        <div className='under-header-box-mobile'></div>
       </div>}
       </>
     )

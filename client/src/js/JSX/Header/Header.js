@@ -33,15 +33,6 @@ export default function Header({date, setDate, active, setActive, weekNumber, gr
             onClick={() => handlers.handlePlanningClick(setActive)}
           />
         </NavLink>
-        <NavLink to='/groups' className={active === 'groups' ? 
-        "nav__item header-active" :
-        "nav__item header-hover"}>
-          <NavButton
-            imageSrc={SEARCH}
-            text={'Группы'}
-            onClick={() => handlers.handleGroupsClick(setActive)}
-          />
-        </NavLink>
         <NavLink to='/profile' className={active === 'profile' ? 
         "nav__item header-active" :
         "nav__item header-hover"}>

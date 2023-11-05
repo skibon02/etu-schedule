@@ -6,8 +6,9 @@ import { makeGroupListSelect } from "../../Utils/Profile/makeGroupListSelect";
 import { handleGroupSelect, handlefullNameEnabledSelect } from "../../Handlers/Profile/HandleGroupSelect";
 import { makeFullNameEnabledDV, makeFullGroupNumberDV } from "../../Utils/Profile/makeSelectState";
 import { fullGroupNumberDVFx, fullNameEnabledDVFx } from "../../FxFetches/Profile/SelectFetches";
+import DeAuthButton from "./DeAuthButton";
 
-export default function Profile({vkData, setVkData, groupList}) {
+export default function Profile({vkData, setVkData, groupList, setGroupSchedule}) {
   const [fullNameEnabledDV, setFullNameEnabledDV] = useState(makeFullNameEnabledDV());
   const [fullGroupNumberDV, setFullGroupNumberDV] = useState(makeFullGroupNumberDV());
   
@@ -30,7 +31,7 @@ export default function Profile({vkData, setVkData, groupList}) {
             {isAuthorized ?
               <img src={vkData.profile_photo_url} alt="" class="user-info__image" />
               :
-              <img src={PROFILE} alt="" class="user-info__image" />
+              <img src={PROFILE} alt="" class="user-info__image shitty-image" />
             }
           </div>
         </div>
@@ -48,8 +49,9 @@ export default function Profile({vkData, setVkData, groupList}) {
               {isAuthorized ? 'Авторизован' : 'Не авторизован'}
             </div>
           </div>
+          {!isAuthorized && <VKButton_old_v setVkData={setVkData} />}
+          {isAuthorized && <DeAuthButton setVkData={setVkData} />}
         </div>
-        {!isAuthorized && <VKButton_old_v setVkData={setVkData} />}
       </div>
       {isAuthorized &&
         <div class="profile__user-preferenses">
@@ -60,7 +62,7 @@ export default function Profile({vkData, setVkData, groupList}) {
             <div class="user-preference__value">
                 <Select 
                   options={makeGroupListSelect(groupList)}
-                  onChange={handleGroupSelect}
+                  onChange={(option) => handleGroupSelect(option, setGroupSchedule)}
                   defaultValue={fullGroupNumberDV} />
             </div>
           </div>

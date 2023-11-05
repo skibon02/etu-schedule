@@ -17,7 +17,6 @@ const SERVER_HOST = currentHost;
 export default function VkButton({setVkData}) {
     const [authData, setAuthData] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    console.log('rerender!');
 
     useEffect(() => {
         console.log('updating vkdata, isloading:');

@@ -1,4 +1,5 @@
-function handleGroupSelect(option) {
+function handleGroupSelect(option, setGroupSchedule) {
+  setGroupSchedule(null);
   window.localStorage.setItem('groupNumber', option.label);
   window.localStorage.setItem('groupId', option.value);
 }

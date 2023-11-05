@@ -3,7 +3,7 @@ function makeFullNameEnabledDV() {
     value: window.localStorage.getItem('fullNameEnabledValue'),
     label: window.localStorage.getItem('fullNameEnabledLabel')
   };
-  const defaultFullNameEnabledValue = storedFullNameEnabledValue.value && storedFullNameEnabledValue.label ? 
+  const defaultFullNameEnabledValue = storedFullNameEnabledValue.label ? 
   storedFullNameEnabledValue : {
     value: 'auto', 
     label: 'Авто'
@@ -16,7 +16,7 @@ function makeFullGroupNumberDV() {
     value: window.localStorage.getItem('groupId'),
     label: window.localStorage.getItem('groupNumber')
   };
-  const defaultGroupNumberValue = storedGroupNumberValue.value && storedGroupNumberValue.label ? 
+  const defaultGroupNumberValue = storedGroupNumberValue.label ? 
   storedGroupNumberValue : {
     value: null, 
     label: 'Не выбрана'

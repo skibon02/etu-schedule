@@ -374,6 +374,9 @@
       width: pxToEm(60px, );
     }
   }
+  .no-schedule {
+    font-size: 0.6em;
+  }
 }
 @media screen and (max-width: 500px) {
   .no-schedule {

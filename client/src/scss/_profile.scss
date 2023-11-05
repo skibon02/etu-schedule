@@ -2,6 +2,7 @@
 
 $GREEN: #2DB694;
 $RED: #d60000f4;
+$BG: rgb(146, 173, 255);
 
 .profile {
   // border: 1px solid #000;
@@ -10,6 +11,7 @@ $RED: #d60000f4;
   gap: pxToEm(60px);
   font-size: 0.8em;
   padding-top: pxToEm(20px);
+  padding-bottom: pxToEm(20px);
   
   &__user-info {
   }
@@ -17,7 +19,7 @@ $RED: #d60000f4;
   &__user-preferenses {
     padding: pxToEm(30px);
     border-radius: pxToEm(30px);
-    background: #7c89b5;
+    background: $BG;
     // background: linear-gradient(0deg, rgba(192,219,255,1) 0%, rgba(255,221,253,1) 50%, rgba(255,232,196,1) 100%);
   }
 
@@ -27,7 +29,7 @@ $RED: #d60000f4;
 
 .user-info {
   display: flex;
-  background: #7c89b5;
+  background: $BG;
   // background: linear-gradient(0deg, rgb(217, 218, 255) 0%, rgb(211, 239, 233) 50%, rgba(255,255,255,1) 100%);
   border-radius: pxToEm(30px);
   padding: pxToEm(20px);
@@ -58,7 +60,7 @@ $RED: #d60000f4;
   }
 
   &__name {
-    font-weight: 100;
+    // font-weight: 100;
     line-height: 1em;
     color: #fff;
   }
@@ -68,6 +70,7 @@ $RED: #d60000f4;
     padding: pxToEm(5px) pxToEm(8px);
     border-radius: pxToEm(10px);
     background: #fff;
+    line-height: 1em;
   }
 
   &__auth-text {
@@ -75,6 +78,16 @@ $RED: #d60000f4;
     text-transform: uppercase;
     letter-spacing: 0.1em;
   }
+}
+
+.shitty-image {
+  margin-right: pxToEm(-10px);
+}
+
+.vk {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .user-preference {
@@ -100,6 +113,71 @@ $RED: #d60000f4;
   }
 }
 
+.deauth-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: pxToEm(20px);
+}
+
+.deauth-button {
+  user-select: none;
+  width: 100%;
+  cursor: pointer;
+  padding: pxToEm(5px);
+  gap: pxToEm(5px);
+  background: #d60000f4;
+  border-radius: pxToEm(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 50ms ease;
+
+  &:active {
+    width: 95%;
+    height: 95%;
+    font-size: 0.95em;
+    .loader {
+      border: pxToEm(1.5px) solid #fff; 
+      border-top: pxToEm(1.5px) solid transparent; 
+      border-radius: 50%; 
+      animation: spin 1s linear infinite; 
+    }
+  }
+
+  &:hover {
+    background: #f23737f4;
+  }
+
+  &__image {
+    width: pxToEm(10px);
+  }
+
+  &__text-container {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  &__text {
+    font-size: 0.6em;
+    color: #fff;
+    font-weight: 500;
+    text-align: center;
+  }
+}
+
+.loader {
+  width: pxToEm(10px);
+  height: pxToEm(10px);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+
 @media screen and (max-width: 1200px) {
   .profile {
     width: calc(100% - 80px);
@@ -109,6 +187,23 @@ $RED: #d60000f4;
 @media screen and (max-width: 700px) {
   .profile {
     font-size: 0.6em;
+  }
+  .deauth-button {
+    &:active {
+      .loader {
+        border: pxToEm(1px) solid #fff; 
+        border-top: pxToEm(1px) solid transparent; 
+        border-radius: 50%; 
+        animation: spin 1s linear infinite; 
+      }
+    }
+    &__image {
+      width: pxToEm(13px);
+    }
+  }
+  .loader {
+    width: pxToEm(13px);
+    height: pxToEm(13px);
   }
 }
 
