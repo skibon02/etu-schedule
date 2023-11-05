@@ -1,65 +1,85 @@
 import { useState, useEffect } from "react";
 import VKButton_old_v from "./VKButton_old_v";
+import Select from 'react-select'
 import PROFILE from '../../../icons/profile.svg'
+import { makeGroupListSelect } from "../../Utils/Profile/makeGroupListSelect";
+import { handleGroupSelect, handlefullNameEnabledSelect } from "../../Handlers/Profile/HandleGroupSelect";
+import { makeFullNameEnabledDV, makeFullGroupNumberDV } from "../../Utils/Profile/makeSelectState";
+import { fullGroupNumberDVFx, fullNameEnabledDVFx } from "../../FxFetches/Profile/SelectFetches";
 
-export default function Profile({vkData, setVkData}) {
+export default function Profile({vkData, setVkData, groupList}) {
+  const [fullNameEnabledDV, setFullNameEnabledDV] = useState(makeFullNameEnabledDV());
+  const [fullGroupNumberDV, setFullGroupNumberDV] = useState(makeFullGroupNumberDV());
+  
   const isAuthorized = vkData.is_authorized;
+
+  useEffect(() => {
+    fullNameEnabledDVFx(setFullNameEnabledDV)
+  }, [window.localStorage.getItem('fullNameEnabledValue')]);
+
+  useEffect(() => {
+    fullGroupNumberDVFx(setFullGroupNumberDV)
+  }, [window.localStorage.getItem('groupNumber')]);
 
   return (
     <>
-    <div className="profile-container">
-      <div className="profile schedule">
-        <div className="profile__image-container">
-          {isAuthorized ?
-            <img src={vkData.profile_photo_url} alt="pic" className="profile__true-image profile__image" />
-            :
-            <img src={PROFILE} alt="" className="profile__false-image profile__image" />
-          }
-        </div>
-        {isAuthorized ?
-          <div className="profile__user-name">
-            <div className="profile__name-true profile__name">
-              {vkData.first_name}
-            </div>
-            <div className="profile__name-true profile__name">
-              {vkData.last_name}
-            </div>
-          </div>
-          :
-          <div className="profile__user-name">
-            <div className="profile__name-false profile__name">
-              Пользователь
-            </div>
-            <div className="profile__name-false profile__name">
-              Неизвестен
-            </div>
-          </div>
-        }
-        {!isAuthorized && <div className="profile__access-denied">Мы не повзолим пользоваться сайтом без авторизации!</div>}
-        <div className="profile__status status">
-          {isAuthorized ? 
-            <div className="status__true">
-              Вы авторизованы
-            </div>
-            :
-            <div className="status__false">
-              Вы не авторизованы
-            </div>
-          }
-        </div>
-        {isAuthorized &&
-          <div className="profile__choose-group-message">
-            Теперь сайт может запомнить твой выбор при указании номера группы. Перейди во вкладку "Группы" и убедись! 
-            {window.localStorage.getItem("groupNumber") !== null ? 
-            <p>Сейчас номер постоянной группы: {window.localStorage.getItem("groupNumber")}.</p>
-            :
-            <p>Сейчас ты не выбрал постоянную группу.</p>
+    <div class="profile schedule">
+      <div class="profile__user-info user-info">
+        <div class="user-info__avatar">
+          <div class="user-info__image-container">
+            {isAuthorized ?
+              <img src={vkData.profile_photo_url} alt="" class="user-info__image" />
+              :
+              <img src={PROFILE} alt="" class="user-info__image" />
             }
           </div>
-        }
-        {/* {isAuthorized && <div className="profile__reauth">Ты можешь авторизоваться ещё раз, мы не запрещаем</div>} */}
+        </div>
+        <div class="user-info__text-info">
+          <div class="user-info__name">
+            {isAuthorized ?
+              vkData.first_name + ' ' +
+              vkData.last_name
+              :
+              ''
+            }
+          </div>
+          <div class="user-info__auth">
+            <div class="user-info__auth-text">
+              {isAuthorized ? 'Авторизован' : 'Не авторизован'}
+            </div>
+          </div>
+        </div>
         {!isAuthorized && <VKButton_old_v setVkData={setVkData} />}
       </div>
+      {isAuthorized &&
+        <div class="profile__user-preferenses">
+         <div class="profile__user-preference user-preference">
+            <div class="user-preference__title">
+              Постоянная группа:
+            </div>
+            <div class="user-preference__value">
+                <Select 
+                  options={makeGroupListSelect(groupList)}
+                  onChange={handleGroupSelect}
+                  defaultValue={fullGroupNumberDV} />
+            </div>
+          </div>
+         <div class="profile__user-preference user-preference">
+            <div class="user-preference__title">
+              Отображение названий предметов
+            </div>
+            <div class="user-preference__value">
+                <Select 
+                  options={[
+                    {value: 'auto', label: 'Авто'},
+                    {value: 'short', label: 'Сокращённое'},
+                  ]}
+                  onChange={handlefullNameEnabledSelect}
+                  defaultValue={fullNameEnabledDV} />
+            </div>
+          </div>
+        </div>
+      }
     </div>
     </>
   )

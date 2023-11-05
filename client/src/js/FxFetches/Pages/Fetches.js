@@ -15,6 +15,8 @@ async function getGroupList(setGroupList, setGroupListError) {
         id: k
       });
     }
+    console.log('groups:');
+    console.log(groups);
 
     setGroupList(groups);
   } catch (error) {

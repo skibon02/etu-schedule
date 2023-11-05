@@ -25,6 +25,9 @@ export function makeUsableSchedule(scheduleObject) {
     title =  titleWords[i].length > 16 ? shortTitle : title;
   }
   title = titleWords.length > 6 ? shortTitle : title
+  if (window.localStorage.getItem('fullNameEnabledValue') === 'short') {
+    title = shortTitle;
+  }
 
   let teachers = [];
   let firstTeacherId;

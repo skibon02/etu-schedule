@@ -51,18 +51,22 @@ $HALF-HEIGHT: 75px;
     flex-direction: column;
     user-select: none;
     height: 100%;
-    width: pxToEm(220px, );
+    width: pxToEm(244px, );
     line-height: 1.9em;
     text-align: center;
     border-right: .1px solid $BORDER-COLOR;
     padding: pxToEm(10px) 0;
     text-transform: uppercase;
     transition: all 0.3s ease;
+    font-size: 0.9em;
 
     &:first-child {
       border-left: .1px solid $BORDER-COLOR;
     }
+  }
 
+  &__week-button-text {
+    // font-size: 0.95em;
   }
 }
 

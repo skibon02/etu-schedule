@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom'
 
 export default function Groups({setGroupId, setActive, groupList, setGroupNumber, setGroupSchedule}) {
   const [inputValue, setInputValue] = useState('');
-  const [isChecked, setIsChecked] = useState(false);
   const inputRef = useRef(null);
   const navigate = useNavigate();
 
@@ -28,17 +27,8 @@ export default function Groups({setGroupId, setActive, groupList, setGroupNumber
             onChange={(e) => handlers.onInputChange(setInputValue, e.target.value)}
           />
           {!inputValue && <img src={SEARCH} alt="" className='groups-input__icon'/>}
-            <>
-            <div className='groups__checkbox-container'>
-              <label className='groups__checkbox-label'>
-                <input type="checkbox" className='groups__checkbox' checked={isChecked} onChange={() => setIsChecked(!isChecked)} /> {' '} 
-                <span className="groups__checkbox-description">запомнить мой выбор</span>
-              </label>
-            </div>
-            </>
         </div>
       </div>
-      <div className='groups__under-checkbox-box'></div>
       {!groupList && <span className='groups__loading groups__loading_header'>Загрузка...</span>}
       
       <div className='groups__items groups__items_header'>
@@ -58,7 +48,6 @@ export default function Groups({setGroupId, setActive, groupList, setGroupNumber
                 group.id,
                 group.number,
                 setGroupSchedule, 
-                isChecked
                 );
                 navigate('/schedule')
             }}>

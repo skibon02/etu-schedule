@@ -40,7 +40,7 @@ export function Pages() {
       setGroupId,
       setGroupNumber
     )
-  }, [vkData]);
+  }, [vkData, window.localStorage.getItem('groupNumber')]);
 
   useEffect(() => {
     getGroupSchedule(groupId, setGroupSchedule);
@@ -58,14 +58,15 @@ export function Pages() {
       {groupListError && <div>Server troubles: {groupListError}</div>}
       {!groupListError && 
       <div className='container'>
-        {active !== 'groups' && active !== 'profile' && <div className='under-header-box'></div>}
+        {active !== 'groups' && <div className='under-header-box'></div>}
         <Routes>
           <Route path="/">
             {(!vkData.is_authorized || active === 'profile') &&
               <Route path="/profile" element={
                 <Profile
                   vkData={vkData}
-                  setVkData={setVkData} />
+                  setVkData={setVkData}
+                  groupList={groupList} />
               } />
             }
           </Route>
