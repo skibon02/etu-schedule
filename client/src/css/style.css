@@ -580,7 +580,7 @@ body {
 .schedule-info__date {
   -moz-text-align-last: left;
        text-align-last: left;
-  width: 13.75em;
+  width: 14.375em;
 }
 .day {
   margin-bottom: 1.25em;
@@ -689,15 +689,23 @@ body {
 }
 .lesson-type-room__type {
   text-align: center;
-  padding: 0.3125em;
   margin-top: -0.3125em;
   margin-left: 0.9375em;
+  margin-bottom: 0.625em;
   background: #0b2376;
   color: #fff;
   border-radius: 0.3125em;
-  margin-bottom: 0.625em;
-  width: 2.5em;
+  width: 2.8125em;
   height: 1.5625em;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 .lesson-type-room__room {
   text-align: right;
@@ -785,7 +793,7 @@ body {
   font-size: 0.8em;
   position: absolute;
   top: -1.5625em;
-  left: -6.875em;
+  left: -8.75em;
   padding: 0.4375em;
   border-radius: 0.3125em;
   background: #ff4d00;
@@ -1358,12 +1366,14 @@ h1, h2, h3, h4, h5, h6 {
   .profile {
     font-size: 0.6em;
   }
+  .deauth-button:active {
+    width: 95%;
+    height: 95%;
+    font-size: 0.95em;
+  }
   .deauth-button:active .loader {
     border: 0.0625em solid #fff;
     border-top: 0.0625em solid transparent;
-    border-radius: 50%;
-    -webkit-animation: spin 1s linear infinite;
-            animation: spin 1s linear infinite;
   }
   .deauth-button__image {
     width: 0.8125em;

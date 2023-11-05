@@ -32,9 +32,9 @@ export function Pages() {
 
   useEffect(() => {
     getVkData(setVkData);
-    if (window.localStorage.getItem("groupId") !== null) {
-      setGroupId(window.localStorage.getItem("groupId"))
-      setGroupNumber(window.localStorage.getItem("groupNumber"))
+    if (localStorage.getItem("groupId") !== null) {
+      setGroupId(localStorage.getItem("groupId"))
+      setGroupNumber(localStorage.getItem("groupNumber"))
       // navigate('/schedule');
     } else {
       navigate('/groups');

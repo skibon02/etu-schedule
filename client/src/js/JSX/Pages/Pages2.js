@@ -41,7 +41,7 @@ export function Pages() {
       setGroupNumber,
       groupNumber
     )
-  }, [vkData, window.localStorage.getItem('groupNumber')]);
+  }, [vkData, localStorage.getItem('groupNumber')]);
 
   useEffect(() => {
     getGroupSchedule(groupId, setGroupSchedule);

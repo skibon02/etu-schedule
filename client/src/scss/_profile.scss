@@ -187,14 +187,16 @@ $BG: rgb(146, 173, 255);
 @media screen and (max-width: 700px) {
   .profile {
     font-size: 0.6em;
-  }
+  } 
+
   .deauth-button {
     &:active {
+      width: 95%;
+      height: 95%;
+      font-size: 0.95em;
       .loader {
         border: pxToEm(1px) solid #fff; 
         border-top: pxToEm(1px) solid transparent; 
-        border-radius: 50%; 
-        animation: spin 1s linear infinite; 
       }
     }
     &__image {

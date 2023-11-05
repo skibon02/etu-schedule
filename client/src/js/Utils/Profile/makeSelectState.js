@@ -1,7 +1,7 @@
 function makeFullNameEnabledDV() {
   const storedFullNameEnabledValue = {
-    value: window.localStorage.getItem('fullNameEnabledValue'),
-    label: window.localStorage.getItem('fullNameEnabledLabel')
+    value: localStorage.getItem('fullNameEnabledValue'),
+    label: localStorage.getItem('fullNameEnabledLabel')
   };
   const defaultFullNameEnabledValue = storedFullNameEnabledValue.label ? 
   storedFullNameEnabledValue : {
@@ -13,8 +13,8 @@ function makeFullNameEnabledDV() {
 
 function makeFullGroupNumberDV() {
   const storedGroupNumberValue = {
-    value: window.localStorage.getItem('groupId'),
-    label: window.localStorage.getItem('groupNumber')
+    value: localStorage.getItem('groupId'),
+    label: localStorage.getItem('groupNumber')
   };
   const defaultGroupNumberValue = storedGroupNumberValue.label ? 
   storedGroupNumberValue : {

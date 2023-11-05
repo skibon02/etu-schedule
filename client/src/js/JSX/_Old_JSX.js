@@ -62,8 +62,8 @@ export function Pages() {
         console.log(data);
     
         setGroupSchedule(data);
-        // window.localStorage.setItem('userPref', data);
-        // alert(window.localStorage.getItem('userPref'))
+        // localStorage.setItem('userPref', data);
+        // alert(localStorage.getItem('userPref'))
       }
 
       getGroupSchedule();

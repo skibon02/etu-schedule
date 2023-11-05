@@ -108,7 +108,7 @@
 
   &__date {
     text-align-last: left;
-    width: pxToEm(220px);
+    width: pxToEm(230px);
   }
 
   &__week-parity {
@@ -234,15 +234,17 @@
 
   &__type {
     text-align: center;
-    padding: pxToEm(5px);
     margin-top: pxToEm(-5px);
     margin-left: pxToEm(15px, );
+    margin-bottom: pxToEm(10px, );
     background: #0b2376;
     color: #fff;
     border-radius: pxToEm(5px);
-    margin-bottom: pxToEm(10px, );
-    width: pxToEm(40px, );
+    width: pxToEm(45px, );
     height: pxToEm(25px, );
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   &__room {
@@ -326,7 +328,7 @@
     font-size: 0.8em;
     position: absolute;
     top: pxToEm(-25px, );
-    left: pxToEm(-110px, );
+    left: pxToEm(-140px, );
     padding: pxToEm(7px, );
     border-radius: pxToEm(5px, );
     background: #ff4d00;

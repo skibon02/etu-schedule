@@ -46,8 +46,8 @@ function getGroupSchedule(groupId, setGroupSchedule) {
       // console.log(response.body);
       
       setGroupSchedule(data);
-      // window.localStorage.setItem('userPref', data);
-      // alert(window.localStorage.getItem('userPref'))
+      // localStorage.setItem('userPref', data);
+      // alert(localStorage.getItem('userPref'))
     }
 
     getSchedule();

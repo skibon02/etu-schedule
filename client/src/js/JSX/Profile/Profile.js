@@ -16,11 +16,11 @@ export default function Profile({vkData, setVkData, groupList, setGroupSchedule}
 
   useEffect(() => {
     fullNameEnabledDVFx(setFullNameEnabledDV)
-  }, [window.localStorage.getItem('fullNameEnabledValue')]);
+  }, [localStorage.getItem('fullNameEnabledValue')]);
 
   useEffect(() => {
     fullGroupNumberDVFx(setFullGroupNumberDV)
-  }, [window.localStorage.getItem('groupNumber')]);
+  }, [localStorage.getItem('groupNumber')]);
 
   return (
     <>
