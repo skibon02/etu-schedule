@@ -82,16 +82,16 @@ impl<'r> FromRequest<'r> for DocumentRequest {
         let path = req.uri().path();
         // info!("{}", path);
         if path == "/" {
-            return rocket::request::Outcome::Forward(());
+            return Outcome::Forward(());
         }
         let fir_seg = path.segments().next().unwrap();
         if fir_seg == "static" {
-            return rocket::request::Outcome::Forward(());
+            return Outcome::Forward(());
         }
         if fir_seg.find('.').is_some() {
-            return rocket::request::Outcome::Forward(());
+            return Outcome::Forward(());
         }
-        rocket::request::Outcome::Success(DocumentRequest)
+        Outcome::Success(DocumentRequest)
     }
 }
 

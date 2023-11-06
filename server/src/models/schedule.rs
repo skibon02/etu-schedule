@@ -89,9 +89,8 @@ impl ScheduleObjModel {
 
 #[derive(sqlx::FromRow, Default, Debug, Clone)]
 pub struct SubjectModel {
+    pub subject_obj_id: u32,
     pub subject_id: u32,
-
-    pub link_id: u32,
 
     // tracked with versioning
     pub title: String,

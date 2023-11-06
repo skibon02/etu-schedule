@@ -1,7 +1,6 @@
 use anyhow::Context;
 use sqlx::pool::PoolConnection;
 use sqlx::Sqlite;
-use crate::api::etu_api::ScheduleObjectOriginal;
 use crate::data_merges::MergeResult;
 use crate::models;
 use crate::models::schedule::ScheduleObjModel;
@@ -19,7 +18,6 @@ async fn get_last_gen_id(con: &mut PoolConnection<Sqlite>) -> anyhow::Result<u32
 
     Ok(res.unwrap_or(0))
 }
-
 
 async fn create_new_gen(con: &mut PoolConnection<Sqlite>, gen_id: u32) -> anyhow::Result<()> {
     sqlx::query("INSERT OR IGNORE INTO schedule_generation (gen_id, creation_time) VALUES (?, strftime('%s', 'now'))")
@@ -159,7 +157,7 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
 
             sqlx::query!("UPDATE schedule_objs SET \
             gen_end = ? \
-            WHERE schedule_obj_id = ?", new_gen_id, existing_sched_obj.schedule_obj_id)
+            WHERE schedule_obj_id = ? AND gen_end IS NULL", new_gen_id, existing_sched_obj.schedule_obj_id)
                 .execute(&mut *con)
                 .await.context("Failed to invalidate old schedule object")?;
         }

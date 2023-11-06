@@ -1,7 +1,3 @@
-use std::collections::{HashMap, BTreeMap};
-
-use rocket::serde::json::{Json, Value};
-use rocket::time::format_description::parse;
 use serde::{Deserialize, Serialize};
 
 use crate::models::groups::{DepartmentModel, FacultyModel, GroupModel};
@@ -153,7 +149,7 @@ impl Into<SubjectModel> for SubjectOriginal {
 
 
             // not related info
-            link_id: Default::default(),
+            subject_obj_id: Default::default(),
             gen_start: Default::default(),
             gen_end: Default::default(),
             existence_diff: Default::default(),

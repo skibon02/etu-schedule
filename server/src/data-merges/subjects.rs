@@ -6,13 +6,6 @@ use crate::data_merges::MergeResult;
 use crate::models::schedule::SubjectModel;
 
 
-async fn get_new_link_id(con: &mut PoolConnection<Sqlite>) -> anyhow::Result<u32> {
-    let res: Option<u32> = sqlx::query_scalar("SELECT MAX(link_id) as max FROM subjects")
-        .fetch_optional(&mut *con).await.context("Failed to fetch max link_id")?;
-
-    Ok(res.unwrap_or(0) + 1)
-}
-
 async fn get_last_gen_id(con: &mut PoolConnection<Sqlite>) -> anyhow::Result<u32> {
     let res: Option<u32> = sqlx::query_scalar("SELECT MAX(gen_id) as max FROM subjects_generation")
         .fetch_optional(&mut *con).await.context("Failed to fetch max gen_id")?;
@@ -52,8 +45,35 @@ async fn single_subject_merge(subject_id: u32, subject: &SubjectModel, last_gen_
 
         if diff {
             debug!("Detected difference in subject, updating...");
-            todo!("Update subject");
-            return Ok(MergeResult::Updated);
+
+            let new_gen_id = last_gen_id + 1;
+
+            //invalidate old gen
+            sqlx::query("UPDATE subjects SET gen_end = ? WHERE subject_id = ? AND gen_end IS NULL")
+                .bind(&new_gen_id)
+                .bind(&subject_id)
+                .execute(&mut **con).await.context("Failed to invalidate old subject generation")?;
+
+            // insert new row
+            sqlx::query("INSERT INTO subjects (subject_id, \
+        title, short_title, subject_type, control_type, \
+        semester, alien_id, department_id,\
+        gen_start, existence_diff)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+                .bind(&subject_id)
+                .bind(&subject.title)
+                .bind(&subject.short_title)
+                .bind(&subject.subject_type)
+                .bind(&subject.control_type)
+
+                .bind(&subject.semester)
+                .bind(&subject.alien_id)
+                .bind(&subject.department_id)
+                .bind(&new_gen_id)
+                .bind("changed")
+                .execute(&mut **con).await.context("Failed to insert subject in subject merge")?;
+
+            Ok(MergeResult::Updated)
         }
         else {
             debug!("No difference in subject, skipping...");
@@ -61,7 +81,7 @@ async fn single_subject_merge(subject_id: u32, subject: &SubjectModel, last_gen_
             if row.semester != subject.semester ||
                 row.alien_id != subject.alien_id ||
                 row.department_id != subject.department_id {
-                debug!("Updating untracked information in subject");
+                debug!("Updating untracked information in subject...");
 
                 sqlx::query("UPDATE subjects SET semester = ?, alien_id = ?, department_id = ? WHERE subject_id = ?")
                     .bind(&subject.semester)
@@ -72,29 +92,28 @@ async fn single_subject_merge(subject_id: u32, subject: &SubjectModel, last_gen_
                     .await.context("Failed to update subject in subject merge")?;
 
             }
-            return Ok(MergeResult::NotModified);
+            Ok(MergeResult::NotModified)
         }
     }
     else {
         // insert
         debug!("Inserting new subject");
 
-        let new_link_id = get_new_link_id(con).await?;
         let new_gen_id = last_gen_id + 1;
 
         create_new_gen(con, new_gen_id).await?;
 
-        sqlx::query("INSERT INTO subjects (subject_id, link_id, \
+        sqlx::query("INSERT INTO subjects (subject_id, \
         title, short_title, subject_type, control_type, \
         semester, alien_id, department_id,\
         gen_start, existence_diff)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
             .bind(&subject_id)
-            .bind(new_link_id)
             .bind(&subject.title)
             .bind(&subject.short_title)
             .bind(&subject.subject_type)
             .bind(&subject.control_type)
+
             .bind(&subject.semester)
             .bind(&subject.alien_id)
             .bind(&subject.department_id)
@@ -102,7 +121,7 @@ async fn single_subject_merge(subject_id: u32, subject: &SubjectModel, last_gen_
             .bind("new")
             .execute(&mut **con).await.context("Failed to insert subject in subject merge")?;
 
-        return Ok(MergeResult::Inserted);
+        Ok(MergeResult::Inserted)
     }
 }
 
@@ -121,6 +140,9 @@ pub async fn subjects_merge(subjects: &BTreeMap<u32, SubjectModel>, con: &mut Po
         }
     }
 
+    if modified {
+        info!("MERGE::SUBJECTS Merging subjects finished with changes! New generation created with id {}", last_gen_id + 1);
+    }
     info!("MERGE::SUBJECTS Merging subjects finished in {}ms!", start.elapsed().as_millis());
 
     Ok(())
