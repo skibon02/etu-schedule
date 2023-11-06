@@ -7,7 +7,7 @@ use rocket_db_pools::Connection;
 
 use crate::{api::etu_api::{self, ScheduleObjectOriginal}, models::groups::GroupModel, models, MERGE_REQUEST_CHANNEL};
 use crate::models::Db;
-use crate::models::schedule::ScheduleObjModel;
+use crate::models::schedule::{ScheduleObjModel, SubjectModel};
 
 
 
@@ -26,6 +26,7 @@ pub struct OutputSubjectModel {
     pub short_title: Option<String>,
     pub subject_type: Option<String>,
     pub control_type: Option<String>,
+    pub department_id: u32
 }
 
 #[derive(serde::Serialize)]
@@ -55,21 +56,26 @@ pub struct OutputScheduleObjectModel {
     id: u32
 }
 
-impl Into<OutputScheduleObjectModel> for ScheduleObjModel {
-    fn into(self) -> OutputScheduleObjectModel {
-        OutputScheduleObjectModel {
+impl TryInto<OutputScheduleObjectModel> for (ScheduleObjModel, &BTreeMap<u32, SubjectModel>) {
+    type Error = String;
+    fn try_into(self) -> Result<OutputScheduleObjectModel, String> {
+        let sched_model = self.0;
+        let subject = self.1.get(&sched_model.subject_id).map_or(Err("Subject not found!".to_string()), |r| Ok(r))?;
+
+        Ok(OutputScheduleObjectModel {
             auditorium_reservation: OutputAuditoriumReservationModel{
                 auditorium_number: None,
-                time: self.time,
-                week: self.week_parity,
-                week_day: self.week_day.into(),
+                time: sched_model.time,
+                week: sched_model.week_parity,
+                week_day: sched_model.week_day.into(),
             },
             subject: OutputSubjectModel {
-                alien_id: 0,
-                title: "subj title".to_string(),
-                short_title: Some("short_title".to_string()),
-                subject_type: Some("murrr".to_string()),
-                control_type: None,
+                alien_id: subject.alien_id,
+                title: subject.title.clone(),
+                short_title: subject.short_title.clone(),
+                subject_type: subject.subject_type.clone(),
+                control_type: subject.control_type.clone(),
+                department_id: subject.department_id,
             },
             teacher: OutputTeacherModel {
                 name: "name".to_string(),
@@ -103,8 +109,8 @@ impl Into<OutputScheduleObjectModel> for ScheduleObjModel {
                 roles: Vec::new(),
                 work_departments: None,
             },
-            id: self.schedule_obj_id
-        }
+            id: sched_model.schedule_obj_id
+        })
     }
 }
 
@@ -129,6 +135,8 @@ async fn get_group_schedule_objects(group_id: u32, mut con: Connection<Db>) -> R
             match last_merge_time {
                 Some(time) => {
                     let sched_objects = models::schedule::get_current_schedule_for_group(con.deref_mut(), group_id).await.unwrap();
+                    let subjects = models::schedule::get_subjects_for_group(con.deref_mut(), group_id).await.unwrap();
+                    let subjects_map: BTreeMap<u32, SubjectModel> = subjects.into_iter().map(|row| (row.subject_id, row.clone())).collect();
 
                     let channel = MERGE_REQUEST_CHANNEL.get().unwrap();
                     //check if it is full
@@ -136,7 +144,7 @@ async fn get_group_schedule_objects(group_id: u32, mut con: Connection<Db>) -> R
                         warn!("Channel is full, skipping merge request for group {}", group_id);
                     }
 
-                    let output_objs: Vec<OutputScheduleObjectModel> = sched_objects.into_iter().map(|s| s.into()).collect();
+                    let output_objs: Vec<OutputScheduleObjectModel> = sched_objects.into_iter().map(|s| (s, &subjects_map).try_into().unwrap()).collect();
                     let output = OutputGroupScheduleModel {
                         sched_objs: output_objs,
                         is_ready: true,
