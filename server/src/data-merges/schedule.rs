@@ -75,7 +75,43 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
 
                 if diff {
                     debug!("Detected diff in schedule object, updating...");
-                    todo!("Update schedule object");
+
+                    // invalidate old sched_obj (update gen_id)
+
+                    let new_gen_id = last_gen_id + 1;
+                    create_new_gen(con, new_gen_id).await?;
+
+                    sqlx::query!("UPDATE schedule_objs SET \
+            gen_end = ? \
+            WHERE schedule_obj_id = ? AND gen_end IS NULL", new_gen_id, existing_sched_obj.schedule_obj_id)
+                        .execute(&mut *con)
+                        .await.context("Failed to invalidate old schedule object")?;
+
+                    // insert new object
+                    sqlx::query("INSERT INTO schedule_objs \
+            (last_known_orig_sched_obj_id, group_id, link_id, subject_id, subject_gen_id,\
+            teacher_id, teacher_gen_id, second_teacher_id, second_teacher_gen_id, auditorium,\
+            updated_at, time, week_day, week_parity, gen_start, existence_diff) \
+            VALUES\
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+                        .bind(input_sched_obj.last_known_orig_sched_obj_id)
+                        .bind(group_id)
+                        .bind(existing_sched_obj.link_id)
+                        .bind(subject_id)
+                        .bind(models::schedule::get_subject_cur_gen(con, subject_id).await.unwrap())
+                        .bind(input_sched_obj.teacher_id)
+                        .bind(0)
+                        .bind(input_sched_obj.second_teacher_id)
+                        .bind(0)
+                        .bind(input_sched_obj.auditorium.clone())
+                        .bind(input_sched_obj.updated_at.clone())
+                        .bind(input_sched_obj.time)
+                        .bind(input_sched_obj.week_day)
+                        .bind(input_sched_obj.week_parity)
+                        .bind(new_gen_id)
+                        .bind("changed")
+                        .execute(&mut *con)
+                        .await.context("Failed to insert new schedule object")?;
                     res.push(MergeResult::Updated);
                 }
                 else {
@@ -204,6 +240,8 @@ pub async fn schedule_objs_merge(group_id: u32, schedule_objs: &Vec<ScheduleObjM
             info!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for subject id {} finished:\tno changes!", subj_id);
         }
     }
+
+    models::groups::set_last_group_merge(group_id, con).await?;
 
     if any_modified {
         info!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for group id {} finished with changes! New generation created with id {}", group_id, last_gen_id + 1);

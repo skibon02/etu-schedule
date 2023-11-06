@@ -17,6 +17,7 @@ use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use std::{env, fs};
 use std::collections::BTreeMap;
+use std::time::Instant;
 
 use rocket::fs::{FileServer, NamedFile};
 
@@ -126,10 +127,12 @@ pub fn bg_worker() -> AdHoc {
 
 use chrono::Local;
 use colored::*;
+use lazy_static::lazy_static;
 use rand::Rng;
 use rocket::response::{Responder, Redirect};
-use rocket_db_pools::Database;
+use rocket_db_pools::{Connection, Database};
 use sqlx::{Pool, Sqlite, SqlitePool};
+use tokio::select;
 use crate::api::etu_api;
 use crate::api::vk_api::VK_SERVICE_TOKEN;
 use crate::models::groups::DepartmentModel;
@@ -256,16 +259,61 @@ pub fn run() -> Rocket<Build> {
         rocket
     }
 }
+pub static MERGE_REQUEST_CHANNEL: OnceLock<tokio::sync::mpsc::Sender<u32>> = OnceLock::new();
+
+const GROUPS_MERGE_INTERVAL: u64 = 60*10;
+const ETU_REQUEST_INTERVAL: u64 = 10;
 
 async fn periodic_task(mut con: Db) {
     // For demonstration, use a loop with a delay
+    let (tx, mut rx) = tokio::sync::mpsc::channel(5);
+    MERGE_REQUEST_CHANNEL.set(tx).unwrap();
+
+    let mut last_etu_request = Instant::now() - tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL);
+
     loop {
-        info!("Running periodic task!");
+        let mut group_request = None;
+
+        select! {
+            _ = tokio::time::sleep(tokio::time::Duration::from_secs(60*10)) => {
+                info!("BGTASK: 10 minutes passed, starting merge routine...");
+            },
+            Some(request) = rx.recv() => {
+                info!("BGTASK: Got request for merging {} group", request);
+
+                let time = models::groups::get_time_since_last_group_merge(request, &mut con).await;
+                match time {
+                    Ok(time) => {
+                        if time < 30 {
+                            warn!("BGTASK: Last merge for group {} was {} seconds ago, skipping...", request, time);
+                            continue;
+                        }
+                    },
+                    Err(_) => {
+                        warn!("BGTASK: Group schedule was never requested! Launching merge...");
+                    }
+                }
+
+                group_request = Some(request);
+            }
+        }
+        if Instant::now() - last_etu_request < tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL) {
+            warn!("BGTASK: Last ETU request was {} seconds ago, waiting...", (Instant::now() - last_etu_request).as_secs());
+            tokio::time::sleep(tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL) - (Instant::now() - last_etu_request)).await;
+        }
+
+        info!("BGTASK: Starting default background mering routime...");
         let new_groups = etu_api::get_groups_list().await;
         data_merges::groups::groups_merge(&new_groups, &mut con.acquire().await.unwrap()).await.unwrap();
 
 
-        let group_id = 4362u32;
+        let group_id = match group_request {
+            Some(id) => id,
+            None => {
+                // models::groups::get_oldest_group(&mut con);
+                4362
+            }
+        };
         let sched_objs = etu_api::get_schedule_objs_group(group_id).await.unwrap();
         let mut sched_objs_models: Vec<ScheduleObjModel> = Vec::new();
         let mut subjects: BTreeMap<u32, SubjectModel> = BTreeMap::new();
@@ -281,7 +329,8 @@ async fn periodic_task(mut con: Db) {
         data_merges::subjects::subjects_merge(&subjects, &mut con.acquire().await.unwrap()).await.unwrap();
         data_merges::schedule::schedule_objs_merge(group_id, &sched_objs_models, &mut con.acquire().await.unwrap()).await.unwrap();
 
-        tokio::time::sleep(tokio::time::Duration::from_secs(60*10)).await
+        last_etu_request = Instant::now();
+
 
     }
 }

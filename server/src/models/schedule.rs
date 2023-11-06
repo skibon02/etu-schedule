@@ -46,6 +46,20 @@ impl TryFrom<String> for WeekDay {
     }
 }
 
+impl Into<String> for WeekDay {
+    fn into(self) -> String {
+        match self {
+            WeekDay::Mon => "MON".to_string(),
+            WeekDay::Tue => "TUE".to_string(),
+            WeekDay::Wed => "WED".to_string(),
+            WeekDay::Thu => "THU".to_string(),
+            WeekDay::Fri => "FRI".to_string(),
+            WeekDay::Sat => "SAT".to_string(),
+            WeekDay::Sun => "SUN".to_string(),
+        }
+    }
+}
+
 #[derive(sqlx::FromRow, Default, Debug, Clone)]
 pub struct ScheduleObjModel {
     pub schedule_obj_id: u32,
@@ -125,16 +139,12 @@ pub async fn get_subject_cur_gen(con: &mut PoolConnection<Sqlite>, subject_id: u
     Ok(res.unwrap_or(0))
 }
 
-pub async fn get_schedule_group(mut con: Connection<Db>, group_id: u32) -> anyhow::Result<ScheduleObjModel> {
+pub async fn get_current_schedule_for_group(mut con: Connection<Db>, group_id: u32) -> anyhow::Result<Vec<ScheduleObjModel>> {
     let res = sqlx::query_as(
-        "SELECT * FROM schedule_objs WHERE group_id = ?",
+        "SELECT * FROM schedule_objs WHERE group_id = ? and gen_end = NULL",
     )
         .bind(group_id)
-        .fetch_one(con.acquire().await?).await?;
+        .fetch_all(con.acquire().await?).await?;
 
     Ok(res)
 }
-//
-// pub async fn get_subject(mut con: Connection<Db>, subject_id: u32) -> anyhow::Result<SubjectModel> {
-//     let res = sqlx
-// }
