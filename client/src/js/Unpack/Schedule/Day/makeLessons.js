@@ -9,7 +9,7 @@ export function makeLessons(daySchedule, Subject, active) {
       <Subject 
         key={daySchedule[i].id} 
         subjectData={usableSchedule} 
-        orderNumber={i} 
+        orderNumber={usableSchedule.time} 
         active={active} />
     )
   }
