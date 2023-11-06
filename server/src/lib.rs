@@ -269,6 +269,11 @@ async fn periodic_task(mut con: Db) {
     let (tx, mut rx) = tokio::sync::mpsc::channel(50);
     MERGE_REQUEST_CHANNEL.set(tx).unwrap();
 
+
+
+    let new_groups = etu_api::get_groups_list().await;
+    data_merges::groups::groups_merge(&new_groups, &mut con.acquire().await.unwrap()).await.unwrap();
+
     let mut last_etu_request = Instant::now() - tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL);
 
     loop {

@@ -139,12 +139,16 @@ pub async fn get_subject_cur_gen(con: &mut PoolConnection<Sqlite>, subject_id: u
     Ok(res.unwrap_or(0))
 }
 
-pub async fn get_current_schedule_for_group(mut con: Connection<Db>, group_id: u32) -> anyhow::Result<Vec<ScheduleObjModel>> {
+pub async fn get_current_schedule_for_group(con: &mut PoolConnection<Sqlite>, group_id: u32) -> anyhow::Result<Vec<ScheduleObjModel>> {
     let res = sqlx::query_as(
         "SELECT * FROM schedule_objs WHERE group_id = ? and gen_end IS NULL",
     )
         .bind(group_id)
-        .fetch_all(con.acquire().await?).await?;
+        .fetch_all(&mut *con).await?;
 
     Ok(res)
+}
+
+pub async fn get_subjects_for_group(con: &mut PoolConnection<Sqlite>, group_id: u32) {
+
 }

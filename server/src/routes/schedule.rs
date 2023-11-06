@@ -128,7 +128,7 @@ async fn get_group_schedule_objects(group_id: u32, mut con: Connection<Db>) -> R
         Ok(last_merge_time) => {
             match last_merge_time {
                 Some(time) => {
-                    let sched_objects = models::schedule::get_current_schedule_for_group(con, group_id).await.unwrap();
+                    let sched_objects = models::schedule::get_current_schedule_for_group(con.deref_mut(), group_id).await.unwrap();
 
                     let channel = MERGE_REQUEST_CHANNEL.get().unwrap();
                     //check if it is full
