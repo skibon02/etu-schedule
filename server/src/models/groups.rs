@@ -33,7 +33,7 @@ pub struct GroupModel {
     pub specialty_id: u32,
 }
 
-pub async fn get_oldest_group_id(con: &mut Db) -> anyhow::Result<GroupModel> {
+pub async fn get_oldest_group_id(con: &mut Db) -> anyhow::Result<u32> {
     let res = sqlx::query_scalar(
         "SELECT * FROM groups
          ORDER BY
@@ -52,15 +52,33 @@ pub async fn get_oldest_group_id(con: &mut Db) -> anyhow::Result<GroupModel> {
 
     }
 }
-pub async fn get_time_since_last_group_merge(group_id: u32, con: &mut Db) -> anyhow::Result<u32> {
-    let res = sqlx::query_scalar(
+
+// Result: is group exists?
+// Option: if merge was ever made for this group?
+pub async fn get_time_since_last_group_merge(group_id: u32, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<Option<u32>> {
+    let res: Option<u32> = sqlx::query_scalar(
         "SELECT strftime('%s', 'now') - latest_schedule_merge FROM groups WHERE group_id = ? and latest_schedule_merge IS NOT NULL")
         .bind(group_id)
-        .fetch_optional(&mut con.acquire().await.unwrap()).await?;
+        .fetch_optional(&mut *con).await?;
 
     match res {
-        Some(res) => Ok(res),
-        None => Err(anyhow::anyhow!("Group not found"))
+        Some(res) => Ok(Some(res)),
+        None => {
+            //check if it is null
+            let res: Option<u32> = sqlx::query_scalar(
+                "SELECT group_id FROM groups WHERE group_id = ? and latest_schedule_merge IS NULL")
+                .bind(group_id)
+                .fetch_optional(&mut *con).await?;
+
+            match res {
+                Some(_) => {
+                    Ok(None)
+                },
+                None => {
+                    Err(anyhow::anyhow!("Error: cannot find group!"))
+                }
+            }
+        }
     }
 }
 

@@ -262,11 +262,11 @@ pub fn run() -> Rocket<Build> {
 pub static MERGE_REQUEST_CHANNEL: OnceLock<tokio::sync::mpsc::Sender<u32>> = OnceLock::new();
 
 const GROUPS_MERGE_INTERVAL: u64 = 60*10;
-const ETU_REQUEST_INTERVAL: u64 = 10;
+const ETU_REQUEST_INTERVAL: u64 = 5;
 
 async fn periodic_task(mut con: Db) {
     // For demonstration, use a loop with a delay
-    let (tx, mut rx) = tokio::sync::mpsc::channel(5);
+    let (tx, mut rx) = tokio::sync::mpsc::channel(50);
     MERGE_REQUEST_CHANNEL.set(tx).unwrap();
 
     let mut last_etu_request = Instant::now() - tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL);
@@ -281,16 +281,24 @@ async fn periodic_task(mut con: Db) {
             Some(request) = rx.recv() => {
                 info!("BGTASK: Got request for merging {} group", request);
 
-                let time = models::groups::get_time_since_last_group_merge(request, &mut con).await;
+                let time = models::groups::get_time_since_last_group_merge(request, &mut con.acquire().await.unwrap()).await;
                 match time {
                     Ok(time) => {
-                        if time < 30 {
-                            warn!("BGTASK: Last merge for group {} was {} seconds ago, skipping...", request, time);
-                            continue;
+                        match time {
+                            Some(time) => {
+                                if time < 30 {
+                                    warn!("BGTASK: Last merge for group {} was {} seconds ago, skipping...", request, time);
+                                    continue;
+                                }
+                            },
+                            None => {
+                                warn!("BGTASK: Group schedule was never requested! Launching merge...");
+                            }
                         }
                     },
                     Err(_) => {
-                        warn!("BGTASK: Group schedule was never requested! Launching merge...");
+                        error!("BGTASK: Non-existing group merge requested!");
+                        continue;
                     }
                 }
 
@@ -310,8 +318,7 @@ async fn periodic_task(mut con: Db) {
         let group_id = match group_request {
             Some(id) => id,
             None => {
-                // models::groups::get_oldest_group(&mut con);
-                4362
+                models::groups::get_oldest_group_id(&mut con).await.unwrap_or(0)
             }
         };
         let sched_objs = etu_api::get_schedule_objs_group(group_id).await.unwrap();

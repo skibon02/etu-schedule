@@ -81,7 +81,7 @@ pub struct ScheduleObjModel {
 
     pub time: u32,
     pub week_day: WeekDay,
-    pub week_parity: bool,
+    pub week_parity: String,
 
     pub gen_start: u32,
     pub gen_end: Option<u32>,
@@ -91,7 +91,7 @@ pub struct ScheduleObjModel {
 impl ScheduleObjModel {
     pub fn get_lesson_pos(&self) -> u32 {
         let mut res = self.week_day.as_num() as u32;
-        if self.week_parity {
+        if self.week_parity == "2" {
             res += 7;
         }
         res *= 14;
@@ -141,7 +141,7 @@ pub async fn get_subject_cur_gen(con: &mut PoolConnection<Sqlite>, subject_id: u
 
 pub async fn get_current_schedule_for_group(mut con: Connection<Db>, group_id: u32) -> anyhow::Result<Vec<ScheduleObjModel>> {
     let res = sqlx::query_as(
-        "SELECT * FROM schedule_objs WHERE group_id = ? and gen_end = NULL",
+        "SELECT * FROM schedule_objs WHERE group_id = ? and gen_end IS NULL",
     )
         .bind(group_id)
         .fetch_all(con.acquire().await?).await?;

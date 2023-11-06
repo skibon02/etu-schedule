@@ -106,16 +106,9 @@ pub struct ReservationTimeOriginal {
 }
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
-pub struct AuditoriumOriginal {
-    displayName: String,
-    number: String,
-}
-
-#[derive(Deserialize, Debug, Clone, Serialize)]
 pub struct AuditoriumReservationOriginal {
     id: u32,
     auditoriumNumber: Option<String>,
-    auditorium: Option<AuditoriumOriginal>,
     description: String,
     #[serde(rename = "type")]
     _type: String,
@@ -206,7 +199,7 @@ impl Into<Vec<ScheduleObjModel>> for ScheduleObjectOriginal {
                 auditorium: self.lesson.auditoriumReservation.auditoriumNumber.clone(),
                 time,
                 week_day: WeekDay::try_from(self.lesson.auditoriumReservation.reservationTime.weekDay.clone()).unwrap(),
-                week_parity: self.lesson.auditoriumReservation.reservationTime.week == "2",
+                week_parity: self.lesson.auditoriumReservation.reservationTime.week.clone(),
 
                 // unrelated info
                 subject_gen_id: Default::default(),
