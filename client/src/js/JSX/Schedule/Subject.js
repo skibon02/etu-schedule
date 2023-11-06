@@ -16,9 +16,7 @@ export function Subject({subjectData, orderNumber, active}) {
   const [lessonStart, lessonEnd, checkInDeadline] = knowSubjectTime(orderNumber, new Date(subjectData.date));
   const lessonName = subjectData.title;
   const lessonType = subjectData.subjectType;
-  // const roomName = subjectData.displayName;
   const roomName = subjectData.number;
-  // const roomNumber = subjectData.number;
   const teachers = makeTeachers(subjectData.teachers);
 
   const [isDead, setIsDead] = useState(checkTimeAndSetTheme(checkInDeadline));

@@ -60,7 +60,9 @@
 }
 
 .no-schedule {
-  padding-top: 40vh;
+  width: 95%;
+  margin: 0 auto;
+  padding-top: 25vmin;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,7 +70,7 @@
     text-align: center;
     font-size: 5em;
     color: #828282; 
-    line-height: 1em;
+    line-height: 1.2em;
   }
 }
 
@@ -382,7 +384,7 @@
 }
 @media screen and (max-width: 500px) {
   .no-schedule {
-    padding-top: 25vh;
+    padding-top: 25vmin;
   }
   .schedule {
     width: 95%;

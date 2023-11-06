@@ -10,6 +10,13 @@ export default function Schedule({groupSchedule, groupNumber, date, active}) {
       <NoSchedule groupNumber={groupNumber} />
     )
   }
+  
+  if (!groupSchedule.is_ready) {
+    return (
+      <NoSchedule groupNumber={-1} />
+    )
+  }
+
 
   const weekSchedule = active === 'schedule' ? makeSchedule(groupSchedule, date) : groupSchedule;
   const weekNumber = getWeekNumber(date);

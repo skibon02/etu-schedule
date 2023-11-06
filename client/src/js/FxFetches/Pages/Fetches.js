@@ -40,8 +40,8 @@ function getGroupSchedule(groupId, setGroupSchedule) {
       // setGroupSchedule(null);
       let response = await myfetch(`/api/scheduleObjs/group/${groupId}`);
       let data = await response.json();
-      // console.log('successful fetch on Schedule\nresponse.json():');
-      // console.log(data);
+      console.log('successful fetch on Schedule\nresponse.json():');
+      console.log(data);
       // console.log('response.body:');
       // console.log(response.body);
       

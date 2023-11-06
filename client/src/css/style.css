@@ -529,7 +529,9 @@ body {
 }
 
 .no-schedule {
-  padding-top: 40vh;
+  width: 95%;
+  margin: 0 auto;
+  padding-top: 25vmin;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -544,7 +546,7 @@ body {
   text-align: center;
   font-size: 5em;
   color: #828282;
-  line-height: 1em;
+  line-height: 1.2em;
 }
 
 .schedule {
@@ -848,7 +850,7 @@ body {
 }
 @media screen and (max-width: 500px) {
   .no-schedule {
-    padding-top: 25vh;
+    padding-top: 25vmin;
   }
   .schedule {
     width: 95%;
@@ -1164,7 +1166,7 @@ h1, h2, h3, h4, h5, h6 {
   padding-top: 1.25em;
   padding-bottom: 1.25em;
 }
-.profile__user-preferenses {
+.profile__user-preferences {
   padding: 1.875em;
   border-radius: 1.875em;
   background: rgb(146, 173, 255);
@@ -1212,7 +1214,7 @@ h1, h2, h3, h4, h5, h6 {
 .user-info__auth {
   font-size: 0.8em;
   padding: 0.3125em 0.5em;
-  border-radius: 0.625em;
+  border-radius: 0.375em;
   background: #fff;
   line-height: 1em;
 }
@@ -1277,6 +1279,16 @@ h1, h2, h3, h4, h5, h6 {
       -ms-flex-align: center;
           align-items: center;
   height: 1.25em;
+}
+
+.css-1dimb5e-singleValue {
+  height: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
 .deauth-button {

@@ -43,7 +43,7 @@ export default function Header({date, setDate, active, setActive, weekNumber, gr
           />
         </NavLink>
       </div>
-      {active === 'schedule' && groupSchedule &&
+      {active === 'schedule' && groupSchedule && groupSchedule.is_ready &&
       <div className="header__week-buttons">
         <ScheduleButton 
           text={'К предыдущей неделе'} 

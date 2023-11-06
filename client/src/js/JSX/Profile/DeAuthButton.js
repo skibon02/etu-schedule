@@ -6,12 +6,12 @@ export default function DeAuthButton({setVkData, setGroupNumber, setGroupId, set
   return (
     <>
     <div 
-    className='deauth-button-container'
-    onClick={() => deauth(setVkData, setGroupNumber, setGroupId, setGroupList, setGroupSchedule)} >
+      className='deauth-button-container'
+      onClick={() => deauth(setVkData, setGroupNumber, setGroupId, setGroupList, setGroupSchedule)} >
       <div className="deauth-button">
         <img src={EXIT} alt="" className='deauth-button__image' />
         <div className="deauth-button__text-container"><div className='deauth-button__text'>Выйти из профиля</div></div>
-        <div class="loader"></div>
+        <div className="loader"></div>
       </div>
     </div>
     </>

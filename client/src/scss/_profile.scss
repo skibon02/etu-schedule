@@ -16,7 +16,7 @@ $BG: rgb(146, 173, 255);
   &__user-info {
   }
 
-  &__user-preferenses {
+  &__user-preferences {
     padding: pxToEm(30px);
     border-radius: pxToEm(30px);
     background: $BG;
@@ -68,7 +68,7 @@ $BG: rgb(146, 173, 255);
   &__auth {
     font-size: 0.8em;
     padding: pxToEm(5px) pxToEm(8px);
-    border-radius: pxToEm(10px);
+    border-radius: pxToEm(6px);
     background: #fff;
     line-height: 1em;
   }
@@ -118,6 +118,12 @@ $BG: rgb(146, 173, 255);
   justify-content: center;
   align-items: center;
   height: pxToEm(20px);
+}
+
+.css-1dimb5e-singleValue {
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .deauth-button {

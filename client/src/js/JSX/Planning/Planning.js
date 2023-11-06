@@ -14,6 +14,12 @@ export default function Planning({groupSchedule, groupNumber, active}) {
     )
   }
 
+  if (!groupSchedule.is_ready) {
+    return (
+      <NoSchedule groupNumber={-1} />
+    )
+  }
+
   const weekSchedule1 = makeSchedule(groupSchedule, new Date('2023-09-01'));
   const weekSchedule2 = makeSchedule(groupSchedule, new Date(new Date('2023-09-01').getTime() + 1000 * 60 * 60 * 24 * 7));
 

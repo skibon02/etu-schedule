@@ -5,16 +5,13 @@ export function makeLessons(daySchedule, Subject, active) {
   for (let i = 0; i < daySchedule.length; i++) {
     let usableSchedule = makeUsableSchedule(daySchedule[i]);
   
-    for (let j = usableSchedule.startIndex; j <= usableSchedule.endIndex; j++) {
-      lessons.push(
-        <Subject 
-          key={daySchedule[i].id + ' ' + j.toString()} 
-          subjectData={usableSchedule} 
-          orderNumber={j} 
-          active={active}
-        />
-      );
-    }
+    lessons.push(
+      <Subject 
+        key={daySchedule[i].id} 
+        subjectData={usableSchedule} 
+        orderNumber={i} 
+        active={active} />
+    )
   }
   return lessons;
 }

@@ -12,7 +12,7 @@ import Profile from "../Profile/Profile";
 
 export function Pages() {
   const [date, setDate] = useState(new Date());
-  const [active, setActive] = useState('groups');
+  const [active, setActive] = useState('profile');
 
   const [groupList, setGroupList] = useState(null);
   const [groupListError, setGroupListError] = useState(null);
@@ -21,7 +21,7 @@ export function Pages() {
   const [groupNumber, setGroupNumber] = useState(null);
   const [groupSchedule, setGroupSchedule] = useState(null);
 
-  const [vkData, setVkData] = useState();
+  const [vkData, setVkData] = useState(null);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -38,8 +38,7 @@ export function Pages() {
       setGroupListError,
       navigate,
       setGroupId,
-      setGroupNumber,
-      groupNumber
+      setGroupNumber
     )
   }, [vkData, localStorage.getItem('groupNumber')]);
 
@@ -114,7 +113,8 @@ export function Pages() {
           }
         </Routes>
         <div className='under-header-box-mobile'></div>
-      </div>}
+      </div>
+      }
       </>
     )
   }

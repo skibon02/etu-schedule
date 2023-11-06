@@ -5,21 +5,17 @@ const WEEK_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 export function makeUsableSchedule(scheduleObject) {
 
-  const lesson = scheduleObject.lesson;
-
   const date = scheduleObject.date;
+  const auditoriumReservation = scheduleObject.auditorium_reservation;
+  const subject = scheduleObject.subject;
 
-  const auditoriumReservation = lesson.auditoriumReservation;
-  const subject = lesson.subject;
-  const firstTeacher = lesson.teacher; 
-  const secondTeacher = lesson.secondTeacher;
+  const firstTeacher = scheduleObject.teacher; 
+  const secondTeacher = scheduleObject.second_teacher;
   
-  const reservationTime = auditoriumReservation.reservationTime;
-  const auditorium = auditoriumReservation.auditorium;
 
   let title = subject.title;
-  let shortTitle = subject.shortTitle;
-  const subjectType = subject.subjectType;
+  let shortTitle = subject.short_title;
+  const subjectType = subject.subject_type;
   let titleWords = title.split(' ');
   for (let i = 0; i < titleWords.length; i++) {
     title =  titleWords[i].length > 16 ? shortTitle : title;
@@ -30,61 +26,48 @@ export function makeUsableSchedule(scheduleObject) {
   }
 
   let teachers = [];
-  let firstTeacherId;
-  let firstTeacherName;
-  let firstTeacherSurname;
-  let firstTeacherMidame;
   if (firstTeacher !== null) {
-    firstTeacherId = firstTeacher.id;
-    firstTeacherName = firstTeacher.name;
-    firstTeacherSurname = firstTeacher.surname;
-    firstTeacherMidame = firstTeacher.midname;
-    teachers.push({id: firstTeacherId, name: firstTeacherName, surname: firstTeacherSurname, midname: firstTeacherMidame});
+    teachers.push({
+      id: firstTeacher.id, 
+      name: firstTeacher.name, 
+      surname: firstTeacher.surname, 
+      midname: firstTeacher.midname
+    });
   }
 
-  let secondTeacherId;
-  let secondTeacherName;
-  let secondTeacherSurname;
-  let secondTeacherMidame;
   if (secondTeacher !== null) {
-    secondTeacherId = secondTeacher.id;
-    secondTeacherName = secondTeacher.name;
-    secondTeacherSurname = secondTeacher.surname;
-    secondTeacherMidame = secondTeacher.midname;
-    teachers.push({id: secondTeacherId, name: secondTeacherName, surname: secondTeacherSurname, midname: secondTeacherMidame});
+    teachers.push({
+      id: secondTeacher.id, 
+      name: secondTeacher.name, 
+      surname: secondTeacher.surname, 
+      midname: secondTeacher.midname
+    });
   }
 
-  const startTime = reservationTime.startTime;
-  const endTime = reservationTime.endTime;
-  const weekDay = reservationTime.weekDay;
+  const time = auditoriumReservation.time;
+  const weekDay = auditoriumReservation.week_day;
 
-  let displayName;
   let number;
-  if (auditorium !== null) {
-    displayName = auditorium.displayName;
-    number = auditorium.number;
+  if (auditoriumReservation !== null) {
+    number = auditoriumReservation.auditorium_number;
   }
 
   return {
     title: title,
     subjectType: subjectType,
-    displayName: displayName,
     number: number,
     teachers: teachers,
-    startIndex: startTime % 10,
-    endIndex: endTime % 10,
+    time: time,
     weekDay: weekDay,
     date: date,
   }
-  
-
 }
 
 
 // returns week -> array of sheduleObjects relevant to parity of current week
 function parseWeek(scheduleObjects, weekParity) {
   return scheduleObjects.filter((scheduleObject) => 
-    scheduleObject.lesson.auditoriumReservation.reservationTime.week === weekParity
+    scheduleObject.auditorium_reservation.week === weekParity
   );
 }
 
@@ -104,12 +87,11 @@ function parseWeek(scheduleObjects, weekParity) {
 */
 function parseDays(week, dayOfWeek, date, currentDayOfWeek) {
   if (week.some((scheduleObject) => 
-  scheduleObject.lesson.auditoriumReservation.reservationTime.weekDay === dayOfWeek)) 
+    scheduleObject.auditorium_reservation.week_day === dayOfWeek)) 
   {
-
-    return week.
+     return week.
     filter((scheduleObject) => 
-    scheduleObject.lesson.auditoriumReservation.reservationTime.weekDay === dayOfWeek).
+    scheduleObject.auditorium_reservation.week_day === dayOfWeek).
     map((day) => ({
       ...day,
       date: currentDayOfWeek !== 'SUN' ?
@@ -126,23 +108,27 @@ function parseDays(week, dayOfWeek, date, currentDayOfWeek) {
 
 function sortScheduleByLesson(scheduleObjectI, scheduleObjectJ) {
   return (
-      +scheduleObjectI.lesson.auditoriumReservation.reservationTime.startTime 
+      +scheduleObjectI.auditorium_reservation.time 
       - 
-      +scheduleObjectJ.lesson.auditoriumReservation.reservationTime.startTime
+      +scheduleObjectJ.auditorium_reservation.time
     );
 }
 
 export default function makeSchedule(scheduleObjects, date) {
+
   let parity = isEvenWeek(date);
   let currentDayOfWeek = WEEK_DAYS[date.getDay()];
 
-  const week = parseWeek(scheduleObjects, parity); // -> arr contain arr
+  const week = parseWeek(scheduleObjects.sched_objs, parity); // -> arr contain arr
 
   let weekSchedule = [];
   
   for (let i = 1; i < 7; i++) {
     weekSchedule.push(parseDays(week, WEEK_DAYS[i], date, currentDayOfWeek));
   }
+
+  console.log('week schedule from parseSchedule');
+  console.log(weekSchedule);
   
   return weekSchedule;
 }
