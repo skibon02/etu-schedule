@@ -1,0 +1,12 @@
+delete from schedule_objs;
+delete from subjects;
+delete from teachers;
+delete from groups;
+delete from subjects_generation;
+delete from schedule_generation;
+delete from teachers_departments;
+delete from teachers_generation;
+delete from users;
+delete from user_group;
+delete from departments;
+delete from faculties;
