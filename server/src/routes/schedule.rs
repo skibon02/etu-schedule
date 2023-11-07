@@ -5,10 +5,10 @@ use rocket::{serde::json::Json, Route};
 use rocket::response::status::BadRequest;
 use rocket_db_pools::Connection;
 
-use crate::{api::etu_api::{self, ScheduleObjectOriginal}, models::groups::GroupModel, models, MERGE_REQUEST_CHANNEL};
+use crate::{api::etu_api::{self, ScheduleObjectOriginal}, models::groups::GroupModel, models, MERGE_REQUEST_CHANNEL, MERGE_REQUEST_CNT};
 use crate::models::Db;
-use crate::models::schedule::{ScheduleObjModel, SubjectModel};
-
+use crate::models::schedule::{ScheduleObjModel};
+use crate::models::subjects::SubjectModel;
 
 
 #[derive(serde::Serialize)]
@@ -53,6 +53,7 @@ pub struct OutputScheduleObjectModel {
     subject: OutputSubjectModel,
     teacher: OutputTeacherModel,
     second_teacher: OutputTeacherModel,
+    third_teacher: OutputTeacherModel,
     id: u32
 }
 
@@ -64,7 +65,7 @@ impl TryInto<OutputScheduleObjectModel> for (ScheduleObjModel, &BTreeMap<u32, Su
 
         Ok(OutputScheduleObjectModel {
             auditorium_reservation: OutputAuditoriumReservationModel{
-                auditorium_number: None,
+                auditorium_number: sched_model.auditorium,
                 time: sched_model.time,
                 week: sched_model.week_parity,
                 week_day: sched_model.week_day.into(),
@@ -109,6 +110,22 @@ impl TryInto<OutputScheduleObjectModel> for (ScheduleObjModel, &BTreeMap<u32, Su
                 roles: Vec::new(),
                 work_departments: None,
             },
+            third_teacher: OutputTeacherModel {
+                name: "name".to_string(),
+                surname: "surname".to_string(),
+                midname: "midname".to_string(),
+                initials: "teacher initials".to_string(),
+
+                birthday: "teacher birthday".to_string(),
+                email: None,
+                group_id: None,
+
+                rank: None,
+                position: None,
+                degree: None,
+                roles: Vec::new(),
+                work_departments: None,
+            },
             id: sched_model.schedule_obj_id
         })
     }
@@ -135,13 +152,16 @@ async fn get_group_schedule_objects(group_id: u32, mut con: Connection<Db>) -> R
             match last_merge_time {
                 Some(time) => {
                     let sched_objects = models::schedule::get_current_schedule_for_group(con.deref_mut(), group_id).await.unwrap();
-                    let subjects = models::schedule::get_subjects_for_group(con.deref_mut(), group_id).await.unwrap();
+                    let subjects = models::subjects::get_subjects_for_group(con.deref_mut(), group_id).await.unwrap();
                     let subjects_map: BTreeMap<u32, SubjectModel> = subjects.into_iter().map(|row| (row.subject_id, row.clone())).collect();
 
                     let channel = MERGE_REQUEST_CHANNEL.get().unwrap();
                     //check if it is full
                     if channel.try_send(group_id).is_err() {
                         warn!("Channel is full, skipping merge request for group {}", group_id);
+                    }
+                    else {
+                        MERGE_REQUEST_CNT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                     }
 
                     let output_objs: Vec<OutputScheduleObjectModel> = sched_objects.into_iter().map(|s| (s, &subjects_map).try_into().unwrap()).collect();
@@ -159,6 +179,9 @@ async fn get_group_schedule_objects(group_id: u32, mut con: Connection<Db>) -> R
                     //check if it is full
                     if channel.try_send(group_id).is_err() {
                         warn!("Channel is full, skipping merge request for group {}", group_id);
+                    }
+                    else {
+                        MERGE_REQUEST_CNT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                     }
 
                     let output = OutputGroupScheduleModel {

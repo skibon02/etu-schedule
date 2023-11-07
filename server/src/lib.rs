@@ -17,6 +17,7 @@ use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use std::{env, fs};
 use std::collections::BTreeMap;
+use std::sync::atomic::AtomicUsize;
 use std::time::Instant;
 
 use rocket::fs::{FileServer, NamedFile};
@@ -129,14 +130,14 @@ use chrono::Local;
 use colored::*;
 use lazy_static::lazy_static;
 use rand::Rng;
-use rocket::response::{Responder, Redirect};
-use rocket_db_pools::{Connection, Database};
-use sqlx::{Pool, Sqlite, SqlitePool};
+use rocket::response::Responder;
+use rocket_db_pools::Database;
 use tokio::select;
 use crate::api::etu_api;
 use crate::api::vk_api::VK_SERVICE_TOKEN;
-use crate::models::groups::DepartmentModel;
-use crate::models::schedule::{ScheduleObjModel, SubjectModel};
+use crate::models::groups::{DepartmentModel, get_not_merged_sched_group_id_list};
+use crate::models::schedule::{ScheduleObjModel};
+use crate::models::subjects::{get_subjects_cur_gen, SubjectModel};
 
 
 fn loglevel_formatter(level: &log::Level) -> ColoredString {
@@ -162,13 +163,12 @@ fn setup_logger() -> Result<(), fern::InitError> {
                 message
             ))
         })
-        .level(log::LevelFilter::Trace)
+        .level(log::LevelFilter::Debug)
         .chain(std::io::stdout())
         .chain(fern::log_file("output.log")?)
         .apply()?;
     Ok(())
 }
-
 
 async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
     match Db::fetch(&rocket) {
@@ -182,7 +182,6 @@ async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
         None => Err(rocket),
     }
 }
-
 
 pub fn run() -> Rocket<Build> {
 
@@ -260,30 +259,50 @@ pub fn run() -> Rocket<Build> {
     }
 }
 pub static MERGE_REQUEST_CHANNEL: OnceLock<tokio::sync::mpsc::Sender<u32>> = OnceLock::new();
+pub static MERGE_REQUEST_CNT: AtomicUsize = AtomicUsize::new(0);
 
-const GROUPS_MERGE_INTERVAL: u64 = 60*10;
+const GROUPS_MERGE_INTERVAL: u64 = 60*2;
 const ETU_REQUEST_INTERVAL: u64 = 5;
+
+const SINGLE_GROUP_INTERVAL: u32 = 30;
+
+const FORCE_REQ_CHANNEL_SIZE: usize = 50;
+const FORCE_REQ_THROTTLE_THRESHOLD: usize = 10;
 
 async fn periodic_task(mut con: Db) {
     // For demonstration, use a loop with a delay
-    let (tx, mut rx) = tokio::sync::mpsc::channel(50);
+    let (tx, mut rx) = tokio::sync::mpsc::channel(FORCE_REQ_CHANNEL_SIZE);
     MERGE_REQUEST_CHANNEL.set(tx).unwrap();
 
 
-
+    info!("BGTASK: Phase 1. Initial merge for all groups.");
     let new_groups = etu_api::get_groups_list().await;
     data_merges::groups::groups_merge(&new_groups, &mut con.acquire().await.unwrap()).await.unwrap();
 
+    while let Ok(groups) = get_not_merged_sched_group_id_list(&mut con, 50).await {
+        info!("BGTASK: received {} groups for merge", groups.len());
+        process_schedule_merge(groups, &mut con).await;
+    }
+    info!("BGTASK: Initial merge for all groups finished.");
+
+    info!("BGTASK: Phase 2. Starting merge routine...");
+    // for balancing forced requests
     let mut last_etu_request = Instant::now() - tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL);
 
+    let mut forced_request_skip = false;
     loop {
-        let mut group_request = None;
-
         select! {
             _ = tokio::time::sleep(tokio::time::Duration::from_secs(60*10)) => {
                 info!("BGTASK: 10 minutes passed, starting merge routine...");
+
+                let group_id_range = models::groups::get_oldest_group_id_list(&mut con, 30).await.unwrap();
+
+                process_schedule_merge(group_id_range, &mut con).await;
+                last_etu_request = Instant::now();
+                forced_request_skip = false;
             },
             Some(request) = rx.recv() => {
+                MERGE_REQUEST_CNT.fetch_sub(1, std::sync::atomic::Ordering::Relaxed);
                 info!("BGTASK: Got request for merging {} group", request);
 
                 let time = models::groups::get_time_since_last_group_merge(request, &mut con.acquire().await.unwrap()).await;
@@ -291,7 +310,7 @@ async fn periodic_task(mut con: Db) {
                     Ok(time) => {
                         match time {
                             Some(time) => {
-                                if time < 30 {
+                                if time < SINGLE_GROUP_INTERVAL {
                                     warn!("BGTASK: Last merge for group {} was {} seconds ago, skipping...", request, time);
                                     continue;
                                 }
@@ -307,44 +326,64 @@ async fn periodic_task(mut con: Db) {
                     }
                 }
 
-                group_request = Some(request);
+
+                if Instant::now() - last_etu_request < tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL) {
+                    warn!("BGTASK: Last ETU request was {} seconds ago, waiting...", (Instant::now() - last_etu_request).as_secs());
+                    tokio::time::sleep(tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL) - (Instant::now() - last_etu_request)).await;
+                }
+
+                info!("BGTASK: Starting default background mering routime...");
+
+                let group_id_range = if forced_request_skip {
+                    models::groups::get_oldest_group_id_list(&mut con, 10).await.unwrap()
+                } else {
+                    vec![request]
+                };
+
+                process_schedule_merge(group_id_range, &mut con).await;
+                last_etu_request = Instant::now();
+                if MERGE_REQUEST_CNT.load(std::sync::atomic::Ordering::Relaxed) > FORCE_REQ_THROTTLE_THRESHOLD {
+                    warn!("BGTASK: Forced request throttle threshold reached, starting to skip some forced requests...");
+                    forced_request_skip = !forced_request_skip;
+                }
+                else {
+                    forced_request_skip = false;
+                }
             }
         }
-        if Instant::now() - last_etu_request < tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL) {
-            warn!("BGTASK: Last ETU request was {} seconds ago, waiting...", (Instant::now() - last_etu_request).as_secs());
-            tokio::time::sleep(tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL) - (Instant::now() - last_etu_request)).await;
-        }
 
-        info!("BGTASK: Starting default background mering routime...");
-        let new_groups = etu_api::get_groups_list().await;
-        data_merges::groups::groups_merge(&new_groups, &mut con.acquire().await.unwrap()).await.unwrap();
+    }
+}
 
+async fn process_schedule_merge(group_id_vec: Vec<u32>, con: &mut Db) {
 
-        let group_id = match group_request {
-            Some(id) => id,
-            None => {
-                models::groups::get_oldest_group_id(&mut con).await.unwrap_or(0)
-            }
-        };
-        let sched_objs = etu_api::get_schedule_objs_group(group_id).await.unwrap();
+    let new_groups = etu_api::get_groups_list().await;
+    data_merges::groups::groups_merge(&new_groups, &mut con.acquire().await.unwrap()).await.unwrap();
+
+    info!("BGTASK: Starting merge for groups: {:?}", group_id_vec);
+    let start = Instant::now();
+    let sched_objs = etu_api::get_schedule_objs_groups(group_id_vec.clone()).await.unwrap();
+
+    let con = &mut con.acquire().await.unwrap();
+    let last_gen_id = get_subjects_cur_gen(&mut *con).await.unwrap();
+    for (group_id, sched_objs) in sched_objs {
+        info!("BGTASK: Starting merge for group id {}", group_id);
         let mut sched_objs_models: Vec<ScheduleObjModel> = Vec::new();
         let mut subjects: BTreeMap<u32, SubjectModel> = BTreeMap::new();
         let mut departments: Vec<DepartmentModel> = Vec::new();
         for sched_obj_orig in sched_objs.scheduleObjects {
-            sched_objs_models.append(&mut sched_obj_orig.clone().into());
+            sched_objs_models.push(sched_obj_orig.clone().try_into().unwrap());
             subjects.insert(sched_obj_orig.lesson.subject.id, sched_obj_orig.lesson.subject.clone().into());
             departments.push(sched_obj_orig.lesson.subject.department.into());
         }
         for department in departments {
-            data_merges::groups::department_single_merge(department, None, &mut con.acquire().await.unwrap()).await.unwrap();
+            data_merges::groups::department_single_merge(department, None, &mut *con).await.unwrap();
         }
-        data_merges::subjects::subjects_merge(&subjects, &mut con.acquire().await.unwrap()).await.unwrap();
-        data_merges::schedule::schedule_objs_merge(group_id, &sched_objs_models, &mut con.acquire().await.unwrap()).await.unwrap();
 
-        last_etu_request = Instant::now();
-
-
+        data_merges::subjects::subjects_merge(&subjects, last_gen_id, &mut *con).await.unwrap();
+        data_merges::schedule::schedule_objs_merge(group_id, &sched_objs_models, &mut *con).await.unwrap();
     }
+    info!("BGTASK: Merge for {} groups finished in {:?}", group_id_vec.len(), (Instant::now() - start));
 }
 
 #[options("/<_path..>")]

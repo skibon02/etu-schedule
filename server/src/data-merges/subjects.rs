@@ -3,26 +3,8 @@ use anyhow::Context;
 use sqlx::pool::PoolConnection;
 use sqlx::Sqlite;
 use crate::data_merges::MergeResult;
-use crate::models::schedule::SubjectModel;
-
-
-async fn get_last_gen_id(con: &mut PoolConnection<Sqlite>) -> anyhow::Result<u32> {
-    let res: Option<u32> = sqlx::query_scalar("SELECT MAX(gen_id) as max FROM subjects_generation")
-        .fetch_optional(&mut *con).await.context("Failed to fetch max gen_id")?;
-
-    Ok(res.unwrap_or(0))
-}
-
-
-async fn create_new_gen(con: &mut PoolConnection<Sqlite>, gen_id: u32) -> anyhow::Result<()> {
-    sqlx::query("INSERT OR IGNORE INTO subjects_generation (gen_id, creation_time) VALUES (?, strftime('%s', 'now'))")
-        .bind(gen_id)
-        .execute(&mut *con)
-        .await.context("Failed to insert new schedule generation")?;
-
-    Ok(())
-}
-
+use crate::models;
+use crate::models::subjects::{get_subjects_cur_gen, SubjectModel};
 
 async fn single_subject_merge(subject_id: u32, subject: &SubjectModel, last_gen_id: u32, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<MergeResult> {
     debug!("Merging single subject {}", subject_id);
@@ -47,6 +29,7 @@ async fn single_subject_merge(subject_id: u32, subject: &SubjectModel, last_gen_
             debug!("Detected difference in subject, updating...");
 
             let new_gen_id = last_gen_id + 1;
+            models::subjects::create_new_gen(con, new_gen_id).await?;
 
             //invalidate old gen
             sqlx::query("UPDATE subjects SET gen_end = ? WHERE subject_id = ? AND gen_end IS NULL")
@@ -100,8 +83,7 @@ async fn single_subject_merge(subject_id: u32, subject: &SubjectModel, last_gen_
         debug!("Inserting new subject");
 
         let new_gen_id = last_gen_id + 1;
-
-        create_new_gen(con, new_gen_id).await?;
+        models::subjects::create_new_gen(con, new_gen_id).await?;
 
         sqlx::query("INSERT INTO subjects (subject_id, \
         title, short_title, subject_type, control_type, \
@@ -125,11 +107,9 @@ async fn single_subject_merge(subject_id: u32, subject: &SubjectModel, last_gen_
     }
 }
 
-pub async fn subjects_merge(subjects: &BTreeMap<u32, SubjectModel>, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
+pub async fn subjects_merge(subjects: &BTreeMap<u32, SubjectModel>, last_gen_id: u32, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
     info!("MERGE::SUBJECTS Merging subjects started!");
     let start = std::time::Instant::now();
-
-    let last_gen_id = get_last_gen_id(con).await?;
 
     let mut modified = false;
     for (&subj_id, subj) in subjects {

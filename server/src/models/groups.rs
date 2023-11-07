@@ -33,7 +33,7 @@ pub struct GroupModel {
     pub specialty_id: u32,
 }
 
-pub async fn get_oldest_group_id(con: &mut Db) -> anyhow::Result<u32> {
+pub async fn get_oldest_group_id_list(con: &mut Db, upper_limit: u32) -> anyhow::Result<Vec<u32>> {
     let res = sqlx::query_scalar(
         "SELECT * FROM groups
          ORDER BY
@@ -42,15 +42,33 @@ pub async fn get_oldest_group_id(con: &mut Db) -> anyhow::Result<u32> {
                  ELSE 1
              END,
              latest_schedule_merge ASC
-         LIMIT 1",
+         LIMIT ?",
     )
-        .fetch_optional(&mut con.acquire().await.unwrap()).await?;
+        .bind(upper_limit)
+        .fetch_all(&mut con.acquire().await.unwrap()).await?;
 
-    match res {
-        Some(res) => Ok(res),
-        None => Err(anyhow::anyhow!("No groups found"))
-
+    if res.len() == 0 {
+        return Err(anyhow::anyhow!("No groups found!"));
     }
+    Ok(res)
+}
+
+
+pub async fn get_not_merged_sched_group_id_list(con: &mut Db, upper_limit: u32) -> anyhow::Result<Vec<u32>> {
+    let res = sqlx::query_scalar(
+        "SELECT * FROM groups
+            WHERE latest_schedule_merge IS NULL
+            ORDER BY
+             latest_schedule_merge ASC
+         LIMIT ?",
+    )
+        .bind(upper_limit)
+        .fetch_all(&mut con.acquire().await.unwrap()).await?;
+
+    if res.len() == 0 {
+        return Err(anyhow::anyhow!("No groups found!"));
+    }
+    Ok(res)
 }
 
 // Result: is group exists?

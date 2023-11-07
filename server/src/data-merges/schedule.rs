@@ -1,9 +1,10 @@
+use std::collections::BTreeMap;
 use anyhow::Context;
 use sqlx::pool::PoolConnection;
 use sqlx::Sqlite;
 use crate::data_merges::MergeResult;
 use crate::models;
-use crate::models::schedule::ScheduleObjModel;
+use crate::models::schedule::{ScheduleObjModel, WeekDay};
 
 async fn get_new_link_id(con: &mut PoolConnection<Sqlite>) -> anyhow::Result<u32> {
     let res: Option<u32> = sqlx::query_scalar("SELECT MAX(link_id) as max FROM schedule_objs")
@@ -12,16 +13,18 @@ async fn get_new_link_id(con: &mut PoolConnection<Sqlite>) -> anyhow::Result<u32
     Ok(res.unwrap_or(0) + 1)
 }
 
-async fn get_last_gen_id(con: &mut PoolConnection<Sqlite>) -> anyhow::Result<u32> {
-    let res: Option<u32> = sqlx::query_scalar("SELECT MAX(gen_id) as max FROM schedule_generation")
+async fn get_last_gen_id(con: &mut PoolConnection<Sqlite>, group_id: u32) -> anyhow::Result<u32> {
+    let res: Option<u32> = sqlx::query_scalar("SELECT MAX(gen_id) as max FROM schedule_generation WHERE group_id = ?")
+        .bind(group_id)
         .fetch_optional(&mut *con).await.context("Failed to fetch max gen_id")?;
 
     Ok(res.unwrap_or(0))
 }
 
-async fn create_new_gen(con: &mut PoolConnection<Sqlite>, gen_id: u32) -> anyhow::Result<()> {
-    sqlx::query("INSERT OR IGNORE INTO schedule_generation (gen_id, creation_time) VALUES (?, strftime('%s', 'now'))")
+async fn create_new_gen(con: &mut PoolConnection<Sqlite>, gen_id: u32, group_id: u32) -> anyhow::Result<()> {
+    sqlx::query("INSERT OR IGNORE INTO schedule_generation (gen_id, creation_time, group_id) VALUES (?, strftime('%s', 'now'), ?)")
         .bind(gen_id)
+        .bind(group_id)
         .execute(&mut *con)
         .await.context("Failed to insert new schedule generation")?;
 
@@ -33,6 +36,18 @@ async fn create_new_gen(con: &mut PoolConnection<Sqlite>, gen_id: u32) -> anyhow
 async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Vec<ScheduleObjModel>, subject_id: u32, last_gen_id: u32, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<Vec<MergeResult>> {
     debug!("Merging single schedule object group");
     let mut input_schedule_objs = input_schedule_objs.clone();
+
+    //check for unique position condition
+    let mut unique_positions = BTreeMap::<(WeekDay, String, u32), u32>::new();
+    for input_sched_obj in &input_schedule_objs {
+        *unique_positions.entry((input_sched_obj.week_day, input_sched_obj.week_parity.clone(), input_sched_obj.time)).or_default() += 1;
+    }
+
+    for unique_position in unique_positions {
+        if unique_position.1 > 1 {
+            return Err(anyhow::anyhow!("Unique position condition in single_schedule_obj_group_merge has failed!"));
+        }
+    }
 
     let mut existing_sched_objs: Vec<ScheduleObjModel> = sqlx::query_as("SELECT * FROM schedule_objs WHERE group_id = ? AND subject_id = ?")
         .bind(group_id)
@@ -67,6 +82,7 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
 
                 if input_sched_obj.teacher_id != existing_sched_obj.teacher_id
                     || input_sched_obj.second_teacher_id != existing_sched_obj.second_teacher_id
+                    || input_sched_obj.third_teacher_id != existing_sched_obj.third_teacher_id
                     || input_sched_obj.auditorium != existing_sched_obj.auditorium
                     || input_sched_obj.get_lesson_pos() != existing_sched_obj.get_lesson_pos() {
                     diff = true;
@@ -79,29 +95,33 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
                     // invalidate old sched_obj (update gen_id)
 
                     let new_gen_id = last_gen_id + 1;
-                    create_new_gen(con, new_gen_id).await?;
+                    create_new_gen(con, new_gen_id, group_id).await?;
 
-                    sqlx::query!("UPDATE schedule_objs SET \
-            gen_end = ? \
-            WHERE schedule_obj_id = ? AND gen_end IS NULL", new_gen_id, existing_sched_obj.schedule_obj_id)
+                    sqlx::query("UPDATE schedule_objs SET \
+                        gen_end = ? \
+                        WHERE schedule_obj_id = ? AND gen_end IS NULL")
+                        .bind(new_gen_id)
+                        .bind(existing_sched_obj.schedule_obj_id)
                         .execute(&mut *con)
                         .await.context("Failed to invalidate old schedule object")?;
 
                     // insert new object
                     sqlx::query("INSERT INTO schedule_objs \
             (last_known_orig_sched_obj_id, group_id, link_id, subject_id, subject_gen_id,\
-            teacher_id, teacher_gen_id, second_teacher_id, second_teacher_gen_id, auditorium,\
+            teacher_id, teacher_gen_id, second_teacher_id, second_teacher_gen_id, third_teacher_id, third_teacher_gen_id, auditorium,\
             updated_at, time, week_day, week_parity, gen_start, existence_diff) \
             VALUES\
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                         .bind(input_sched_obj.last_known_orig_sched_obj_id)
                         .bind(group_id)
                         .bind(existing_sched_obj.link_id)
                         .bind(subject_id)
-                        .bind(models::schedule::get_subject_cur_gen(con, subject_id).await.unwrap())
+                        .bind(models::subjects::get_subjects_cur_gen(con).await.unwrap())
                         .bind(input_sched_obj.teacher_id)
                         .bind(0)
                         .bind(input_sched_obj.second_teacher_id)
+                        .bind(0)
+                        .bind(input_sched_obj.third_teacher_id)
                         .bind(0)
                         .bind(input_sched_obj.auditorium.clone())
                         .bind(input_sched_obj.updated_at.clone())
@@ -143,22 +163,25 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
             let new_link_id = get_new_link_id(con).await?;
             let new_gen_id = last_gen_id + 1;
 
-            create_new_gen(con, new_gen_id).await?;
+            create_new_gen(con, new_gen_id, group_id).await?;
 
             sqlx::query("INSERT INTO schedule_objs \
             (last_known_orig_sched_obj_id, group_id, link_id, subject_id, subject_gen_id,\
-            teacher_id, teacher_gen_id, second_teacher_id, second_teacher_gen_id, auditorium,\
+            teacher_id, teacher_gen_id, second_teacher_id, second_teacher_gen_id, third_teacher_id, \
+            third_teacher_gen_id, auditorium,\
             updated_at, time, week_day, week_parity, gen_start, existence_diff) \
             VALUES\
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                 .bind(input_sched_obj.last_known_orig_sched_obj_id)
                 .bind(group_id)
                 .bind(new_link_id)
                 .bind(subject_id)
-                .bind(models::schedule::get_subject_cur_gen(con, subject_id).await.unwrap())
+                .bind(models::subjects::get_subjects_cur_gen(con).await.unwrap())
                 .bind(input_sched_obj.teacher_id)
                 .bind(0)
                 .bind(input_sched_obj.second_teacher_id)
+                .bind(0)
+                .bind(input_sched_obj.third_teacher_id)
                 .bind(0)
                 .bind(input_sched_obj.auditorium.clone())
                 .bind(input_sched_obj.updated_at.clone())
@@ -189,11 +212,13 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
             debug!("Invalidating old schedule object: {}", existing_sched_obj.last_known_orig_sched_obj_id);
 
             let new_gen_id = last_gen_id + 1;
-            create_new_gen(con, new_gen_id).await?;
+            create_new_gen(con, new_gen_id, group_id).await?;
 
-            sqlx::query!("UPDATE schedule_objs SET \
+            sqlx::query("UPDATE schedule_objs SET \
             gen_end = ? \
-            WHERE schedule_obj_id = ? AND gen_end IS NULL", new_gen_id, existing_sched_obj.schedule_obj_id)
+            WHERE schedule_obj_id = ? AND gen_end IS NULL")
+                .bind(new_gen_id)
+                .bind(existing_sched_obj.schedule_obj_id)
                 .execute(&mut *con)
                 .await.context("Failed to invalidate old schedule object")?;
         }
@@ -215,7 +240,7 @@ pub async fn schedule_objs_merge(group_id: u32, schedule_objs: &Vec<ScheduleObjM
         subj_id_to_sched_objs.get_mut(&sched_obj.subject_id).unwrap().push(sched_obj.clone());
     }
 
-    let last_gen_id = get_last_gen_id(con).await?;
+    let last_gen_id = get_last_gen_id(con, group_id).await?;
 
 
     let mut any_modified = false;
