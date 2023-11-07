@@ -4,6 +4,9 @@ use serde::{Deserialize, Serialize};
 use crate::models::groups::{DepartmentModel, FacultyModel, GroupModel};
 use crate::models::schedule::{ScheduleObjModel, WeekDay};
 use crate::models::subjects::SubjectModel;
+use crate::models::teachers::TeacherModel;
+
+use itertools::Itertools;
 
 const BASE_URL_SCHEDULE: &str = "https://digital.etu.ru/api/schedule/";
 const BASE_URL_ATTENDANCE: &str = "https://digital.etu.ru/api/attendance/";
@@ -173,6 +176,44 @@ pub struct TeacherOriginal {
     workDepartments: Option<Vec<String>>,
 }
 
+impl Into<(TeacherModel, Vec<String>)> for TeacherOriginal {
+    fn into(self) -> (TeacherModel, Vec<String>) {
+        let fixed_birthday = self.birthday.rsplit("-").join("-");
+
+        let is_worker = self.roles.contains(&"worker".to_string());
+        let is_student = self.roles.contains(&"student".to_string());
+        let is_department_head = self.roles.contains(&"departmentHead".to_string());
+        let is_department_dispatcher = self.roles.contains(&"departmentDispatcher".to_string());
+        let teacher = TeacherModel {
+            teacher_id: self.id,
+            initials: self.initials,
+            name: self.name,
+            surname: self.surname,
+            midname: self.midname,
+            birthday: fixed_birthday,
+            email: self.email,
+            group_id: self.groupId,
+            is_worker,
+            is_department_head,
+            is_department_dispatcher,
+            is_student,
+            position: self.position.clone(),
+            degree: self.degree.clone(),
+            rank: self.rank.clone(),
+
+            // db stuff
+            gen_end: Default::default(),
+            gen_start: Default::default(),
+            teacher_obj_id: Default::default(),
+            existence_diff: Default::default()
+
+        };
+        let work_departments = self.workDepartments.unwrap_or_default();
+
+        (teacher, work_departments)
+    }
+}
+
 #[derive(Deserialize, Debug, Clone, Serialize)]
 pub struct LessonOriginal {
     pub id: u32,
@@ -208,8 +249,6 @@ impl TryInto<ScheduleObjModel> for ScheduleObjectOriginal {
             // unrelated info
             subject_gen_id: Default::default(),
             teacher_gen_id: Default::default(),
-            second_teacher_gen_id: Default::default(),
-            third_teacher_gen_id: Default::default(),
             schedule_obj_id: Default::default(), // db id
             link_id: Default::default(),
             group_id: Default::default(), // known from outside
@@ -264,7 +303,7 @@ fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleO
     // preprocessing: merge same auditoriums
     // 1) by group
     for group_schedule in sched_objs.iter() {
-        info!("Parsing group {}", group_schedule.group_id);
+        trace!("Parsing group {}", group_schedule.group_id);
         let mut group_schedule_res = GroupScheduleOriginal {scheduleObjects: Vec::new(), group_id: group_schedule.group_id};
 
         // 2) by subject and placement
@@ -287,7 +326,12 @@ fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleO
         for (_, mut uniq_placement_elements) in unique_subject_positions.iter_mut() {
             if uniq_placement_elements.len() > 1 {
                 //merge
+                warn!("During parse sched objs for group id {}...", group_schedule.group_id);
                 warn!("Found more than one schedule object for subject at single time placement");
+                info!("\tsubject_id: {}", uniq_placement_elements[0].lesson.subject.id);
+                info!("\tweek_parity: {}", uniq_placement_elements[0].lesson.auditoriumReservation.reservationTime.week);
+                info!("\tweek_day: {}", uniq_placement_elements[0].lesson.auditoriumReservation.reservationTime.weekDay);
+                info!("\ttime: {}", uniq_placement_elements[0].lesson.auditoriumReservation.reservationTime.startTime);
 
                 let mut auditoriums = Vec::new();
                 if let Some(auditorium) = uniq_placement_elements[0].lesson.auditoriumReservation.auditoriumNumber.clone() {

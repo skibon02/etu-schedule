@@ -34,7 +34,7 @@ async fn create_new_gen(con: &mut PoolConnection<Sqlite>, gen_id: u32, group_id:
 /// group of schedule object with the same lesson
 /// last gen id is used to reuse single new generation across merges
 async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Vec<ScheduleObjModel>, subject_id: u32, last_gen_id: u32, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<Vec<MergeResult>> {
-    debug!("Merging single schedule object group");
+    trace!("Merging single schedule object group");
     let mut input_schedule_objs = input_schedule_objs.clone();
 
     //check for unique position condition
@@ -55,26 +55,19 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
         .fetch_all(&mut *con)
         .await.context("Failed to fetch schedule object in ")?;
 
-    debug!("group_id: {}, subject_id: {}", group_id, subject_id);
-    debug!("Found {} existing schedule objects", existing_sched_objs.len());
-    debug!("Received {} input schedule objects", input_schedule_objs.len());
+    trace!("group_id: {}, subject_id: {}", group_id, subject_id);
+    trace!("Found {} existing schedule objects", existing_sched_objs.len());
+    trace!("Received {} input schedule objects", input_schedule_objs.len());
 
 
     let mut res = Vec::new();
 
     //try to link by schedule_obj_id or get_lesson_pos
     for input_sched_obj in &input_schedule_objs {
-        debug!("Searching link for input schedule object: {}", input_sched_obj.last_known_orig_sched_obj_id);
+        trace!("Searching link for input schedule object: {}", input_sched_obj.last_known_orig_sched_obj_id);
         let mut found = false;
         for existing_sched_obj in &mut existing_sched_objs {
             if input_sched_obj.get_lesson_pos() == existing_sched_obj.get_lesson_pos() {
-
-                if input_sched_obj.last_known_orig_sched_obj_id == existing_sched_obj.last_known_orig_sched_obj_id {
-                    debug!("Linked by last_known_orig_sched_obj_id");
-                }
-                else {
-                    debug!("Linked by get_lesson_pos() information");
-                }
                 found = true;
 
                 // process diff and update
@@ -90,7 +83,7 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
 
 
                 if diff {
-                    debug!("Detected diff in schedule object, updating...");
+                    trace!("Detected diff in schedule object, updating...");
 
                     // invalidate old sched_obj (update gen_id)
 
@@ -108,21 +101,19 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
                     // insert new object
                     sqlx::query("INSERT INTO schedule_objs \
             (last_known_orig_sched_obj_id, group_id, link_id, subject_id, subject_gen_id,\
-            teacher_id, teacher_gen_id, second_teacher_id, second_teacher_gen_id, third_teacher_id, third_teacher_gen_id, auditorium,\
+            teacher_id, teacher_gen_id, second_teacher_id, third_teacher_id, auditorium,\
             updated_at, time, week_day, week_parity, gen_start, existence_diff) \
             VALUES\
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                         .bind(input_sched_obj.last_known_orig_sched_obj_id)
                         .bind(group_id)
                         .bind(existing_sched_obj.link_id)
                         .bind(subject_id)
                         .bind(models::subjects::get_subjects_cur_gen(con).await.unwrap())
                         .bind(input_sched_obj.teacher_id)
-                        .bind(0)
+                        .bind(models::teachers::get_teachers_cur_gen(con).await.unwrap())
                         .bind(input_sched_obj.second_teacher_id)
-                        .bind(0)
                         .bind(input_sched_obj.third_teacher_id)
-                        .bind(0)
                         .bind(input_sched_obj.auditorium.clone())
                         .bind(input_sched_obj.updated_at.clone())
                         .bind(input_sched_obj.time)
@@ -132,10 +123,14 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
                         .bind("changed")
                         .execute(&mut *con)
                         .await.context("Failed to insert new schedule object")?;
+
+                    info!("Schedule object [CHANGED]: ({}): {} week {}:{}", input_sched_obj.last_known_orig_sched_obj_id, input_sched_obj.week_parity,
+                        input_sched_obj.week_day.to_string(), input_sched_obj.time);
+
                     res.push(MergeResult::Updated);
                 }
                 else {
-                    debug!("No diff in schedule object, skipping...");
+                    trace!("No diff in schedule object, skipping...");
                     // btw update untracked information
                     if input_sched_obj.updated_at != existing_sched_obj.updated_at
                         || input_sched_obj.last_known_orig_sched_obj_id != existing_sched_obj.last_known_orig_sched_obj_id {
@@ -158,31 +153,29 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
             }
         }
         if !found {
-            debug!("Schedule object not found, inserting...");
+            trace!("Schedule object not found, inserting...");
             //process new schedule object
             let new_link_id = get_new_link_id(con).await?;
             let new_gen_id = last_gen_id + 1;
 
             create_new_gen(con, new_gen_id, group_id).await?;
 
+
             sqlx::query("INSERT INTO schedule_objs \
             (last_known_orig_sched_obj_id, group_id, link_id, subject_id, subject_gen_id,\
-            teacher_id, teacher_gen_id, second_teacher_id, second_teacher_gen_id, third_teacher_id, \
-            third_teacher_gen_id, auditorium,\
+            teacher_id, teacher_gen_id, second_teacher_id, third_teacher_id, auditorium,\
             updated_at, time, week_day, week_parity, gen_start, existence_diff) \
             VALUES\
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                 .bind(input_sched_obj.last_known_orig_sched_obj_id)
                 .bind(group_id)
                 .bind(new_link_id)
                 .bind(subject_id)
                 .bind(models::subjects::get_subjects_cur_gen(con).await.unwrap())
                 .bind(input_sched_obj.teacher_id)
-                .bind(0)
+                .bind(models::teachers::get_teachers_cur_gen(con).await.unwrap())
                 .bind(input_sched_obj.second_teacher_id)
-                .bind(0)
                 .bind(input_sched_obj.third_teacher_id)
-                .bind(0)
                 .bind(input_sched_obj.auditorium.clone())
                 .bind(input_sched_obj.updated_at.clone())
                 .bind(input_sched_obj.time)
@@ -192,7 +185,8 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
                 .bind("new")
                 .execute(&mut *con)
                 .await.context("Failed to insert new schedule object")?;
-
+            info!("Schedule object [INSERTED]: ({}): {} week {}:{}", input_sched_obj.last_known_orig_sched_obj_id, input_sched_obj.week_parity,
+                input_sched_obj.week_day.to_string(), input_sched_obj.time);
 
             res.push(MergeResult::Inserted);
         }
@@ -209,7 +203,7 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
         }
         if !found {
             // invalidate old sched_obj (update gen_id)
-            debug!("Invalidating old schedule object: {}", existing_sched_obj.last_known_orig_sched_obj_id);
+            trace!("Invalidating old schedule object: {}", existing_sched_obj.last_known_orig_sched_obj_id);
 
             let new_gen_id = last_gen_id + 1;
             create_new_gen(con, new_gen_id, group_id).await?;
@@ -230,51 +224,67 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
 
 pub async fn schedule_objs_merge(group_id: u32, schedule_objs: &Vec<ScheduleObjModel>, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
     // group by subject_id
-    info!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for group id {} started!", group_id);
+
+    let group_name = models::groups::get_group(con, group_id).await?.number;
+    info!("MERGE::SCHEDULE_OBJ_GROUP Merging started! Group: ({}): {}", group_id, group_name);
     let start = std::time::Instant::now();
     let mut subj_id_to_sched_objs: std::collections::HashMap<u32, Vec<ScheduleObjModel>> = std::collections::HashMap::new();
+
+    // group by subject id
     for sched_obj in schedule_objs {
-        if !subj_id_to_sched_objs.contains_key(&sched_obj.subject_id) {
-            subj_id_to_sched_objs.insert(sched_obj.subject_id, Vec::new());
-        }
-        subj_id_to_sched_objs.get_mut(&sched_obj.subject_id).unwrap().push(sched_obj.clone());
+        subj_id_to_sched_objs.entry(sched_obj.subject_id).or_default().push(sched_obj.clone());
     }
 
     let last_gen_id = get_last_gen_id(con, group_id).await?;
-
+    info!("MERGE::SCHEDULE_OBJ_GROUP Last generation: {}", last_gen_id);
 
     let mut any_modified = false;
+    let mut total_inserted_cnt = 0;
+    let mut total_changed_cnt = 0;
     for (subj_id, subj_sched_objs) in subj_id_to_sched_objs {
         let mut modified = false;
-        info!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for subject id {} started!", subj_id);
+        let mut inserted_cnt = 0;
+        let mut changed_cnt = 0;
+
+        trace!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for subject id {} started!", subj_id);
         let res = single_schedule_obj_group_merge(group_id, &subj_sched_objs, subj_id, last_gen_id, con).await?;
         for r in res {
+            if r == MergeResult::Inserted {
+                inserted_cnt += 1;
+            }
+            if r == MergeResult::Updated {
+                changed_cnt += 1;
+            }
             if r != MergeResult::NotModified {
                 modified = true;
-                info!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for subject id {} modified!", subj_id);
+
+                total_inserted_cnt += inserted_cnt;
+                total_changed_cnt += changed_cnt;
                 break;
             }
         }
 
-        if modified {
-            info!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for subject id {} finished:\tmodified!", subj_id);
-            any_modified = true;
-        }
-        else {
+        if inserted_cnt > 0 || changed_cnt > 0 {
+            info!("MERGE::SCHEDULE_OBJ_GROUP Schedule objects modified! Grouped by subject_id = {}", subj_id);
+            info!("\tinserted: {}", inserted_cnt);
+            info!("\tchanged: {}", changed_cnt);
 
-            info!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for subject id {} finished:\tno changes!", subj_id);
+            info!("MERGE::SCHEDULE_OBJ_GROUP Using generation id {}", last_gen_id + 1);
         }
     }
 
     models::groups::set_last_group_merge(group_id, con).await?;
 
     if any_modified {
-        info!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for group id {} finished with changes! New generation created with id {}", group_id, last_gen_id + 1);
+        info!("MERGE::SCHEDULE_OBJ_GROUP Merge schedule objects for group finished with changes! New generation created with id {}", last_gen_id + 1);
+        info!("\tinserted: {}", total_inserted_cnt);
+        info!("\tchanged: {}", total_changed_cnt);
     }
     else {
-        info!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for group id {} finished with no changes! Keeping last generation", group_id);
+        info!("MERGE::SCHEDULE_OBJ_GROUP Merge schedule objects: \tno changes!")
     }
-    info!("MERGE::SCHEDULE_OBJ_GROUP Merging sched obj group took {:?}", start.elapsed());
+    info!("MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for group finished in {:?}", start.elapsed());
+    info!("");
 
     Ok(())
 }

@@ -4,11 +4,13 @@ use std::ops::DerefMut;
 use rocket::{serde::json::Json, Route};
 use rocket::response::status::BadRequest;
 use rocket_db_pools::Connection;
+use sqlx::Acquire;
 
-use crate::{api::etu_api::{self, ScheduleObjectOriginal}, models::groups::GroupModel, models, MERGE_REQUEST_CHANNEL, MERGE_REQUEST_CNT};
+use crate::{models::groups::GroupModel, models, MERGE_REQUEST_CHANNEL, MERGE_REQUEST_CNT};
 use crate::models::Db;
 use crate::models::schedule::{ScheduleObjModel};
 use crate::models::subjects::SubjectModel;
+use crate::models::teachers::TeacherModel;
 
 
 #[derive(serde::Serialize)]
@@ -43,25 +45,69 @@ pub struct OutputTeacherModel {
     rank: Option<String>,
     position: Option<String>,
     degree: Option<String>,
-    roles: Vec<String>,
-    work_departments: Option<Vec<String>>,
+    work_departments: Vec<String>,
+
+    is_department_dispatcher: bool,
+    is_department_head: bool,
+    is_student: bool,
+    is_worker: bool,
+}
+
+impl Into<OutputTeacherModel> for (TeacherModel, Vec<String>) {
+    fn into(self) -> OutputTeacherModel {
+        let teacher = self.0;
+        let work_departments = self.1;
+
+        OutputTeacherModel {
+            initials: teacher.initials,
+            group_id: teacher.group_id,
+            is_department_dispatcher: teacher.is_department_dispatcher,
+            is_department_head: teacher.is_department_head,
+            is_student: teacher.is_student,
+            is_worker: teacher.is_worker,
+
+            position: teacher.position,
+            work_departments,
+            birthday: teacher.birthday,
+            degree: teacher.degree,
+            email: teacher.email,
+            midname: teacher.midname,
+            name: teacher.name,
+            rank: teacher.rank,
+            surname: teacher.surname
+
+        }
+    }
 }
 
 #[derive(serde::Serialize)]
 pub struct OutputScheduleObjectModel {
     auditorium_reservation: OutputAuditoriumReservationModel,
     subject: OutputSubjectModel,
-    teacher: OutputTeacherModel,
-    second_teacher: OutputTeacherModel,
-    third_teacher: OutputTeacherModel,
+    teacher: Option<OutputTeacherModel>,
+    second_teacher: Option<OutputTeacherModel>,
+    third_teacher: Option<OutputTeacherModel>,
     id: u32
 }
 
-impl TryInto<OutputScheduleObjectModel> for (ScheduleObjModel, &BTreeMap<u32, SubjectModel>) {
+impl TryInto<OutputScheduleObjectModel> for (ScheduleObjModel, &BTreeMap<u32, SubjectModel>, &BTreeMap<u32, (TeacherModel, Vec<String>)>) {
     type Error = String;
     fn try_into(self) -> Result<OutputScheduleObjectModel, String> {
         let sched_model = self.0;
         let subject = self.1.get(&sched_model.subject_id).map_or(Err("Subject not found!".to_string()), |r| Ok(r))?;
+
+        let first_teacher = match sched_model.teacher_id {
+            Some(id) => Some(self.2.get(&id).cloned().map_or(Err(format!("Teacher {} not found!", id)), |r| Ok(r))?),
+            None => None
+        };
+        let second_teacher = match sched_model.second_teacher_id {
+            Some(id) => Some(self.2.get(&id).cloned().map_or(Err(format!("Teacher {} not found!", id)), |r| Ok(r))?),
+            None => None
+        };
+        let third_teacher = match sched_model.third_teacher_id {
+            Some(id) => Some(self.2.get(&id).cloned().map_or(Err(format!("Teacher {} not found!", id)), |r| Ok(r))?),
+            None => None
+        };
 
         Ok(OutputScheduleObjectModel {
             auditorium_reservation: OutputAuditoriumReservationModel{
@@ -78,54 +124,9 @@ impl TryInto<OutputScheduleObjectModel> for (ScheduleObjModel, &BTreeMap<u32, Su
                 control_type: subject.control_type.clone(),
                 department_id: subject.department_id,
             },
-            teacher: OutputTeacherModel {
-                name: "name".to_string(),
-                surname: "surname".to_string(),
-                midname: "midname".to_string(),
-                initials: "teacher initials".to_string(),
-
-                birthday: "teacher birthday".to_string(),
-                email: None,
-                group_id: None,
-
-                rank: None,
-                position: None,
-                degree: None,
-                roles: Vec::new(),
-                work_departments: None,
-            },
-            second_teacher: OutputTeacherModel {
-                name: "name".to_string(),
-                surname: "surname".to_string(),
-                midname: "midname".to_string(),
-                initials: "teacher initials".to_string(),
-
-                birthday: "teacher birthday".to_string(),
-                email: None,
-                group_id: None,
-
-                rank: None,
-                position: None,
-                degree: None,
-                roles: Vec::new(),
-                work_departments: None,
-            },
-            third_teacher: OutputTeacherModel {
-                name: "name".to_string(),
-                surname: "surname".to_string(),
-                midname: "midname".to_string(),
-                initials: "teacher initials".to_string(),
-
-                birthday: "teacher birthday".to_string(),
-                email: None,
-                group_id: None,
-
-                rank: None,
-                position: None,
-                degree: None,
-                roles: Vec::new(),
-                work_departments: None,
-            },
+            teacher: first_teacher.map(|t| t.into()),
+            second_teacher: second_teacher.map(|t| t.into()),
+            third_teacher: third_teacher.map(|t| t.into()),
             id: sched_model.schedule_obj_id
         })
     }
@@ -155,6 +156,13 @@ async fn get_group_schedule_objects(group_id: u32, mut con: Connection<Db>) -> R
                     let subjects = models::subjects::get_subjects_for_group(con.deref_mut(), group_id).await.unwrap();
                     let subjects_map: BTreeMap<u32, SubjectModel> = subjects.into_iter().map(|row| (row.subject_id, row.clone())).collect();
 
+                    let teachers = models::teachers::get_teachers_for_group(con.deref_mut(), group_id).await.unwrap();
+                    let mut teachers_map: BTreeMap<u32, (TeacherModel, Vec<String>)> = BTreeMap::new();
+                    for teacher in teachers {
+                        let teacher_departments = models::teachers::get_teacher_departments(teacher.teacher_id, &mut *con).await.unwrap();
+                        teachers_map.insert(teacher.teacher_id, (teacher, teacher_departments));
+                    }
+
                     let channel = MERGE_REQUEST_CHANNEL.get().unwrap();
                     //check if it is full
                     if channel.try_send(group_id).is_err() {
@@ -164,7 +172,7 @@ async fn get_group_schedule_objects(group_id: u32, mut con: Connection<Db>) -> R
                         MERGE_REQUEST_CNT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                     }
 
-                    let output_objs: Vec<OutputScheduleObjectModel> = sched_objects.into_iter().map(|s| (s, &subjects_map).try_into().unwrap()).collect();
+                    let output_objs: Vec<OutputScheduleObjectModel> = sched_objects.into_iter().map(|s| (s, &subjects_map, &teachers_map).try_into().unwrap()).collect();
                     let output = OutputGroupScheduleModel {
                         sched_objs: output_objs,
                         is_ready: true,
@@ -205,8 +213,8 @@ async fn get_group_schedule_objects(group_id: u32, mut con: Connection<Db>) -> R
 }
 
 #[get("/groups")]
-async fn get_groups(con: Connection<Db>) -> Json<BTreeMap<u32, GroupModel>> {
-    let groups = models::groups::get_groups(con).await.unwrap();
+async fn get_groups(mut con: Connection<Db>) -> Json<BTreeMap<u32, GroupModel>> {
+    let groups = models::groups::get_groups(con.deref_mut()).await.unwrap();
     let mut out_groups = BTreeMap::new();
     for g in groups.into_iter() {
         out_groups.insert(g.group_id, g);

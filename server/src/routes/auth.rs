@@ -38,7 +38,7 @@ impl<'r> FromRequest<'r> for UserInfo {
                 }
             }
             _ => {
-                error!("Failed to get user info: no token");
+                warn!("Failed to get user info: no token");
                 return request::Outcome::Forward(());
             }
         }

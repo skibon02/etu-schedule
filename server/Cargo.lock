@@ -1840,6 +1840,7 @@ dependencies = [
  "chrono",
  "colored",
  "fern",
+ "itertools",
  "lazy_static",
  "log",
  "rand",

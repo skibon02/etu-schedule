@@ -18,7 +18,7 @@ pub enum WeekDay {
 }
 
 impl WeekDay {
-    fn as_num(&self) -> u8 {
+    pub fn as_num(&self) -> u8 {
         match self {
             WeekDay::Mon => 0,
             WeekDay::Tue => 1,
@@ -28,6 +28,9 @@ impl WeekDay {
             WeekDay::Sat => 5,
             WeekDay::Sun => 6
         }
+    }
+    pub fn to_string(self) -> String {
+        self.into()
     }
 }
 
@@ -75,9 +78,7 @@ pub struct ScheduleObjModel {
     pub teacher_id: Option<u32>,
     pub teacher_gen_id: Option<u32>,
     pub second_teacher_id: Option<u32>,
-    pub second_teacher_gen_id: Option<u32>,
     pub third_teacher_id: Option<u32>,
-    pub third_teacher_gen_id: Option<u32>,
 
     pub auditorium: Option<String>,
     pub updated_at: String,

@@ -16,25 +16,30 @@ async fn faculty_single_merge(faculty: FacultyModel, con: &mut PoolConnection<Sq
 
     if let Some(row) = row {
         if row != faculty {
-            info!("MERGE::FACULTIES \tUpdating faculty {} with title {}: \n old: {:?}, new: {:?}", id, faculty.title, row, faculty);
+            trace!("MERGE::FACULTIES \tUpdating faculty {} with title {}: \n old: {:?}, new: {:?}", id, faculty.title, row, faculty);
             sqlx::query("UPDATE faculties SET title = ? WHERE faculty_id = ?")
                 .bind(&faculty.title)
                 .bind(&faculty.faculty_id)
                 .execute(&mut **con)
                 .await.context("Failed to update faculty in faculty merge")?;
-            return Ok(MergeResult::Updated);
-        }
+            info!("Faculty [CHANGED]: ({}): {}", faculty.faculty_id, faculty.title);
 
-        return Ok(MergeResult::NotModified);
+            Ok(MergeResult::Updated)
+        }
+        else {
+            Ok(MergeResult::NotModified)
+        }
     }
     else {
-        info!("MERGE::FACULTIES \tNew faculty: {} with title {}", id, faculty.title);
+        trace!("MERGE::FACULTIES \tNew faculty: {} with title {}", id, faculty.title);
         sqlx::query("INSERT INTO faculties (faculty_id, title) VALUES (?, ?)")
             .bind(&faculty.faculty_id)
             .bind(&faculty.title)
             .execute(&mut **con)
             .await.context("Failed to insert faculty in faculty merge")?;
-        return Ok(MergeResult::Inserted);
+        info!("Faculty [INSERTED]: ({}): {}", faculty.faculty_id, faculty.title);
+
+        Ok(MergeResult::Inserted)
     }
 }
 pub async fn department_single_merge(department: DepartmentModel, faculty: Option<&FacultyModel>, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<MergeResult> {
@@ -54,7 +59,7 @@ pub async fn department_single_merge(department: DepartmentModel, faculty: Optio
     if let Some(row) = row {
         // do not update if faculty is None
         if (faculty.is_some() || row.faculty_id == department.faculty_id) && row != department {
-            info!("MERGE::DEPARTMENTS \tUpdating department {} with title {}: \n old: {:?}, new: {:?}", id, department.title, row, department);
+            trace!("MERGE::DEPARTMENTS \tUpdating department {} with title {}: \n old: {:?}, new: {:?}", id, department.title, row, department);
             sqlx::query("UPDATE departments SET title = ?, long_title = ?, department_type = ?, faculty_id = ? WHERE department_id = ?")
                 .bind(&department.title)
                 .bind(&department.long_title)
@@ -63,13 +68,15 @@ pub async fn department_single_merge(department: DepartmentModel, faculty: Optio
                 .bind(&department.department_id)
                 .execute(&mut *con)
                 .await.context("Failed to update department in department merge")?;
+            info!("Department [CHANGED]: ({}): {}", department.department_id, department.title);
+
             Ok(MergeResult::Updated)
         }
         else {
             Ok(MergeResult::NotModified)
         }
     } else {
-        info!("MERGE::DEPARTMENTS \tNew department: {} with title {}", id, department.title);
+        trace!("MERGE::DEPARTMENTS \tNew department: {} with title {}", id, department.title);
         sqlx::query("INSERT INTO departments (department_id, title, long_title, department_type, faculty_id) VALUES (?, ?, ?, ?, ?)")
             .bind(&department.department_id)
             .bind(&department.title)
@@ -78,6 +85,8 @@ pub async fn department_single_merge(department: DepartmentModel, faculty: Optio
             .bind(&department.faculty_id)
             .execute(con)
             .await.context("Failed to insert department")?;
+        info!("Department [INSERTED]: ({}): {}", department.department_id, department.title);
+
         Ok(MergeResult::Inserted)
     }
 }
@@ -99,7 +108,7 @@ async fn group_single_merge(group: &GroupModel, department: Option<&DepartmentMo
 
     if let Some(row) = row {
         if row != *group {
-            info!("MERGE::GROUPS \tUpdating group {} with number {}: \n old: {:?}, new: {:?}", id, group.number, row, *group);
+            trace!("MERGE::GROUPS \tUpdating group {} with number {}: \n old: {:?}, new: {:?}", id, group.number, row, *group);
             sqlx::query("UPDATE groups SET number = ?, studying_type = ?, education_level = ?, start_year = ?, end_year = ?, department_id = ?, specialty_id = ? WHERE group_id = ?")
                 .bind(&group.number)
                 .bind(&group.studying_type)
@@ -111,12 +120,14 @@ async fn group_single_merge(group: &GroupModel, department: Option<&DepartmentMo
                 .bind(&group.group_id)
                 .execute(&mut *con)
                 .await.context("Failed to update group in group merge")?;
+            info!("Group [CHANGED]: ({}): {}", group.group_id, group.number);
+
             Ok(MergeResult::Updated)
         } else {
             Ok(MergeResult::NotModified)
         }
     } else {
-        info!("MERGE::GROUPS \tNew group: {} with number {}", id, group.number);
+        trace!("MERGE::GROUPS \tNew group: {} with number {}", id, group.number);
         sqlx::query("INSERT INTO groups (group_id, number, studying_type, education_level, start_year, end_year, department_id, specialty_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
             .bind(&group.group_id)
             .bind(&group.number)
@@ -128,29 +139,41 @@ async fn group_single_merge(group: &GroupModel, department: Option<&DepartmentMo
             .bind(&group.specialty_id)
             .execute(&mut **con)
             .await.context("Failed to insert group in group merge")?;
+        info!("Group [INSERTED]: ({}): {}", group.group_id, group.number);
+
         Ok(MergeResult::Inserted)
     }
 }
 
 pub async fn groups_merge(groups: &Vec<GroupOriginal>, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
+    info!("MERGE::GROUPS Merging started!");
     let start = std::time::Instant::now();
-    let mut modified = false;
+
+    let mut changed_cnt = 0;
+    let mut inserted_cnt = 0;
     for group in groups.iter() {
         let group_model = group.as_model();
         let department_model = group.department.as_model();
         let faculty_model = group.department.faculty.as_model();
         let res = group_single_merge(&group_model, Some(&department_model), Some(&faculty_model), con).await.context("Failed to merge group")?;
 
-        if let MergeResult::Updated | MergeResult::Inserted = res {
-            modified = true;
+        if MergeResult::Updated == res {
+            changed_cnt += 1;
+        }
+        if MergeResult::Inserted == res {
+            inserted_cnt += 1;
         }
     }
-    if modified {
-        info!("MERGE::GROUPS \tGroups merge done with modifications");
+
+    if changed_cnt > 0 || inserted_cnt > 0 {
+        info!("MERGE::GROUPS Merging groups finished with changes!");
+        info!("MERGE::GROUPS \tinserted: {}", inserted_cnt);
+        info!("MERGE::GROUPS \tchanged: {}", changed_cnt);
     }
     else {
-        info!("MERGE::GROUPS \tGroups merge done without modifications");
+        info!("MERGE::GROUPS Merging groups: \tno changes")
     }
-    info!("MERGE::GROUPS \tGroups merge done in {:?}", start.elapsed());
+    info!("MERGE::GROUPS Merging groups finished in {:?}!", start.elapsed());
+    info!("");
     Ok(())
 }

@@ -138,6 +138,7 @@ use crate::api::vk_api::VK_SERVICE_TOKEN;
 use crate::models::groups::{DepartmentModel, get_not_merged_sched_group_id_list};
 use crate::models::schedule::{ScheduleObjModel};
 use crate::models::subjects::{get_subjects_cur_gen, SubjectModel};
+use crate::models::teachers::{get_teachers_cur_gen, TeacherModel};
 
 
 fn loglevel_formatter(level: &log::Level) -> ColoredString {
@@ -365,22 +366,39 @@ async fn process_schedule_merge(group_id_vec: Vec<u32>, con: &mut Db) {
     let sched_objs = etu_api::get_schedule_objs_groups(group_id_vec.clone()).await.unwrap();
 
     let con = &mut con.acquire().await.unwrap();
-    let last_gen_id = get_subjects_cur_gen(&mut *con).await.unwrap();
+    let last_subjects_generation = get_subjects_cur_gen(&mut *con).await.unwrap();
+    let last_teachers_generation = get_teachers_cur_gen(&mut *con).await.unwrap();
     for (group_id, sched_objs) in sched_objs {
         info!("BGTASK: Starting merge for group id {}", group_id);
         let mut sched_objs_models: Vec<ScheduleObjModel> = Vec::new();
-        let mut subjects: BTreeMap<u32, SubjectModel> = BTreeMap::new();
+        let mut subjects: BTreeMap<u32, Vec<SubjectModel>> = BTreeMap::new();
         let mut departments: Vec<DepartmentModel> = Vec::new();
+        let mut teachers: BTreeMap<u32, (TeacherModel, Vec<String>)> = BTreeMap::new();
+
         for sched_obj_orig in sched_objs.scheduleObjects {
             sched_objs_models.push(sched_obj_orig.clone().try_into().unwrap());
-            subjects.insert(sched_obj_orig.lesson.subject.id, sched_obj_orig.lesson.subject.clone().into());
+            subjects.entry(sched_obj_orig.lesson.subject.id).or_default().push(sched_obj_orig.lesson.subject.clone().into());
             departments.push(sched_obj_orig.lesson.subject.department.into());
+
+            if let Some(teacher) = sched_obj_orig.lesson.teacher {
+                let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
+                teachers.insert(teacher_model.0.teacher_id, teacher_model);
+            }
+            if let Some(teacher) = sched_obj_orig.lesson.secondTeacher {
+                let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
+                teachers.insert(teacher_model.0.teacher_id, teacher_model);
+            }
+            if let Some(teacher) = sched_obj_orig.lesson.thirdTeacher {
+                let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
+                teachers.insert(teacher_model.0.teacher_id, teacher_model);
+            }
         }
         for department in departments {
             data_merges::groups::department_single_merge(department, None, &mut *con).await.unwrap();
         }
 
-        data_merges::subjects::subjects_merge(&subjects, last_gen_id, &mut *con).await.unwrap();
+        data_merges::subjects::subjects_merge(&subjects, last_subjects_generation, &mut *con).await.unwrap();
+        data_merges::teachers::teachers_merge(teachers, last_teachers_generation, &mut *con).await.unwrap();
         data_merges::schedule::schedule_objs_merge(group_id, &sched_objs_models, &mut *con).await.unwrap();
     }
     info!("BGTASK: Merge for {} groups finished in {:?}", group_id_vec.len(), (Instant::now() - start));

@@ -108,7 +108,7 @@ pub async fn set_last_group_merge(group_id: u32, con: &mut PoolConnection<Sqlite
 
     Ok(())
 }
-pub async fn get_groups(mut con: Connection<Db>) -> anyhow::Result<Vec<GroupModel>> {
+pub async fn get_groups(con: &mut PoolConnection<Sqlite>) -> anyhow::Result<Vec<GroupModel>> {
     let res = sqlx::query_as(
         "SELECT * FROM groups",
     )
@@ -117,7 +117,7 @@ pub async fn get_groups(mut con: Connection<Db>) -> anyhow::Result<Vec<GroupMode
     Ok(res)
 }
 
-pub async fn get_group(mut con: Connection<Db>, group_id: u32) -> anyhow::Result<GroupModel> {
+pub async fn get_group(con: &mut PoolConnection<Sqlite>, group_id: u32) -> anyhow::Result<GroupModel> {
     let res = sqlx::query_as(
         "SELECT * FROM groups WHERE group_id = ?",
     )
