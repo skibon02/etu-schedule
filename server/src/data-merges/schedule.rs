@@ -135,8 +135,8 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
                     // btw update untracked information
                     if input_sched_obj.updated_at != existing_sched_obj.updated_at
                         || input_sched_obj.last_known_orig_sched_obj_id != existing_sched_obj.last_known_orig_sched_obj_id
-                        || existing_sched_obj.subject_id != latest_subject_gen
-                        || existing_sched_obj.teacher_id.map(|id| id != latest_teachers_gen).unwrap_or(false) {
+                        || existing_sched_obj.subject_gen_id != latest_subject_gen
+                        || existing_sched_obj.teacher_gen_id.map(|id| id != latest_teachers_gen).unwrap_or(false) {
                         info!("Updating untracked information for schedule object");
 
                         let new_teacher_gen_id = existing_sched_obj.teacher_id.map(|id| latest_teachers_gen);
