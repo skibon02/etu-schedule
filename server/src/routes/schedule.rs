@@ -33,6 +33,7 @@ pub struct OutputSubjectModel {
 
 #[derive(serde::Serialize)]
 pub struct OutputTeacherModel {
+    id: u32,
     name: String,
     surname: String,
     midname: String,
@@ -59,6 +60,8 @@ impl Into<OutputTeacherModel> for (TeacherModel, Vec<String>) {
         let work_departments = self.1;
 
         OutputTeacherModel {
+            id: teacher.teacher_id,
+
             initials: teacher.initials,
             group_id: teacher.group_id,
             is_department_dispatcher: teacher.is_department_dispatcher,
