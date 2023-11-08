@@ -56,7 +56,8 @@ pub async fn get_teachers_for_group(con: &mut PoolConnection<Sqlite>, group_id: 
         "select * from teachers where teachers.teacher_id in (SELECT DISTINCT teachers.teacher_id FROM teachers join schedule_objs on \
             (teachers.teacher_id = schedule_objs.teacher_id OR \
                 teachers.teacher_id = schedule_objs.second_teacher_id OR \
-                teachers.teacher_id = schedule_objs.third_teacher_id) \
+                teachers.teacher_id = schedule_objs.third_teacher_id OR \
+                teachers.teacher_id = schedule_objs.fourth_teacher_id) \
             and teachers.gen_start <= schedule_objs.teacher_gen_id \
             AND (teachers.gen_end IS null OR teachers.gen_end > schedule_objs.teacher_gen_id) \
         WHERE schedule_objs.gen_end IS NULL and schedule_objs.group_id = ?)")

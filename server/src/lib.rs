@@ -392,6 +392,10 @@ async fn process_schedule_merge(group_id_vec: Vec<u32>, con: &mut Db) {
                 let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
                 teachers.insert(teacher_model.0.teacher_id, teacher_model);
             }
+            if let Some(teacher) = sched_obj_orig.lesson.fourthTeacher {
+                let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
+                teachers.insert(teacher_model.0.teacher_id, teacher_model);
+            }
         }
         for department in departments {
             data_merges::groups::department_single_merge(department, None, &mut *con).await.unwrap();

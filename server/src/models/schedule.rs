@@ -79,6 +79,7 @@ pub struct ScheduleObjModel {
     pub teacher_gen_id: Option<u32>,
     pub second_teacher_id: Option<u32>,
     pub third_teacher_id: Option<u32>,
+    pub fourth_teacher_id: Option<u32>,
 
     pub auditorium: Option<String>,
     pub updated_at: String,

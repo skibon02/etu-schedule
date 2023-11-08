@@ -87,6 +87,7 @@ pub struct OutputScheduleObjectModel {
     teacher: Option<OutputTeacherModel>,
     second_teacher: Option<OutputTeacherModel>,
     third_teacher: Option<OutputTeacherModel>,
+    fourth_teacher: Option<OutputTeacherModel>,
     id: u32
 }
 
@@ -105,6 +106,10 @@ impl TryInto<OutputScheduleObjectModel> for (ScheduleObjModel, &BTreeMap<u32, Su
             None => None
         };
         let third_teacher = match sched_model.third_teacher_id {
+            Some(id) => Some(self.2.get(&id).cloned().map_or(Err(format!("Teacher {} not found!", id)), |r| Ok(r))?),
+            None => None
+        };
+        let fourth_teacher = match sched_model.fourth_teacher_id {
             Some(id) => Some(self.2.get(&id).cloned().map_or(Err(format!("Teacher {} not found!", id)), |r| Ok(r))?),
             None => None
         };
@@ -127,6 +132,7 @@ impl TryInto<OutputScheduleObjectModel> for (ScheduleObjModel, &BTreeMap<u32, Su
             teacher: first_teacher.map(|t| t.into()),
             second_teacher: second_teacher.map(|t| t.into()),
             third_teacher: third_teacher.map(|t| t.into()),
+            fourth_teacher: fourth_teacher.map(|t| t.into()),
             id: sched_model.schedule_obj_id
         })
     }

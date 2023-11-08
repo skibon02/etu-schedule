@@ -223,6 +223,8 @@ pub struct LessonOriginal {
     pub secondTeacher: Option<TeacherOriginal>,
     // not included in original response
     pub thirdTeacher: Option<TeacherOriginal>,
+    // not included in original response
+    pub fourthTeacher: Option<TeacherOriginal>,
 }
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
@@ -241,6 +243,7 @@ impl TryInto<ScheduleObjModel> for ScheduleObjectOriginal {
             teacher_id: self.lesson.teacher.as_ref().map(|t| t.id),
             second_teacher_id: self.lesson.secondTeacher.as_ref().map(|t| t.id),
             third_teacher_id: self.lesson.thirdTeacher.as_ref().map(|t| t.id),
+            fourth_teacher_id: self.lesson.fourthTeacher.as_ref().map(|t| t.id),
             auditorium: self.lesson.auditoriumReservation.auditoriumNumber.clone(),
             time: self.lesson.auditoriumReservation.reservationTime.startTime,
             week_day: WeekDay::try_from(self.lesson.auditoriumReservation.reservationTime.weekDay.clone()).map_err(|_| "Cannot parse week day!".to_string())?,
@@ -379,8 +382,8 @@ fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleO
                                     cur.teacher_id.is_some() && cur.second_teacher_id.is_none() {
                                     // ok, we can merge it
                                     info!("2+1 case");
-                                    if fir.second_teacher_id != cur.teacher_id &&
-                                        cur.teacher_id != fir.teacher_id {
+                                    if fir.second_teacher_id == cur.teacher_id ||
+                                        fir.teacher_id == cur.teacher_id {
                                         info!("Same, merge not needed");
                                     }
                                     else {
@@ -390,9 +393,25 @@ fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleO
                                     }
                                 }
                                 else {
-                                    error!("Error, only auditorium can be different in unique subject and placement group! abotring...");
-                                    return Err(anyhow::anyhow!("Error! only auditorium can be different in unique subject and placement group!"))
+                                    if fir.third_teacher_id.is_some() && fir.fourth_teacher_id.is_none() &&
+                                        cur.teacher_id.is_some() && cur.second_teacher_id.is_none() {
+                                        info!("3+1 case");
 
+                                        if fir.third_teacher_id == cur.teacher_id ||
+                                            fir.second_teacher_id == cur.teacher_id ||
+                                            fir.teacher_id == cur.teacher_id {
+                                            info!("Same, merge not needed");
+                                        }
+                                        else {
+                                            info!("Different, merge needed");
+                                            fir.fourth_teacher_id = cur.teacher_id;
+                                            uniq_placement_elements[0].lesson.fourthTeacher = uniq_placement_elements[i].lesson.teacher.clone();
+                                        }
+                                    }
+                                    else {
+                                        error!("Error, only auditorium can be different in unique subject and placement group! abotring...");
+                                        return Err(anyhow::anyhow!("Error! only auditorium can be different in unique subject and placement group!"))
+                                    }
                                 }
                             }
                         }

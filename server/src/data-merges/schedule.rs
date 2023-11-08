@@ -76,6 +76,7 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
                 if input_sched_obj.teacher_id != existing_sched_obj.teacher_id
                     || input_sched_obj.second_teacher_id != existing_sched_obj.second_teacher_id
                     || input_sched_obj.third_teacher_id != existing_sched_obj.third_teacher_id
+                    || input_sched_obj.fourth_teacher_id != existing_sched_obj.fourth_teacher_id
                     || input_sched_obj.auditorium != existing_sched_obj.auditorium
                     || input_sched_obj.get_lesson_pos() != existing_sched_obj.get_lesson_pos() {
                     diff = true;
@@ -101,10 +102,10 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
                     // insert new object
                     sqlx::query("INSERT INTO schedule_objs \
             (last_known_orig_sched_obj_id, group_id, link_id, subject_id, subject_gen_id,\
-            teacher_id, teacher_gen_id, second_teacher_id, third_teacher_id, auditorium,\
+            teacher_id, teacher_gen_id, second_teacher_id, third_teacher_id, fourth_teacher_id, auditorium,\
             updated_at, time, week_day, week_parity, gen_start, existence_diff) \
             VALUES\
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                         .bind(input_sched_obj.last_known_orig_sched_obj_id)
                         .bind(group_id)
                         .bind(existing_sched_obj.link_id)
@@ -114,6 +115,7 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
                         .bind(models::teachers::get_teachers_cur_gen(con).await.unwrap())
                         .bind(input_sched_obj.second_teacher_id)
                         .bind(input_sched_obj.third_teacher_id)
+                        .bind(input_sched_obj.fourth_teacher_id)
                         .bind(input_sched_obj.auditorium.clone())
                         .bind(input_sched_obj.updated_at.clone())
                         .bind(input_sched_obj.time)
@@ -163,10 +165,10 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
 
             sqlx::query("INSERT INTO schedule_objs \
             (last_known_orig_sched_obj_id, group_id, link_id, subject_id, subject_gen_id,\
-            teacher_id, teacher_gen_id, second_teacher_id, third_teacher_id, auditorium,\
+            teacher_id, teacher_gen_id, second_teacher_id, third_teacher_id, fourth_teacher_id, auditorium,\
             updated_at, time, week_day, week_parity, gen_start, existence_diff) \
             VALUES\
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                 .bind(input_sched_obj.last_known_orig_sched_obj_id)
                 .bind(group_id)
                 .bind(new_link_id)
@@ -176,6 +178,7 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
                 .bind(models::teachers::get_teachers_cur_gen(con).await.unwrap())
                 .bind(input_sched_obj.second_teacher_id)
                 .bind(input_sched_obj.third_teacher_id)
+                .bind(input_sched_obj.fourth_teacher_id)
                 .bind(input_sched_obj.auditorium.clone())
                 .bind(input_sched_obj.updated_at.clone())
                 .bind(input_sched_obj.time)
