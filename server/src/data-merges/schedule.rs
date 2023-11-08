@@ -142,15 +142,14 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
                         let new_teacher_gen_id = existing_sched_obj.teacher_id.map(|id| latest_teachers_gen);
                         sqlx::query("UPDATE schedule_objs SET \
                             updated_at = ?, \
-                            last_known_orig_sched_obj_id = ? \
-                            subject_gen_id = ? \
+                            last_known_orig_sched_obj_id = ?, \
+                            subject_gen_id = ?, \
                             teacher_gen_id = ? \
                             WHERE schedule_obj_id = ?")
                             .bind(input_sched_obj.updated_at.clone())
                             .bind(input_sched_obj.last_known_orig_sched_obj_id)
                             .bind(latest_subject_gen)
                             .bind(new_teacher_gen_id)
-
 
                             .bind(existing_sched_obj.schedule_obj_id)
                             .execute(&mut *con)
