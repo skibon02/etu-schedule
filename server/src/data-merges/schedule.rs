@@ -4,7 +4,7 @@ use sqlx::pool::PoolConnection;
 use sqlx::Sqlite;
 use crate::data_merges::MergeResult;
 use crate::models;
-use crate::models::schedule::{ScheduleObjModel, WeekDay};
+use crate::models::schedule::{get_current_schedule_for_group_with_subject, ScheduleObjModel, WeekDay};
 
 async fn get_new_link_id(con: &mut PoolConnection<Sqlite>) -> anyhow::Result<u32> {
     let res: Option<u32> = sqlx::query_scalar("SELECT MAX(link_id) as max FROM schedule_objs")
@@ -49,11 +49,7 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
         }
     }
 
-    let mut existing_sched_objs: Vec<ScheduleObjModel> = sqlx::query_as("SELECT * FROM schedule_objs WHERE group_id = ? AND subject_id = ?")
-        .bind(group_id)
-        .bind(subject_id)
-        .fetch_all(&mut *con)
-        .await.context("Failed to fetch schedule object in ")?;
+    let mut existing_sched_objs = get_current_schedule_for_group_with_subject(con, group_id, subject_id).await?;
 
     trace!("group_id: {}, subject_id: {}", group_id, subject_id);
     trace!("Found {} existing schedule objects", existing_sched_objs.len());
@@ -61,6 +57,9 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
 
 
     let mut res = Vec::new();
+
+    let latest_subject_gen = models::subjects::get_subjects_cur_gen(con).await?;
+    let latest_teachers_gen = models::subjects::get_subjects_cur_gen(con).await?;
 
     //try to link by schedule_obj_id or get_lesson_pos
     for input_sched_obj in &input_schedule_objs {
@@ -78,7 +77,7 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
                     || input_sched_obj.third_teacher_id != existing_sched_obj.third_teacher_id
                     || input_sched_obj.fourth_teacher_id != existing_sched_obj.fourth_teacher_id
                     || input_sched_obj.auditorium != existing_sched_obj.auditorium
-                    || input_sched_obj.get_lesson_pos() != existing_sched_obj.get_lesson_pos() {
+                    || input_sched_obj.get_lesson_pos() != existing_sched_obj.get_lesson_pos(){
                     diff = true;
                 }
 
@@ -110,9 +109,9 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
                         .bind(group_id)
                         .bind(existing_sched_obj.link_id)
                         .bind(subject_id)
-                        .bind(models::subjects::get_subjects_cur_gen(con).await.unwrap())
+                        .bind(latest_subject_gen)
                         .bind(input_sched_obj.teacher_id)
-                        .bind(models::teachers::get_teachers_cur_gen(con).await.unwrap())
+                        .bind(latest_teachers_gen)
                         .bind(input_sched_obj.second_teacher_id)
                         .bind(input_sched_obj.third_teacher_id)
                         .bind(input_sched_obj.fourth_teacher_id)
@@ -135,15 +134,24 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
                     trace!("No diff in schedule object, skipping...");
                     // btw update untracked information
                     if input_sched_obj.updated_at != existing_sched_obj.updated_at
-                        || input_sched_obj.last_known_orig_sched_obj_id != existing_sched_obj.last_known_orig_sched_obj_id {
+                        || input_sched_obj.last_known_orig_sched_obj_id != existing_sched_obj.last_known_orig_sched_obj_id
+                        || existing_sched_obj.subject_id != latest_subject_gen
+                        || existing_sched_obj.teacher_id.map(|id| id != latest_teachers_gen).unwrap_or(false) {
                         info!("Updating untracked information for schedule object");
 
+                        let new_teacher_gen_id = existing_sched_obj.teacher_id.map(|id| latest_teachers_gen);
                         sqlx::query("UPDATE schedule_objs SET \
-                    updated_at = ?, \
-                    last_known_orig_sched_obj_id = ? \
-                    WHERE schedule_obj_id = ?")
+                            updated_at = ?, \
+                            last_known_orig_sched_obj_id = ? \
+                            subject_gen_id = ? \
+                            teacher_gen_id = ? \
+                            WHERE schedule_obj_id = ?")
                             .bind(input_sched_obj.updated_at.clone())
                             .bind(input_sched_obj.last_known_orig_sched_obj_id)
+                            .bind(latest_subject_gen)
+                            .bind(new_teacher_gen_id)
+
+
                             .bind(existing_sched_obj.schedule_obj_id)
                             .execute(&mut *con)
                             .await.context("Failed to update schedule object")?;
@@ -162,7 +170,6 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
 
             create_new_gen(con, new_gen_id, group_id).await?;
 
-
             sqlx::query("INSERT INTO schedule_objs \
             (last_known_orig_sched_obj_id, group_id, link_id, subject_id, subject_gen_id,\
             teacher_id, teacher_gen_id, second_teacher_id, third_teacher_id, fourth_teacher_id, auditorium,\
@@ -173,9 +180,9 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
                 .bind(group_id)
                 .bind(new_link_id)
                 .bind(subject_id)
-                .bind(models::subjects::get_subjects_cur_gen(con).await.unwrap())
+                .bind(latest_subject_gen)
                 .bind(input_sched_obj.teacher_id)
-                .bind(models::teachers::get_teachers_cur_gen(con).await.unwrap())
+                .bind(latest_teachers_gen)
                 .bind(input_sched_obj.second_teacher_id)
                 .bind(input_sched_obj.third_teacher_id)
                 .bind(input_sched_obj.fourth_teacher_id)
@@ -198,8 +205,7 @@ async fn single_schedule_obj_group_merge(group_id: u32, input_schedule_objs: &Ve
     for existing_sched_obj in existing_sched_objs {
         let mut found = false;
         for input_sched_obj in &mut input_schedule_objs {
-            if input_sched_obj.last_known_orig_sched_obj_id == existing_sched_obj.last_known_orig_sched_obj_id
-            || input_sched_obj.get_lesson_pos() == existing_sched_obj.get_lesson_pos() {
+            if input_sched_obj.get_lesson_pos() == existing_sched_obj.get_lesson_pos() {
                 found = true;
                 break;
             }
@@ -260,12 +266,11 @@ pub async fn schedule_objs_merge(group_id: u32, schedule_objs: &Vec<ScheduleObjM
             }
             if r != MergeResult::NotModified {
                 modified = true;
-
-                total_inserted_cnt += inserted_cnt;
-                total_changed_cnt += changed_cnt;
-                break;
             }
         }
+
+        total_inserted_cnt += inserted_cnt;
+        total_changed_cnt += changed_cnt;
 
         if inserted_cnt > 0 || changed_cnt > 0 {
             info!("MERGE::SCHEDULE_OBJ_GROUP Schedule objects modified! Grouped by subject_id = {}", subj_id);

@@ -29,10 +29,7 @@ async fn insert_teacher_work_departments(teacher_id: u32, work_departments: Vec<
 async fn single_teacher_merge(teacher_id: u32, teacher: &TeacherModel, last_gen_id: u32, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<MergeResult> {
     trace!("Merging single teacher {}", teacher_id);
     let mut transaction = con.begin().await?;
-    let row : Option<TeacherModel> = sqlx::query_as("SELECT * FROM teachers WHERE teacher_id = ? AND gen_end IS NULL")
-        .bind(teacher_id)
-        .fetch_optional(&mut transaction)
-        .await.context("Failed to fetch teacher in teacher merge")?;
+    let row : Option<TeacherModel> = models::teachers::get_cur_gen_teacher_by_id(teacher_id, &mut transaction).await?;
 
     if let Some(row) = row {
         // merge

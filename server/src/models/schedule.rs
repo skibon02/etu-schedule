@@ -123,3 +123,14 @@ pub async fn get_current_schedule_for_group(con: &mut PoolConnection<Sqlite>, gr
 
     Ok(res)
 }
+
+pub async fn get_current_schedule_for_group_with_subject(con: &mut PoolConnection<Sqlite>, group_id: u32, subject_id: u32) -> anyhow::Result<Vec<ScheduleObjModel>> {
+    let res = sqlx::query_as(
+        "SELECT * FROM schedule_objs WHERE group_id = ? and gen_end IS NULL and subject_id = ?",
+    )
+        .bind(group_id)
+        .bind(subject_id)
+        .fetch_all(&mut *con).await?;
+
+    Ok(res)
+}

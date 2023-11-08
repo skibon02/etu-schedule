@@ -77,3 +77,12 @@ pub async fn get_teacher_departments(teacher_id: u32, con: &mut PoolConnection<S
 
     Ok(res)
 }
+
+pub async fn get_cur_gen_teacher_by_id(teacher_id: u32, transaction: &mut Transaction<'_, Sqlite>) -> anyhow::Result<Option<TeacherModel>> {
+    let res = sqlx::query_as("SELECT * FROM teachers WHERE teacher_id = ? AND gen_end IS NULL")
+        .bind(teacher_id)
+        .fetch_optional(transaction)
+        .await.context("Failed to fetch teacher in teacher merge")?;
+
+    Ok(res)
+}

@@ -262,7 +262,7 @@ pub fn run() -> Rocket<Build> {
 pub static MERGE_REQUEST_CHANNEL: OnceLock<tokio::sync::mpsc::Sender<u32>> = OnceLock::new();
 pub static MERGE_REQUEST_CNT: AtomicUsize = AtomicUsize::new(0);
 
-const GROUPS_MERGE_INTERVAL: u64 = 60*2;
+const GROUPS_MERGE_INTERVAL: u64 = 60*5;
 const ETU_REQUEST_INTERVAL: u64 = 5;
 
 const SINGLE_GROUP_INTERVAL: u32 = 30;
@@ -293,8 +293,8 @@ async fn periodic_task(mut con: Db) {
     let mut forced_request_skip = false;
     loop {
         select! {
-            _ = tokio::time::sleep(tokio::time::Duration::from_secs(60*10)) => {
-                info!("BGTASK: 10 minutes passed, starting merge routine...");
+            _ = tokio::time::sleep(tokio::time::Duration::from_secs(GROUPS_MERGE_INTERVAL)) => {
+                info!("BGTASK: {} secs passed, starting merge routine...", GROUPS_MERGE_INTERVAL);
 
                 let group_id_range = models::groups::get_oldest_group_id_list(&mut con, 30).await.unwrap();
 

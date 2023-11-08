@@ -55,3 +55,12 @@ pub async fn get_subjects_for_group(con: &mut PoolConnection<Sqlite>, group_id: 
 
     Ok(res)
 }
+
+pub async fn get_cur_gen_subject_by_id(subject_id: u32, transaction: &mut Transaction<'_, Sqlite>) -> anyhow::Result<Option<SubjectModel>> {
+    let res = sqlx::query_as("SELECT * FROM subjects WHERE subject_id = ? AND gen_end IS NULL")
+        .bind(subject_id)
+        .fetch_optional(transaction)
+        .await.context("Failed to fetch subject in subject merge")?;
+
+    Ok(res)
+}

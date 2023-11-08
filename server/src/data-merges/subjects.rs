@@ -9,10 +9,7 @@ use crate::models::subjects::{get_subjects_cur_gen, SubjectModel};
 async fn single_subject_merge(subject_id: u32, subject: &SubjectModel, last_gen_id: u32, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<MergeResult> {
     trace!("Merging single subject {}", subject_id);
     let mut transaction = con.begin().await?;
-    let row : Option<SubjectModel> = sqlx::query_as("SELECT * FROM subjects WHERE subject_id = ? AND gen_end IS NULL")
-        .bind(subject_id)
-        .fetch_optional(&mut transaction)
-        .await.context("Failed to fetch subject in subject merge")?;
+    let row : Option<SubjectModel> = models::subjects::get_cur_gen_subject_by_id(subject_id, &mut transaction).await?;
 
     if let Some(row) = row {
         // merge
