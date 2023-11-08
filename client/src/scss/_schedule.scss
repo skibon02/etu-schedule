@@ -62,13 +62,13 @@
 .no-schedule {
   width: 95%;
   margin: 0 auto;
-  padding-top: 25vmin;
+  min-height: 95vmin;
   display: flex;
   align-items: center;
   justify-content: center;
   &__text {
     text-align: center;
-    font-size: 5em;
+    font-size: 3em;
     color: #828282; 
     line-height: 1.2em;
   }
@@ -99,9 +99,11 @@
   padding: pxToEm(5px);
   display: flex;
   justify-content: center;
-  gap: pxToEm(10px);
 
   &__item {
+    &:first-child {
+      margin-right: pxToEm(10px);
+    }
   }
 
   &__group {
@@ -213,8 +215,10 @@
     }
 
     &__teacher {
-      &:nth-child(2) {
-        margin-top: pxToEm(5px);
+      margin-bottom: pxToEm(5px);
+
+      &:last-child {
+        margin-bottom: 0;
       }
     }
 
@@ -250,15 +254,24 @@
   }
 
   &__room {
-    text-align: right;
     margin-top: auto;
-    margin-bottom: pxToEm(6px, );
+    margin-bottom: pxToEm(10px, );
     margin-left: pxToEm(15px, );
+    display: flex;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
   &__image {
     width: pxToEm(15px, );
     user-select: none;
+  }
+
+  &__text {
+    text-align: right;
+    min-width: pxToEm(45px);
   }
 }
 

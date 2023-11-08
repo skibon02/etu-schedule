@@ -13,7 +13,7 @@ export default function Planning({groupSchedule, groupNumber, active}) {
       <NoSchedule groupNumber={groupNumber} />
     )
   }
-
+  
   if (!groupSchedule.is_ready) {
     return (
       <NoSchedule groupNumber={-1} />

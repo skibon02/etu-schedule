@@ -4,6 +4,7 @@ $GREEN: #2DB694;
 $RED: #d60000f4;
 $BG: rgb(146, 173, 255);
 
+
 .profile {
   // border: 1px solid #000;
   display: flex;
@@ -45,6 +46,7 @@ $BG: rgb(146, 173, 255);
   }
 
   &__image {
+    user-select: none;
     width: pxToEm(300px);
     height: pxToEm(300px);
     border-radius: 50%;
@@ -93,6 +95,7 @@ $BG: rgb(146, 173, 255);
 .user-preference {
   font-size: 1.8em;
   display: flex;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
   padding: pxToEm(10px);
   border-radius: pxToEm(5px);
@@ -104,12 +107,66 @@ $BG: rgb(146, 173, 255);
   }
 
   &__title {
-    flex: 1;
+    flex: 0 0 50%;
     line-height: 1em;
   }
 
   &__value {
-    flex: 1;
+    flex: 0 0 50%;
+  }
+
+  &__access-token-container {
+    display: flex;
+    gap: pxToEm(10px)
+  }
+
+  &__input {
+    width: calc(100% - pxToEm(32px));
+    flex-shrink: 1;
+    border: 1.5px solid #CCCCCC;
+    height: pxToEm(30px);
+    border-radius: 5px;
+    padding: 10px;
+    color: #333333;
+  }
+
+  &__button {
+    cursor: pointer;
+    flex-shrink: 0;
+    user-select: none;
+    width: pxToEm(30px) !important;
+    height: pxToEm(30px);
+    border-radius: 5px;
+    background: #000;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 pxToEm(1px) black;
+    transition: all .1s ease;
+
+    &:active {
+      box-shadow: 0 0 pxToEm(.1px) black;
+    }
+  }
+
+  &__button-mark {
+  }
+
+  &__confirm-button {
+    background: #2DB694;
+
+    &:hover {
+      background: #7fccb9;
+    }
+  }
+
+  &__delete-button {
+
+    background: #d60000f4;
+    &:hover {
+      background: #ff8f8ff4;
+    }
   }
 }
 
@@ -124,6 +181,10 @@ $BG: rgb(146, 173, 255);
   height: 100%;
   display: flex;
   align-items: center;
+}
+
+.css-1dimb5e-singleValue {
+  color: #757575 !important;
 }
 
 .deauth-button {
@@ -195,6 +256,12 @@ $BG: rgb(146, 173, 255);
     font-size: 0.6em;
   } 
 
+  .user-preference {
+    &__button-mark {
+      font-size: 1.2em;
+    }
+  }
+
   .deauth-button {
     &:active {
       width: 95%;
@@ -230,6 +297,9 @@ $BG: rgb(146, 173, 255);
     
     &__value {
       width: 100%;
+    }
+
+    &__button-mark {
     }
   }
 

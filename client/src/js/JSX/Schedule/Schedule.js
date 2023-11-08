@@ -5,13 +5,13 @@ import { getWeekNumber } from "../../Utils/handleTime";
 import NoSchedule from "./NoSchedule";
 
 export default function Schedule({groupSchedule, groupNumber, date, active}) {
-  if (!groupSchedule) {
+  if (!groupSchedule && active === 'schedule' ) {
     return (
       <NoSchedule groupNumber={groupNumber} />
     )
   }
   
-  if (!groupSchedule.is_ready) {
+  if (!groupSchedule.is_ready && active === 'schedule' ) {
     return (
       <NoSchedule groupNumber={-1} />
     )

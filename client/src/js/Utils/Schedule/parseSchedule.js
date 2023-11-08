@@ -9,8 +9,10 @@ export function makeUsableSchedule(scheduleObject) {
   const auditoriumReservation = scheduleObject.auditorium_reservation;
   const subject = scheduleObject.subject;
 
-  const firstTeacher = scheduleObject.teacher; 
-  const secondTeacher = scheduleObject.second_teacher;
+  let firstTeacher = scheduleObject.teacher; 
+  let secondTeacher = scheduleObject.second_teacher;
+  let thirdTeacher = scheduleObject.third_teacher;
+  let fourthTeacher = scheduleObject.fourth_teacher;
   
 
   let title = subject.title;
@@ -26,23 +28,10 @@ export function makeUsableSchedule(scheduleObject) {
   }
 
   let teachers = [];
-  if (firstTeacher !== null) {
-    teachers.push({
-      id: firstTeacher.id, 
-      name: firstTeacher.name, 
-      surname: firstTeacher.surname, 
-      midname: firstTeacher.midname
-    });
-  }
-
-  if (secondTeacher !== null) {
-    teachers.push({
-      id: secondTeacher.id, 
-      name: secondTeacher.name, 
-      surname: secondTeacher.surname, 
-      midname: secondTeacher.midname
-    });
-  }
+  firstTeacher = makeTeacher(firstTeacher, teachers);
+  secondTeacher = makeTeacher(secondTeacher, teachers);
+  thirdTeacher = makeTeacher(thirdTeacher, teachers);
+  fourthTeacher = makeTeacher(fourthTeacher, teachers);
 
   const time = auditoriumReservation.time;
   const weekDay = auditoriumReservation.week_day;
@@ -60,6 +49,17 @@ export function makeUsableSchedule(scheduleObject) {
     time: time,
     weekDay: weekDay,
     date: date,
+  }
+}
+
+function makeTeacher(teacher, teachers) {
+  if (teacher !== null) {
+    teachers.push({
+      id: teacher.id, 
+      name: teacher.name, 
+      surname: teacher.surname, 
+      midname: teacher.midname
+    });
   }
 }
 

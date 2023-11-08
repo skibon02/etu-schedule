@@ -1,10 +1,8 @@
-import { makeTeachers } from "../../Unpack/Schedule/Subject/makeTeachers";
-import { checkTimeAndSetTheme } from "../../Utils/Schedule/Subject/checkTimeAndSetTheme";
-import * as handlers from "../../Handlers/Schedule/Subject/handlers";
-import { makeClockTime, knowSubjectTime } from "../../Utils/handleTime";
 import { useState, useEffect } from "react";
-import GPSLIGHT from '../../../icons/gpslite.svg'
-import GPS from '../../../icons/location-pin-svgrepo-com.svg'
+import { makeRooms } from "../../Utils/Schedule/Subject/makeRooms";
+import { makeTeachers } from "../../Utils/Schedule/Subject/makeTeachers";
+import { checkTimeAndSetTheme } from "../../Utils/Schedule/Subject/checkTimeAndSetTheme";
+import { makeClockTime, knowSubjectTime } from "../../Utils/handleTime";
 import Attendance from "./Attendance";
 import PlanningSwitch from "../Planning/PlanningSwitch";
 
@@ -16,10 +14,11 @@ export function Subject({subjectData, orderNumber, active}) {
   const [lessonStart, lessonEnd, checkInDeadline] = knowSubjectTime(orderNumber, new Date(subjectData.date));
   const lessonName = subjectData.title;
   const lessonType = subjectData.subjectType;
-  const roomName = subjectData.number;
   const teachers = makeTeachers(subjectData.teachers);
 
   const [isDead, setIsDead] = useState(checkTimeAndSetTheme(checkInDeadline));
+  
+  const roomName = makeRooms(subjectData.number, isDead, active);
 
   useEffect(() => {
     setIsDead(checkTimeAndSetTheme(checkInDeadline));
@@ -64,26 +63,18 @@ export function Subject({subjectData, orderNumber, active}) {
             "lesson-type-room__type" }>
               {lessonType}
           </p>
-          {roomName && 
-          <p className='lesson-type-room__room'>
-            <img 
-              draggable={false} 
-              className='lesson-type-room__image' 
-              src={active === 'schedule' && isDead ? GPSLIGHT : GPS} 
-              alt="gps" /> {roomName}
-          </p>}
+          {roomName}
         </div>
       </div>
       {active === 'schedule' ?
         <Attendance 
-        isDead={isDead}
-        timerId={timerId}
-        setTimerId={setTimerId}
-        toggleClock={toggleClock}
-        setToggleClock={setToggleClock}
-        toggleMessage={toggleMessage}
-        setToggleMessage={setToggleMessage}
-        />
+          isDead={isDead}
+          timerId={timerId}
+          setTimerId={setTimerId}
+          toggleClock={toggleClock}
+          setToggleClock={setToggleClock}
+          toggleMessage={toggleMessage}
+          setToggleMessage={setToggleMessage} />
       :
       <PlanningSwitch />
       }

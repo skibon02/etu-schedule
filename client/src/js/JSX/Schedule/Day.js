@@ -1,4 +1,4 @@
-import { makeLessons } from "../../Unpack/Schedule/Day/makeLessons";
+import { makeLessons } from "../../Utils/Schedule/Day/makeLessons";
 import { Subject } from "./Subject";
 import { DAYS } from "../../Utils/DAYS";
 import { makeCalendarTime } from "../../Utils/handleTime";

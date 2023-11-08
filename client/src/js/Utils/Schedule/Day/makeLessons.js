@@ -1,4 +1,4 @@
-import { makeUsableSchedule } from "../../../Utils/Schedule/parseSchedule";
+import { makeUsableSchedule } from "../parseSchedule";
 
 export function makeLessons(daySchedule, Subject, active) {
   let lessons = [];

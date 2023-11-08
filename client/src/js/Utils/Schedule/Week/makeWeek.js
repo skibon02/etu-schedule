@@ -1,4 +1,4 @@
-import { makeCalendarTime } from "../../../Utils/handleTime";
+import { makeCalendarTime } from "../../handleTime";
 
 export function makeWeek(weekSchedule, Day, DAYS, active) {
   let week = [];

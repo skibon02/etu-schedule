@@ -531,7 +531,7 @@ body {
 .no-schedule {
   width: 95%;
   margin: 0 auto;
-  padding-top: 25vmin;
+  min-height: 95vmin;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -544,7 +544,7 @@ body {
 }
 .no-schedule__text {
   text-align: center;
-  font-size: 5em;
+  font-size: 3em;
   color: #828282;
   line-height: 1.2em;
 }
@@ -574,7 +574,9 @@ body {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
-  gap: 0.625em;
+}
+.schedule-info__item:first-child {
+  margin-right: 0.625em;
 }
 .schedule-info__group {
   margin-right: 0.3125em;
@@ -667,8 +669,11 @@ body {
   font-weight: 700;
   margin-bottom: 0.3125em;
 }
-.lesson__teacher:nth-child(2) {
-  margin-top: 0.3125em;
+.lesson__teacher {
+  margin-bottom: 0.3125em;
+}
+.lesson__teacher:last-child {
+  margin-bottom: 0;
 }
 .lesson__type-room {
   margin-left: auto;
@@ -710,10 +715,15 @@ body {
           align-items: center;
 }
 .lesson-type-room__room {
-  text-align: right;
   margin-top: auto;
-  margin-bottom: 0.375em;
+  margin-bottom: 0.625em;
   margin-left: 0.9375em;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.lesson-type-room__room:last-child {
+  margin-bottom: 0;
 }
 .lesson-type-room__image {
   width: 0.9375em;
@@ -721,6 +731,10 @@ body {
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
+}
+.lesson-type-room__text {
+  text-align: right;
+  min-width: 2.8125em;
 }
 
 .attendance {
@@ -1188,6 +1202,10 @@ h1, h2, h3, h4, h5, h6 {
   border: 0.1875em solid #ffffff;
 }
 .user-info__image {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   width: 18.75em;
   height: 18.75em;
   border-radius: 50%;
@@ -1245,6 +1263,7 @@ h1, h2, h3, h4, h5, h6 {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  grid-template-columns: 1fr 1fr;
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
@@ -1257,15 +1276,74 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0;
 }
 .user-preference__title {
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 50%;
+          flex: 0 0 50%;
   line-height: 1em;
 }
 .user-preference__value {
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 50%;
+          flex: 0 0 50%;
+}
+.user-preference__access-token-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 0.625em;
+}
+.user-preference__input {
+  width: calc(100% - 2em);
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
+  border: 1.5px solid #CCCCCC;
+  height: 1.875em;
+  border-radius: 5px;
+  padding: 10px;
+  color: #333333;
+}
+.user-preference__button {
+  cursor: pointer;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  width: 1.875em !important;
+  height: 1.875em;
+  border-radius: 5px;
+  background: #000;
+  color: #fff;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-shadow: 0 0 0.0625em black;
+          box-shadow: 0 0 0.0625em black;
+  -webkit-transition: all 0.1s ease;
+  transition: all 0.1s ease;
+}
+.user-preference__button:active {
+  -webkit-box-shadow: 0 0 0.00625em black;
+          box-shadow: 0 0 0.00625em black;
+}
+.user-preference__confirm-button {
+  background: #2DB694;
+}
+.user-preference__confirm-button:hover {
+  background: #7fccb9;
+}
+.user-preference__delete-button {
+  background: rgba(214, 0, 0, 0.9568627451);
+}
+.user-preference__delete-button:hover {
+  background: rgba(255, 143, 143, 0.9568627451);
 }
 
 .deauth-button-container {
@@ -1289,6 +1367,10 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+}
+
+.css-1dimb5e-singleValue {
+  color: #757575 !important;
 }
 
 .deauth-button {
@@ -1377,6 +1459,9 @@ h1, h2, h3, h4, h5, h6 {
 @media screen and (max-width: 700px) {
   .profile {
     font-size: 0.6em;
+  }
+  .user-preference__button-mark {
+    font-size: 1.2em;
   }
   .deauth-button:active {
     width: 95%;

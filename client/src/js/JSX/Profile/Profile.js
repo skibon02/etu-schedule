@@ -4,9 +4,19 @@ import PROFILE from '../../../icons/profile.svg'
 import { makeFullNameEnabledDV, makeFullGroupNumberDV } from "../../Utils/Profile/makeSelectState";
 import { fullGroupNumberDVFx, fullNameEnabledDVFx } from "../../FxFetches/Profile/SelectFetches";
 import DeAuthButton from "./DeAuthButton";
-import { FullNamePreference, GroupPreference } from "./UserPreferences";
+import { FullNamePreference, GroupPreference, TokenPreference } from "./UserPreferences";
 
-export default function Profile({vkData, setVkData, groupList, setGroupSchedule, setGroupNumber, setGroupId, setGroupList}) {
+export default function Profile({
+  vkData, 
+  setVkData, 
+  groupList, 
+  setGroupSchedule, 
+  setGroupNumber, 
+  setGroupId, 
+  setGroupList,
+  setAccessToken,
+  accessToken
+}) {
   const [fullNameEnabledDV, setFullNameEnabledDV] = useState(makeFullNameEnabledDV());
   const [fullGroupNumberDV, setFullGroupNumberDV] = useState(makeFullGroupNumberDV());
   
@@ -60,6 +70,9 @@ export default function Profile({vkData, setVkData, groupList, setGroupSchedule,
       </div>
       {isAuthorized &&
         <div className="profile__user-preferences">
+          <TokenPreference 
+            setAccessToken={setAccessToken} 
+            accessToken={accessToken} />
           <GroupPreference 
             fullGroupNumberDV={fullGroupNumberDV}
             groupList={groupList} 

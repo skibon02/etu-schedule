@@ -23,6 +23,8 @@ export function Pages() {
 
   const [vkData, setVkData] = useState(null);
 
+  const [accessToken, setAccessToken] = useState(null);
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -70,7 +72,9 @@ export function Pages() {
                   setGroupSchedule={setGroupSchedule}
                   setGroupId={setGroupId}
                   setGroupNumber={setGroupNumber}
-                  setGroupList={setGroupList} />
+                  setGroupList={setGroupList}
+                  setAccessToken={setAccessToken} 
+                  accessToken={accessToken} />
               } />
             }
           </Route>
