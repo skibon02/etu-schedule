@@ -2,7 +2,6 @@ use std::collections::BTreeMap;
 use std::ops::DerefMut;
 
 use rocket::{serde::json::Json, Route};
-use rocket::response::status::BadRequest;
 use rocket_db_pools::Connection;
 use sqlx::Acquire;
 
@@ -11,6 +10,7 @@ use crate::models::Db;
 use crate::models::schedule::{ScheduleObjModel};
 use crate::models::subjects::SubjectModel;
 use crate::models::teachers::TeacherModel;
+use crate::routes::ResponseErrorMessage;
 
 
 #[derive(serde::Serialize)]
@@ -148,14 +148,16 @@ pub struct OutputGroupScheduleModel {
     actual_time: Option<u32>,
 }
 
-
-#[derive(serde::Serialize)]
-pub struct OutputGroupScheduleModelError {
-    message: String
+#[derive(Responder)]
+enum GetGroupScheduleObjectsResponse {
+    #[response(status = 200, content_type = "json")]
+    Success(Json<OutputGroupScheduleModel>),
+    #[response(status = 400, content_type = "json")]
+    Failed(Json<ResponseErrorMessage>)
 }
 
 #[get("/scheduleObjs/group/<group_id>")]
-async fn get_group_schedule_objects(group_id: u32, mut con: Connection<Db>) -> Result<Json<OutputGroupScheduleModel>, BadRequest<Json<OutputGroupScheduleModelError>>> {
+async fn get_group_schedule_objects(group_id: u32, mut con: Connection<Db>) -> GetGroupScheduleObjectsResponse {
     let last_merge_time = models::groups::get_time_since_last_group_merge(group_id, con.deref_mut()).await;
     match last_merge_time {
         Ok(last_merge_time) => {
@@ -188,7 +190,7 @@ async fn get_group_schedule_objects(group_id: u32, mut con: Connection<Db>) -> R
                         actual_time: Some(time)
                     };
 
-                    Ok(Json(output))
+                    GetGroupScheduleObjectsResponse::Success(Json(output))
                 },
                 None => {
                     warn!("Group {} is not yet ready!", group_id);
@@ -207,15 +209,14 @@ async fn get_group_schedule_objects(group_id: u32, mut con: Connection<Db>) -> R
                         actual_time: None
                     };
 
-                    Ok(Json(output))
+                    GetGroupScheduleObjectsResponse::Success(Json(output))
                 }
             }
         },
-        Err(_) => {
-            let res = OutputGroupScheduleModelError {
-                message: format!("Group id wasn't found!"),
-            };
-            Err(BadRequest(Some(Json(res))))
+        Err(e) => {
+            let res = ResponseErrorMessage::new(format!("Group id wasn't found!"));
+            error!("Failed to get group schedule objects: {:?}", e);
+            GetGroupScheduleObjectsResponse::Failed(Json(res))
         }
     }
 

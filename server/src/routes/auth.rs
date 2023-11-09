@@ -8,8 +8,9 @@ use rocket_db_pools::Connection;
 use serde_derive::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
-use crate::{FRONTEND_PORT, FrontendPort, models::{users::{self, AuthorizeInfo, UserInfo}, Db}};
+use crate::{FRONTEND_PORT, FrontendPort, models::{users::{self, UserInfo}, Db}};
 use crate::api::vk_api;
+use crate::routes::ResponseErrorMessage;
 
 #[post("/auth/deauth")]
 fn deauth(cookie: &CookieJar) -> Status {
@@ -47,6 +48,13 @@ impl<'r> FromRequest<'r> for UserInfo {
 }
 
 
+#[derive(Serialize)]
+#[derive(Default, Debug)]
+pub struct AuthorizeInfo {
+    pub access_token: Option<String>,
+    pub user_id: u32,
+}
+
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for AuthorizeInfo {
     type Error = ();
@@ -61,7 +69,7 @@ impl<'r> FromRequest<'r> for AuthorizeInfo {
                 }
                 request::Outcome::Success(AuthorizeInfo {
                     access_token: Some(access_token),
-                    user_id: user_id.to_string(),
+                    user_id,
                 })
             }
             _ => {

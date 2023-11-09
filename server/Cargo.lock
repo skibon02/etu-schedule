@@ -1851,6 +1851,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
+ "thiserror",
  "tokio",
 ]
 

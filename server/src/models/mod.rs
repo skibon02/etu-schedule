@@ -5,6 +5,7 @@ pub mod subjects;
 pub mod teachers;
 
 use rocket_db_pools::{sqlx, Database};
+use thiserror::Error;
 
 #[derive(Database, Clone)]
 #[database("sqlx")]

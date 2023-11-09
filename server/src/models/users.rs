@@ -1,15 +1,11 @@
+use anyhow::{anyhow, Context};
 use rocket_db_pools::Connection;
 use serde_derive::Serialize;
 use sqlx::{Acquire, Row};
+use thiserror::Error;
+use crate::models::groups::GroupModel;
 
 use super::Db;
-
-#[derive(Serialize)]
-#[derive(Default, Debug)]
-pub struct AuthorizeInfo {
-    pub access_token: Option<String>,
-    pub user_id: String,
-}
 
 #[derive(Serialize)]
 #[derive(Default, Debug)]
@@ -63,4 +59,47 @@ pub async fn user_exists(mut con: Connection<Db>, id: u32) -> anyhow::Result<boo
         .fetch_one(&mut **con).await?;
 
     Ok(res.get::<u32, _>("vk_id") == id)
+}
+
+pub async fn get_user_group(mut con: Connection<Db>, user_id: u32) -> anyhow::Result<Option<u32>> {
+    let res = sqlx::query_scalar("SELECT groups.group_id from groups join user_group on groups.group_id = user_group.group_id AND user_group.user_id = ?")
+        .bind(user_id)
+        .fetch_optional(&mut *con).await.context("Failed to get user group")?;
+
+    Ok(res)
+}
+
+
+#[derive(Error, Debug)]
+pub enum SetUserGroupError {
+    #[error("Group {0} does not exist")]
+    GroupDoesNotExist(u32),
+}
+pub async fn set_user_group(mut con: Connection<Db>, user_id: u32, group_id: u32) -> anyhow::Result<()> {
+    let group_exists: Option<u32> = sqlx::query_scalar("select group_id from groups where group_id = ?")
+        .bind(group_id)
+        .fetch_optional(&mut *con).await.context("Failed to check if group exists")?;
+
+    if group_exists.is_some() {
+        sqlx::query("DELETE FROM user_group WHERE user_id = ?")
+            .bind(user_id)
+            .execute(&mut *con).await.context("Failed to clear previous user group")?;
+        sqlx::query("INSERT INTO user_group(user_id, group_id) values (?, ?)")
+            .bind(user_id)
+            .bind(group_id)
+            .execute(&mut *con).await.context("Failed to get user group")?;
+
+        Ok(())
+    }
+    else {
+        Err(SetUserGroupError::GroupDoesNotExist(group_id).into())
+    }
+}
+
+pub async fn reset_user_group(mut con: Connection<Db>, user_id: u32) -> anyhow::Result<()> {
+    sqlx::query("DELETE FROM user_group WHERE user_id = ?")
+        .bind(user_id)
+        .execute(&mut *con).await.context("Failed to clear previous user group")?;
+
+    Ok(())
 }
