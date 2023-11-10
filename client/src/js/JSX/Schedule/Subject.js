@@ -5,8 +5,11 @@ import { checkTimeAndSetTheme } from "../../Utils/Schedule/Subject/checkTimeAndS
 import { makeClockTime, knowSubjectTime } from "../../Utils/handleTime";
 import Attendance from "./Attendance";
 import PlanningSwitch from "../Planning/PlanningSwitch";
+import { useSelector } from "react-redux";
 
-export function Subject({subjectData, orderNumber, active}) {
+export function Subject({subjectData, orderNumber}) {
+  const {active} = useSelector(s => s.active);
+
   const [toggleClock, setToggleClock] = useState(false);
   const [toggleMessage, setToggleMessage] = useState(false);
   const [timerId,  setTimerId] = useState(0);

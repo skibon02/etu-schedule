@@ -1,13 +1,14 @@
 import { makeLessons } from "../../Utils/Schedule/Day/makeLessons";
-import { Subject } from "./Subject";
+import { useSelector } from "react-redux";
 import { DAYS } from "../../Utils/DAYS";
 import { makeCalendarTime } from "../../Utils/handleTime";
 
+export function Day({daySchedule}) {
+  const {active} = useSelector(s => s.active);
 
-export function Day({daySchedule, active}) {
   const dayOfWeek = makeCalendarTime(daySchedule[0].date, DAYS)
 
-  const lessons = makeLessons(daySchedule, Subject, active);
+  const lessons = makeLessons(daySchedule);
 
   return (
     <div className="day">

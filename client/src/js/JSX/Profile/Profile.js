@@ -1,26 +1,35 @@
 import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import VKButton_old_v from "./VKButton_old_v";
 import PROFILE from '../../../icons/profile.svg'
 import { makeFullNameEnabledDV, makeFullGroupNumberDV } from "../../Utils/Profile/makeSelectState";
 import { fullGroupNumberDVFx, fullNameEnabledDVFx } from "../../FxFetches/Profile/SelectFetches";
 import DeAuthButton from "./DeAuthButton";
 import { FullNamePreference, GroupPreference, TokenPreference } from "./UserPreferences";
+import { groupListFetch } from "../../ReduxStates/Slices/groupListSlice";
 
 export default function Profile({
-  vkData, 
-  setVkData, 
-  groupList, 
   setGroupSchedule, 
   setGroupNumber, 
   setGroupId, 
-  setGroupList,
   setAccessToken,
   accessToken
 }) {
+  const dispatch = useDispatch();
+
+  const {groupList, groupListStatus, groupListError } = useSelector(s => s.groupList);
+  const {vkData, vkDataStatus, vkDataError } = useSelector(s => s.vkData);
+
   const [fullNameEnabledDV, setFullNameEnabledDV] = useState(makeFullNameEnabledDV());
   const [fullGroupNumberDV, setFullGroupNumberDV] = useState(makeFullGroupNumberDV());
   
   const isAuthorized = vkData.is_authorized;
+
+  useEffect(() => {
+    if (!groupList) {
+      dispatch(groupListFetch())
+    };
+  }, []);
 
   useEffect(() => {
     fullNameEnabledDVFx(setFullNameEnabledDV)
@@ -57,14 +66,12 @@ export default function Profile({
               {isAuthorized ? 'Авторизован' : 'Не авторизован'}
             </div>
           </div>
-          {!isAuthorized && <VKButton_old_v setVkData={setVkData} />}
+          {!isAuthorized && <VKButton_old_v />}
           {isAuthorized && 
             <DeAuthButton 
-              setVkData={setVkData}
               setGroupSchedule={setGroupSchedule}
               setGroupId={setGroupId}
-              setGroupNumber={setGroupNumber}
-              setGroupList={setGroupList} />
+              setGroupNumber={setGroupNumber} />
           }
         </div>
       </div>
@@ -75,7 +82,6 @@ export default function Profile({
             accessToken={accessToken} />
           <GroupPreference 
             fullGroupNumberDV={fullGroupNumberDV}
-            groupList={groupList} 
             setGroupSchedule={setGroupSchedule} />
           <FullNamePreference 
             fullNameEnabledDV={fullNameEnabledDV} />

@@ -1,3 +1,5 @@
+import { useDispatch, useSelector } from 'react-redux'
+import { setActive } from '../../ReduxStates/Slices/ActiveSlice'
 import CALENDAR from './../../../icons/calendar-pen.svg'
 import NAVCLOCK from './../../../icons/clock-for-nav.svg'
 import SEARCH from '../../../icons/search_2-for-nav.svg'
@@ -8,9 +10,12 @@ import { NavLink } from 'react-router-dom'
 import { NavButton } from './NavButton'
 import { ScheduleButton } from './ScheduleButton'
 
-import * as handlers from '../../Handlers/Header/handlers'
+import { handleCurrentWeek, handleNextWeek, handlePrevWeek } from '../../Handlers/Header/handlers'
 
-export default function Header({date, setDate, active, setActive, weekNumber, groupSchedule}) {
+export default function Header({date, setDate, weekNumber, groupSchedule}) {
+  const dispatch = useDispatch();
+
+  const {active} = useSelector(s => s.active);
 
   return (
     <div className="header">
@@ -21,7 +26,7 @@ export default function Header({date, setDate, active, setActive, weekNumber, gr
           <NavButton
             imageSrc={NAVCLOCK}
             text={'Расписание'}
-            onClick={() => handlers.handleScheduleClick(setActive)}
+            onClick={() => dispatch(setActive('schedule'))}
           />
         </NavLink>
         <NavLink to='/planning' className={active === 'planning' ? 
@@ -30,7 +35,7 @@ export default function Header({date, setDate, active, setActive, weekNumber, gr
           <NavButton
             imageSrc={CALENDAR}
             text={'Планирование'}
-            onClick={() => handlers.handlePlanningClick(setActive)}
+            onClick={() => dispatch(setActive('planning'))}
           />
         </NavLink>
         <NavLink to='/profile' className={active === 'profile' ? 
@@ -39,7 +44,7 @@ export default function Header({date, setDate, active, setActive, weekNumber, gr
           <NavButton
             imageSrc={VK}
             text={'Профиль'}
-            onClick={() => handlers.handleProfileClick(setActive)}
+            onClick={() => dispatch(setActive('profile'))}
           />
         </NavLink>
       </div>
@@ -47,15 +52,15 @@ export default function Header({date, setDate, active, setActive, weekNumber, gr
       <div className="header__week-buttons">
         <ScheduleButton 
           text={'К предыдущей неделе'} 
-          handleClick={() => handlers.handlePrevWeek(setDate, date, weekNumber)} 
+          handleClick={() => handlePrevWeek(setDate, date, weekNumber)} 
         />
         <ScheduleButton 
           text={'К текущей неделе'} 
-          handleClick={() => handlers.handleCurrentWeek(setDate)} 
+          handleClick={() => handleCurrentWeek(setDate)} 
         />
         <ScheduleButton 
           text={'К следующей неделе'} 
-          handleClick={() => handlers.handleNextWeek(setDate, date, weekNumber)} 
+          handleClick={() => handleNextWeek(setDate, date, weekNumber)} 
         />
       </div>}
     </div>

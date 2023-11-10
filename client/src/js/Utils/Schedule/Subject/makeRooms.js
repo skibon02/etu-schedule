@@ -9,7 +9,7 @@ export function makeRooms(roomN, isDead, active) {
   let rooms = [];
   for (let i = 0; i < roomN.length; i++) {
     rooms.push(
-        <div className='lesson-type-room__room'>
+        <div key={roomN[i]} className='lesson-type-room__room'>
           <img 
             draggable={false} 
             className='lesson-type-room__image' 

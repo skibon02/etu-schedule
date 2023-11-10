@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { getVkData, getGroupSchedule } from "../../FxFetches/Pages/Fetches";
+import { useSelector, useDispatch } from 'react-redux'
+import { getGroupSchedule } from "../../FxFetches/Pages/Fetches";
 import { routingFx } from "../../FxFetches/Pages/RoutingFx";
 import { setActiveByLocation } from "../../FxFetches/Pages/SetActiveByLocation";
 import { getWeekNumber } from "../../Utils/handleTime";
@@ -8,19 +9,19 @@ import Header from "../../JSX/Header/Header";
 import Schedule from '../../JSX/Schedule/Schedule'
 import Planning from "../Planning/Planning";
 import Profile from "../Profile/Profile";
+import { vkDataFetch } from "../../ReduxStates/Slices/vkDataSlice";
 
 export function Pages() {
-  const [date, setDate] = useState(new Date());
-  const [active, setActive] = useState('profile');
+  const dispatch = useDispatch();
 
-  const [groupList, setGroupList] = useState(null);
-  const [groupListError, setGroupListError] = useState(null);
+  const [date, setDate] = useState(new Date());
+  const {active} = useSelector(s => s.active);
 
   const [groupId, setGroupId] = useState(null);
   const [groupNumber, setGroupNumber] = useState(null);
   const [groupSchedule, setGroupSchedule] = useState(null);
 
-  const [vkData, setVkData] = useState(null);
+  const { vkData, vkDataStatus, vkDataError } = useSelector(s => s.vkData);
 
   const [accessToken, setAccessToken] = useState(null);
 
@@ -28,15 +29,14 @@ export function Pages() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getVkData(setVkData);
+    // getVkData(setVkData);
+    dispatch(vkDataFetch());
   }, []);
 
   useEffect(() => {
     routingFx(
       location.pathname,
       vkData,
-      setGroupList,
-      setGroupListError,
       navigate,
       setGroupId,
       setGroupNumber
@@ -50,14 +50,12 @@ export function Pages() {
   }, [groupId])
 
   useEffect(() => {
-    setActiveByLocation(location, setActive)
+    setActiveByLocation(dispatch, location)
   }, [location]);
 
   if (vkData) {
     return (
       <>
-      {groupListError && <div>Server troubles: {groupListError}</div>}
-      {!groupListError && 
       <div className='container'>
         {active !== 'groups' && <div className='under-header-box'></div>}
         <Routes>
@@ -65,13 +63,9 @@ export function Pages() {
             {(!vkData.is_authorized || active === 'profile') &&
               <Route path="/profile" element={
                 <Profile
-                  vkData={vkData}
-                  setVkData={setVkData}
-                  groupList={groupList}
                   setGroupSchedule={setGroupSchedule}
                   setGroupId={setGroupId}
                   setGroupNumber={setGroupNumber}
-                  setGroupList={setGroupList}
                   setAccessToken={setAccessToken} 
                   accessToken={accessToken} />
               } />
@@ -82,8 +76,6 @@ export function Pages() {
           <Header 
             date={date} 
             setDate={setDate} 
-            active={active} 
-            setActive={setActive}
             setGroupSchedule={setGroupSchedule}
             setGroupId={setGroupId}
             weekNumber={getWeekNumber(date)}
@@ -95,11 +87,9 @@ export function Pages() {
               {active === 'schedule' &&
                 <Route path="/schedule" element={
                   <Schedule 
-                    key={groupId} 
                     date={date}
                     groupSchedule={groupSchedule}
-                    groupNumber={groupNumber}
-                    active={active} />
+                    groupNumber={groupNumber} />
                   } />
               }
               {active === 'planning' && 
@@ -107,9 +97,8 @@ export function Pages() {
                   path="/planning"
                   element={
                     <Planning 
-                    groupNumber={groupNumber}
-                    groupSchedule={groupSchedule}
-                    active={active} />
+                      groupNumber={groupNumber}
+                      groupSchedule={groupSchedule} />
                   } />
               }
             </Route>
@@ -117,8 +106,9 @@ export function Pages() {
         </Routes>
         <div className='under-header-box-mobile'></div>
       </div>
-      }
       </>
     )
+  } else {
+    return <div>сервер лёг брух</div>
   }
 }

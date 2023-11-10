@@ -1,11 +1,13 @@
 import myfetch from "../myfetch";
+import { setGroupList } from '../../ReduxStates/Slices/groupListSlice'
+import { setVkData } from "../../ReduxStates/Slices/vkDataSlice";
 
-async function deauth(setVkData, setGroupNumber, setGroupId, setGroupList, setGroupSchedule) {
+async function deauth(dispatch, setGroupNumber, setGroupId, setGroupSchedule) {
   await myfetch('/api/auth/deauth', {method: "POST"} )
   localStorage.clear();
   setVkData({});
   setGroupId(null);
-  setGroupList(null);
+  dispatch(setGroupList(null));
   setGroupNumber(null);
   setGroupSchedule(null);
 }

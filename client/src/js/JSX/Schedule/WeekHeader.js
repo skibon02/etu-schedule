@@ -1,7 +1,10 @@
+import { useSelector } from "react-redux";
 import { weekHeaderTime, isEvenWeek } from "../../Utils/handleTime";
 import { useState, useEffect } from "react";
 
-export function WeekHeader({groupNumber, date, active}) {
+export function WeekHeader({groupNumber, date}) {
+  const {active} = useSelector(s => s.active);
+
   const [clock, setClock] = useState(weekHeaderTime(new Date()));
 
   useEffect(() => {

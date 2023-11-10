@@ -4,9 +4,12 @@ import makeSchedule from "../../Utils/Schedule/parseSchedule"
 import { PlanningButton } from "./PlanningButton"
 import NoSchedule from "../Schedule/NoSchedule";
 import { isEvenWeek } from "../../Utils/handleTime";
+import { useSelector } from "react-redux";
 
 
-export default function Planning({groupSchedule, groupNumber, active}) {
+export default function Planning({groupSchedule, groupNumber}) {
+  const {active} = useSelector(s => s.active);
+
   const [weekParity, setWeekParity] = useState(isEvenWeek(new Date));
   if (!groupSchedule) {
     return (
@@ -60,8 +63,7 @@ export default function Planning({groupSchedule, groupNumber, active}) {
     {weekParity === '2' &&
     <Schedule 
       groupSchedule={weekSchedule2} 
-      groupNumber={groupNumber} 
-      active={active} 
+      groupNumber={groupNumber}
       date={new Date(new Date('2023-09-01').getTime() + 1000 * 60 * 60 * 24 * 7)} />}
 
       {active === 'planning' && <div className="under-planning-thead-box-mobile"></div>}

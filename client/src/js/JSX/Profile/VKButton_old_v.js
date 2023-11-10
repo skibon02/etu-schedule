@@ -5,6 +5,8 @@ import { Connect, ConnectEvents } from '@vkontakte/superappkit';
 import { isdev, currentHost } from '../../FxFetches/util';
 import { getVkData } from '../../FxFetches/Pages/Fetches';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { vkDataFetch } from '../../ReduxStates/Slices/vkDataSlice';
 
 // vk id штучка
 Config.init({
@@ -14,14 +16,16 @@ Config.init({
 const SERVER_HOST = currentHost;
 
 
-export default function VkButton({setVkData}) {
+export default function VkButton() {
+    const dispatch = useDispatch();
+
     const [authData, setAuthData] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         console.log('updating vkdata, isloading:');
         console.log(isLoading);
-        getVkData(setVkData);
+        dispatch(vkDataFetch());
     }, [isLoading]);
 
     useEffect(() => {

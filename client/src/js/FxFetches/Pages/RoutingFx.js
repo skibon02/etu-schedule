@@ -1,6 +1,7 @@
-import { getGroupList } from "./Fetches";
+
  
-function routingFx(loc, vkData, setGroupList, setGroupListError, navigate, setGroupId, setGroupNumber) {
+function routingFx(loc, vkData, navigate, setGroupId, setGroupNumber) {
+
   if (localStorage.getItem("groupId") !== null) {
     setGroupId(localStorage.getItem("groupId"));
     setGroupNumber(localStorage.getItem("groupNumber"));
@@ -11,8 +12,6 @@ function routingFx(loc, vkData, setGroupList, setGroupListError, navigate, setGr
   if (vkData  && !vkData.is_authorized) {
     navigate('/profile')
   }
-  
-  getGroupList(setGroupList, setGroupListError);
 }
 
 export {

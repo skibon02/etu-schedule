@@ -1,10 +1,12 @@
-function setActiveByLocation(location, setActive) {
+import { setActive } from "../../ReduxStates/Slices/ActiveSlice";
+
+function setActiveByLocation(dispatch, location) {
   let loc = location.pathname
   console.log(`location is:\n${loc}`);
   if (loc === '/') {
-    setActive('groups');
+    dispatch(setActive('groups'));
   } else {
-    setActive(loc.slice(1));
+    dispatch(setActive(loc.slice(1)));
   }
 }
 

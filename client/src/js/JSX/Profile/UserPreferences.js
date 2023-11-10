@@ -1,5 +1,6 @@
 import Select from 'react-select'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { handlefullNameEnabledSelect } from "../../Handlers/Profile/HandleGroupSelect"
 import { makeGroupListSelect } from "../../Utils/Profile/makeGroupListSelect"
 import { handleGroupSelect } from "../../Handlers/Profile/HandleGroupSelect"
@@ -26,7 +27,9 @@ function FullNamePreference({fullNameEnabledDV}) {
 }
 
 
-function GroupPreference({groupList, fullGroupNumberDV, setGroupSchedule}) {
+function GroupPreference({fullGroupNumberDV, setGroupSchedule}) {
+  const { groupList, groupListStatus, groupListError } = useSelector((s) => s.groupList);
+
   return (
     <div className="profile__user-preference user-preference">
       <div className="user-preference__title">

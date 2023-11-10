@@ -1,28 +1,16 @@
-import { makeCalendarTime } from "../../handleTime";
+import EmptyDay from "../../../JSX/Schedule/EmptyDay";
+import { Day } from "../../../JSX/Schedule/Day";
 
-export function makeWeek(weekSchedule, Day, DAYS, active) {
+export function makeWeek(weekSchedule) {
   let week = [];
   for (let i = 0; i < weekSchedule.length; i++) {
     if (weekSchedule[i][0] !== null) {
-      week.push(<Day key={i} daySchedule={weekSchedule[i]} active={active}  />)
+      week.push(
+        <Day key={i} daySchedule={weekSchedule[i]} />
+      )
     } else {
       week.push(
-        <div key={i} className="day">
-          <div className="day__date">
-            {active === 'planning' ? 
-            makeCalendarTime(weekSchedule[i][1], DAYS).slice(0, -5)
-            :
-            makeCalendarTime(weekSchedule[i][1], DAYS)
-            }
-          </div>
-          <div className="day__lessons">
-            <div className='day__empty'>
-              <div className="day__empty-text">
-                so empty...
-              </div>
-            </div>
-          </div>
-        </div>
+        <EmptyDay key={i} weekSchedule={weekSchedule[i][1]} />
       )
     }
   }

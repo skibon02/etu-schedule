@@ -3,8 +3,11 @@ import { Week } from "./Week";
 import { WeekHeader } from "./WeekHeader";
 import { getWeekNumber } from "../../Utils/handleTime";
 import NoSchedule from "./NoSchedule";
+import { useSelector } from "react-redux";
 
-export default function Schedule({groupSchedule, groupNumber, date, active}) {
+export default function Schedule({groupSchedule, groupNumber, date}) {
+  const {active} = useSelector(s => s.active)
+
   if (!groupSchedule && active === 'schedule' ) {
     return (
       <NoSchedule groupNumber={groupNumber} />
@@ -26,13 +29,11 @@ export default function Schedule({groupSchedule, groupNumber, date, active}) {
     <div className='schedule-info-container'>
       <WeekHeader
         groupNumber={groupNumber}
-        date={date}
-        active={active} />
+        date={date} />
     </div>
     <Week
       weekSchedule={weekSchedule}
-      weekNumber={weekNumber}
-      active={active} />
+      weekNumber={weekNumber} />
     </>
   )
 }

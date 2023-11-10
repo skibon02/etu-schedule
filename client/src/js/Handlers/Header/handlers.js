@@ -14,29 +14,10 @@ function handlePrevWeek(setDate, date, weekNumber) {
   }
 }
 
-function handleScheduleClick(setActive) {
-  setActive('schedule');
-}
-
-function handlePlanningClick(setActive) {
-  setActive('planning');
-}
-
-function handleGroupsClick(setActive) {
-  setActive('groups');
-}
-
-function handleProfileClick(setActive) {
-  setActive('profile');
-}
 
 
 export {
   handleCurrentWeek, 
-  handleGroupsClick, 
-  handleNextWeek, 
-  handlePlanningClick, 
+  handleNextWeek,  
   handlePrevWeek,
-  handleScheduleClick,
-  handleProfileClick,
 }
