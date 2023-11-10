@@ -47,7 +47,7 @@ async fn set_group(db: Connection<Db>, auth: AuthorizeInfo, body: Json<SetGroupB
 
 #[derive(Serialize)]
 pub struct GetUserGroupSuccess {
-    group_ic: Option<u32>,
+    group_id: Option<u32>,
 }
 #[derive(Responder)]
 pub enum GetUserGroupResult {
@@ -61,7 +61,7 @@ async fn get_group(db: Connection<Db>, auth: AuthorizeInfo) -> GetUserGroupResul
     let res = models::users::get_user_group(db, auth.user_id).await;
 
     match res {
-        Ok(_) => GetUserGroupResult::Success(Json(GetUserGroupSuccess { group: res.unwrap() })),
+        Ok(_) => GetUserGroupResult::Success(Json(GetUserGroupSuccess { group_id: res.unwrap() })),
         Err(e) => {
             error!("Failed to get user group: {:?}", e);
             GetUserGroupResult::Failed(Json(ResponseErrorMessage::new("не скажу".to_string())))
