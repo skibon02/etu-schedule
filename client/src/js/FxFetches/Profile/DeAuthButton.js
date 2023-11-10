@@ -5,7 +5,7 @@ import { setVkData } from "../../ReduxStates/Slices/vkDataSlice";
 async function deauth(dispatch, setGroupNumber, setGroupId, setGroupSchedule) {
   await myfetch('/api/auth/deauth', {method: "POST"} )
   localStorage.clear();
-  setVkData({});
+  dispatch(setVkData({}));
   setGroupId(null);
   dispatch(setGroupList(null));
   setGroupNumber(null);

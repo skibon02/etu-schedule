@@ -29,7 +29,6 @@ export function Pages() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // getVkData(setVkData);
     dispatch(vkDataFetch());
   }, []);
 
@@ -109,6 +108,6 @@ export function Pages() {
       </>
     )
   } else {
-    return <div>сервер лёг брух</div>
+    return <div style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100vh"}}>fish</div>
   }
 }

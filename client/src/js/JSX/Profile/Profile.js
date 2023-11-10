@@ -29,7 +29,7 @@ export default function Profile({
     if (!groupList) {
       dispatch(groupListFetch())
     };
-  }, []);
+  }, [vkData]);
 
   useEffect(() => {
     fullNameEnabledDVFx(setFullNameEnabledDV)

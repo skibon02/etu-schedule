@@ -23,8 +23,6 @@ export default function VkButton() {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        console.log('updating vkdata, isloading:');
-        console.log(isLoading);
         dispatch(vkDataFetch());
     }, [isLoading]);
 
