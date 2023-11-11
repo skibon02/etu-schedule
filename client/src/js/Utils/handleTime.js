@@ -116,9 +116,9 @@ function isEvenWeek(date) {
 
 
   if (weeksDiff % 2 === 0) {
-    return '1';
-  } else {
     return '2';
+  } else {
+    return '1';
   }
 }
 

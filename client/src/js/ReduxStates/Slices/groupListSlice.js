@@ -13,8 +13,7 @@ const groupListFetch = createAsyncThunk('groups/groupListFetch', async () => {
         id: k
       });
     }
-    console.log('groups:');
-    console.log(groups);
+    console.log('groups:\n', groups);
 
     return groups;
   } catch (error) {

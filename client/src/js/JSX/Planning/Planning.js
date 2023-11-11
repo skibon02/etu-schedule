@@ -1,14 +1,17 @@
 import { useState } from "react";
-import Schedule from "../Schedule/Schedule";
 import makeSchedule from "../../Utils/Schedule/parseSchedule"
 import { PlanningButton } from "./PlanningButton"
 import NoSchedule from "../Schedule/NoSchedule";
+import { Week } from "../Schedule/Week";
+import { WeekHeader } from "../Schedule/WeekHeader";
 import { isEvenWeek } from "../../Utils/handleTime";
 import { useSelector } from "react-redux";
 
 
-export default function Planning({groupSchedule, groupNumber}) {
+export default function Planning() {
   const {active} = useSelector(s => s.active);
+  const {groupNumber, groupId} = useSelector(s => s.groupNI);
+  const { groupSchedule, groupScheduleStatus, groupScheduleError } = useSelector(s => s.groupSchedule);
 
   const [weekParity, setWeekParity] = useState(isEvenWeek(new Date));
   if (!groupSchedule) {
@@ -23,8 +26,8 @@ export default function Planning({groupSchedule, groupNumber}) {
     )
   }
 
-  const weekSchedule1 = makeSchedule(groupSchedule, new Date('2023-09-01'));
-  const weekSchedule2 = makeSchedule(groupSchedule, new Date(new Date('2023-09-01').getTime() + 1000 * 60 * 60 * 24 * 7));
+  const weekSchedule1 = makeSchedule(groupSchedule, new Date());
+  const weekSchedule2 = makeSchedule(groupSchedule, new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7));
 
   return (
     <>  
@@ -54,17 +57,23 @@ export default function Planning({groupSchedule, groupNumber}) {
     
     {active === 'planning' && <div className="under-planning-thead-box"></div>}
 
-    {weekParity === '1' &&
-    <Schedule 
-      groupSchedule={weekSchedule1} 
-      groupNumber={groupNumber} 
-      active={active} 
-      date={new Date('2023-09-01')} />}
-    {weekParity === '2' &&
-    <Schedule 
-      groupSchedule={weekSchedule2} 
-      groupNumber={groupNumber}
-      date={new Date(new Date('2023-09-01').getTime() + 1000 * 60 * 60 * 24 * 7)} />}
+    {weekParity === '1' ?
+    <>
+    <div className='schedule-info-container'>
+      <WeekHeader weekParity={weekParity} />
+    </div>
+    <Week
+      weekSchedule={weekSchedule1} />
+    </>
+    :
+    <>
+    <div className='schedule-info-container'>
+      <WeekHeader weekParity={weekParity} />
+    </div>
+    <Week
+      weekSchedule={weekSchedule2} />
+    </>
+    }
 
       {active === 'planning' && <div className="under-planning-thead-box-mobile"></div>}
     </>

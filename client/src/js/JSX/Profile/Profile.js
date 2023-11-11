@@ -8,13 +8,7 @@ import DeAuthButton from "./DeAuthButton";
 import { FullNamePreference, GroupPreference, TokenPreference } from "./UserPreferences";
 import { groupListFetch } from "../../ReduxStates/Slices/groupListSlice";
 
-export default function Profile({
-  setGroupSchedule, 
-  setGroupNumber, 
-  setGroupId, 
-  setAccessToken,
-  accessToken
-}) {
+export default function Profile() {
   const dispatch = useDispatch();
 
   const {groupList, groupListStatus, groupListError } = useSelector(s => s.groupList);
@@ -68,21 +62,15 @@ export default function Profile({
           </div>
           {!isAuthorized && <VKButton_old_v />}
           {isAuthorized && 
-            <DeAuthButton 
-              setGroupSchedule={setGroupSchedule}
-              setGroupId={setGroupId}
-              setGroupNumber={setGroupNumber} />
+            <DeAuthButton />
           }
         </div>
       </div>
       {isAuthorized &&
         <div className="profile__user-preferences">
-          <TokenPreference 
-            setAccessToken={setAccessToken} 
-            accessToken={accessToken} />
+          <TokenPreference />
           <GroupPreference 
-            fullGroupNumberDV={fullGroupNumberDV}
-            setGroupSchedule={setGroupSchedule} />
+            fullGroupNumberDV={fullGroupNumberDV} />
           <FullNamePreference 
             fullNameEnabledDV={fullNameEnabledDV} />
         </div>

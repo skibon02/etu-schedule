@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { makeRooms } from "../../Utils/Schedule/Subject/makeRooms";
 import { makeTeachers } from "../../Utils/Schedule/Subject/makeTeachers";
 import { checkTimeAndSetTheme } from "../../Utils/Schedule/Subject/checkTimeAndSetTheme";
-import { makeClockTime, knowSubjectTime } from "../../Utils/handleTime";
+import { makeClockTime, knowSubjectTime, getWeekNumber } from "../../Utils/handleTime";
 import Attendance from "./Attendance";
 import PlanningSwitch from "../Planning/PlanningSwitch";
 import { useSelector } from "react-redux";
 
 export function Subject({subjectData, orderNumber}) {
   const {active} = useSelector(s => s.active);
+  const {date, weekNumber} = useSelector(s => s.date);
 
   const [toggleClock, setToggleClock] = useState(false);
   const [toggleMessage, setToggleMessage] = useState(false);
@@ -69,7 +70,7 @@ export function Subject({subjectData, orderNumber}) {
           {roomName}
         </div>
       </div>
-      {active === 'schedule' ?
+      {active === 'schedule' && weekNumber === getWeekNumber(new Date()) &&
         <Attendance 
           isDead={isDead}
           timerId={timerId}
@@ -78,9 +79,8 @@ export function Subject({subjectData, orderNumber}) {
           setToggleClock={setToggleClock}
           toggleMessage={toggleMessage}
           setToggleMessage={setToggleMessage} />
-      :
-      <PlanningSwitch />
       }
+      {active === 'planning' && <PlanningSwitch />}
     </div>
   )
 }

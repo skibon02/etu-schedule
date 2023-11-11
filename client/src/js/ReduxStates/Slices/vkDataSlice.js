@@ -6,12 +6,11 @@ const vkDataFetch = createAsyncThunk('groups/vkDataFetch', async () => {
     let response = await myfetch('/api/auth/data');
     let data = await response.json();
 
-    console.log('vk data:');
-    console.log(data);
+    console.log('vk data:\n', data);
 
     return data;
   } catch (error) {
-    throw error; // Rethrow the error to be caught by groupListFetch.rejected
+    throw error; // Rethrow the error to be caught by vkDataFetch.rejected
   }
 });
 

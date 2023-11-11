@@ -1,16 +1,19 @@
-function handleNextWeek(setDate, date, weekNumber) {
+import { setDate } from "../../ReduxStates/Slices/dateSLice";
+const weekTime = 24 * 60 * 60 * 1000 * 7;
+
+function handleNextWeek(dispatch, date, weekNumber) {
   if (weekNumber < 17) {
-    setDate(new Date(date.getTime() + 24 * 60 * 60 * 1000 * 7));
+    dispatch(setDate(new Date(date.getTime() + weekTime)))
   }
 }
 
-function handleCurrentWeek(setDate) {
-  setDate(new Date());
+function handleCurrentWeek(dispatch) {
+  dispatch(setDate(new Date()))
 }
 
-function handlePrevWeek(setDate, date, weekNumber) {
+function handlePrevWeek(dispatch, date, weekNumber) {
   if (weekNumber > 0) {
-    setDate(new Date(date.getTime() - 24 * 60 * 60 * 1000 * 7));
+    dispatch(setDate(new Date(date.getTime() - weekTime)))
   }
 }
 

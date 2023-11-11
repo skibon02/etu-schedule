@@ -6,6 +6,7 @@ import { makeGroupListSelect } from "../../Utils/Profile/makeGroupListSelect"
 import { handleGroupSelect } from "../../Handlers/Profile/HandleGroupSelect"
 import { groupFilterOptions } from "../../Utils/Profile/makeSelectState"
 import { accessTokenUpdate, accessTokenDelete } from '../../FxFetches/Profile/AccessToken'
+import { accessTokenFetch, setAccessToken } from '../../ReduxStates/Slices/accessTokenSlice'
 
 function FullNamePreference({fullNameEnabledDV}) {
   return (
@@ -27,8 +28,9 @@ function FullNamePreference({fullNameEnabledDV}) {
 }
 
 
-function GroupPreference({fullGroupNumberDV, setGroupSchedule}) {
+function GroupPreference({fullGroupNumberDV}) {
   const { groupList, groupListStatus, groupListError } = useSelector((s) => s.groupList);
+  const dispatch = useDispatch();
 
   return (
     <div className="profile__user-preference user-preference">
@@ -38,7 +40,7 @@ function GroupPreference({fullGroupNumberDV, setGroupSchedule}) {
       <div className="user-preference__value">
         <Select 
           options={makeGroupListSelect(groupList)}
-          onChange={(option) => handleGroupSelect(option, setGroupSchedule)}
+          onChange={(option) => handleGroupSelect(dispatch, option)}
           defaultValue={fullGroupNumberDV}
           filterOption={groupFilterOptions} />
       </div>
@@ -46,7 +48,10 @@ function GroupPreference({fullGroupNumberDV, setGroupSchedule}) {
   )
 }
 
-function TokenPreference({setAccessToken, accessToken}) {
+function TokenPreference() {
+  const dispatch = useDispatch();
+
+  const { accessToken, accessTokenStatus, accessTokenError } = useSelector(s => s.accessToken);
   const [inputV, setInputV] = useState('');
   const [inputClass, setInputClass] = useState(!accessToken ? 
     'user-preference__input_enabled' : 
@@ -68,13 +73,14 @@ function TokenPreference({setAccessToken, accessToken}) {
           {!accessToken ?
           <div 
             className="user-preference__button user-preference__confirm-button"
-            onClick={() => accessTokenUpdate(inputV, setAccessToken, setInputClass)}>
+            onClick={() => dispatch(accessTokenFetch())}>
             <div className='user-preference__button-mark'>✔</div>
           </div>
           :
           <div 
             className="user-preference__button user-preference__delete-button"
-            onClick={() => accessTokenDelete(setAccessToken, setInputClass)}>
+            // ALERT are u sure?
+            onClick={() => dispatch(setAccessToken(null))}>
             <div className='user-preference__button-mark'>✖</div>
           </div>  
           }

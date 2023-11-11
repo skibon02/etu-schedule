@@ -6,14 +6,7 @@ async function accessTokenUpdate(token, setAccessToken) {
   setAccessToken(data);
 }
 
-async function accessTokenDelete(setAccessToken) {
-  let response = await myfetch('/api/accessToken/delete/');
-  if (response.ok) {
-    setAccessToken(null);
-  }
-}
 
 export {
   accessTokenUpdate,
-  accessTokenDelete,
 }

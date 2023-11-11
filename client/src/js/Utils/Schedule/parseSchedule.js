@@ -127,8 +127,7 @@ export default function makeSchedule(scheduleObjects, date) {
     weekSchedule.push(parseDays(week, WEEK_DAYS[i], date, currentDayOfWeek));
   }
 
-  console.log('week schedule from parseSchedule');
-  console.log(weekSchedule);
+  console.log('week schedule from parseSchedule\n', weekSchedule);
   
   return weekSchedule;
 }

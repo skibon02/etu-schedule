@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { setActive } from '../../ReduxStates/Slices/ActiveSlice'
+import { setActive } from '../../ReduxStates/Slices/activeSlice'
 import CALENDAR from './../../../icons/calendar-pen.svg'
 import NAVCLOCK from './../../../icons/clock-for-nav.svg'
 import SEARCH from '../../../icons/search_2-for-nav.svg'
@@ -12,10 +12,12 @@ import { ScheduleButton } from './ScheduleButton'
 
 import { handleCurrentWeek, handleNextWeek, handlePrevWeek } from '../../Handlers/Header/handlers'
 
-export default function Header({date, setDate, weekNumber, groupSchedule}) {
+export default function Header() {
   const dispatch = useDispatch();
 
   const {active} = useSelector(s => s.active);
+  const {date, weekNumber} = useSelector(s => s.date);
+  const { groupSchedule, groupScheduleStatus, groupScheduleError } = useSelector(s => s.groupSchedule);
 
   return (
     <div className="header">
@@ -52,15 +54,15 @@ export default function Header({date, setDate, weekNumber, groupSchedule}) {
       <div className="header__week-buttons">
         <ScheduleButton 
           text={'К предыдущей неделе'} 
-          handleClick={() => handlePrevWeek(setDate, date, weekNumber)} 
+          handleClick={() => handlePrevWeek(dispatch, new Date(date), weekNumber)} 
         />
         <ScheduleButton 
           text={'К текущей неделе'} 
-          handleClick={() => handleCurrentWeek(setDate)} 
+          handleClick={() => handleCurrentWeek(dispatch)} 
         />
         <ScheduleButton 
           text={'К следующей неделе'} 
-          handleClick={() => handleNextWeek(setDate, date, weekNumber)} 
+          handleClick={() => handleNextWeek(dispatch, new Date(date), weekNumber)} 
         />
       </div>}
     </div>

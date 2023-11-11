@@ -8,6 +8,7 @@ const activeSlice = createSlice({
   reducers: {
     setActive: (s, a) => {
       s.active = a.payload;
+      console.log('active:\n', s.active);
     }
   }
 });

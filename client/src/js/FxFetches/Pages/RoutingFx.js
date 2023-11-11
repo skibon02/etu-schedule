@@ -1,10 +1,12 @@
-
+import { setGroupNI } from "../../ReduxStates/Slices/groupNISlice";
  
-function routingFx(loc, vkData, navigate, setGroupId, setGroupNumber) {
+function routingFx(navigate, dispatch, loc, vkData) {
 
   if (localStorage.getItem("groupId") !== null) {
-    setGroupId(localStorage.getItem("groupId"));
-    setGroupNumber(localStorage.getItem("groupNumber"));
+    dispatch(setGroupNI({
+      groupNumber: localStorage.getItem("groupNumber"),
+      groupId: localStorage.getItem("groupId")
+    }))
   }
   if (loc === '/' && vkData && vkData.is_authorized) {
     navigate('/schedule')

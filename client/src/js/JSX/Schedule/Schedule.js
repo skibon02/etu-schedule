@@ -1,12 +1,15 @@
 import makeSchedule from "../../Utils/Schedule/parseSchedule";
 import { Week } from "./Week";
 import { WeekHeader } from "./WeekHeader";
-import { getWeekNumber } from "../../Utils/handleTime";
 import NoSchedule from "./NoSchedule";
 import { useSelector } from "react-redux";
 
-export default function Schedule({groupSchedule, groupNumber, date}) {
-  const {active} = useSelector(s => s.active)
+export default function Schedule() {
+
+  const {date, weekNumber} = useSelector(s => s.date);
+  const {active} = useSelector(s => s.active);
+  const {groupNumber, groupId} = useSelector(s => s.groupNI);
+  const { groupSchedule, groupScheduleStatus, groupScheduleError } = useSelector(s => s.groupSchedule);
 
   if (!groupSchedule && active === 'schedule' ) {
     return (
@@ -20,20 +23,15 @@ export default function Schedule({groupSchedule, groupNumber, date}) {
     )
   }
 
-
-  const weekSchedule = active === 'schedule' ? makeSchedule(groupSchedule, date) : groupSchedule;
-  const weekNumber = getWeekNumber(date);
+  const weekSchedule = active === 'schedule' ? makeSchedule(groupSchedule, new Date(date)) : groupSchedule;
 
   return (
     <>
     <div className='schedule-info-container'>
-      <WeekHeader
-        groupNumber={groupNumber}
-        date={date} />
+      <WeekHeader weekParity={null} />
     </div>
     <Week
-      weekSchedule={weekSchedule}
-      weekNumber={weekNumber} />
+      weekSchedule={weekSchedule} />
     </>
   )
 }
