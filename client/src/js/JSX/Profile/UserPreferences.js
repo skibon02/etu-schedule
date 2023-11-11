@@ -55,6 +55,7 @@ function TokenPreference() {
   const [inputClass, setInputClass] = useState(!accessToken ? 
     'user-preference__input_enabled' : 
     'user-preference__input_disabled');
+    
   return (
     <>
     <div className="profile__user-preference user-preference">
