@@ -3,8 +3,6 @@ import { Config } from '@vkontakte/superappkit';
 import myfetch from '../../FxFetches/myfetch';
 import { Connect, ConnectEvents } from '@vkontakte/superappkit';
 import { isdev, currentHost } from '../../FxFetches/util';
-import { getVkData } from '../../FxFetches/Pages/Fetches';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { vkDataFetch } from '../../ReduxStates/Slices/vkDataSlice';
 
