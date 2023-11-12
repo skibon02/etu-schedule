@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { setActive } from '../../ReduxStates/Slices/activeSlice'
+import { setActive } from '../../ReduxStates/Slices/activeSlice2'
 import CALENDAR from './../../../icons/calendar-pen.svg'
 import NAVCLOCK from './../../../icons/clock-for-nav.svg'
 import SEARCH from '../../../icons/search_2-for-nav.svg'

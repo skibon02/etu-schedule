@@ -1,4 +1,4 @@
-import { setActive } from "../../ReduxStates/Slices/activeSlice";
+import { setActive } from "../../ReduxStates/Slices/activeSlice2";
 
 function setActiveByLocation(dispatch, location) {
   let loc = location.pathname
