@@ -4,6 +4,7 @@ use rocket_db_pools::Connection;
 use serde_derive::{Deserialize, Serialize};
 use crate::models;
 use crate::models::Db;
+use crate::models::groups::GroupModel;
 use crate::routes::auth::AuthorizeInfo;
 use crate::routes::ResponseErrorMessage;
 
@@ -47,7 +48,7 @@ async fn set_group(db: Connection<Db>, auth: AuthorizeInfo, body: Json<SetGroupB
 
 #[derive(Serialize)]
 pub struct GetUserGroupSuccess {
-    group_id: Option<u32>,
+    current_group: Option<GroupModel>,
 }
 #[derive(Responder)]
 pub enum GetUserGroupResult {
@@ -61,7 +62,7 @@ async fn get_group(db: Connection<Db>, auth: AuthorizeInfo) -> GetUserGroupResul
     let res = models::users::get_user_group(db, auth.user_id).await;
 
     match res {
-        Ok(_) => GetUserGroupResult::Success(Json(GetUserGroupSuccess { group_id: res.unwrap() })),
+        Ok(_) => GetUserGroupResult::Success(Json(GetUserGroupSuccess { current_group: res.unwrap() })),
         Err(e) => {
             error!("Failed to get user group: {:?}", e);
             GetUserGroupResult::Failed(Json(ResponseErrorMessage::new("не скажу".to_string())))

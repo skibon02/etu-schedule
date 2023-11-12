@@ -61,8 +61,8 @@ pub async fn user_exists(mut con: Connection<Db>, id: u32) -> anyhow::Result<boo
     Ok(res.get::<u32, _>("vk_id") == id)
 }
 
-pub async fn get_user_group(mut con: Connection<Db>, user_id: u32) -> anyhow::Result<Option<u32>> {
-    let res = sqlx::query_scalar("SELECT groups.group_id from groups join user_group on groups.group_id = user_group.group_id AND user_group.user_id = ?")
+pub async fn get_user_group(mut con: Connection<Db>, user_id: u32) -> anyhow::Result<Option<GroupModel>> {
+    let res = sqlx::query_as("SELECT * from groups join user_group on groups.group_id = user_group.group_id AND user_group.user_id = ?")
         .bind(user_id)
         .fetch_optional(&mut *con).await.context("Failed to get user group")?;
 
