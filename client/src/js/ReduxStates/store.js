@@ -2,7 +2,7 @@ import { configureStore, combineReducers, getDefaultMiddleware } from '@reduxjs/
 import thunk from 'redux-thunk'
 import groupListSlice from './Slices/groupListSlice'
 import vkDataSlice from './Slices/vkDataSlice'
-import ActiveSlice from './Slices/activeSlice'
+import activeSlice from './Slices/activeSlice'
 import dateSLice from './Slices/dateSLice'
 import groupNISlice from './Slices/groupNISlice'
 import groupScheduleSlice from './Slices/groupScheduleSlice'
@@ -12,7 +12,7 @@ const rootReducer = combineReducers({
   // stateName: sliceName,
   groupList: groupListSlice,
   vkData: vkDataSlice,
-  active: ActiveSlice,
+  active: activeSlice,
   date: dateSLice,
   groupNI: groupNISlice,
   groupSchedule: groupScheduleSlice,
