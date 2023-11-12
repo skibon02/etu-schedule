@@ -2,7 +2,7 @@ import { configureStore, combineReducers, getDefaultMiddleware } from '@reduxjs/
 import thunk from 'redux-thunk'
 import groupListSlice from './Slices/groupListSlice'
 import vkDataSlice from './Slices/vkDataSlice'
-import activeSlice from './Slices/activeSlice2'
+import activeSlice from './Slices/activeSlice'
 import dateSLice from './Slices/dateSLice'
 import groupNISlice from './Slices/groupNISlice'
 import groupScheduleSlice from './Slices/groupScheduleSlice'
