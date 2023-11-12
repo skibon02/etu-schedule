@@ -69,7 +69,7 @@ $BG: rgb(146, 173, 255);
   &__auth {
     font-size: 0.8em;
     padding: pxToEm(5px) pxToEm(8px);
-    border-radius: pxToEm(6px);
+    border-radius: pxToEm(5px);
     background: #fff;
     line-height: 1em;
   }
@@ -331,12 +331,12 @@ $BG: rgb(146, 173, 255);
     }
 
     &__input {
-      height: pxToEm(40px);
+      height: pxToEm(50px);
     }
 
     &__button {
-      width: pxToEm(40px) !important;
-      height: pxToEm(40px);
+      width: pxToEm(50px) !important;
+      height: pxToEm(50px);
     }
 
     &__image {
