@@ -1,14 +1,14 @@
 import { useEffect } from "react";
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux'
-import { routingFx } from "../../FxFetches/Pages/RoutingFx";
-import { setActiveByLocation } from "../../FxFetches/Pages/SetActiveByLocation";
+import { routingFx } from "../../FxFetches/Pages/routingFx";
+import { setActiveByLocationFx } from "../../FxFetches/Pages/setActiveByLocationFx";
 import { vkDataFetch } from "../../ReduxStates/Slices/vkDataSlice";
-import { groupScheduleFetch } from "../../ReduxStates/Slices/groupScheduleSlice";
 import Header from "../Header/Header";
 import Schedule from '../Schedule/Schedule'
 import Planning from "../Planning/Planning";
 import Profile from "../Profile/Profile";
+import { groupScheduleIdFx } from "../../FxFetches/Pages/groupScheduleIdFx";
 
 export function Pages() {
   const dispatch = useDispatch();
@@ -24,17 +24,15 @@ export function Pages() {
   }, [dispatch]);
 
   useEffect(() => {
-    routingFx(navigate, dispatch, location.pathname, vkData)
-  }, [dispatch, vkData, localStorage.getItem('groupNumber')]);
+    routingFx(navigate, location.pathname, vkData)
+  }, [dispatch, vkData]);
 
   useEffect(() => {
-    if (groupId) {
-      dispatch(groupScheduleFetch(groupId));
-    }
-  }, [dispatch, groupId])
+    groupScheduleIdFx(dispatch, groupId);
+  }, [dispatch, groupId, localStorage.getItem('groupNumber')])
 
   useEffect(() => {
-    setActiveByLocation(dispatch, location)
+    setActiveByLocationFx(dispatch, location)
   }, [dispatch, location]);
 
   if (vkData) {

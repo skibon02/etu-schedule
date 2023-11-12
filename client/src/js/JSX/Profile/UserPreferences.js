@@ -1,9 +1,8 @@
 import Select from 'react-select'
 import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { handlefullNameEnabledSelect } from "../../Handlers/Profile/HandleGroupSelect"
 import { makeGroupListSelect } from "../../Utils/Profile/makeGroupListSelect"
-import { handleGroupSelect } from "../../Handlers/Profile/HandleGroupSelect"
+import { handleGroupSelect, handlefullNameEnabledSelect } from "../../Handlers/Profile/handleSelect"
 import { groupFilterOptions } from "../../Utils/Profile/makeSelectState"
 import { accessTokenFetch, setAccessToken } from '../../ReduxStates/Slices/accessTokenSlice'
 import CROSSMARK from '../../../icons/cross-mark.svg'

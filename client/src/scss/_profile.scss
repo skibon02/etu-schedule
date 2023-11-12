@@ -401,9 +401,6 @@ $BG: rgb(146, 173, 255);
       width: pxToEm(48px) !important;
       height: pxToEm(48px);
     }
-
-    &__button-mark {
-    }
   }
 
   .user-info {
@@ -422,5 +419,9 @@ $BG: rgb(146, 173, 255);
     &__text-info {
       padding-bottom: 0;
     }
+  }
+
+  .are-you-sure {
+    font-size: 1.2em;
   }
 }

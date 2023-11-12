@@ -124,7 +124,7 @@ function isEvenWeek(date) {
 
 function getWeekNumber(date) {
   const today = new Date(date);
-  const firstWeek = new Date(today.getFullYear(), 7, 27); // (month 0-based index) 28 aug.
+  const firstWeek = new Date(today.getFullYear(), 7, 28);
 
   const daysDiff = Math.floor((today - firstWeek) / (24 * 60 * 60 * 1000));
   const weeksDiff = Math.floor(daysDiff / 7);

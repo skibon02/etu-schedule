@@ -51,7 +51,7 @@ $HALF-HEIGHT: 75px;
     flex-direction: column;
     user-select: none;
     height: 100%;
-    width: pxToEm(244px, );
+    width: pxToEm(244.5px, );
     line-height: 1.9em;
     text-align: center;
     border-right: .1px solid $BORDER-COLOR;
@@ -66,7 +66,6 @@ $HALF-HEIGHT: 75px;
   }
 
   &__week-button-text {
-    // font-size: 0.95em;
   }
 }
 
@@ -74,14 +73,11 @@ $HALF-HEIGHT: 75px;
 .nav {
   display: flex;
   justify-content: center;
-  // border-bottom: .1px solid $BORDER-COLOR;
   height: pxToEm($HALF-HEIGHT) !important;
   
   &__item {
-    // height: pxToEm($HALF-HEIGHT) !important;
     height: 100%;
     color: #fff;
-    // width: pxToEm(165px);
     width: pxToEm(220px, );
     border-right: .1px solid $BORDER-COLOR;
     transition: all .3s ease;
@@ -91,7 +87,10 @@ $HALF-HEIGHT: 75px;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    // gap: pxToEm(5px);
+
+    &_planning {
+      width: pxToEm(247.5px) !important;
+    }
 
     &:first-child {
       border-left: .1px solid $BORDER-COLOR;
@@ -165,14 +164,9 @@ $HALF-HEIGHT: 75px;
     border-top: .1px solid $BORDER-COLOR;
     border-bottom: none;
     order: 2;
-    // height: $HALF-HEIGHT;
     &__item {
-      &:first-child {
-        // border-left: .1px solid #fff;
-      }
-      &:last-child {
-        // border-right: .1px solid #fff;
-        // border-left: none;
+      &_planning {
+        width: pxToEm(231px) !important;
       }
     }
   }
@@ -181,5 +175,12 @@ $HALF-HEIGHT: 75px;
 @media screen and (max-width: 350px) {
   .header {
     font-size: 0.65em;
+  }
+  .nav {
+    &__item {
+      &_planning {
+        width: pxToEm(215px) !important;
+      }
+    }
   }
 }

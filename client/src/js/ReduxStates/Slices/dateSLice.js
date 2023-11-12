@@ -11,6 +11,8 @@ const dateSlice = createSlice({
     setDate: (s, a) => {
       s.date = (a.payload).toISOString();
       s.weekNumber = getWeekNumber(a.payload);
+      console.log('date is:\n', s.date);
+      console.log('weekNumber is:\n', s.weekNumber);
     }
   }
 });
