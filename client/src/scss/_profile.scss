@@ -122,7 +122,7 @@ $BG: rgb(146, 173, 255);
   &__input {
     width: calc(100% - pxToEm(32px));
     flex-shrink: 1;
-    border: 1.5px solid #CCCCCC;
+    border: pxToEm(.8px) solid #CCCCCC;
     height: pxToEm(30px);
     border-radius: 5px;
     padding: 10px;
@@ -331,12 +331,13 @@ $BG: rgb(146, 173, 255);
     }
 
     &__input {
-      height: pxToEm(50px);
+      height: pxToEm(40px);
+      border-width: pxToEm(1.1px);
     }
 
     &__button {
-      width: pxToEm(50px) !important;
-      height: pxToEm(50px);
+      width: pxToEm(40px) !important;
+      height: pxToEm(40px);
     }
 
     &__image {
@@ -392,7 +393,13 @@ $BG: rgb(146, 173, 255);
     }
 
     &__input {
-      border-width: .1px;
+      height: pxToEm(48px);
+      border-width: pxToEm(1px);
+    }
+
+    &__button {
+      width: pxToEm(48px) !important;
+      height: pxToEm(48px);
     }
 
     &__button-mark {

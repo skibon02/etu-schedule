@@ -1311,7 +1311,7 @@ h1, h2, h3, h4, h5, h6 {
   width: calc(100% - 2em);
   -ms-flex-negative: 1;
       flex-shrink: 1;
-  border: 1.5px solid #CCCCCC;
+  border: 0.05em solid #CCCCCC;
   height: 1.875em;
   border-radius: 5px;
   padding: 10px;
@@ -1571,11 +1571,12 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1.2em;
   }
   .user-preference__input {
-    height: 3.125em;
+    height: 2.5em;
+    border-width: 0.06875em;
   }
   .user-preference__button {
-    width: 3.125em !important;
-    height: 3.125em;
+    width: 2.5em !important;
+    height: 2.5em;
   }
   .user-preference__image {
     width: 1.25em;
@@ -1623,7 +1624,12 @@ h1, h2, h3, h4, h5, h6 {
     width: 100%;
   }
   .user-preference__input {
-    border-width: 0.1px;
+    height: 3em;
+    border-width: 0.0625em;
+  }
+  .user-preference__button {
+    width: 3em !important;
+    height: 3em;
   }
   .user-info {
     -webkit-box-orient: vertical;
