@@ -40,9 +40,9 @@ export default function Profile() {
         <div className="user-info__avatar">
           <div className="user-info__image-container">
             {isAuthorized ?
-              <img src={vkData.profile_photo_url} alt="" className="user-info__image" />
+              <img src={vkData.profile_photo_url} alt="" className="user-info__image" draggable={false} />
               :
-              <img src={PROFILE} alt="" className="user-info__image shitty-image" />
+              <img src={PROFILE} alt="" className="user-info__image shitty-image" draggable={false} />
             }
           </div>
         </div>

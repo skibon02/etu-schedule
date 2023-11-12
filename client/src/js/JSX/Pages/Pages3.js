@@ -5,8 +5,8 @@ import { routingFx } from "../../FxFetches/Pages/RoutingFx";
 import { setActiveByLocation } from "../../FxFetches/Pages/SetActiveByLocation";
 import { vkDataFetch } from "../../ReduxStates/Slices/vkDataSlice";
 import { groupScheduleFetch } from "../../ReduxStates/Slices/groupScheduleSlice";
-import Header from "../../JSX/Header/Header";
-import Schedule from '../../JSX/Schedule/Schedule'
+import Header from "../Header/Header";
+import Schedule from '../Schedule/Schedule'
 import Planning from "../Planning/Planning";
 import Profile from "../Profile/Profile";
 
@@ -65,6 +65,6 @@ export function Pages() {
       </div>
     )
   } else {
-    return <div style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100vh"}}>fish</div>
+    return <div className="fish">fish</div>
   }
 }

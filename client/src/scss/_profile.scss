@@ -63,7 +63,7 @@ $BG: rgb(146, 173, 255);
 
   &__name {
     // font-weight: 100;
-    line-height: 1em;
+    line-height: 1.1em;
     color: #fff;
   }
 
@@ -150,6 +150,10 @@ $BG: rgb(146, 173, 255);
     }
   }
 
+  &__image {
+    width: pxToEm(15px);
+  }
+
   &__button-mark {
   }
 
@@ -170,13 +174,6 @@ $BG: rgb(146, 173, 255);
   }
 }
 
-.deauth-button-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: pxToEm(20px);
-}
-
 .css-1dimb5e-singleValue {
   height: 100%;
   display: flex;
@@ -187,11 +184,19 @@ $BG: rgb(146, 173, 255);
   color: #757575 !important;
 }
 
+.deauth-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: pxToEm(22px);
+}
+
 .deauth-button {
   user-select: none;
   width: 100%;
-  cursor: pointer;
+  height: 100%;
   padding: pxToEm(5px);
+  cursor: pointer;
   gap: pxToEm(5px);
   background: #d60000f4;
   border-radius: pxToEm(5px);
@@ -217,7 +222,7 @@ $BG: rgb(146, 173, 255);
   }
 
   &__image {
-    width: pxToEm(10px);
+    width: pxToEm(12px);
   }
 
   &__text-container {
@@ -226,24 +231,89 @@ $BG: rgb(146, 173, 255);
   }
 
   &__text {
-    font-size: 0.6em;
+    font-size: 0.5em;
     color: #fff;
-    font-weight: 500;
+    font-weight: 700;
     text-align: center;
   }
 }
 
 .loader {
-  width: pxToEm(10px);
-  height: pxToEm(10px);
+  width: pxToEm(12px);
+  height: pxToEm(12px);
+}
+
+.are-you-sure {
+  position: fixed;
+  z-index: 100000000;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.804)000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &__body {
+    width: pxToEm(200px);
+    height: pxToEm(120px);
+    padding: pxToEm(30px);
+    background: #fff;
+    border-radius: pxToEm(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: pxToEm(20px);
+  }
+
+  &__text {
+    line-height: 1.1em;
+    text-align: center;
+  }
+
+  &__buttons {
+    display: flex;
+    gap: pxToEm(30px)
+  }
+
+  &__button {
+    font-weight: 300;
+    font-size: 0.8em;
+    width: pxToEm(80px);
+    height: pxToEm(30px);
+    border-radius: pxToEm(3px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    color: #fff;
+    transition: all .2s ease;
+
+    &_cancel {
+      background: $GREEN;
+
+      &:hover, :active {
+        box-shadow: 0 0 pxToEm(2px) #000;
+      }
+    }
+
+    &_confirm {
+      background: $RED;
+      
+      &:hover, :active {
+        box-shadow: 0 0 pxToEm(2px) #000;
+      }
+    }
+  }
 }
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-
-
 
 @media screen and (max-width: 1200px) {
   .profile {
@@ -254,12 +324,29 @@ $BG: rgb(146, 173, 255);
 @media screen and (max-width: 700px) {
   .profile {
     font-size: 0.6em;
-  } 
+  }
 
   .user-preference {
     &__button-mark {
       font-size: 1.2em;
     }
+
+    &__input {
+      height: pxToEm(40px);
+    }
+
+    &__button {
+      width: pxToEm(40px) !important;
+      height: pxToEm(40px);
+    }
+
+    &__image {
+      width: pxToEm(20px);
+    }
+  }
+
+  .deauth-button-container {
+    height: pxToEm(33px);
   }
 
   .deauth-button {
@@ -272,13 +359,19 @@ $BG: rgb(146, 173, 255);
         border-top: pxToEm(1px) solid transparent; 
       }
     }
+
     &__image {
-      width: pxToEm(13px);
+      width: pxToEm(17px);
+    }
+
+    &__text {
+      font-size: 0.7em;
     }
   }
+
   .loader {
-    width: pxToEm(13px);
-    height: pxToEm(13px);
+    width: pxToEm(17px);
+    height: pxToEm(17px);
   }
 }
 

@@ -253,8 +253,11 @@
     align-items: center;
   }
 
+  &__rooms {
+    // margin-top: auto;
+  }
+
   &__room {
-    margin-top: auto;
     margin-bottom: pxToEm(10px, );
     margin-left: pxToEm(15px, );
     display: flex;
@@ -271,7 +274,7 @@
 
   &__text {
     text-align: right;
-    min-width: pxToEm(45px);
+    margin-left: pxToEm(2px);
   }
 }
 

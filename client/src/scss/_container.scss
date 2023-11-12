@@ -39,6 +39,14 @@ body {
   height: 0 !important;
   display: inline-block;
 }
+
+.fish {
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  height: 100vh;
+  user-select: none;
+}
  
 .container {
   font-size: 16px;

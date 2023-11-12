@@ -6,6 +6,7 @@ import { makeGroupListSelect } from "../../Utils/Profile/makeGroupListSelect"
 import { handleGroupSelect } from "../../Handlers/Profile/HandleGroupSelect"
 import { groupFilterOptions } from "../../Utils/Profile/makeSelectState"
 import { accessTokenFetch, setAccessToken } from '../../ReduxStates/Slices/accessTokenSlice'
+import CROSSMARK from '../../../icons/cross-mark.svg'
 
 function FullNamePreference({fullNameEnabledDV}) {
   return (
@@ -74,7 +75,7 @@ function TokenPreference() {
           <div 
             className="user-preference__button user-preference__confirm-button"
             onClick={() => dispatch(accessTokenFetch())}>
-            <div className='user-preference__button-mark'>✔</div>
+            <img src={CROSSMARK} alt="" className="user-preference__image" draggable={false} />
           </div>
           :
           <div 

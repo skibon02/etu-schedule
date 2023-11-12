@@ -194,6 +194,23 @@ body {
   display: inline-block;
 }
 
+.fish {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  height: 100vh;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
 .container {
   font-size: 16px;
   font-weight: 400;
@@ -715,7 +732,6 @@ body {
           align-items: center;
 }
 .lesson-type-room__room {
-  margin-top: auto;
   margin-bottom: 0.625em;
   margin-left: 0.9375em;
   display: -webkit-box;
@@ -734,7 +750,7 @@ body {
 }
 .lesson-type-room__text {
   text-align: right;
-  min-width: 2.8125em;
+  margin-left: 0.125em;
 }
 
 .attendance {
@@ -1226,7 +1242,7 @@ h1, h2, h3, h4, h5, h6 {
   padding-bottom: 1.25em;
 }
 .user-info__name {
-  line-height: 1em;
+  line-height: 1.1em;
   color: #fff;
 }
 .user-info__auth {
@@ -1333,6 +1349,9 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-box-shadow: 0 0 0.00625em black;
           box-shadow: 0 0 0.00625em black;
 }
+.user-preference__image {
+  width: 0.9375em;
+}
 .user-preference__confirm-button {
   background: #2DB694;
 }
@@ -1344,19 +1363,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 .user-preference__delete-button:hover {
   background: rgba(255, 143, 143, 0.9568627451);
-}
-
-.deauth-button-container {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  height: 1.25em;
 }
 
 .css-1dimb5e-singleValue {
@@ -1373,14 +1379,28 @@ h1, h2, h3, h4, h5, h6 {
   color: #757575 !important;
 }
 
+.deauth-button-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  height: 1.375em;
+}
+
 .deauth-button {
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
   width: 100%;
-  cursor: pointer;
+  height: 100%;
   padding: 0.3125em;
+  cursor: pointer;
   gap: 0.3125em;
   background: rgba(214, 0, 0, 0.9568627451);
   border-radius: 0.3125em;
@@ -1412,22 +1432,110 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(242, 55, 55, 0.9568627451);
 }
 .deauth-button__image {
-  width: 0.625em;
+  width: 0.75em;
 }
 .deauth-button__text-container {
   margin-left: auto;
   margin-right: auto;
 }
 .deauth-button__text {
-  font-size: 0.6em;
+  font-size: 0.5em;
   color: #fff;
-  font-weight: 500;
+  font-weight: 700;
   text-align: center;
 }
 
 .loader {
-  width: 0.625em;
-  height: 0.625em;
+  width: 0.75em;
+  height: 0.75em;
+}
+
+.are-you-sure {
+  position: fixed;
+  z-index: 100000000;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.804) 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.are-you-sure__body {
+  width: 12.5em;
+  height: 7.5em;
+  padding: 1.875em;
+  background: #fff;
+  border-radius: 0.625em;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  gap: 1.25em;
+}
+.are-you-sure__text {
+  line-height: 1.1em;
+  text-align: center;
+}
+.are-you-sure__buttons {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 1.875em;
+}
+.are-you-sure__button {
+  font-weight: 300;
+  font-size: 0.8em;
+  width: 5em;
+  height: 1.875em;
+  border-radius: 0.1875em;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  color: #fff;
+  -webkit-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+}
+.are-you-sure__button_cancel {
+  background: #2DB694;
+}
+.are-you-sure__button_cancel:hover, .are-you-sure__button_cancel :active {
+  -webkit-box-shadow: 0 0 0.125em #000;
+          box-shadow: 0 0 0.125em #000;
+}
+.are-you-sure__button_confirm {
+  background: rgba(214, 0, 0, 0.9568627451);
+}
+.are-you-sure__button_confirm:hover, .are-you-sure__button_confirm :active {
+  -webkit-box-shadow: 0 0 0.125em #000;
+          box-shadow: 0 0 0.125em #000;
 }
 
 @-webkit-keyframes spin {
@@ -1463,6 +1571,19 @@ h1, h2, h3, h4, h5, h6 {
   .user-preference__button-mark {
     font-size: 1.2em;
   }
+  .user-preference__input {
+    height: 2.5em;
+  }
+  .user-preference__button {
+    width: 2.5em !important;
+    height: 2.5em;
+  }
+  .user-preference__image {
+    width: 1.25em;
+  }
+  .deauth-button-container {
+    height: 2.0625em;
+  }
   .deauth-button:active {
     width: 95%;
     height: 95%;
@@ -1473,11 +1594,14 @@ h1, h2, h3, h4, h5, h6 {
     border-top: 0.0625em solid transparent;
   }
   .deauth-button__image {
-    width: 0.8125em;
+    width: 1.0625em;
+  }
+  .deauth-button__text {
+    font-size: 0.7em;
   }
   .loader {
-    width: 0.8125em;
-    height: 0.8125em;
+    width: 1.0625em;
+    height: 1.0625em;
   }
 }
 @media screen and (max-width: 500px) {

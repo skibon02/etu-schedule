@@ -9,7 +9,6 @@ import { useSelector } from "react-redux";
 
 export function Subject({subjectData, orderNumber}) {
   const {active} = useSelector(s => s.active);
-  const {date, weekNumber} = useSelector(s => s.date);
 
   const [toggleClock, setToggleClock] = useState(false);
   const [toggleMessage, setToggleMessage] = useState(false);
@@ -70,7 +69,7 @@ export function Subject({subjectData, orderNumber}) {
           {roomName}
         </div>
       </div>
-      {active === 'schedule' && weekNumber === getWeekNumber(new Date()) &&
+      {active === 'schedule' &&
         <Attendance 
           isDead={isDead}
           timerId={timerId}
