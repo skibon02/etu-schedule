@@ -1622,6 +1622,9 @@ h1, h2, h3, h4, h5, h6 {
   .user-preference__value {
     width: 100%;
   }
+  .user-preference__input {
+    border-width: 0.1px;
+  }
   .user-info {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
