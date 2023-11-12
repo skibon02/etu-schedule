@@ -1,4 +1,4 @@
-import {deauth} from '../../FxFetches/Profile/DeAuthButton'
+import {deauthFetch} from '../../FxFetches/Profile/deauthFetch'
 import { useDispatch } from 'react-redux'
 
 export default function AreYouSure({areYouSure, setAreYouSure}) {
@@ -13,7 +13,7 @@ export default function AreYouSure({areYouSure, setAreYouSure}) {
         </div>
         <div className="are-you-sure__buttons">
           <div className="are-you-sure__button are-you-sure__button_confirm"
-               onClick={() => deauth(dispatch)}>
+               onClick={() => deauthFetch(dispatch)}>
             Да
           </div>
           <div className="are-you-sure__button are-you-sure__button_cancel"

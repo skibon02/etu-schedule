@@ -3,12 +3,12 @@ import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux'
 import { routingFx } from "../../FxFetches/Pages/routingFx";
 import { setActiveByLocationFx } from "../../FxFetches/Pages/setActiveByLocationFx";
+import { groupScheduleIdFx } from "../../FxFetches/Pages/groupScheduleIdFx";
 import { vkDataFetch } from "../../ReduxStates/Slices/vkDataSlice";
 import Header from "../Header/Header";
 import Schedule from '../Schedule/Schedule'
 import Planning from "../Planning/Planning";
 import Profile from "../Profile/Profile";
-import { groupScheduleIdFx } from "../../FxFetches/Pages/groupScheduleIdFx";
 
 export function Pages() {
   const dispatch = useDispatch();

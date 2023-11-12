@@ -4,7 +4,7 @@ import { setVkData } from "../../ReduxStates/Slices/vkDataSlice";
 import { setGroupNI } from "../../ReduxStates/Slices/groupNISlice";
 import { setGroupSchedule } from "../../ReduxStates/Slices/groupScheduleSlice";
 
-async function deauth(dispatch) {
+async function deauthFetch(dispatch) {
   await myfetch('/api/auth/deauth', {method: "POST"} )
   localStorage.clear();
   dispatch(setVkData({}));
@@ -17,5 +17,5 @@ async function deauth(dispatch) {
 }
 
 export {
-  deauth,
+  deauthFetch,
 }

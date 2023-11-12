@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import VKButton_old_v from "./VKButton_old_v";
 import PROFILE from '../../../icons/profile.svg'
 import { makeFullNameEnabledDV, makeFullGroupNumberDV } from "../../Utils/Profile/makeSelectState";
-import { fullGroupNumberDVFx, fullNameEnabledDVFx } from "../../FxFetches/Profile/SelectFetches";
+import { fullGroupNumberDVFx, fullNameEnabledDVFx } from "../../FxFetches/Profile/selectFx";
 import DeAuthButton from "./DeAuthButton";
 import { FullNamePreference, GroupPreference, TokenPreference } from "./UserPreferences";
 import { groupListFetch } from "../../ReduxStates/Slices/groupListSlice";
