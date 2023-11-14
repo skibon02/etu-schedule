@@ -23,11 +23,11 @@ fn deauth(cookie: &CookieJar) -> Status {
 impl<'r> FromRequest<'r> for UserInfo {
     type Error = ();
     async fn from_request(req: &'r Request<'_>) -> request::Outcome<Self, Self::Error> { 
-        let db_con = req.guard::<Connection<Db>>().await.unwrap();
+        let mut db_con = req.guard::<Connection<Db>>().await.unwrap();
         match (req.cookies().get_private("token"), req.cookies().get_private("token2")) {
             (Some(token), Some(_)) => {
                 let user_id = token.value().to_string().parse::<u32>().unwrap();
-                let user_info = users::get_user_info(db_con, user_id).await;
+                let user_info = users::get_user_info(&mut db_con, user_id).await;
                 match user_info {
                     Ok(user_info) => request::Outcome::Success(user_info),
                     Err(e) => {
@@ -59,12 +59,12 @@ pub struct AuthorizeInfo {
 impl<'r> FromRequest<'r> for AuthorizeInfo {
     type Error = ();
     async fn from_request(req: &'r Request<'_>) -> request::Outcome<Self, Self::Error> { 
-        let db_con = req.guard::<Connection<Db>>().await.unwrap();
+        let mut db_con = req.guard::<Connection<Db>>().await.unwrap();
         match (req.cookies().get_private("token"), req.cookies().get_private("token2")) {
             (Some(token), Some(token2)) => {
                 let user_id = token.value().to_string().parse::<u32>().unwrap();
                 let access_token = token2.value().to_string();
-                if !users::user_exists(db_con, user_id).await.unwrap_or(false) {
+                if !users::user_exists(&mut db_con, user_id).await.unwrap_or(false) {
                     return request::Outcome::Forward(());
                 }
                 request::Outcome::Success(AuthorizeInfo {
