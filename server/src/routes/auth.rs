@@ -234,8 +234,8 @@ async fn process_auth(db: Connection<Db>, cookie: &CookieJar<'_>, token: &str, u
     let auth_info = (access_token, user_info["id"].to_string());
     let user_info = parse_auth_info(user_info.into_inner());
 
-    if users::create_user(db, user_info).await.is_err() {
-        error!("Failed to create user");
+    if let Err(err) = users::create_user(db, user_info).await {
+        error!("Failed to create user: {}", err);
         return Err(AuthorizeError::FailedDbRequest);
     }
 
