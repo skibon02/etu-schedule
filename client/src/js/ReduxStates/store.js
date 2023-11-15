@@ -7,6 +7,8 @@ import dateSLice from './Slices/dateSLice'
 import groupNISlice from './Slices/groupNISlice'
 import groupScheduleSlice from './Slices/groupScheduleSlice'
 import accessTokenSlice from './Slices/accessTokenSlice'
+import userDataSlice from './Slices/userDataSlice'
+import fullNameEnabledSlice from './Slices/fullNameEnabledSlice'
 
 const rootReducer = combineReducers({
   // stateName: sliceName,
@@ -16,7 +18,9 @@ const rootReducer = combineReducers({
   date: dateSLice,
   groupNI: groupNISlice,
   groupSchedule: groupScheduleSlice,
-  accessToken: accessTokenSlice
+  accessToken: accessTokenSlice,
+  userData: userDataSlice,
+  fullNameEnabled: fullNameEnabledSlice,
 });
 
 export default configureStore({

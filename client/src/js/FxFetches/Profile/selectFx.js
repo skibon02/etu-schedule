@@ -12,23 +12,6 @@ function fullNameEnabledDVFx(setFullNameEnabledDV) {
   }
 }
 
-function fullGroupNumberDVFx(setFullGroupNumberDV) { 
-  if (localStorage.getItem('groupNumber') !== null) {
-    setFullGroupNumberDV({
-      value: localStorage.getItem('groupId'), 
-      label: localStorage.getItem('groupNumber')
-    })
-  } else {
-    setFullGroupNumberDV({
-      value: null, 
-      label: 'Не выбрана'
-    });
-  }
-}
-
-
-
 export {
-  fullGroupNumberDVFx,
   fullNameEnabledDVFx,
 }

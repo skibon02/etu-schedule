@@ -116,15 +116,15 @@ function isEvenWeek(date) {
 
 
   if (weeksDiff % 2 === 0) {
-    return '2';
-  } else {
     return '1';
+  } else {
+    return '2';
   }
 }
 
 function getWeekNumber(date) {
   const today = new Date(date);
-  const firstWeek = new Date(today.getFullYear(), 7, 28);
+  const firstWeek = new Date(today.getFullYear(), 7, 27);
 
   const daysDiff = Math.floor((today - firstWeek) / (24 * 60 * 60 * 1000));
   const weeksDiff = Math.floor(daysDiff / 7);

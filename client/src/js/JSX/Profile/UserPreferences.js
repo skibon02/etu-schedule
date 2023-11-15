@@ -7,29 +7,50 @@ import { groupFilterOptions } from "../../Utils/Profile/makeSelectState"
 import { accessTokenFetch, setAccessToken } from '../../ReduxStates/Slices/accessTokenSlice'
 import CROSSMARK from '../../../icons/cross-mark.svg'
 
-function FullNamePreference({fullNameEnabledDV}) {
+function FullNamePreference() {
+  const dispatch = useDispatch();
+
+  const {fullNameEnabledValue, fullNameEnabledLabel} = useSelector(s => s.fullNameEnabled);
+
   return (
     <div className="profile__user-preference user-preference">
       <div className="user-preference__title">
         Отображение названий предметов
       </div>
       <div className="user-preference__value">
+        {fullNameEnabledValue === 'auto' ?
         <Select 
+          key={1}
           options={[
             {value: 'auto', label: 'Авто'},
-            {value: 'short', label: 'Сокращённое'},
+            {value: 'shorten', label: 'Сокращённое'},
           ]}
-          onChange={handlefullNameEnabledSelect}
-          defaultValue={fullNameEnabledDV} />
+          onChange={(option) => handlefullNameEnabledSelect(dispatch, option)}
+          defaultValue={{label: 'Авто'}} />
+        :
+        <Select 
+          key={2}
+          options={[
+            {value: 'auto', label: 'Авто'},
+            {value: 'shorten', label: 'Сокращённое'},
+          ]}
+          onChange={(option) => handlefullNameEnabledSelect(dispatch, option)}
+          defaultValue={{label: 'Сокращённое'}} />
+        }
       </div>
     </div>
   )
 }
 
-
-function GroupPreference({fullGroupNumberDV}) {
-  const { groupList, groupListStatus, groupListError } = useSelector((s) => s.groupList);
+function GroupPreference() {
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    console.log(`don't forget about react-cringe with groupNumberDV in <GroupPreference />...`);
+  }, []);
+
+  const { groupList, groupListStatus, groupListError } = useSelector(s => s.groupList);
+  const {groupNumber, groupId} = useSelector(s => s.groupNI);
 
   return (
     <div className="profile__user-preference user-preference">
@@ -37,11 +58,21 @@ function GroupPreference({fullGroupNumberDV}) {
         Постоянная группа:
       </div>
       <div className="user-preference__value">
+        {groupNumber ?
         <Select 
+          key={0}
           options={makeGroupListSelect(groupList)}
           onChange={(option) => handleGroupSelect(dispatch, option)}
-          defaultValue={fullGroupNumberDV}
+          defaultValue={{label: groupNumber}}
           filterOption={groupFilterOptions} />
+        :
+        <Select 
+          key={1}
+          options={makeGroupListSelect(groupList)}
+          onChange={(option) => handleGroupSelect(dispatch, option)}
+          defaultValue={{label: 'Не выбрана'}}
+          filterOption={groupFilterOptions} />
+        }
       </div>
     </div>
   )
@@ -79,7 +110,6 @@ function TokenPreference() {
           :
           <div 
             className="user-preference__button user-preference__delete-button"
-            // ALERT are u sure?
             onClick={() => dispatch(setAccessToken(null))}>
             <div className='user-preference__button-mark'>✖</div>
           </div>  

@@ -5,6 +5,7 @@ import { routingFx } from "../../FxFetches/Pages/routingFx";
 import { setActiveByLocationFx } from "../../FxFetches/Pages/setActiveByLocationFx";
 import { groupScheduleIdFx } from "../../FxFetches/Pages/groupScheduleIdFx";
 import { vkDataFetch } from "../../ReduxStates/Slices/vkDataSlice";
+import { userDataGETFetch } from "../../ReduxStates/Slices/userDataSlice";
 import Header from "../Header/Header";
 import Schedule from '../Schedule/Schedule'
 import Planning from "../Planning/Planning";
@@ -24,12 +25,13 @@ export function Pages() {
   }, [dispatch]);
 
   useEffect(() => {
-    routingFx(navigate, location.pathname, vkData)
+    routingFx(navigate, location.pathname, vkData);
+    dispatch(userDataGETFetch(dispatch));
   }, [dispatch, vkData]);
 
   useEffect(() => {
     groupScheduleIdFx(dispatch, groupId);
-  }, [dispatch, groupId, localStorage.getItem('groupNumber')])
+  }, [dispatch, groupId]);
 
   useEffect(() => {
     setActiveByLocationFx(dispatch, location)

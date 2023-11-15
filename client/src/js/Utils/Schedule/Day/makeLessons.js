@@ -1,10 +1,10 @@
 import { makeUsableSchedule } from "../parseSchedule";
 import { Subject } from "../../../JSX/Schedule/Subject";
 
-export function makeLessons(daySchedule) {
+export function makeLessons(daySchedule, fullNameEnabledValue) {
   let lessons = [];
   for (let i = 0; i < daySchedule.length; i++) {
-    let usableSchedule = makeUsableSchedule(daySchedule[i]);
+    let usableSchedule = makeUsableSchedule(daySchedule[i], fullNameEnabledValue);
   
     lessons.push(
       <Subject 

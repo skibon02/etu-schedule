@@ -3,7 +3,7 @@ import { isEvenWeek, getWeekNumber } from "../handleTime";
 
 const WEEK_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
-export function makeUsableSchedule(scheduleObject) {
+export function makeUsableSchedule(scheduleObject, fullNameEnabledValue) {
 
   const date = scheduleObject.date;
   const auditoriumReservation = scheduleObject.auditorium_reservation;
@@ -23,7 +23,7 @@ export function makeUsableSchedule(scheduleObject) {
     title =  titleWords[i].length > 16 ? shortTitle : title;
   }
   title = titleWords.length > 6 ? shortTitle : title
-  if (localStorage.getItem('fullNameEnabledValue') === 'short') {
+  if (fullNameEnabledValue === 'shorten') {
     title = shortTitle;
   }
 

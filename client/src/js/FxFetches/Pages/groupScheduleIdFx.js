@@ -1,13 +1,7 @@
-import { setGroupNI } from "../../ReduxStates/Slices/groupNISlice";
 import { groupScheduleFetch } from "../../ReduxStates/Slices/groupScheduleSlice";
+import { groupNIGETFetch } from "../../ReduxStates/Slices/groupNISlice";
 
-function groupScheduleIdFx(dispatch, groupId) {
-  if (localStorage.getItem("groupId") !== null) {
-    dispatch(setGroupNI({
-      groupNumber: localStorage.getItem("groupNumber"),
-      groupId: localStorage.getItem("groupId")
-    }))
-  }
+async function groupScheduleIdFx(dispatch, groupId) {
   if (groupId) {
     dispatch(groupScheduleFetch(groupId));
   }

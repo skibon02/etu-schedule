@@ -15,7 +15,7 @@ const vkDataFetch = createAsyncThunk('groups/vkDataFetch', async () => {
 });
 
 const vkDataSlice = createSlice({
-  name: 'vkData',
+  name: 'userData',
   initialState: {
     vkData: null,
     vkDataStatus: 'idle',

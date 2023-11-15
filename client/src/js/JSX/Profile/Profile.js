@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import VKButton_old_v from "./VKButton_old_v";
 import PROFILE from '../../../icons/profile.svg'
-import { makeFullNameEnabledDV, makeFullGroupNumberDV } from "../../Utils/Profile/makeSelectState";
-import { fullGroupNumberDVFx, fullNameEnabledDVFx } from "../../FxFetches/Profile/selectFx";
 import DeAuthButton from "./DeAuthButton";
 import { FullNamePreference, GroupPreference, TokenPreference } from "./UserPreferences";
 import { groupListFetch } from "../../ReduxStates/Slices/groupListSlice";
@@ -14,8 +12,6 @@ export default function Profile() {
   const {groupList, groupListStatus, groupListError } = useSelector(s => s.groupList);
   const {vkData, vkDataStatus, vkDataError } = useSelector(s => s.vkData);
 
-  const [fullNameEnabledDV, setFullNameEnabledDV] = useState(makeFullNameEnabledDV());
-  const [fullGroupNumberDV, setFullGroupNumberDV] = useState(makeFullGroupNumberDV());
   
   const isAuthorized = vkData.is_authorized;
 
@@ -24,14 +20,6 @@ export default function Profile() {
       dispatch(groupListFetch())
     };
   }, [vkData]);
-
-  useEffect(() => {
-    fullNameEnabledDVFx(setFullNameEnabledDV)
-  }, [localStorage.getItem('fullNameEnabledValue')]);
-
-  useEffect(() => {
-    fullGroupNumberDVFx(setFullGroupNumberDV)
-  }, [localStorage.getItem('groupNumber')]);
 
   return (
     <>
@@ -69,10 +57,8 @@ export default function Profile() {
       {isAuthorized &&
         <div className="profile__user-preferences">
           <TokenPreference />
-          <GroupPreference 
-            fullGroupNumberDV={fullGroupNumberDV} />
-          <FullNamePreference 
-            fullNameEnabledDV={fullNameEnabledDV} />
+          <GroupPreference />
+          <FullNamePreference />
         </div>
       }
     </div>

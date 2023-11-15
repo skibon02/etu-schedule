@@ -1,14 +1,16 @@
 import { setGroupSchedule } from "../../ReduxStates/Slices/groupScheduleSlice";
+import { groupNISETFx } from "../../FxFetches/groupNISETFx";
+import { userDataSETFetch } from "../../ReduxStates/Slices/userDataSlice";
+import { setFullNameEnabled } from "../../ReduxStates/Slices/fullNameEnabledSlice";
 
 function handleGroupSelect(dispatch, option) {
   dispatch(setGroupSchedule(null));
-  localStorage.setItem('groupNumber', option.label);
-  localStorage.setItem('groupId', option.value);
+  groupNISETFx(dispatch, option.value);
 }
 
-function handlefullNameEnabledSelect(option) {
-  localStorage.setItem('fullNameEnabledValue', option.value);
-  localStorage.setItem('fullNameEnabledLabel', option.label);
+function handlefullNameEnabledSelect(dispatch, option) {
+  dispatch(setFullNameEnabled(option.value));
+  userDataSETFetch({fullNameEnabled: option.value});
 }
 
 export {
