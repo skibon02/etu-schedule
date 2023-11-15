@@ -41,15 +41,11 @@ export function Pages() {
     return (
       <div className='container'>
         <div className='under-header-box'></div>
+        {vkData.is_authorized && <Header  />}
         <Routes>
           {(!vkData.is_authorized || active === 'profile') &&
             <Route path="/profile" element={<Profile />} />
           }
-        </Routes>
-        {vkData.is_authorized &&
-          <Header  />
-        }
-        <Routes>
           {vkData.is_authorized &&
           <>
           {active === 'schedule' &&
