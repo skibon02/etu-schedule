@@ -195,6 +195,7 @@ body {
 }
 
 .fish {
+  text-align: center;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -209,6 +210,18 @@ body {
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.no-match-link {
+  color: #0b2376;
+  text-decoration: underline;
+}
+.no-match-link:active, .no-match-link :hover {
+  text-decoration: none;
 }
 
 .container {

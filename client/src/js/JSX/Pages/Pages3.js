@@ -10,6 +10,7 @@ import Header from "../Header/Header";
 import Schedule from '../Schedule/Schedule'
 import Planning from "../Planning/Planning";
 import Profile from "../Profile/Profile";
+import NoMatchRoute from "../NoMatchRoute/NoMatchRoute";
 
 export function Pages() {
   const dispatch = useDispatch();
@@ -41,8 +42,11 @@ export function Pages() {
     return (
       <div className='container'>
         <div className='under-header-box'></div>
-        {vkData.is_authorized && <Header  />}
+        {vkData.is_authorized && (active === 'schedule' || active === 'profile' || active === 'planning') && 
+          <Header />
+        }
         <Routes>
+          <Route path="*" element={<NoMatchRoute />} />
           {(!vkData.is_authorized || active === 'profile') &&
             <Route path="/profile" element={<Profile />} />
           }

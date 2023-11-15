@@ -41,11 +41,21 @@ body {
 }
 
 .fish {
+  text-align: center;
   display: flex; 
   justify-content: center; 
   align-items: center; 
   height: 100vh;
   user-select: none;
+  flex-direction: column;
+}
+
+.no-match-link {
+   color: #0b2376;
+   text-decoration: underline;
+   &:active, :hover {
+    text-decoration: none;
+   }
 }
  
 .container {
