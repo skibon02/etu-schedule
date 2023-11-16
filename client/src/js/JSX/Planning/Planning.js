@@ -9,11 +9,12 @@ import { useSelector } from "react-redux";
 
 
 export default function Planning() {
-  const {active} = useSelector(s => s.active);
   const {groupNumber, groupId} = useSelector(s => s.groupNI);
   const { groupSchedule, groupScheduleStatus, groupScheduleError } = useSelector(s => s.groupSchedule);
+  const {parsedSchedule1, parsedSchedule2} = useSelector(s => s.parsedSchedule);
 
   const [weekParity, setWeekParity] = useState(isEvenWeek(new Date));
+
   if (!groupSchedule) {
     return (
       <NoSchedule groupNumber={groupNumber} />
@@ -25,9 +26,6 @@ export default function Planning() {
       <NoSchedule groupNumber={-1} />
     )
   }
-
-  const weekSchedule1 = makeSchedule(groupSchedule, new Date());
-  const weekSchedule2 = makeSchedule(groupSchedule, new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7));
 
   return (
     <>  
@@ -43,7 +41,6 @@ export default function Planning() {
         text={'Вторая неделя'}
         handleClick={() => setWeekParity('2')} />
     </div>
-
     <div className="planning-thead">
       <div className="planning-thead__body">
         <div className="planning-thead__lesson">
@@ -55,27 +52,23 @@ export default function Planning() {
       </div>
     </div>
     
-    {active === 'planning' && <div className="under-planning-thead-box"></div>}
+    <div className="under-planning-thead-box"></div>
 
     {weekParity === '1' ?
     <>
-    <div className='schedule-info-container'>
-      <WeekHeader weekParity={weekParity} />
-    </div>
+    <WeekHeader weekParity={weekParity} />
     <Week
-      weekSchedule={weekSchedule1} />
+      weekSchedule={parsedSchedule1} />
     </>
     :
     <>
-    <div className='schedule-info-container'>
-      <WeekHeader weekParity={weekParity} />
-    </div>
+    <WeekHeader weekParity={weekParity} />
     <Week
-      weekSchedule={weekSchedule2} />
+      weekSchedule={parsedSchedule2} />
     </>
     }
 
-      {active === 'planning' && <div className="under-planning-thead-box-mobile"></div>}
+    <div className="under-planning-thead-box-mobile"></div>
     </>
   )
 }

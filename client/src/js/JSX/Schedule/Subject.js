@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { makeRooms } from "../../Utils/Schedule/Subject/makeRooms";
 import { makeTeachers } from "../../Utils/Schedule/Subject/makeTeachers";
 import { checkTimeAndSetTheme } from "../../Utils/Schedule/Subject/checkTimeAndSetTheme";
-import { makeClockTime, knowSubjectTime, getWeekNumber } from "../../Utils/handleTime";
+import { makeClockTime, knowSubjectTime } from "../../Utils/handleTime";
 import Attendance from "./Attendance";
 import PlanningSwitch from "../Planning/PlanningSwitch";
 import { useSelector } from "react-redux";

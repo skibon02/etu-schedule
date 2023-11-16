@@ -9,7 +9,7 @@ const dateSlice = createSlice({
   },
   reducers: {
     setDate: (s, a) => {
-      s.date = (a.payload).toISOString();
+      s.date = a.payload;
       s.weekNumber = getWeekNumber(a.payload);
       console.log('date is:\n', s.date);
       console.log('weekNumber is:\n', s.weekNumber);

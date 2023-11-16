@@ -18,25 +18,14 @@ function FullNamePreference() {
         Отображение названий предметов
       </div>
       <div className="user-preference__value">
-        {fullNameEnabledValue === 'auto' ?
         <Select 
-          key={1}
+          key={fullNameEnabledValue} // !!!
           options={[
             {value: 'auto', label: 'Авто'},
             {value: 'shorten', label: 'Сокращённое'},
           ]}
           onChange={(option) => handlefullNameEnabledSelect(dispatch, option)}
-          defaultValue={{label: 'Авто'}} />
-        :
-        <Select 
-          key={2}
-          options={[
-            {value: 'auto', label: 'Авто'},
-            {value: 'shorten', label: 'Сокращённое'},
-          ]}
-          onChange={(option) => handlefullNameEnabledSelect(dispatch, option)}
-          defaultValue={{label: 'Сокращённое'}} />
-        }
+          defaultValue={{label: fullNameEnabledLabel}} />
       </div>
     </div>
   )
@@ -58,21 +47,12 @@ function GroupPreference() {
         Постоянная группа:
       </div>
       <div className="user-preference__value">
-        {groupNumber ?
         <Select 
-          key={0}
+          key={groupNumber} // !!!
           options={makeGroupListSelect(groupList)}
           onChange={(option) => handleGroupSelect(dispatch, option)}
           defaultValue={{label: groupNumber}}
           filterOption={groupFilterOptions} />
-        :
-        <Select 
-          key={1}
-          options={makeGroupListSelect(groupList)}
-          onChange={(option) => handleGroupSelect(dispatch, option)}
-          defaultValue={{label: 'Не выбрана'}}
-          filterOption={groupFilterOptions} />
-        }
       </div>
     </div>
   )

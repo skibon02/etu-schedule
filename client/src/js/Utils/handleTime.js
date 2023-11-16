@@ -94,7 +94,6 @@ function knowSubjectTime(i, date) {
 }
 
 function makeClockTime(date) {
-
   const hours = date.getHours();
   const minutes = date.getMinutes();
 
@@ -104,22 +103,8 @@ function makeClockTime(date) {
 }
 
 function makeCalendarTime(date, days) {
+  date = (new Date(date));
   return `${days[date.getDay()]} ${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`
-}
-
-function isEvenWeek(date) {
-  const today = new Date(date);
-  const firstWeek = new Date(today.getFullYear(), 7, 27); // (month 0-based index) 28 aug.
-
-  const daysDiff = Math.floor((today - firstWeek) / (24 * 60 * 60 * 1000));
-  const weeksDiff = Math.floor(daysDiff / 7);
-
-
-  if (weeksDiff % 2 === 0) {
-    return '1';
-  } else {
-    return '2';
-  }
 }
 
 function getWeekNumber(date) {
@@ -130,6 +115,16 @@ function getWeekNumber(date) {
   const weeksDiff = Math.floor(daysDiff / 7);
 
   return weeksDiff
+}
+
+function isEvenWeek(date) {
+  const weeksDiff = getWeekNumber(date);
+
+  if (weeksDiff % 2 === 0) {
+    return '1';
+  } else {
+    return '2';
+  }
 }
 
 function weekHeaderTime(date) {

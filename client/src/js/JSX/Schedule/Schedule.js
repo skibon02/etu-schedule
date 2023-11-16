@@ -27,9 +27,7 @@ export default function Schedule() {
 
   return (
     <>
-    <div className='schedule-info-container'>
-      <WeekHeader weekParity={null} />
-    </div>
+    <WeekHeader weekParity={null} />
     <Week
       weekSchedule={weekSchedule} />
     </>

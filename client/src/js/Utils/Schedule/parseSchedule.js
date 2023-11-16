@@ -1,4 +1,4 @@
-import { isEvenWeek, getWeekNumber } from "../handleTime";
+import { isEvenWeek } from "../handleTime";
 
 
 const WEEK_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
@@ -95,14 +95,14 @@ function parseDays(week, dayOfWeek, date, currentDayOfWeek) {
     map((day) => ({
       ...day,
       date: currentDayOfWeek !== 'SUN' ?
-        new Date(date.getTime() - (24 * 60 * 60 * 1000) * (WEEK_DAYS.indexOf(currentDayOfWeek) - WEEK_DAYS.indexOf(dayOfWeek))) :
-        new Date(date.getTime() - (24 * 60 * 60 * 1000) * (7 - WEEK_DAYS.indexOf(dayOfWeek)))
+        (new Date(date.getTime() - (24 * 60 * 60 * 1000) * (WEEK_DAYS.indexOf(currentDayOfWeek) - WEEK_DAYS.indexOf(dayOfWeek)))).toISOString() :
+        (new Date(date.getTime() - (24 * 60 * 60 * 1000) * (7 - WEEK_DAYS.indexOf(dayOfWeek)))).toISOString()
     })).
     sort(sortScheduleByLesson);
   } else {
     return [null, currentDayOfWeek !== 'SUN' ?
-    new Date(date.getTime() - (24 * 60 * 60 * 1000) * (WEEK_DAYS.indexOf(currentDayOfWeek) - WEEK_DAYS.indexOf(dayOfWeek))) :
-    new Date(date.getTime() - (24 * 60 * 60 * 1000) * (7 - WEEK_DAYS.indexOf(dayOfWeek)))];
+    (new Date(date.getTime() - (24 * 60 * 60 * 1000) * (WEEK_DAYS.indexOf(currentDayOfWeek) - WEEK_DAYS.indexOf(dayOfWeek)))).toISOString() :
+    (new Date(date.getTime() - (24 * 60 * 60 * 1000) * (7 - WEEK_DAYS.indexOf(dayOfWeek)))).toISOString()];
   }
 }
 
@@ -126,8 +126,6 @@ export default function makeSchedule(scheduleObjects, date) {
   for (let i = 1; i < 7; i++) {
     weekSchedule.push(parseDays(week, WEEK_DAYS[i], date, currentDayOfWeek));
   }
-
-  console.log('week schedule from parseSchedule\n', weekSchedule);
   
   return weekSchedule;
 }

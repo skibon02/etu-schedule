@@ -3,7 +3,7 @@ import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux'
 import { routingFx } from "../../FxFetches/Pages/routingFx";
 import { setActiveByLocationFx } from "../../FxFetches/Pages/setActiveByLocationFx";
-import { groupScheduleIdFx } from "../../FxFetches/Pages/groupScheduleIdFx";
+import { groupScheduleFx } from "../../FxFetches/Pages/groupScheduleFx";
 import { vkDataFetch } from "../../ReduxStates/Slices/vkDataSlice";
 import { userDataGETFetch } from "../../ReduxStates/Slices/userDataSlice";
 import Header from "../Header/Header";
@@ -11,6 +11,7 @@ import Schedule from '../Schedule/Schedule'
 import Planning from "../Planning/Planning";
 import Profile from "../Profile/Profile";
 import NoMatchRoute from "../NoMatchRoute/NoMatchRoute";
+import { setParsedSchedule } from "../../ReduxStates/Slices/parsedScheduleSLice";
 
 export function Pages() {
   const dispatch = useDispatch();
@@ -20,6 +21,7 @@ export function Pages() {
   const {active} = useSelector(s => s.active);
   const {groupNumber, groupId} = useSelector(s => s.groupNI);
   const { vkData, vkDataStatus, vkDataError } = useSelector(s => s.vkData);
+  const {groupSchedule, groupScheduleStatus, groupScheduleError} = useSelector(s => s.groupSchedule);
 
   useEffect(() => {
     dispatch(vkDataFetch());
@@ -31,8 +33,12 @@ export function Pages() {
   }, [dispatch, vkData]);
 
   useEffect(() => {
-    groupScheduleIdFx(dispatch, groupId);
+    groupScheduleFx(dispatch, groupId);
   }, [dispatch, groupId]);
+
+  useEffect(() => {
+    dispatch(setParsedSchedule(groupSchedule))
+  }, [dispatch, groupSchedule]);
 
   useEffect(() => {
     setActiveByLocationFx(dispatch, location)
