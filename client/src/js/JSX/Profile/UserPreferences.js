@@ -51,7 +51,7 @@ function GroupPreference() {
           key={groupNumber} // !!!
           options={makeGroupListSelect(groupList)}
           onChange={(option) => handleGroupSelect(dispatch, option)}
-          defaultValue={{label: groupNumber}}
+          defaultValue={groupNumber ? {label: groupNumber} : {label: 'Группа не выбрана'}}
           filterOption={groupFilterOptions} />
       </div>
     </div>
