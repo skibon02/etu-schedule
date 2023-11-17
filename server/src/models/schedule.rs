@@ -124,6 +124,23 @@ pub async fn get_current_schedule_for_group(con: &mut PoolConnection<Sqlite>, gr
     Ok(res)
 }
 
+pub async fn get_current_schedule_link_ids(con: &mut PoolConnection<Sqlite>, group_id: u32) -> anyhow::Result<Vec<u32>> {
+    let res = sqlx::query_scalar(
+        "SELECT schedule_objs.link_id FROM schedule_objs WHERE group_id = ? and gen_end IS NULL",
+    )
+        .bind(group_id)
+        .fetch_all(&mut *con).await?;
+
+    //assertion to be unique
+    let mut set = std::collections::HashSet::new();
+    for &item in res.iter() {
+        set.insert(item);
+    }
+    assert_eq!(set.len(), res.len());
+
+    Ok(res)
+}
+
 pub async fn get_current_schedule_for_group_with_subject(con: &mut PoolConnection<Sqlite>, group_id: u32, subject_id: u32) -> anyhow::Result<Vec<ScheduleObjModel>> {
     let res = sqlx::query_as(
         "SELECT * FROM schedule_objs WHERE group_id = ? and gen_end IS NULL and subject_id = ?",

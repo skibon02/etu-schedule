@@ -3,7 +3,6 @@ use std::ops::DerefMut;
 
 use rocket::{serde::json::Json, Route};
 use rocket_db_pools::Connection;
-use sqlx::Acquire;
 
 use crate::{models::groups::GroupModel, models, MERGE_REQUEST_CHANNEL, MERGE_REQUEST_CNT};
 use crate::models::Db;
@@ -91,7 +90,8 @@ pub struct OutputScheduleObjectModel {
     second_teacher: Option<OutputTeacherModel>,
     third_teacher: Option<OutputTeacherModel>,
     fourth_teacher: Option<OutputTeacherModel>,
-    id: u32
+    id: u32,
+    time_link_id: u32,
 }
 
 impl TryInto<OutputScheduleObjectModel> for (ScheduleObjModel, &BTreeMap<u32, SubjectModel>, &BTreeMap<u32, (TeacherModel, Vec<String>)>) {
@@ -136,7 +136,8 @@ impl TryInto<OutputScheduleObjectModel> for (ScheduleObjModel, &BTreeMap<u32, Su
             second_teacher: second_teacher.map(|t| t.into()),
             third_teacher: third_teacher.map(|t| t.into()),
             fourth_teacher: fourth_teacher.map(|t| t.into()),
-            id: sched_model.schedule_obj_id
+            id: sched_model.schedule_obj_id,
+            time_link_id: sched_model.link_id
         })
     }
 }

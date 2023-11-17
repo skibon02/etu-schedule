@@ -28,7 +28,12 @@ struct SetGroupBody {
 }
 
 #[post("/user/set_group", data = "<body>")]
-async fn set_group(mut db: Connection<Db>, auth: AuthorizeInfo, body: Json<SetGroupBody>) -> SetUserGroupResult {
+async fn set_group(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Json<SetGroupBody>) -> SetUserGroupResult {
+    if auth.is_none() {
+        return SetUserGroupResult::Failed(Json(ResponseErrorMessage::new("User is not authorized!".to_string())));
+    }
+    let auth = auth.unwrap();
+
     let res = match body.group_id {
         Some(group_id) => models::users::set_user_group(&mut db, auth.user_id, group_id).await,
         None => models::users::reset_user_group(&mut db, auth.user_id).await,
@@ -61,7 +66,12 @@ pub enum SetUserDataResult {
 }
 
 #[post("/user/set_data", data = "<body>")]
-async fn set_data(mut db: Connection<Db>, auth: AuthorizeInfo, body: Json<UserDataOptionalModel>) -> SetUserDataResult {
+async fn set_data(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Json<UserDataOptionalModel>) -> SetUserDataResult {
+    if auth.is_none() {
+        return SetUserDataResult::Failed(Json(ResponseErrorMessage::new("User is not authorized!".to_string())));
+    }
+    let auth = auth.unwrap();
+
     let res = models::users::set_user_data(&mut db, auth.user_id, body.into_inner()).await;
 
     if let Err(e) = res {
@@ -99,7 +109,12 @@ pub enum GetUserDataResult {
 }
 
 #[get("/user/get_data")]
-async fn get_data(mut db: Connection<Db>, auth: AuthorizeInfo) -> GetUserDataResult {
+async fn get_data(mut db: Connection<Db>, auth: Option<AuthorizeInfo>) -> GetUserDataResult {
+    if auth.is_none() {
+        return GetUserDataResult::Failed(Json(ResponseErrorMessage::new("User is not authorized!".to_string())));
+    }
+    let auth = auth.unwrap();
+
     let res = models::users::get_user_data(&mut db, auth.user_id).await;
 
     match res {
@@ -137,7 +152,12 @@ pub enum GetUserGroupResult {
     Failed(Json<ResponseErrorMessage>),
 }
 #[get("/user/get_group")]
-async fn get_group(mut db: Connection<Db>, auth: AuthorizeInfo) -> GetUserGroupResult {
+async fn get_group(mut db: Connection<Db>, auth: Option<AuthorizeInfo>) -> GetUserGroupResult {
+    if auth.is_none() {
+        return GetUserGroupResult::Failed(Json(ResponseErrorMessage::new("User is not authorized!".to_string())));
+    }
+    let auth = auth.unwrap();
+
     let res = models::users::get_user_group(&mut db, auth.user_id).await;
 
     match res {
