@@ -6,7 +6,6 @@ import { WeekHeader } from "../Schedule/WeekHeader";
 import { isEvenWeek } from "../../Utils/handleTime";
 import { useDispatch, useSelector } from "react-redux";
 import { setParsedSchedule } from "../../ReduxStates/Slices/parsedScheduleSLice";
-import { planningDataGETFetch } from "../../ReduxStates/Slices/planningDataSlice";
 import { processPlanningQueue } from "../../FxFetches/Profile/processPlanningQueue";
 
 export default function Planning() {
@@ -28,10 +27,6 @@ export default function Planning() {
   useEffect(() => {
     dispatch(setParsedSchedule(groupSchedule));
   }, [dispatch, groupSchedule]);
-
-  useEffect(() => {
-    dispatch(planningDataGETFetch());
-  }, [dispatch]);
 
   if (!groupSchedule) {
     return (

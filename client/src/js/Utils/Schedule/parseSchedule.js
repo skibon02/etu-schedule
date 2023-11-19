@@ -130,7 +130,7 @@ export default function makeSchedule(scheduleObjects, date) {
   for (let i = 1; i < 7; i++) {
     weekSchedule.push(parseDays(week, WEEK_DAYS[i], date, currentDayOfWeek));
   }
-  
+  console.log('week Schedule is:\n', weekSchedule);
   return weekSchedule;
 }
 

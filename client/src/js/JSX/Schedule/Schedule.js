@@ -24,12 +24,14 @@ export default function Schedule() {
   }
 
   const weekSchedule = active === 'schedule' ? makeSchedule(groupSchedule, new Date(date)) : groupSchedule;
-
-  return (
-    <>
-    <WeekHeader weekParity={null} />
-    <Week
-      weekSchedule={weekSchedule} />
-    </>
-  )
+  
+  if (weekSchedule) {
+    return (
+      <>
+      <WeekHeader weekParity={null} />
+      <Week
+        weekSchedule={weekSchedule} />
+      </>
+    )
+  }
 }

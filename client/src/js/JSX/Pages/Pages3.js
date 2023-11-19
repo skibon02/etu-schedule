@@ -5,6 +5,7 @@ import { routingFx } from "../../FxFetches/Pages/routingFx";
 import { setActiveByLocationFx } from "../../FxFetches/Pages/setActiveByLocationFx";
 import { groupScheduleFx } from "../../FxFetches/Pages/groupScheduleFx";
 import { vkDataFetch } from "../../ReduxStates/Slices/vkDataSlice";
+import { planningDataGETFetch } from "../../ReduxStates/Slices/planningDataSlice";
 import { userDataGETFetch } from "../../ReduxStates/Slices/userDataSlice";
 import Header from "../Header/Header";
 import Schedule from '../Schedule/Schedule'
@@ -29,6 +30,7 @@ export function Pages() {
   useEffect(() => {
     routingFx(navigate, location.pathname, vkData);
     dispatch(userDataGETFetch(dispatch));
+    dispatch(planningDataGETFetch());
   }, [dispatch, vkData]);
 
   useEffect(() => {

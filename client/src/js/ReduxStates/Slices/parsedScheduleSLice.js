@@ -18,8 +18,6 @@ const parsedScheduleSlice = createSlice({
           s.parsedSchedule2 = makeSchedule(a.payload, new Date());
           s.parsedSchedule1 = makeSchedule(a.payload, new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7));
         }
-        console.log('week schedule from parseSchedule (week 1):\n', s.parsedSchedule1);
-        console.log('week schedule from parseSchedule (week 2):\n', s.parsedSchedule2);
       }
     }
   }
