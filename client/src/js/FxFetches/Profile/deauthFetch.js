@@ -15,6 +15,7 @@ async function deauthFetch(dispatch) {
     groupNumber: null,
   }));
   dispatch(setGroupSchedule(null));
+  dispatch(setUserData(null));
 }
 
 export {

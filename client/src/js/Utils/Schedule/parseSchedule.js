@@ -8,6 +8,8 @@ export function makeUsableSchedule(scheduleObject, fullNameEnabledValue) {
   const date = scheduleObject.date;
   const auditoriumReservation = scheduleObject.auditorium_reservation;
   const subject = scheduleObject.subject;
+  const id = scheduleObject.id;
+  const time_link_id = scheduleObject.time_link_id;
 
   let firstTeacher = scheduleObject.teacher; 
   let secondTeacher = scheduleObject.second_teacher;
@@ -49,6 +51,8 @@ export function makeUsableSchedule(scheduleObject, fullNameEnabledValue) {
     time: time,
     weekDay: weekDay,
     date: date,
+    id: id,
+    time_link_id: time_link_id,
   }
 }
 

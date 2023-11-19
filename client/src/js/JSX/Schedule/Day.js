@@ -6,10 +6,11 @@ import { makeCalendarTime } from "../../Utils/handleTime";
 export function Day({daySchedule}) {
   const {active} = useSelector(s => s.active);
   const {fullNameEnabledValue, fullNameEnabledLabel} = useSelector(s => s.fullNameEnabled);
+  const {planningData, planningDataStatus, planningDataError} = useSelector(s => s.planningData);
 
   const dayOfWeek = makeCalendarTime(daySchedule[0].date, DAYS)
 
-  const lessons = makeLessons(daySchedule, fullNameEnabledValue);
+  const lessons = makeLessons(daySchedule, fullNameEnabledValue, planningData);
 
   return (
     <div className="day">

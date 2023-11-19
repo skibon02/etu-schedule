@@ -14,7 +14,7 @@ const accessTokenFetch = createAsyncThunk('groups/accessTokenFetch', async (toke
   }
 });
 
-const vkDataSlice = createSlice({
+const accessTokenSlice = createSlice({
   name: 'accessToken',
   initialState: {
     accessToken: null,
@@ -42,6 +42,6 @@ const vkDataSlice = createSlice({
   },
 });
 
-export default vkDataSlice.reducer
+export default accessTokenSlice.reducer
 export {accessTokenFetch}
-export const {setAccessToken} = vkDataSlice.actions;
+export const {setAccessToken} = accessTokenSlice.actions;

@@ -11,7 +11,6 @@ import Schedule from '../Schedule/Schedule'
 import Planning from "../Planning/Planning";
 import Profile from "../Profile/Profile";
 import NoMatchRoute from "../NoMatchRoute/NoMatchRoute";
-import { setParsedSchedule } from "../../ReduxStates/Slices/parsedScheduleSLice";
 
 export function Pages() {
   const dispatch = useDispatch();
@@ -37,10 +36,6 @@ export function Pages() {
   }, [dispatch, groupId]);
 
   useEffect(() => {
-    dispatch(setParsedSchedule(groupSchedule))
-  }, [dispatch, groupSchedule]);
-
-  useEffect(() => {
     setActiveByLocationFx(dispatch, location)
   }, [dispatch, location]);
 
@@ -48,9 +43,7 @@ export function Pages() {
     return (
       <div className='container'>
         <div className='under-header-box'></div>
-        {vkData.is_authorized && (active === 'schedule' || active === 'profile' || active === 'planning') && 
-          <Header />
-        }
+        {vkData.is_authorized && <Header />}
         <Routes>
           <Route path="*" element={<NoMatchRoute />} />
           {(!vkData.is_authorized || active === 'profile') &&

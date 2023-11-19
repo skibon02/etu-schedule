@@ -7,7 +7,7 @@
     navigate('/profile');
     return;
   }
-  if (loc !== '/active' && loc !== '/profile' && loc !== '/schedule') {
+  if (loc !== '/planning' && loc !== '/profile' && loc !== '/schedule') {
     navigate('/schedule');
     return;
   }
