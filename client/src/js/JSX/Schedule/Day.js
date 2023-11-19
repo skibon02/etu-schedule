@@ -9,19 +9,22 @@ export function Day({daySchedule}) {
   const {planningData, planningDataStatus, planningDataError} = useSelector(s => s.planningData);
 
   const dayOfWeek = makeCalendarTime(daySchedule[0].date, DAYS)
-  const lessons = makeLessons(daySchedule, fullNameEnabledValue, planningData);
 
-  return (
-    <div className="day">
-      <div className="day__date">
-        {active === 'schedule' ?
-          dayOfWeek :
-          dayOfWeek.slice(0, -5)
-        }
+  if (planningData) {
+    const lessons = makeLessons(daySchedule, fullNameEnabledValue, planningData);
+
+    return (
+      <div className="day">
+        <div className="day__date">
+          {active === 'schedule' ?
+            dayOfWeek :
+            dayOfWeek.slice(0, -5)
+          }
+        </div>
+        <div className="day__lessons">
+          {lessons}
+        </div>
       </div>
-      <div className="day__lessons">
-        {lessons}
-      </div>
-    </div>
-  )
+    );
+  }
 }

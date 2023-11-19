@@ -6,7 +6,6 @@ const planningDataGETFetch = createAsyncThunk('groups/planningDataGETFetch', asy
     let response = await myfetch(`/api/attendance/schedule`);
     let data = await response.json();
 
-    console.log(`planning Data is:\n${data}`);
 
     return data;
   } catch (error) {

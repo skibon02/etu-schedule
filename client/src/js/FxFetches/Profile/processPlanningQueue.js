@@ -1,18 +1,31 @@
-import {planningQueueREMOVE, isProcessingFalse, isProcessingTrue} from '../../ReduxStates/Slices/planningQueueSlice'
 import { planningDataSETFetch } from '../../ReduxStates/Slices/planningDataSlice';
 
-export async function processPlanningQueue(dispatch, planningQueue, isProcessing) {
-  if (!isProcessing && planningQueue.length > 0) {
-    const item = planningQueue[0];
-    console.log('started processing planning, left in queue: ', planningQueue.length);
-    dispatch(isProcessingTrue());
+function createQueueProcessor() {
+  let isProcessing = false;
+  const queue = [];
 
-    await planningDataSETFetch(...item);
-    dispatch(isProcessingFalse());
-    console.log('finished processing planning, left in queue: ', planningQueue.length);
-    dispatch(planningQueueREMOVE());
-  } else {
-    console.log('i will not start, untill prev is pending or queue is empty, isPending:', isProcessing);
-    console.log('queue:', Array.of(planningQueue));
-  }
+  const processQueue = async () => {
+    if (isProcessing || queue.length === 0) {
+      return;
+    }
+
+    const nextRequest = queue.shift();
+    
+    isProcessing = true;
+    await planningDataSETFetch(...nextRequest)
+    isProcessing = false;
+
+    processQueue(); 
+  };
+
+  const addToQueue = (request) => {
+    queue.push(request);
+    processQueue();
+  };
+
+  return addToQueue;
 }
+
+const addToQueue = createQueueProcessor();
+
+export {addToQueue};

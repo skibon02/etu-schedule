@@ -6,10 +6,9 @@ import { WeekHeader } from "../Schedule/WeekHeader";
 import { isEvenWeek } from "../../Utils/handleTime";
 import { useDispatch, useSelector } from "react-redux";
 import { setParsedSchedule } from "../../ReduxStates/Slices/parsedScheduleSLice";
-import { processPlanningQueue } from "../../FxFetches/Profile/processPlanningQueue";
 
 export default function Planning() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const {groupNumber, groupId} = useSelector(s => s.groupNI);
   const { groupSchedule, groupScheduleStatus, groupScheduleError } = useSelector(s => s.groupSchedule);
@@ -17,12 +16,7 @@ export default function Planning() {
   const {planningData, planningDataStatus, planningDataError} = useSelector(s => s.planningData);
   const {planningQueue, isProcessing} = useSelector(s => s.planningQueue);
 
-
   const [weekParity, setWeekParity] = useState(isEvenWeek(new Date));
-  
-  useEffect(() => {
-    processPlanningQueue(dispatch, planningQueue, isProcessing);
-  }, [dispatch, planningQueue, isProcessing]);
 
   useEffect(() => {
     dispatch(setParsedSchedule(groupSchedule));
@@ -31,7 +25,7 @@ export default function Planning() {
   if (!groupSchedule) {
     return (
       <NoSchedule groupNumber={groupNumber} />
-    )
+    );
   }
   
   if (!groupSchedule.is_ready) {
@@ -82,6 +76,6 @@ export default function Planning() {
   
       <div className="under-planning-thead-box-mobile"></div>
       </>
-    )
+    );
   }
 }

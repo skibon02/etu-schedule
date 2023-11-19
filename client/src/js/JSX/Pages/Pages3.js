@@ -25,12 +25,12 @@ export function Pages() {
 
   useEffect(() => {
     dispatch(vkDataFetch());
+    dispatch(userDataGETFetch(dispatch));
+    dispatch(planningDataGETFetch());
   }, [dispatch]);
 
   useEffect(() => {
     routingFx(navigate, location.pathname, vkData);
-    dispatch(userDataGETFetch(dispatch));
-    dispatch(planningDataGETFetch());
   }, [dispatch, vkData]);
 
   useEffect(() => {
