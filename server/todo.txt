@@ -2,3 +2,5 @@
 разделить бг таску на 2 параллельных (основной мердж для самой несвежей группы и новые реквесты)
 
 user attendance schedule periodic cleanup
+
+detect bg task failure

@@ -266,12 +266,17 @@ pub async fn set_user_attendance_schedule_diffs(mut db: Connection<Db>, auth: Op
     SetUserAttendanceDiffsScheduleResult::Success(Json(SetUserAttendanceScheduleResultSuccess { ok: true }))
 }
 
-// #[get("/test")]
-// pub async fn test_long_req(mut db: Connection<Db>) {
-//     tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-// }
+#[post("/test")]
+pub async fn test_long_req_post(mut db: Connection<Db>) {
+    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+}
+#[get("/test")]
+pub async fn test_long_req(mut db: Connection<Db>) {
+    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+}
 
 pub fn get_routes() -> Vec<Route> {
     routes![get_user_attendance_schedule, set_user_attendance_schedule,
-        get_user_attendance_schedule_diffs, set_user_attendance_schedule_diffs]
+        get_user_attendance_schedule_diffs, set_user_attendance_schedule_diffs,
+    test_long_req, test_long_req_post]
 }
