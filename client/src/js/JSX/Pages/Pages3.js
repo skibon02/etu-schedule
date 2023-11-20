@@ -12,6 +12,7 @@ import Schedule from '../Schedule/Schedule'
 import Planning from "../Planning/Planning";
 import Profile from "../Profile/Profile";
 import NoMatchRoute from "../NoMatchRoute/NoMatchRoute";
+import { scheduleDiffsGETFetch } from "../../ReduxStates/Slices/scheduleDiffsSlice";
 
 export function Pages() {
   const dispatch = useDispatch();
@@ -25,12 +26,13 @@ export function Pages() {
 
   useEffect(() => {
     dispatch(vkDataFetch());
-    dispatch(userDataGETFetch(dispatch));
-    dispatch(planningDataGETFetch());
   }, [dispatch]);
 
   useEffect(() => {
     routingFx(navigate, location.pathname, vkData);
+    dispatch(userDataGETFetch(dispatch));
+    dispatch(planningDataGETFetch());
+    dispatch(scheduleDiffsGETFetch());
   }, [dispatch, vkData]);
 
   useEffect(() => {

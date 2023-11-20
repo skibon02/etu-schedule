@@ -11,7 +11,7 @@ import userDataSlice from './Slices/userDataSlice'
 import fullNameEnabledSlice from './Slices/fullNameEnabledSlice'
 import parsedScheduleSLice from './Slices/parsedScheduleSLice'
 import planningDataSlice from './Slices/planningDataSlice'
-import planningQueueSlice from './Slices/planningQueueSlice'
+import scheduleDiffsSlice from './Slices/scheduleDiffsSlice'
 
 const rootReducer = combineReducers({
   // stateName: sliceName,
@@ -26,7 +26,7 @@ const rootReducer = combineReducers({
   fullNameEnabled: fullNameEnabledSlice,
   parsedSchedule: parsedScheduleSLice,
   planningData: planningDataSlice,
-  planningQueue: planningQueueSlice,
+  scheduleDiffs: scheduleDiffsSlice,
 });
 
 export default configureStore({

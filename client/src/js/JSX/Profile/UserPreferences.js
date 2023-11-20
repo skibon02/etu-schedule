@@ -34,10 +34,6 @@ function FullNamePreference() {
 function GroupPreference() {
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    console.log(`don't forget about react-cringe with groupNumberDV in <GroupPreference />...`);
-  }, []);
-
   const { groupList, groupListStatus, groupListError } = useSelector(s => s.groupList);
   const {groupNumber, groupId} = useSelector(s => s.groupNI);
 

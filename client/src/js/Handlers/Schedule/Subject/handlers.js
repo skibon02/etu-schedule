@@ -4,16 +4,22 @@ function handleClockClick(
     setToggleClock, 
     setToggleMessage,
     toggleClock,
-    setTimerId
+    setTimerId,
+    setInit,
+    needToSHow,
+    setNeedToShow
   ) {
   if (!isDead) {
     clearTimeout(timerId);
     setToggleClock(!toggleClock)
-    setToggleMessage(!toggleClock)
-
-    setTimerId(setTimeout(() => {
-      setToggleMessage(false)
-    }, 5000));
+    if (needToSHow) {
+      setToggleMessage(true)
+      setTimerId(setTimeout(() => {
+        setToggleMessage(false)
+      }, 5000));
+    }
+    setNeedToShow(!needToSHow);
+    setInit(p => !p);
   }
 }
 

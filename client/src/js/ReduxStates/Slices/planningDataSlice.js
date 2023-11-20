@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import myfetch from '../../FxFetches/myfetch';
+import { scheduleDiffsGETFetch } from './scheduleDiffsSlice';
 
 const planningDataGETFetch = createAsyncThunk('groups/planningDataGETFetch', async () => {
   try {
@@ -13,7 +14,7 @@ const planningDataGETFetch = createAsyncThunk('groups/planningDataGETFetch', asy
   }
 });
 
-async function planningDataSETFetch(time_link_id, flag) {
+async function planningDataSETFetch(dispatch, time_link_id, flag) {
   try {
     let r = await myfetch(`/api/attendance/schedule/update`, {
       body: JSON.stringify({
@@ -26,6 +27,11 @@ async function planningDataSETFetch(time_link_id, flag) {
     let d = await r.json();
   
     console.log('result of changing planning Data\n', d);
+
+    if (d.ok) {
+      dispatch(planningDataGETFetch());
+      dispatch(scheduleDiffsGETFetch());
+    }
   } catch (error) {
     console.error(error.message);
   }
@@ -50,12 +56,7 @@ const planningDataSlice = createSlice({
       })
       .addCase(planningDataGETFetch.fulfilled, (s, a) => {
         s.planningDataStatus = 'succeeded';
-        const d = a.payload;
-        let arr = {};
-        for (let i = 0; i < d.length; i++) {
-          arr[d[i].schedule_obj_time_link_id] = d[i].auto_attendance_enabled;
-        }
-        s.planningData = arr;
+        s.planningData = a.payload;
         console.log('planning Data is:\n', s.planningData);
       })
       .addCase(planningDataGETFetch.rejected, (s, a) => {

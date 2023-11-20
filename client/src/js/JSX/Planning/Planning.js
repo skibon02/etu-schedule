@@ -14,7 +14,6 @@ export default function Planning() {
   const { groupSchedule, groupScheduleStatus, groupScheduleError } = useSelector(s => s.groupSchedule);
   const {parsedSchedule1, parsedSchedule2} = useSelector(s => s.parsedSchedule);
   const {planningData, planningDataStatus, planningDataError} = useSelector(s => s.planningData);
-  const {planningQueue, isProcessing} = useSelector(s => s.planningQueue);
 
   const [weekParity, setWeekParity] = useState(isEvenWeek(new Date));
 

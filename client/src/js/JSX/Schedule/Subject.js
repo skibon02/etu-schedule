@@ -7,12 +7,9 @@ import Attendance from "./Attendance";
 import PlanningSwitch from "../Planning/PlanningSwitch";
 import { useSelector } from "react-redux";
 
-export function Subject({subjectData, orderNumber, planning_time_link_id_value}) {
+export function Subject({subjectData, orderNumber, planning_time_link_id_value, schedule_diffs_value}) {
   const {active} = useSelector(s => s.active);
 
-  const [toggleClock, setToggleClock] = useState(false);
-  const [toggleMessage, setToggleMessage] = useState(false);
-  const [timerId,  setTimerId] = useState(0);
   const [lessonStart, lessonEnd, checkInDeadline] = knowSubjectTime(orderNumber, new Date(subjectData.date));
   const lessonName = subjectData.title;
   const lessonType = subjectData.subjectType;
@@ -72,12 +69,9 @@ export function Subject({subjectData, orderNumber, planning_time_link_id_value})
       {active === 'schedule' &&
         <Attendance 
           isDead={isDead}
-          timerId={timerId}
-          setTimerId={setTimerId}
-          toggleClock={toggleClock}
-          setToggleClock={setToggleClock}
-          toggleMessage={toggleMessage}
-          setToggleMessage={setToggleMessage} />
+          time_link_id={time_link_id}
+          schedule_diffs_value={schedule_diffs_value}
+          planning_time_link_id_value={planning_time_link_id_value} />
       }
       {active === 'planning' && 
       <PlanningSwitch 

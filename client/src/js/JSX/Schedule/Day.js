@@ -7,11 +7,13 @@ export function Day({daySchedule}) {
   const {active} = useSelector(s => s.active);
   const {fullNameEnabledValue, fullNameEnabledLabel} = useSelector(s => s.fullNameEnabled);
   const {planningData, planningDataStatus, planningDataError} = useSelector(s => s.planningData);
+  const {scheduleDiffs, scheduleDiffsStatus, scheduleDiffsError} = useSelector(s => s.scheduleDiffs);
+  const {date, weekNumber} = useSelector(s => s.date);
 
   const dayOfWeek = makeCalendarTime(daySchedule[0].date, DAYS)
 
-  if (planningData) {
-    const lessons = makeLessons(daySchedule, fullNameEnabledValue, planningData);
+  if (planningData && scheduleDiffs) {
+    const lessons = makeLessons(daySchedule, fullNameEnabledValue, planningData, scheduleDiffs[weekNumber]);
 
     return (
       <div className="day">

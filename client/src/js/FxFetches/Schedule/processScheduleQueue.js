@@ -1,10 +1,10 @@
-import { planningDataSETFetch } from '../../ReduxStates/Slices/planningDataSlice';
+import { scheduleDiffsSETFetch } from "../../ReduxStates/Slices/scheduleDiffsSlice";
 
 function createQueueProcessor() {
   let isProcessing = false;
   const queue = [];
 
-  const processQueue = async (dispatch) => {
+  const processQueue = async () => {
     if (isProcessing || queue.length === 0) {
       return;
     }
@@ -12,15 +12,15 @@ function createQueueProcessor() {
     const nextRequest = queue.shift();
     
     isProcessing = true;
-    await planningDataSETFetch(dispatch, ...nextRequest)
+    await scheduleDiffsSETFetch(...nextRequest)
     isProcessing = false;
 
     processQueue(); 
   };
 
-  const addToQueue = (dispatch, request) => {
+  const addToQueue = (request) => {
     queue.push(request);
-    processQueue(dispatch);
+    processQueue();
   };
 
   return addToQueue;
