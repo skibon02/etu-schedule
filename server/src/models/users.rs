@@ -87,17 +87,33 @@ pub enum SetUserGroupError {
     #[error("Group {0} does not exist")]
     GroupDoesNotExist(u32),
 }
+
+/// Do not check if user exists!
 pub async fn set_user_group(con: &mut PoolConnection<Sqlite>, user_id: u32, group_id: u32) -> anyhow::Result<()> {
     let group_exists: Option<u32> = sqlx::query_scalar("select group_id from groups where group_id = ?")
         .bind(group_id)
         .fetch_optional(&mut *con).await.context("Failed to check if group exists")?;
 
+
     if group_exists.is_some() {
         let mut transaction = con.begin().await?;
+
+        let different_group_id: Option<u32> = sqlx::query_scalar("SELECT group_id FROM user_data WHERE user_id = ? AND group_id != ?")
+            .bind(user_id)
+            .bind(group_id)
+            .fetch_optional(&mut *transaction).await.context("Failed to check if group exists")?;
+
         sqlx::query("UPDATE user_data SET group_id=? WHERE user_id = ?")
             .bind(group_id)
             .bind(user_id)
             .execute(&mut *transaction).await.context("Failed to set new user group")?;
+
+        if different_group_id.is_some() {
+            // Invalidate user attendance token
+            sqlx::query("UPDATE user_data SET attendance_token=NULL WHERE user_id = ?")
+                .bind(user_id)
+                .execute(&mut *transaction).await.context("Failed to clear previous user attendance token")?;
+        }
 
         transaction.commit().await?;
         Ok(())
@@ -126,6 +142,7 @@ pub struct UserDataModel {
     pub group_id: Option<u32>,
     pub subjects_title_formatting: SubjectsTitleFormatting,
     pub last_known_schedule_generation: Option<u32>,
+    pub attendance_token: Option<String>
 }
 
 
@@ -158,3 +175,11 @@ pub async fn reset_user_group(con: &mut PoolConnection<Sqlite>, user_id: u32) ->
     Ok(())
 }
 
+pub async fn set_attendance_token(con: &mut PoolConnection<Sqlite>, user_id: u32, attendance_token: Option<String>) -> anyhow::Result<()> {
+    sqlx::query("UPDATE user_data SET attendance_token=? WHERE user_id = ?")
+        .bind(attendance_token)
+        .bind(user_id)
+        .execute(&mut *con).await.context("Failed to set new user attendance token")?;
+
+    Ok(())
+}

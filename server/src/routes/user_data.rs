@@ -94,7 +94,8 @@ async fn set_data(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Opt
 pub struct OutputUserDataModel {
     pub user_id: u32,
     pub group: Option<GroupModel>,
-    pub subjects_title_formatting: SubjectsTitleFormatting
+    pub subjects_title_formatting: SubjectsTitleFormatting,
+    pub attendance_token: Option<String>,
 }
 
 
@@ -104,6 +105,7 @@ impl Into<OutputUserDataModel> for (UserDataModel, Option<GroupModel>) {
             user_id: self.0.user_id,
             group: self.0.group_id.map(|_| self.1.unwrap()),
             subjects_title_formatting: self.0.subjects_title_formatting,
+            attendance_token: self.0.attendance_token,
         }
     }
 }
@@ -177,7 +179,63 @@ async fn get_group(mut db: Connection<Db>, auth: Option<AuthorizeInfo>) -> GetUs
     }
 }
 
+#[derive(Serialize)]
+pub struct SetAttendanceTokenSuccess {
+    ok: bool,
+    group_changed: bool
+}
+#[derive(Responder)]
+pub enum SetAttendanceTokenResult {
+    #[response(status = 200, content_type = "json")]
+    Success(Json<SetAttendanceTokenSuccess>),
+    #[response(status = 400, content_type = "json")]
+    Failed(Json<ResponseErrorMessage>)
+}
+
+#[derive(Deserialize)]
+pub struct SetAttendanceTokenBody {
+    attendance_token: Option<String>,
+}
+
+#[post("/user/set_attendance_token", data = "<body>")]
+pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Option<Json<SetAttendanceTokenBody>>) -> SetAttendanceTokenResult {
+    if body.is_none() {
+        return SetAttendanceTokenResult::Failed(Json(ResponseErrorMessage::new("Invalid body!".to_string())));
+    }
+    let body = body.unwrap();
+    if auth.is_none() {
+        return SetAttendanceTokenResult::Failed(Json(ResponseErrorMessage::new("User is not authorized!".to_string())));
+    }
+    let auth = auth.unwrap();
+
+    //check if token is valid
+    let mut group_changed = false;
+    if let Some(token) = &body.attendance_token {
+        //if digits - valid
+        if token.chars().all(|c| c.is_ascii_digit()) {
+            //ok
+        } else {
+            return SetAttendanceTokenResult::Failed(Json(ResponseErrorMessage::new("Invalid token!".to_string())));
+        }
+
+        let attendance_token = body.attendance_token.clone().unwrap();
+        let user_group = models::users::get_user_group(&mut db, auth.user_id).await.unwrap().unwrap();
+        group_changed = user_group.group_id != attendance_token.parse().unwrap_or(0);
+    }
+
+    let res = models::users::set_attendance_token(&mut db, auth.user_id, body.attendance_token.clone()).await;
+
+    match res {
+        Ok(()) => SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess { ok: true, group_changed })),
+        Err(e) => {
+            error!("Failed to set attendance token: {:?}", e);
+            SetAttendanceTokenResult::Failed(Json(ResponseErrorMessage::new("не скажу".to_string())))
+        }
+    }
+}
+
 
 pub fn get_routes() -> Vec<Route> {
-    routes![set_group, get_group, set_data, get_data]
+    routes![set_group, get_group, set_data, get_data,
+    set_attendance_token]
 }
