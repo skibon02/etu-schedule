@@ -15,7 +15,7 @@ function createQueueProcessor() {
     await planningDataSETFetch(dispatch, ...nextRequest)
     isProcessing = false;
 
-    processQueue(); 
+    processQueue(dispatch); 
   };
 
   const addToQueue = (dispatch, request) => {

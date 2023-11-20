@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addToQueue } from "../../FxFetches/Profile/processPlanningQueue";
+import { planningDataSETFetch } from "../../ReduxStates/Slices/planningDataSlice";
 
 export default function PlanningSwitch({time_link_id, planning_time_link_id_value}) {
   const dispatch = useDispatch()
@@ -15,6 +16,7 @@ export default function PlanningSwitch({time_link_id, planning_time_link_id_valu
           onClick={() => {
             setAutoAttendEnabled(!autoAttendEnabled)
             addToQueue(dispatch, [time_link_id, !autoAttendEnabled]);
+            // planningDataSETFetch(dispatch, time_link_id, !autoAttendEnabled);
           }}>
           <div className={autoAttendEnabled ? "switch__circle-true" : "switch__circle-false"}></div>
         </div>

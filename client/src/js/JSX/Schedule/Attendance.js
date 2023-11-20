@@ -4,6 +4,7 @@ import { useState } from 'react';
 import CLOCK from '../../../icons/icons8-clock.svg'
 import * as handlers from '../../Handlers/Schedule/Subject/handlers'
 import { addToQueue } from '../../FxFetches/Schedule/processScheduleQueue';
+import { scheduleDiffsSETFetch } from '../../ReduxStates/Slices/scheduleDiffsSlice';
 
 export default function Attendance({
   isDead, 
@@ -52,6 +53,7 @@ export default function Attendance({
               setNeedToSHow
             );
             addToQueue([time_link_id, weekNumber, !init])}} >
+            {/* scheduleDiffsSETFetch(time_link_id, weekNumber, !init)}} > */}
           <div 
             className={
               isDead ? 
