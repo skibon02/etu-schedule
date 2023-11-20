@@ -268,6 +268,5 @@ pub async fn set_user_attendance_schedule_diffs(mut db: Connection<Db>, auth: Op
 
 pub fn get_routes() -> Vec<Route> {
     routes![get_user_attendance_schedule, set_user_attendance_schedule,
-        get_user_attendance_schedule_diffs, set_user_attendance_schedule_diffs,
-    test_long_req, test_long_req2, test_long_req_post]
+        get_user_attendance_schedule_diffs, set_user_attendance_schedule_diffs]
 }
