@@ -9,15 +9,13 @@ mod attendance;
 
 #[derive(Serialize)]
 pub struct ResponseErrorMessage {
-    message: String,
-    ok: bool
+    message: String
 }
 
 impl ResponseErrorMessage {
     pub fn new(message: String) -> Self {
         ResponseErrorMessage {
-            message,
-            ok: false
+            message
         }
     }
 }

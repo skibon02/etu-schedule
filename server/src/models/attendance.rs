@@ -120,3 +120,12 @@ pub async fn set_attendance_schedule_diff(con: &mut PoolConnection<Sqlite>, user
 
     Ok(())
 }
+//
+// pub async fn test_long_req(con: &mut PoolConnection<Sqlite>) {
+//     let con = con.acquire().await.unwrap();
+//     println!("Connection has been acquired! waiting...");
+//     tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+//     // con.commit().await.unwrap();
+//     println!("Connection has been released.")
+//
+// }

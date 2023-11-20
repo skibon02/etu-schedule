@@ -189,8 +189,13 @@ struct AuthParams {
 async fn authorize(
     db: Connection<Db>,
     cookie: &CookieJar<'_>,
-    auth_params: Json<AuthParams>,
+    auth_params: Option<Json<AuthParams>>,
 ) -> Status {
+    if auth_params.is_none() {
+        return Status::BadRequest;
+    }
+    let auth_params = auth_params.unwrap();
+
     debug!("> AUTH: silent_token: {:?}", auth_params.silent_token);
     debug!("> AUTH: uuid: {:?}", auth_params.uuid);
 

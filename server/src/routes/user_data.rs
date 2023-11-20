@@ -28,7 +28,11 @@ struct SetGroupBody {
 }
 
 #[post("/user/set_group", data = "<body>")]
-async fn set_group(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Json<SetGroupBody>) -> SetUserGroupResult {
+async fn set_group(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Option<Json<SetGroupBody>>) -> SetUserGroupResult {
+    if body.is_none() {
+        return SetUserGroupResult::Failed(Json(ResponseErrorMessage::new("Invalid body!".to_string())));
+    }
+    let body = body.unwrap();
     if auth.is_none() {
         return SetUserGroupResult::Failed(Json(ResponseErrorMessage::new("User is not authorized!".to_string())));
     }
@@ -66,7 +70,11 @@ pub enum SetUserDataResult {
 }
 
 #[post("/user/set_data", data = "<body>")]
-async fn set_data(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Json<UserDataOptionalModel>) -> SetUserDataResult {
+async fn set_data(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Option<Json<UserDataOptionalModel>>) -> SetUserDataResult {
+    if body.is_none() {
+        return SetUserDataResult::Failed(Json(ResponseErrorMessage::new("Invalid body!".to_string())));
+    }
+    let body = body.unwrap();
     if auth.is_none() {
         return SetUserDataResult::Failed(Json(ResponseErrorMessage::new("User is not authorized!".to_string())));
     }

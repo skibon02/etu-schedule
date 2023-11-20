@@ -10,7 +10,6 @@ use crate::routes::ResponseErrorMessage;
 
 #[derive(Serialize)]
 pub struct AttendanceScheduleObj {
-    schedule_obj_time_link_id: u32,
     is_new: bool,
     auto_attendance_enabled: bool,
 }
@@ -18,7 +17,7 @@ pub struct AttendanceScheduleObj {
 #[derive(Responder)]
 pub enum GetUserAttendanceScheduleResult {
     #[response(status = 200, content_type = "json")]
-    Success(Json<Vec<AttendanceScheduleObj>>),
+    Success(Json<BTreeMap<u32, AttendanceScheduleObj>>),
     #[response(status = 400, content_type = "json")]
     Failed(Json<ResponseErrorMessage>),
 }
@@ -59,12 +58,11 @@ pub async fn get_user_attendance_schedule(mut db: Connection<Db>, auth: Option<A
     }
     let schedule_link_ids = schedule_link_ids.unwrap();
 
-    let mut res = Vec::new();
+    let mut res = BTreeMap::new();
     for link_id in schedule_link_ids {
         let is_new = user_saved_elements.get(&link_id).is_none();
         let auto_attendance_enabled = user_saved_elements.get(&link_id).cloned().unwrap_or(false);
-        res.push(AttendanceScheduleObj {
-            schedule_obj_time_link_id: link_id,
+        res.insert(link_id, AttendanceScheduleObj {
             is_new,
             auto_attendance_enabled,
         });
@@ -94,6 +92,7 @@ pub struct SetUserAttendanceScheduleRequest {
 #[post("/attendance/schedule/update", data = "<data>")]
 pub async fn set_user_attendance_schedule(mut db: Connection<Db>, auth: Option<AuthorizeInfo>,
                                           data: Json<SetUserAttendanceScheduleRequest>) -> SetUserAttendanceScheduleResult {
+    // tokio::time::sleep(std::time::Duration::from_secs(1)).await;
     if auth.is_none() {
         return SetUserAttendanceScheduleResult::Failed(Json(ResponseErrorMessage::new("User is not authorized!".to_string())));
     }
@@ -139,7 +138,6 @@ pub async fn set_user_attendance_schedule(mut db: Connection<Db>, auth: Option<A
 
 #[derive(Serialize)]
 pub struct AttendanceScheduleDiffObj {
-    schedule_obj_time_link_id: u32,
     is_new: bool,
     auto_attendance_enabled: bool,
 }
@@ -147,7 +145,7 @@ pub struct AttendanceScheduleDiffObj {
 #[derive(Responder)]
 pub enum GetUserAttendanceScheduleDiffResult {
     #[response(status = 200, content_type = "json")]
-    Success(Json<BTreeMap<u32, Vec<AttendanceScheduleObj>>>),
+    Success(Json<BTreeMap<u32, BTreeMap<u32, AttendanceScheduleObj>>>),
     #[response(status = 400, content_type = "json")]
     Failed(Json<ResponseErrorMessage>),
 }
@@ -193,8 +191,7 @@ pub async fn get_user_attendance_schedule_diffs(mut db: Connection<Db>, auth: Op
         let is_new = user_saved_elements.get(&link_id).is_none();
         if let Some(link_id_elems) = user_saved_elements.get(&link_id).cloned() {
             for link_id_elem in link_id_elems {
-                res.entry(link_id_elem.1).or_insert(Vec::new()).push(AttendanceScheduleObj {
-                    schedule_obj_time_link_id: link_id,
+                res.entry(link_id_elem.1).or_insert(BTreeMap::new()).insert(link_id, AttendanceScheduleObj {
                     is_new,
                     auto_attendance_enabled: link_id_elem.0,
                 });
@@ -268,6 +265,11 @@ pub async fn set_user_attendance_schedule_diffs(mut db: Connection<Db>, auth: Op
 
     SetUserAttendanceDiffsScheduleResult::Success(Json(SetUserAttendanceScheduleResultSuccess { ok: true }))
 }
+
+// #[get("/test")]
+// pub async fn test_long_req(mut db: Connection<Db>) {
+//     tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+// }
 
 pub fn get_routes() -> Vec<Route> {
     routes![get_user_attendance_schedule, set_user_attendance_schedule,
