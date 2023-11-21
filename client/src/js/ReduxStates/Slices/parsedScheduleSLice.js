@@ -7,19 +7,21 @@ const parsedScheduleSlice = createSlice({
   initialState: {
     parsedSchedule1: null,
     parsedSchedule2: null,
+    parsedGroupId: null,
   },
   reducers: {
     setParsedSchedule: (s, a) => {
-      if (a.payload && a.payload.is_ready) {
+      if (a.payload.groupSchedule && a.payload.groupSchedule.is_ready) {
         if (isEvenWeek(new Date()) === '1') {
-          s.parsedSchedule1 = makeSchedule(a.payload, new Date());
-          s.parsedSchedule2 = makeSchedule(a.payload, new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7));
+          s.parsedSchedule1 = makeSchedule(a.payload.groupSchedule, new Date());
+          s.parsedSchedule2 = makeSchedule(a.payload.groupSchedule, new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7));
         } else {
-          s.parsedSchedule2 = makeSchedule(a.payload, new Date());
-          s.parsedSchedule1 = makeSchedule(a.payload, new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7));
+          s.parsedSchedule2 = makeSchedule(a.payload.groupSchedule, new Date());
+          s.parsedSchedule1 = makeSchedule(a.payload.groupSchedule, new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7));
         }
+        s.parsedGroupId = a.payload.groupId;
       }
-    }
+    },
   }
 });
 

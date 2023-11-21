@@ -1,24 +1,24 @@
 import { useState, useEffect } from "react";
 import { PlanningButton } from "./PlanningButton"
-import NoSchedule from "../Schedule/NoSchedule";
 import { Week } from "../Schedule/Week";
 import { WeekHeader } from "../Schedule/WeekHeader";
 import { isEvenWeek } from "../../Utils/handleTime";
 import { useDispatch, useSelector } from "react-redux";
-import { setParsedSchedule } from "../../ReduxStates/Slices/parsedScheduleSLice";
+import { nullParsedSchedule, setParsedSchedule } from "../../ReduxStates/Slices/parsedScheduleSlice";
+import NoSchedule from "../Schedule/NoSchedule";
 
 export default function Planning() {
   const dispatch = useDispatch();
 
   const {groupNumber, groupId} = useSelector(s => s.groupNI);
   const { groupSchedule, groupScheduleStatus, groupScheduleError } = useSelector(s => s.groupSchedule);
-  const {parsedSchedule1, parsedSchedule2} = useSelector(s => s.parsedSchedule);
+  const {parsedSchedule1, parsedSchedule2, parsedGroupId} = useSelector(s => s.parsedSchedule);
   const {planningData, planningDataStatus, planningDataError} = useSelector(s => s.planningData);
 
   const [weekParity, setWeekParity] = useState(isEvenWeek(new Date));
 
   useEffect(() => {
-    dispatch(setParsedSchedule(groupSchedule));
+    dispatch(setParsedSchedule({groupSchedule: groupSchedule, groupId: groupId}));
   }, [dispatch, groupSchedule]);
 
   if (!groupSchedule) {
@@ -33,7 +33,7 @@ export default function Planning() {
     );
   }
 
-  if (parsedSchedule1 && parsedSchedule2 && planningData) {
+  if (parsedSchedule1 && parsedSchedule2 && planningDataStatus === 'succeeded' && parsedGroupId === groupId) {
     return (
       <>  
       <div className='planning-header'>
@@ -72,9 +72,11 @@ export default function Planning() {
       <Week weekSchedule={parsedSchedule2} />
       </>
       }
-  
+
       <div className="under-planning-thead-box-mobile"></div>
       </>
     );
+  } else {
+    return <div>123</div>
   }
 }

@@ -45,7 +45,11 @@ async function myfetch(path, param = {}) {
         });
     }
     else {
-        return fetch(path, param);
+        try {
+            return fetch(path, param);
+        } catch (error) {
+            sessionStorage.setItem('fish', 1);
+        }
     }
 }
 export default myfetch;

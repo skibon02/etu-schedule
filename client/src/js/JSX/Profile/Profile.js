@@ -16,7 +16,7 @@ export default function Profile() {
   const isAuthorized = vkData.is_authorized;
 
   useEffect(() => {
-    if (!groupList) {
+    if (!groupList && isAuthorized) {
       dispatch(groupListFetch())
     };
   }, [vkData]);

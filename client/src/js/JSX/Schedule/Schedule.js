@@ -11,19 +11,19 @@ export default function Schedule() {
   const {groupNumber, groupId} = useSelector(s => s.groupNI);
   const { groupSchedule, groupScheduleStatus, groupScheduleError } = useSelector(s => s.groupSchedule);
 
-  if (!groupSchedule && active === 'schedule' ) {
+  if (!groupSchedule) {
     return (
       <NoSchedule groupNumber={groupNumber} />
     )
   }
   
-  if (!groupSchedule.is_ready && active === 'schedule' ) {
+  if (!groupSchedule.is_ready) {
     return (
       <NoSchedule groupNumber={-1} />
     )
   }
 
-  const weekSchedule = active === 'schedule' ? makeSchedule(groupSchedule, new Date(date)) : groupSchedule;
+  const weekSchedule = makeSchedule(groupSchedule, new Date(date));
   
   if (weekSchedule) {
     return (
