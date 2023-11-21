@@ -4,7 +4,7 @@ import { Week } from "../Schedule/Week";
 import { WeekHeader } from "../Schedule/WeekHeader";
 import { isEvenWeek } from "../../Utils/handleTime";
 import { useDispatch, useSelector } from "react-redux";
-import { nullParsedSchedule, setParsedSchedule } from "../../ReduxStates/Slices/parsedScheduleSlice";
+import { setParsedSchedule } from "../../ReduxStates/Slices/parsedScheduleSlice";
 import NoSchedule from "../Schedule/NoSchedule";
 
 export default function Planning() {
@@ -33,7 +33,7 @@ export default function Planning() {
     );
   }
 
-  if (parsedSchedule1 && parsedSchedule2 && planningDataStatus === 'succeeded' && parsedGroupId === groupId) {
+  if (parsedSchedule1 && parsedSchedule2 && planningData && parsedGroupId === groupId) {
     return (
       <>  
       <div className='planning-header'>
