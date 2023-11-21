@@ -1,6 +1,6 @@
 import { makeWeek } from "../../Utils/Schedule/Week/makeWeek";
 
-export function Week({weekSchedule}) {
+export default function Week({weekSchedule}) {
   const week = makeWeek(weekSchedule);
 
   return (

@@ -1,8 +1,7 @@
-import makeSchedule from "../../Utils/Schedule/parseSchedule";
-import { Week } from "./Week";
 import { WeekHeader } from "./WeekHeader";
-import NoSchedule from "./NoSchedule";
 import { useSelector } from "react-redux";
+import NoSchedule from "./NoSchedule";import makeSchedule from "../../Utils/Schedule/parseSchedule";
+import Week from "./Week";
 
 export default function Schedule() {
 

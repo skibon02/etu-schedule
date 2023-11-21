@@ -1,25 +1,18 @@
 import { useState, useEffect } from "react";
-import { PlanningButton } from "./PlanningButton"
-import { Week } from "../Schedule/Week";
 import { WeekHeader } from "../Schedule/WeekHeader";
 import { isEvenWeek } from "../../Utils/handleTime";
 import { useDispatch, useSelector } from "react-redux";
-import { setParsedSchedule } from "../../ReduxStates/Slices/parsedScheduleSlice";
 import NoSchedule from "../Schedule/NoSchedule";
+import PlanningHeader from "./PlanningHeader";
+import Week from "../Schedule/Week";
 
 export default function Planning() {
-  const dispatch = useDispatch();
 
   const {groupNumber, groupId} = useSelector(s => s.groupNI);
-  const { groupSchedule, groupScheduleStatus, groupScheduleError } = useSelector(s => s.groupSchedule);
-  const {parsedSchedule1, parsedSchedule2, parsedGroupId} = useSelector(s => s.parsedSchedule);
+  const { groupSchedule, parsedSchedule1, parsedSchedule2 } = useSelector(s => s.groupSchedule);
   const {planningData, planningDataStatus, planningDataError} = useSelector(s => s.planningData);
 
   const [weekParity, setWeekParity] = useState(isEvenWeek(new Date));
-
-  useEffect(() => {
-    dispatch(setParsedSchedule({groupSchedule: groupSchedule, groupId: groupId}));
-  }, [dispatch, groupSchedule]);
 
   if (!groupSchedule) {
     return (
@@ -33,33 +26,10 @@ export default function Planning() {
     );
   }
 
-  if (parsedSchedule1 && parsedSchedule2 && planningData && parsedGroupId === groupId) {
+  if (planningData) {
     return (
       <>  
-      <div className='planning-header'>
-        <PlanningButton
-          parity={'1'}
-          selectedParity={weekParity}
-          text={'Первая неделя'}
-          handleClick={() => setWeekParity('1')} />
-        <PlanningButton
-          parity={'2'}
-          selectedParity={weekParity}
-          text={'Вторая неделя'}
-          handleClick={() => setWeekParity('2')} />
-      </div>
-      <div className="planning-thead">
-        <div className="planning-thead__body">
-          <div className="planning-thead__lesson">
-            Предмет
-          </div>
-          <div className="planning-thead__attendance">
-            Авто-посещение
-          </div>
-        </div>
-      </div>
-      
-      <div className="under-planning-thead-box"></div>
+      <PlanningHeader weekParity={weekParity} setWeekParity={setWeekParity} />
   
       {weekParity === '1' ?
       <>

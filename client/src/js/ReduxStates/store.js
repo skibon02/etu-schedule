@@ -9,7 +9,6 @@ import groupScheduleSlice from './Slices/groupScheduleSlice'
 import accessTokenSlice from './Slices/accessTokenSlice'
 import userDataSlice from './Slices/userDataSlice'
 import fullNameEnabledSlice from './Slices/fullNameEnabledSlice'
-import parsedScheduleSlice from './Slices/parsedScheduleSlice'
 import planningDataSlice from './Slices/planningDataSlice'
 import scheduleDiffsSlice from './Slices/scheduleDiffsSlice'
 
@@ -24,7 +23,6 @@ const rootReducer = combineReducers({
   accessToken: accessTokenSlice,
   userData: userDataSlice,
   fullNameEnabled: fullNameEnabledSlice,
-  parsedSchedule: parsedScheduleSlice,
   planningData: planningDataSlice,
   scheduleDiffs: scheduleDiffsSlice,
 });
