@@ -1,23 +1,22 @@
 use std::collections::BTreeMap;
 use anyhow::Context;
 use sqlx::pool::PoolConnection;
-use sqlx::{Acquire, Sqlite};
+use sqlx::{Acquire, Postgres};
 use crate::data_merges::MergeResult;
 use crate::models;
 use crate::models::teachers::{get_teachers_cur_gen, TeacherModel};
 
-async fn insert_teacher_work_departments(teacher_id: u32, work_departments: Vec<String>, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
+async fn insert_teacher_work_departments(teacher_id: i32, work_departments: Vec<String>, con: &mut PoolConnection<Postgres>) -> anyhow::Result<()> {
     let mut transaction = con.begin().await?;
     //delete old departments
-    sqlx::query("DELETE from teachers_departments WHERE teacher_id = ?")
-        .bind(teacher_id)
+    sqlx::query!("DELETE from teachers_departments WHERE teacher_id = $1",
+                teacher_id)
         .execute(&mut *transaction).await.context("Deletion old teacher work_departments failed!")?;
 
 
     for department in work_departments {
-        sqlx::query("INSERT INTO teachers_departments (department, teacher_id) VALUES (?, ?)")
-            .bind(&department)
-            .bind(teacher_id)
+        sqlx::query!("INSERT INTO teachers_departments (department, teacher_id) VALUES ($1, $2)",
+        department, teacher_id)
             .execute(&mut *transaction)
             .await?;
     }
@@ -26,7 +25,7 @@ async fn insert_teacher_work_departments(teacher_id: u32, work_departments: Vec<
     Ok(())
 }
 
-async fn single_teacher_merge(teacher_id: u32, teacher: &TeacherModel, last_gen_id: u32, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<MergeResult> {
+async fn single_teacher_merge(teacher_id: i32, teacher: &TeacherModel, last_gen_id: i32, con: &mut PoolConnection<Postgres>) -> anyhow::Result<MergeResult> {
     trace!("Merging single teacher {}", teacher_id);
     let mut transaction = con.begin().await?;
     let row : Option<TeacherModel> = models::teachers::get_cur_gen_teacher_by_id(teacher_id, &mut transaction).await?;
@@ -61,37 +60,23 @@ async fn single_teacher_merge(teacher_id: u32, teacher: &TeacherModel, last_gen_
             models::teachers::create_new_gen(&mut transaction, new_gen_id).await?;
 
             //invalidate old gen
-            sqlx::query("UPDATE teachers SET gen_end = ? WHERE teacher_id = ? AND gen_end IS NULL")
-                .bind(&new_gen_id)
-                .bind(&teacher_id)
+            sqlx::query!("UPDATE teachers SET gen_end = $1 WHERE teacher_id = $2 AND gen_end IS NULL",
+                new_gen_id, teacher_id)
                 .execute(&mut transaction).await.context("Failed to invalidate old teacher generation")?;
 
             // insert new row
-            sqlx::query("INSERT INTO teachers (teacher_id, \
+            sqlx::query!("INSERT INTO teachers (teacher_id, \
         initials, name, surname, midname, birthday, email, group_id,\
         is_worker, is_department_head, is_department_dispatcher,
         is_student, position, degree, rank,
         gen_start, existence_diff)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
-                .bind(&teacher_id)
-
-                .bind(&teacher.initials)
-                .bind(&teacher.name)
-                .bind(&teacher.surname)
-                .bind(&teacher.midname)
-                .bind(&teacher.birthday)
-                .bind(&teacher.email)
-                .bind(&teacher.group_id)
-                .bind(&teacher.is_worker)
-                .bind(&teacher.is_department_head)
-                .bind(&teacher.is_department_dispatcher)
-                .bind(&teacher.is_student)
-                .bind(&teacher.position)
-                .bind(&teacher.degree)
-                .bind(&teacher.rank)
-
-                .bind(&new_gen_id)
-                .bind("changed")
+            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,\
+            $11, $12, $13, $14, $15, $16, $17)",
+                teacher_id, teacher.initials, teacher.name, teacher.surname, teacher.midname,
+                teacher.birthday, teacher.email, teacher.group_id,
+                teacher.is_worker, teacher.is_department_head, teacher.is_department_dispatcher,
+                teacher.is_student, teacher.position, teacher.degree, teacher.rank,
+                new_gen_id, "changed")
                 .execute(&mut transaction).await.context("Failed to insert teacher in teacher merge")?;
             info!("Teacher [CHANGED]: {}, {}", teacher_id, teacher.initials);
 
@@ -114,31 +99,18 @@ async fn single_teacher_merge(teacher_id: u32, teacher: &TeacherModel, last_gen_
         models::teachers::create_new_gen(&mut transaction, new_gen_id).await?;
 
 
-        sqlx::query("INSERT INTO teachers (teacher_id, \
+        sqlx::query!("INSERT INTO teachers (teacher_id, \
         initials, name, surname, midname, birthday, email, group_id,\
         is_worker, is_department_head, is_department_dispatcher,
         is_student, position, degree, rank,
         gen_start, existence_diff)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
-            .bind(&teacher_id)
-
-            .bind(&teacher.initials)
-            .bind(&teacher.name)
-            .bind(&teacher.surname)
-            .bind(&teacher.midname)
-            .bind(&teacher.birthday)
-            .bind(&teacher.email)
-            .bind(&teacher.group_id)
-            .bind(&teacher.is_worker)
-            .bind(&teacher.is_department_head)
-            .bind(&teacher.is_department_dispatcher)
-            .bind(&teacher.is_student)
-            .bind(&teacher.position)
-            .bind(&teacher.degree)
-            .bind(&teacher.rank)
-
-            .bind(&new_gen_id)
-            .bind("new")
+            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10,\
+            $11, $12, $13, $14, $15, $16, $17)",
+            teacher_id, teacher.initials, teacher.name, teacher.surname, teacher.midname,
+            teacher.birthday, teacher.email, teacher.group_id,
+            teacher.is_worker, teacher.is_department_head, teacher.is_department_dispatcher,
+            teacher.is_student, teacher.position, teacher.degree, teacher.rank,
+            new_gen_id, "new")
             .execute(&mut transaction).await.context("Failed to insert teacher in teacher merge")?;
         info!("Teacher [INSERTED]: ({}): {}", teacher_id, teacher.initials);
 
@@ -147,7 +119,7 @@ async fn single_teacher_merge(teacher_id: u32, teacher: &TeacherModel, last_gen_
     }
 }
 
-pub async fn teachers_merge(teachers: BTreeMap<u32, (TeacherModel, Vec<String>)>, last_gen_id: u32, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
+pub async fn teachers_merge(teachers: BTreeMap<i32, (TeacherModel, Vec<String>)>, last_gen_id: i32, con: &mut PoolConnection<Postgres>) -> anyhow::Result<()> {
     info!("MERGE::TEACHERS Merging started! Last generation: {}", last_gen_id);
     let start = std::time::Instant::now();
 

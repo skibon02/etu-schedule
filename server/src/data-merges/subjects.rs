@@ -1,12 +1,12 @@
 use std::collections::BTreeMap;
 use anyhow::Context;
 use sqlx::pool::PoolConnection;
-use sqlx::{Acquire, Sqlite};
+use sqlx::{Acquire, Postgres};
 use crate::data_merges::MergeResult;
 use crate::models;
 use crate::models::subjects::{get_subjects_cur_gen, SubjectModel};
 
-async fn single_subject_merge(subject_id: u32, subject: &SubjectModel, last_gen_id: u32, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<MergeResult> {
+async fn single_subject_merge(subject_id: i32, subject: &SubjectModel, last_gen_id: i32, con: &mut PoolConnection<Postgres>) -> anyhow::Result<MergeResult> {
     trace!("Merging single subject {}", subject_id);
     let mut transaction = con.begin().await?;
     let row : Option<SubjectModel> = models::subjects::get_cur_gen_subject_by_id(subject_id, &mut transaction).await?;
@@ -30,28 +30,19 @@ async fn single_subject_merge(subject_id: u32, subject: &SubjectModel, last_gen_
             models::subjects::create_new_gen(&mut transaction, new_gen_id).await?;
 
             //invalidate old gen
-            sqlx::query("UPDATE subjects SET gen_end = ? WHERE subject_id = ? AND gen_end IS NULL")
-                .bind(&new_gen_id)
-                .bind(&subject_id)
+            sqlx::query!("UPDATE subjects SET gen_end = $1 WHERE subject_id = $2 AND gen_end IS NULL",
+                new_gen_id, subject_id)
                 .execute(&mut transaction).await.context("Failed to invalidate old subject generation")?;
 
             // insert new row
-            sqlx::query("INSERT INTO subjects (subject_id, \
+            sqlx::query!("INSERT INTO subjects (subject_id, \
         title, short_title, subject_type, control_type, \
         semester, alien_id, department_id,\
         gen_start, existence_diff)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
-                .bind(&subject_id)
-                .bind(&subject.title)
-                .bind(&subject.short_title)
-                .bind(&subject.subject_type)
-                .bind(&subject.control_type)
-
-                .bind(&subject.semester)
-                .bind(&subject.alien_id)
-                .bind(&subject.department_id)
-                .bind(&new_gen_id)
-                .bind("changed")
+            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+                subject_id, subject.title, subject.short_title, subject.subject_type, subject.control_type,
+                subject.semester, subject.alien_id, subject.department_id,
+                new_gen_id, "changed")
                 .execute(&mut transaction).await.context("Failed to insert subject in subject merge")?;
             info!("Subject [CHANGED]: ({}): {}", subject_id, subject.title);
 
@@ -66,11 +57,8 @@ async fn single_subject_merge(subject_id: u32, subject: &SubjectModel, last_gen_
                 row.department_id != subject.department_id {
                 trace!("Updating untracked information in subject...");
 
-                sqlx::query("UPDATE subjects SET semester = ?, alien_id = ?, department_id = ? WHERE subject_id = ?")
-                    .bind(&subject.semester)
-                    .bind(&subject.alien_id)
-                    .bind(&subject.department_id)
-                    .bind(&subject_id)
+                sqlx::query!("UPDATE subjects SET semester = $1, alien_id = $2, department_id = $3 WHERE subject_id = $4",
+                    subject.semester, subject.alien_id, subject.department_id, subject_id)
                     .execute(&mut transaction)
                     .await.context("Failed to update subject in subject merge")?;
 
@@ -87,22 +75,14 @@ async fn single_subject_merge(subject_id: u32, subject: &SubjectModel, last_gen_
         let new_gen_id = last_gen_id + 1;
         models::subjects::create_new_gen(&mut transaction, new_gen_id).await?;
 
-        sqlx::query("INSERT INTO subjects (subject_id, \
+        sqlx::query!("INSERT INTO subjects (subject_id, \
         title, short_title, subject_type, control_type, \
         semester, alien_id, department_id,\
         gen_start, existence_diff)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
-            .bind(&subject_id)
-            .bind(&subject.title)
-            .bind(&subject.short_title)
-            .bind(&subject.subject_type)
-            .bind(&subject.control_type)
-
-            .bind(&subject.semester)
-            .bind(&subject.alien_id)
-            .bind(&subject.department_id)
-            .bind(new_gen_id)
-            .bind("new")
+            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+            subject_id, subject.title, subject.short_title, subject.subject_type, subject.control_type,
+            subject.semester, subject.alien_id, subject.department_id,
+            new_gen_id, "new")
             .execute(&mut transaction).await.context("Failed to insert subject in subject merge")?;
         info!("Subject [INSERTED]: ({}): {}", subject_id, subject.title);
 
@@ -111,7 +91,7 @@ async fn single_subject_merge(subject_id: u32, subject: &SubjectModel, last_gen_
     }
 }
 
-pub async fn subjects_merge(subjects: &BTreeMap<u32, Vec<SubjectModel>>, last_gen_id: u32, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
+pub async fn subjects_merge(subjects: &BTreeMap<i32, Vec<SubjectModel>>, last_gen_id: i32, con: &mut PoolConnection<Postgres>) -> anyhow::Result<()> {
     info!("MERGE::SUBJECTS Merging subjects started! Last generation: {}", last_gen_id);
     let start = std::time::Instant::now();
 

@@ -24,7 +24,7 @@ pub enum SetUserGroupResult {
 
 #[derive(Deserialize)]
 struct SetGroupBody {
-    group_id: Option<u32>,
+    group_id: Option<i32>,
 }
 
 #[post("/user/set_group", data = "<body>")]
@@ -92,7 +92,7 @@ async fn set_data(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Opt
 }
 #[derive(Serialize)]
 pub struct OutputUserDataModel {
-    pub user_id: u32,
+    pub user_id: i32,
     pub group: Option<GroupModel>,
     pub subjects_title_formatting: SubjectsTitleFormatting,
     pub attendance_token: Option<String>,

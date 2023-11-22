@@ -52,8 +52,8 @@ export default function Attendance({
               needToShow,
               setNeedToSHow
             );
-            addToQueue([time_link_id, weekNumber, !init])}} >
-            {/* scheduleDiffsSETFetch(time_link_id, weekNumber, !init)}} > */}
+            // addToQueue([time_link_id, weekNumber, !init])}} >
+            scheduleDiffsSETFetch(time_link_id, weekNumber, !init)}} >
           <div 
             className={
               isDead ? 

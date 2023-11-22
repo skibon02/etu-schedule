@@ -1,1 +1,1 @@
-DATABASE_URL="sqlite:db/sqlite.db" cargo run --release -- $@
+DATABASE_URL=postgres://etu_attend_app:12346543@localhost cargo run --release -- $@

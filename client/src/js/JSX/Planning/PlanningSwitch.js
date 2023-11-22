@@ -15,8 +15,8 @@ export default function PlanningSwitch({time_link_id, planning_time_link_id_valu
           className={autoAttendEnabled ? "switch__body-true" : "switch__body-false"}
           onClick={() => {
             setAutoAttendEnabled(!autoAttendEnabled)
-            addToQueue(dispatch, [time_link_id, !autoAttendEnabled]);
-            // planningDataSETFetch(dispatch, time_link_id, !autoAttendEnabled);
+            // addToQueue(dispatch, [time_link_id, !autoAttendEnabled]);
+            planningDataSETFetch(dispatch, time_link_id, !autoAttendEnabled);
           }}>
           <div className={autoAttendEnabled ? "switch__circle-true" : "switch__circle-false"}></div>
         </div>

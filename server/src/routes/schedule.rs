@@ -15,7 +15,7 @@ use crate::routes::ResponseErrorMessage;
 #[derive(serde::Serialize)]
 pub struct OutputAuditoriumReservationModel {
     auditorium_number: Option<String>,
-    time: u32,
+    time: i32,
     week: String,
     week_day: String,
 }
@@ -27,12 +27,12 @@ pub struct OutputSubjectModel {
     pub short_title: Option<String>,
     pub subject_type: Option<String>,
     pub control_type: Option<String>,
-    pub department_id: u32
+    pub department_id: i32
 }
 
 #[derive(serde::Serialize)]
 pub struct OutputTeacherModel {
-    id: u32,
+    id: i32,
     name: String,
     surname: String,
     midname: String,
@@ -40,7 +40,7 @@ pub struct OutputTeacherModel {
 
     birthday: String,
     email: Option<String>,
-    group_id: Option<u32>,
+    group_id: Option<i32>,
 
     rank: Option<String>,
     position: Option<String>,
@@ -90,11 +90,11 @@ pub struct OutputScheduleObjectModel {
     second_teacher: Option<OutputTeacherModel>,
     third_teacher: Option<OutputTeacherModel>,
     fourth_teacher: Option<OutputTeacherModel>,
-    id: u32,
-    time_link_id: u32,
+    id: i32,
+    time_link_id: i32,
 }
 
-impl TryInto<OutputScheduleObjectModel> for (ScheduleObjModel, &BTreeMap<u32, SubjectModel>, &BTreeMap<u32, (TeacherModel, Vec<String>)>) {
+impl TryInto<OutputScheduleObjectModel> for (ScheduleObjModel, &BTreeMap<i32, SubjectModel>, &BTreeMap<i32, (TeacherModel, Vec<String>)>) {
     type Error = String;
     fn try_into(self) -> Result<OutputScheduleObjectModel, String> {
         let sched_model = self.0;
@@ -137,7 +137,7 @@ impl TryInto<OutputScheduleObjectModel> for (ScheduleObjModel, &BTreeMap<u32, Su
             third_teacher: third_teacher.map(|t| t.into()),
             fourth_teacher: fourth_teacher.map(|t| t.into()),
             id: sched_model.schedule_obj_id,
-            time_link_id: sched_model.link_id
+            time_link_id: sched_model.time_link_id
         })
     }
 }
@@ -146,7 +146,7 @@ impl TryInto<OutputScheduleObjectModel> for (ScheduleObjModel, &BTreeMap<u32, Su
 pub struct OutputGroupScheduleModel {
     sched_objs: Vec<OutputScheduleObjectModel>,
     is_ready: bool,
-    actual_time: Option<u32>,
+    actual_time: Option<i32>,
 }
 
 #[derive(Responder)]
@@ -158,7 +158,7 @@ enum GetGroupScheduleObjectsResponse {
 }
 
 #[get("/scheduleObjs/group/<group_id>")]
-async fn get_group_schedule_objects(group_id: u32, mut con: Connection<Db>) -> GetGroupScheduleObjectsResponse {
+async fn get_group_schedule_objects(group_id: i32, mut con: Connection<Db>) -> GetGroupScheduleObjectsResponse {
     let last_merge_time = models::groups::get_time_since_last_group_merge(group_id, con.deref_mut()).await;
     match last_merge_time {
         Ok(last_merge_time) => {
@@ -166,10 +166,10 @@ async fn get_group_schedule_objects(group_id: u32, mut con: Connection<Db>) -> G
                 Some(time) => {
                     let sched_objects = models::schedule::get_current_schedule_for_group(con.deref_mut(), group_id).await.unwrap();
                     let subjects = models::subjects::get_subjects_for_group(con.deref_mut(), group_id).await.unwrap();
-                    let subjects_map: BTreeMap<u32, SubjectModel> = subjects.into_iter().map(|row| (row.subject_id, row.clone())).collect();
+                    let subjects_map: BTreeMap<i32, SubjectModel> = subjects.into_iter().map(|row| (row.subject_id, row.clone())).collect();
 
                     let teachers = models::teachers::get_teachers_for_group(con.deref_mut(), group_id).await.unwrap();
-                    let mut teachers_map: BTreeMap<u32, (TeacherModel, Vec<String>)> = BTreeMap::new();
+                    let mut teachers_map: BTreeMap<i32, (TeacherModel, Vec<String>)> = BTreeMap::new();
                     for teacher in teachers {
                         let teacher_departments = models::teachers::get_teacher_departments(teacher.teacher_id, &mut *con).await.unwrap();
                         teachers_map.insert(teacher.teacher_id, (teacher, teacher_departments));
@@ -224,7 +224,7 @@ async fn get_group_schedule_objects(group_id: u32, mut con: Connection<Db>) -> G
 }
 
 #[get("/groups")]
-async fn get_groups(mut con: Connection<Db>) -> Json<BTreeMap<u32, GroupModel>> {
+async fn get_groups(mut con: Connection<Db>) -> Json<BTreeMap<i32, GroupModel>> {
     let groups = models::groups::get_groups(con.deref_mut()).await.unwrap();
     let mut out_groups = BTreeMap::new();
     for g in groups.into_iter() {

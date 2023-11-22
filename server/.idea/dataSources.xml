@@ -8,18 +8,11 @@
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/db/sqlite.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="sqlite.db [2]" uuid="61faf20e-bea7-4266-a6a0-77ad512aea4f">
-      <driver-ref>sqlite.xerial</driver-ref>
+    <data-source source="LOCAL" name="etu_attend_app" uuid="26d9b698-7cf5-4e03-854f-707317319a80">
+      <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$USER_HOME$/sqlite.db</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
-    <data-source source="LOCAL" name="sqlite.db [3]" uuid="a650babc-7e1c-4188-9206-208df5579b6d">
-      <driver-ref>sqlite.xerial</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$USER_HOME$/sqlite.db</jdbc-url>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/etu_attend_app</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

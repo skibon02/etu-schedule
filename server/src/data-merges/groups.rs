@@ -1,5 +1,5 @@
 use anyhow::{anyhow, Context};
-use sqlx::{Acquire, Sqlite, SqliteConnection};
+use sqlx::{Acquire, Postgres};
 use sqlx::pool::PoolConnection;
 use crate::api::etu_api::{DepartmentOriginal, FacultyOriginal, GroupOriginal};
 use crate::data_merges::MergeResult;
@@ -7,19 +7,19 @@ use crate::data_merges::MergeResult;
 use crate::models::groups::{DepartmentModel, FacultyModel, GroupModel};
 
 
-async fn faculty_single_merge(faculty: FacultyModel, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<MergeResult> {
+async fn faculty_single_merge(faculty: FacultyModel, con: &mut PoolConnection<Postgres>) -> anyhow::Result<MergeResult> {
     let id = faculty.faculty_id;
-    let row : Option<FacultyModel> = sqlx::query_as("SELECT * FROM faculties WHERE faculty_id = ?")
-        .bind(id)
+    let row : Option<FacultyModel> = sqlx::query_as!(FacultyModel,
+        "SELECT * FROM faculties WHERE faculty_id = $1",
+            id)
         .fetch_optional(&mut **con)
         .await.context("Failed to fetch faculty in faculty merge")?;
 
     if let Some(row) = row {
         if row != faculty {
             trace!("MERGE::FACULTIES \tUpdating faculty {} with title {}: \n old: {:?}, new: {:?}", id, faculty.title, row, faculty);
-            sqlx::query("UPDATE faculties SET title = ? WHERE faculty_id = ?")
-                .bind(&faculty.title)
-                .bind(&faculty.faculty_id)
+            sqlx::query!("UPDATE faculties SET title = $1 WHERE faculty_id = $2",
+                faculty.title, faculty.faculty_id)
                 .execute(&mut **con)
                 .await.context("Failed to update faculty in faculty merge")?;
             info!("Faculty [CHANGED]: ({}): {}", faculty.faculty_id, faculty.title);
@@ -32,9 +32,9 @@ async fn faculty_single_merge(faculty: FacultyModel, con: &mut PoolConnection<Sq
     }
     else {
         trace!("MERGE::FACULTIES \tNew faculty: {} with title {}", id, faculty.title);
-        sqlx::query("INSERT INTO faculties (faculty_id, title) VALUES (?, ?)")
-            .bind(&faculty.faculty_id)
-            .bind(&faculty.title)
+        sqlx::query!("INSERT INTO faculties (faculty_id, title) VALUES ($1, $2) ON CONFLICT(faculty_id) DO UPDATE
+            SET title = $2",
+            faculty.faculty_id, faculty.title)
             .execute(&mut **con)
             .await.context("Failed to insert faculty in faculty merge")?;
         info!("Faculty [INSERTED]: ({}): {}", faculty.faculty_id, faculty.title);
@@ -42,10 +42,11 @@ async fn faculty_single_merge(faculty: FacultyModel, con: &mut PoolConnection<Sq
         Ok(MergeResult::Inserted)
     }
 }
-pub async fn department_single_merge(department: DepartmentModel, faculty: Option<&FacultyModel>, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<MergeResult> {
+pub async fn department_single_merge(department: DepartmentModel, faculty: Option<&FacultyModel>, con: &mut PoolConnection<Postgres>) -> anyhow::Result<MergeResult> {
     let id = department.department_id;
-    let row : Option<DepartmentModel> = sqlx::query_as("SELECT * FROM departments WHERE department_id = ?")
-        .bind(id)
+    let row : Option<DepartmentModel> = sqlx::query_as!(DepartmentModel,
+            "SELECT * FROM departments WHERE department_id = $1",
+            id)
         .fetch_optional(&mut *con)
         .await.context("Failed to fetch department in department merge")?;
 
@@ -60,12 +61,10 @@ pub async fn department_single_merge(department: DepartmentModel, faculty: Optio
         // do not update if faculty is None
         if (faculty.is_some() || row.faculty_id == department.faculty_id) && row != department {
             trace!("MERGE::DEPARTMENTS \tUpdating department {} with title {}: \n old: {:?}, new: {:?}", id, department.title, row, department);
-            sqlx::query("UPDATE departments SET title = ?, long_title = ?, department_type = ?, faculty_id = ? WHERE department_id = ?")
-                .bind(&department.title)
-                .bind(&department.long_title)
-                .bind(&department.department_type)
-                .bind(&department.faculty_id)
-                .bind(&department.department_id)
+            sqlx::query!("UPDATE departments SET title = $1, long_title = $2, \
+            department_type = $3, faculty_id = $4 WHERE department_id = $5",
+                department.title, department.long_title, department.department_type,
+                department.faculty_id, department.department_id)
                 .execute(&mut *con)
                 .await.context("Failed to update department in department merge")?;
             info!("Department [CHANGED]: ({}): {}", department.department_id, department.title);
@@ -77,12 +76,10 @@ pub async fn department_single_merge(department: DepartmentModel, faculty: Optio
         }
     } else {
         trace!("MERGE::DEPARTMENTS \tNew department: {} with title {}", id, department.title);
-        sqlx::query("INSERT INTO departments (department_id, title, long_title, department_type, faculty_id) VALUES (?, ?, ?, ?, ?)")
-            .bind(&department.department_id)
-            .bind(&department.title)
-            .bind(&department.long_title)
-            .bind(&department.department_type)
-            .bind(&department.faculty_id)
+        sqlx::query!("INSERT INTO departments (department_id, title, \
+        long_title, department_type, faculty_id) VALUES ($1, $2, $3, $4, $5)",
+            department.department_id, department.title, department.long_title,
+            department.department_type, department.faculty_id)
             .execute(con)
             .await.context("Failed to insert department")?;
         info!("Department [INSERTED]: ({}): {}", department.department_id, department.title);
@@ -92,10 +89,9 @@ pub async fn department_single_merge(department: DepartmentModel, faculty: Optio
 }
 
 async fn group_single_merge(group: &GroupModel, department: Option<&DepartmentModel>,
-                            faculty: Option<&FacultyModel>, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<MergeResult> {
+                            faculty: Option<&FacultyModel>, con: &mut PoolConnection<Postgres>) -> anyhow::Result<MergeResult> {
     let id = group.group_id;
-    let row : Option<GroupModel> = sqlx::query_as("SELECT * FROM groups WHERE group_id = ?")
-        .bind(id)
+    let row: Option<GroupModel> = sqlx::query_as!(GroupModel, "SELECT * FROM groups WHERE group_id = $1", id)
         .fetch_optional(&mut *con)
         .await.context("Failed to fetch group in group merge")?;
 
@@ -109,15 +105,12 @@ async fn group_single_merge(group: &GroupModel, department: Option<&DepartmentMo
     if let Some(row) = row {
         if row != *group {
             trace!("MERGE::GROUPS \tUpdating group {} with number {}: \n old: {:?}, new: {:?}", id, group.number, row, *group);
-            sqlx::query("UPDATE groups SET number = ?, studying_type = ?, education_level = ?, start_year = ?, end_year = ?, department_id = ?, specialty_id = ? WHERE group_id = ?")
-                .bind(&group.number)
-                .bind(&group.studying_type)
-                .bind(&group.education_level)
-                .bind(&group.start_year)
-                .bind(&group.end_year)
-                .bind(&group.department_id)
-                .bind(&group.specialty_id)
-                .bind(&group.group_id)
+            sqlx::query!("UPDATE groups SET number = $1, studying_type = $2, \
+            education_level = $3, start_year = $4, end_year = $5, department_id = $6, \
+            specialty_id = $7 WHERE group_id = $8",
+                group.number, group.studying_type, group.education_level,
+                group.start_year, group.end_year, group.department_id,
+                group.specialty_id, group.group_id)
                 .execute(&mut *con)
                 .await.context("Failed to update group in group merge")?;
             info!("Group [CHANGED]: ({}): {}", group.group_id, group.number);
@@ -128,15 +121,10 @@ async fn group_single_merge(group: &GroupModel, department: Option<&DepartmentMo
         }
     } else {
         trace!("MERGE::GROUPS \tNew group: {} with number {}", id, group.number);
-        sqlx::query("INSERT INTO groups (group_id, number, studying_type, education_level, start_year, end_year, department_id, specialty_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-            .bind(&group.group_id)
-            .bind(&group.number)
-            .bind(&group.studying_type)
-            .bind(&group.education_level)
-            .bind(&group.start_year)
-            .bind(&group.end_year)
-            .bind(&group.department_id)
-            .bind(&group.specialty_id)
+        sqlx::query!("INSERT INTO groups (group_id, number, studying_type, \
+        education_level, start_year, end_year, department_id, specialty_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+            group.group_id, group.number, group.studying_type, group.education_level,
+            group.start_year, group.end_year, group.department_id, group.specialty_id)
             .execute(&mut **con)
             .await.context("Failed to insert group in group merge")?;
         info!("Group [INSERTED]: ({}): {}", group.group_id, group.number);
@@ -145,7 +133,7 @@ async fn group_single_merge(group: &GroupModel, department: Option<&DepartmentMo
     }
 }
 
-pub async fn groups_merge(groups: &Vec<GroupOriginal>, con: &mut PoolConnection<Sqlite>) -> anyhow::Result<()> {
+pub async fn groups_merge(groups: &Vec<GroupOriginal>, con: &mut PoolConnection<Postgres>) -> anyhow::Result<()> {
     info!("MERGE::GROUPS Merging started!");
     let start = std::time::Instant::now();
 

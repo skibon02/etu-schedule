@@ -1,2 +1,2 @@
 #!/bin/bash
-DATABASE_URL="sqlite:db/sqlite.db" sqlx migrate run
+DATABASE_URL="postgres://etu_attend_app:12346543@localhost" sqlx migrate run

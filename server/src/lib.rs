@@ -259,13 +259,13 @@ pub fn run() -> Rocket<Build> {
         rocket
     }
 }
-pub static MERGE_REQUEST_CHANNEL: OnceLock<tokio::sync::mpsc::Sender<u32>> = OnceLock::new();
+pub static MERGE_REQUEST_CHANNEL: OnceLock<tokio::sync::mpsc::Sender<i32>> = OnceLock::new();
 pub static MERGE_REQUEST_CNT: AtomicUsize = AtomicUsize::new(0);
 
 const GROUPS_MERGE_INTERVAL: u64 = 60*5;
 const ETU_REQUEST_INTERVAL: u64 = 5;
 
-const SINGLE_GROUP_INTERVAL: u32 = 30;
+const SINGLE_GROUP_INTERVAL: i32 = 30;
 
 const FORCE_REQ_CHANNEL_SIZE: usize = 50;
 const FORCE_REQ_THROTTLE_THRESHOLD: usize = 10;
@@ -280,7 +280,7 @@ async fn periodic_task(mut con: Db) {
     let new_groups = etu_api::get_groups_list().await;
     data_merges::groups::groups_merge(&new_groups, &mut con.acquire().await.unwrap()).await.unwrap();
 
-    while let Ok(groups) = get_not_merged_sched_group_id_list(&mut con, 50).await {
+    while let Ok(groups) = get_not_merged_sched_group_id_list(&mut con.acquire().await.unwrap(), 50).await {
         info!("BGTASK: received {} groups for merge", groups.len());
         process_schedule_merge(groups, &mut con).await;
     }
@@ -356,7 +356,7 @@ async fn periodic_task(mut con: Db) {
     }
 }
 
-async fn process_schedule_merge(group_id_vec: Vec<u32>, con: &mut Db) {
+async fn process_schedule_merge(group_id_vec: Vec<i32>, con: &mut Db) {
 
     let new_groups = etu_api::get_groups_list().await;
     data_merges::groups::groups_merge(&new_groups, &mut con.acquire().await.unwrap()).await.unwrap();
@@ -371,9 +371,9 @@ async fn process_schedule_merge(group_id_vec: Vec<u32>, con: &mut Db) {
     for (group_id, sched_objs) in sched_objs {
         info!("BGTASK: Starting merge for group id {}", group_id);
         let mut sched_objs_models: Vec<ScheduleObjModel> = Vec::new();
-        let mut subjects: BTreeMap<u32, Vec<SubjectModel>> = BTreeMap::new();
+        let mut subjects: BTreeMap<i32, Vec<SubjectModel>> = BTreeMap::new();
         let mut departments: Vec<DepartmentModel> = Vec::new();
-        let mut teachers: BTreeMap<u32, (TeacherModel, Vec<String>)> = BTreeMap::new();
+        let mut teachers: BTreeMap<i32, (TeacherModel, Vec<String>)> = BTreeMap::new();
 
         for sched_obj_orig in sched_objs.scheduleObjects {
             sched_objs_models.push(sched_obj_orig.clone().try_into().unwrap());

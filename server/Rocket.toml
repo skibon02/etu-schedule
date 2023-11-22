@@ -1,5 +1,5 @@
 [default.databases.sqlx]
-url= "db/sqlite.db"
+url = "postgres://etu_attend_app:12346543@localhost"
 
 [default.tls]
 key = "tls/key.pem"

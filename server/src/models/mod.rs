@@ -6,8 +6,7 @@ pub mod teachers;
 pub mod attendance;
 
 use rocket_db_pools::{sqlx, Database};
-use thiserror::Error;
 
 #[derive(Database, Clone)]
 #[database("sqlx")]
-pub struct Db(sqlx::SqlitePool);
+pub struct Db(sqlx::PgPool);

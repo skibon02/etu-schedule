@@ -7,6 +7,7 @@ use crate::models::subjects::SubjectModel;
 use crate::models::teachers::TeacherModel;
 
 use itertools::Itertools;
+use rocket::time::PrimitiveDateTime;
 
 const BASE_URL_SCHEDULE: &str = "https://digital.etu.ru/api/schedule/";
 const BASE_URL_ATTENDANCE: &str = "https://digital.etu.ru/api/attendance/";
@@ -14,7 +15,7 @@ const BASE_URL_GENERAL: &str = "https://digital.etu.ru/api/general/";
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
 pub struct FacultyOriginal {
-    pub id: u32,
+    pub id: i32,
     pub title: String,
 }
 
@@ -29,7 +30,7 @@ impl FacultyOriginal {
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
 pub struct SubjectDepartmentOriginal {
-    pub id: u32,
+    pub id: i32,
     pub title: String,
     pub longTitle: Option<String>,
     #[serde(rename = "type")]
@@ -50,7 +51,7 @@ impl Into<DepartmentModel> for SubjectDepartmentOriginal {
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
 pub struct DepartmentOriginal {
-    pub id: u32,
+    pub id: i32,
     pub title: String,
     pub longTitle: Option<String>,
     #[serde(rename = "type")]
@@ -75,14 +76,14 @@ impl DepartmentOriginal {
 #[derive(Deserialize, Debug, Clone, Serialize)]
 pub struct GroupOriginal {
     pub fullNumber: String,
-    pub id: u32,
+    pub id: i32,
     pub number: String,
     pub studyingType: String,
     pub educationLevel: String,
-    pub departmentId: u32,
-    pub specialtyId: u32,
-    pub startYear: u16,
-    pub endYear: u16,
+    pub departmentId: i32,
+    pub specialtyId: i32,
+    pub startYear: i32,
+    pub endYear: i32,
     pub department: DepartmentOriginal
 }
 
@@ -97,15 +98,18 @@ impl GroupOriginal {
             end_year: self.endYear,
             department_id: self.departmentId,
             specialty_id: self.specialtyId,
+
+            // missing info:
+            latest_schedule_merge_timestamp: None,
         }
     }
 }
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
 pub struct ReservationTimeOriginal {
-    id: u32,
-    startTime: u32,
-    endTime: u32,
+    id: i32,
+    startTime: i32,
+    endTime: i32,
     week: String,
     weekDay: String,
 }
@@ -123,14 +127,14 @@ pub struct AuditoriumReservationOriginal {
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
 pub struct SubjectOriginal {
-    pub id: u32,
+    pub id: i32,
     pub alienId: i32,
     pub title: String,
     pub shortTitle: Option<String>,
     pub subjectType: Option<String>,
     pub controlType: Option<String>,
     pub department: SubjectDepartmentOriginal,
-    pub semester: u32,
+    pub semester: i32,
 }
 
 impl Into<SubjectModel> for SubjectOriginal {
@@ -146,19 +150,20 @@ impl Into<SubjectModel> for SubjectOriginal {
             semester: self.semester,
 
 
-            // not related info
+            // missing info
             subject_obj_id: Default::default(),
             gen_start: Default::default(),
             gen_end: Default::default(),
             existence_diff: Default::default(),
-
+            created_timestamp: PrimitiveDateTime::MIN,
+            modified_timestamp: PrimitiveDateTime::MIN,
         }
     }
 }
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
 pub struct TeacherOriginal {
-    id: u32,
+    id: i32,
 
     name: String,
     surname: String,
@@ -167,7 +172,7 @@ pub struct TeacherOriginal {
 
     birthday: String,
     email: Option<String>,
-    groupId: Option<u32>,
+    groupId: Option<i32>,
 
     rank: Option<String>,
     position: Option<String>,
@@ -205,8 +210,10 @@ impl Into<(TeacherModel, Vec<String>)> for TeacherOriginal {
             gen_end: Default::default(),
             gen_start: Default::default(),
             teacher_obj_id: Default::default(),
-            existence_diff: Default::default()
+            existence_diff: Default::default(),
 
+            created_timestamp: PrimitiveDateTime::MIN,
+            modified_timestamp: PrimitiveDateTime::MIN,
         };
         let work_departments = self.workDepartments.unwrap_or_default();
 
@@ -216,7 +223,7 @@ impl Into<(TeacherModel, Vec<String>)> for TeacherOriginal {
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
 pub struct LessonOriginal {
-    pub id: u32,
+    pub id: i32,
     pub auditoriumReservation: AuditoriumReservationOriginal,
     pub subject: SubjectOriginal,
     pub teacher: Option<TeacherOriginal>,
@@ -229,7 +236,7 @@ pub struct LessonOriginal {
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
 pub struct ScheduleObjectOriginal {
-    pub id: u32,
+    pub id: i32,
     pub lesson: LessonOriginal,
 }
 
@@ -237,7 +244,6 @@ impl TryInto<ScheduleObjModel> for ScheduleObjectOriginal {
     type Error = String;
     fn try_into(self) -> Result<ScheduleObjModel, String> {
         Ok(ScheduleObjModel {
-            updated_at: self.lesson.auditoriumReservation.updatedAt.clone().unwrap_or("updatedAt is None!".to_string()),
             last_known_orig_sched_obj_id: self.id,
             subject_id: self.lesson.subject.id,
             teacher_id: self.lesson.teacher.as_ref().map(|t| t.id),
@@ -253,11 +259,15 @@ impl TryInto<ScheduleObjModel> for ScheduleObjectOriginal {
             subject_gen_id: Default::default(),
             teacher_gen_id: Default::default(),
             schedule_obj_id: Default::default(), // db id
-            link_id: Default::default(),
+            time_link_id: Default::default(),
             group_id: Default::default(), // known from outside
             gen_start: Default::default(),
             gen_end: Default::default(),
-            existence_diff: Default::default()
+            existence_diff: Default::default(),
+            prev_time_link_id: Default::default(),
+
+            created_timestamp: PrimitiveDateTime::MIN,
+            modified_timestamp: PrimitiveDateTime::MIN,
         })
     }
 }
@@ -267,7 +277,7 @@ impl TryInto<ScheduleObjModel> for ScheduleObjectOriginal {
 pub struct GroupScheduleOriginal {
     pub scheduleObjects: Vec<ScheduleObjectOriginal>,
     #[serde(rename = "id")]
-    pub group_id: u32
+    pub group_id: i32
 }
 
 pub async fn get_schedule_objs_group(group: u32) -> Option<GroupScheduleOriginal> {
@@ -283,7 +293,7 @@ pub async fn get_schedule_objs_group(group: u32) -> Option<GroupScheduleOriginal
     parsed_objs.get(0).cloned()
 }
 
-pub async fn get_schedule_objs_groups(groups: Vec<u32>) -> Option<BTreeMap<u32, GroupScheduleOriginal>> {
+pub async fn get_schedule_objs_groups(groups: Vec<i32>) -> Option<BTreeMap<i32, GroupScheduleOriginal>> {
     let url = format!(
         "{}objects/publicated?subjectType=%D0%9B%D0%B5%D0%BA&subjectType=%D0%9F%D1%80&subjectType=%D0%9B%D0%B0%D0%B1&subjectType=%D0%9A%D0%9F&subjectType=%D0%9A%D0%A0&subjectType=%D0%94%D0%BE%D0%B1&subjectType=%D0%9C%D0%AD%D0%BA&subjectType=%D0%9F%D1%80%D0%B0%D0%BA&subjectType=%D0%A2%D0%B5%D1%81%D1%82&withSubjectCode=true&withURL=true&{}",
         BASE_URL_SCHEDULE,
@@ -293,7 +303,7 @@ pub async fn get_schedule_objs_groups(groups: Vec<u32>) -> Option<BTreeMap<u32, 
     let body = response.text().await.unwrap();
 
     let parsed_objs = parse_schedule_objs_groups(body).unwrap();
-    let res = parsed_objs.into_iter().map(|g| (g.group_id, g)).collect::<BTreeMap<u32, GroupScheduleOriginal>>();
+    let res = parsed_objs.into_iter().map(|g| (g.group_id, g)).collect::<BTreeMap<i32, GroupScheduleOriginal>>();
 
     Some(res)
 }
@@ -310,7 +320,7 @@ fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleO
         let mut group_schedule_res = GroupScheduleOriginal {scheduleObjects: Vec::new(), group_id: group_schedule.group_id};
 
         // 2) by subject and placement
-        let mut unique_subject_positions = BTreeMap::<(u32, WeekDay, String, u32), Vec<ScheduleObjectOriginal>>::new();
+        let mut unique_subject_positions = BTreeMap::<(i32, WeekDay, String, i32), Vec<ScheduleObjectOriginal>>::new();
         for schedule_obj in &group_schedule.scheduleObjects {
             // 3) subdivide start/end time
             for time in (schedule_obj.lesson.auditoriumReservation.reservationTime.startTime%10)..(schedule_obj.lesson.auditoriumReservation.reservationTime.endTime%10+1) {

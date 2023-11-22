@@ -17,18 +17,19 @@ log = "0.4.20"
 rand = "0.8.5"
 reqwest = { version = "0.11.22", features = ["json"] }
 rocket = { version = "=0.5.0-rc.3", features = ["json", "tls", "secrets"] }
-rocket_db_pools = { version = "0.1.0-rc.3", features = ["sqlx_sqlite"] }
+rocket_db_pools = { version = "0.1.0-rc.3", features = ["sqlx_postgres"] }
 serde = { version = "1.0.188", features = ["derive"] }
 serde_derive = "1.0.188"
 serde_json = "1.0.107"
 thiserror = "1.0.50"
+time = { version = "0.3.30", features = ["serde"] }
 tokio = { version = "1.33.0", features = ["rt", "sync"] }
 
 
 [dependencies.sqlx]
 version = "0.6.0"
 default-features = false
-features = ["macros", "offline", "migrate"]
+features = ["macros", "offline", "migrate", "time"]
 
 [lib]
 

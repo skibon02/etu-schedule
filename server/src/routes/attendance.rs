@@ -17,7 +17,7 @@ pub struct AttendanceScheduleObj {
 #[derive(Responder)]
 pub enum GetUserAttendanceScheduleResult {
     #[response(status = 200, content_type = "json")]
-    Success(Json<BTreeMap<u32, AttendanceScheduleObj>>),
+    Success(Json<BTreeMap<i32, AttendanceScheduleObj>>),
     #[response(status = 400, content_type = "json")]
     Failed(Json<ResponseErrorMessage>),
 }
@@ -85,7 +85,7 @@ pub enum SetUserAttendanceScheduleResult {
 
 #[derive(Deserialize)]
 pub struct SetUserAttendanceScheduleRequest {
-    schedule_obj_time_link_id: u32,
+    schedule_obj_time_link_id: i32,
     enable_auto_attendance: bool,
 }
 
@@ -145,7 +145,7 @@ pub struct AttendanceScheduleDiffObj {
 #[derive(Responder)]
 pub enum GetUserAttendanceScheduleDiffResult {
     #[response(status = 200, content_type = "json")]
-    Success(Json<BTreeMap<u32, BTreeMap<u32, AttendanceScheduleObj>>>),
+    Success(Json<BTreeMap<i32, BTreeMap<i32, AttendanceScheduleObj>>>),
     #[response(status = 400, content_type = "json")]
     Failed(Json<ResponseErrorMessage>),
 }
@@ -213,8 +213,8 @@ pub enum SetUserAttendanceDiffsScheduleResult {
 
 #[derive(Deserialize)]
 pub struct SetUserAttendanceDiffsScheduleRequest {
-    schedule_obj_time_link_id: u32,
-    week_num: u32,
+    schedule_obj_time_link_id: i32,
+    week_num: i32,
     enable_auto_attendance: bool,
 }
 

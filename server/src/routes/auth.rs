@@ -4,6 +4,7 @@ use rocket::{
     serde::json::Json,
     Route, request::{FromRequest, self, Request},
 };
+use rocket::time::PrimitiveDateTime;
 use rocket_db_pools::Connection;
 use serde_derive::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -26,7 +27,7 @@ impl<'r> FromRequest<'r> for UserInfo {
         let mut db_con = req.guard::<Connection<Db>>().await.unwrap();
         match (req.cookies().get_private("token"), req.cookies().get_private("token2")) {
             (Some(token), Some(_)) => {
-                let user_id = token.value().to_string().parse::<u32>().unwrap();
+                let user_id = token.value().to_string().parse::<i32>().unwrap();
                 let user_info = users::get_user_info(&mut db_con, user_id).await;
                 match user_info {
                     Ok(user_info) => request::Outcome::Success(user_info),
@@ -52,7 +53,7 @@ impl<'r> FromRequest<'r> for UserInfo {
 #[derive(Default, Debug)]
 pub struct AuthorizeInfo {
     pub access_token: Option<String>,
-    pub user_id: u32,
+    pub user_id: i32,
 }
 
 #[rocket::async_trait]
@@ -62,7 +63,7 @@ impl<'r> FromRequest<'r> for AuthorizeInfo {
         let mut db_con = req.guard::<Connection<Db>>().await.unwrap();
         match (req.cookies().get_private("token"), req.cookies().get_private("token2")) {
             (Some(token), Some(token2)) => {
-                let user_id = token.value().to_string().parse::<u32>().unwrap();
+                let user_id = token.value().to_string().parse::<i32>().unwrap();
                 let access_token = token2.value().to_string();
                 if !users::user_exists(&mut db_con, user_id).await.unwrap_or(false) {
                     return request::Outcome::Forward(());
@@ -98,9 +99,9 @@ struct UserInfoResponse {
     user_id: String,
     first_name: String,
     last_name: String,
-    profile_photo_url: String,
+    profile_photo_url: Option<String>,
     sex: u8,
-    birthdate: String,
+    birthdate: Option<String>,
     is_authorized: bool,
 }
 
@@ -111,7 +112,7 @@ impl From<UserInfo> for UserInfoResponse {
             first_name: value.first_name,
             last_name: value.last_name,
             profile_photo_url: value.profile_photo_url,
-            sex: value.sex,
+            sex: value.sex as u8,
             birthdate: value.birthdate,
             is_authorized: true,
         }
@@ -223,12 +224,14 @@ fn parse_auth_info(inp: serde_json::Value) -> UserInfo {
     UserInfo {
         first_name: inp["first_name"].as_str().unwrap_or("").to_owned(),
         last_name: inp["last_name"].as_str().unwrap_or("").to_owned(),
-        vk_id: inp["id"].as_u64().unwrap_or_default() as u32,
-        birthdate: inp["bdate"].as_str().unwrap_or("").to_owned(),
-        profile_photo_url: inp["photo_200"].as_str().unwrap_or("").to_owned(),
-        sex: inp["sex"].as_u64().unwrap_or_default() as u8, // you might want to handle this unwrap in a way that fits your app's error handling
-        creation_date_time: None,
-        last_vk_fetch_date_time: None,
+        vk_id: inp["id"].as_u64().unwrap_or_default() as i32,
+        birthdate: inp["bdate"].as_str().map(|v| v.to_owned()),
+        profile_photo_url: inp["photo_200"].as_str().map(|v| v.to_owned()),
+        sex: inp["sex"].as_u64().unwrap_or_default() as i32, // you might want to handle this unwrap in a way that fits your app's error handling
+
+        // not used
+        created_timestamp: PrimitiveDateTime::MIN,
+        last_vk_fetch_timestamp:PrimitiveDateTime::MIN,
     }
 }
 async fn process_auth(db: Connection<Db>, cookie: &CookieJar<'_>, token: &str, uuid: &str) -> Result<(), AuthorizeError> {

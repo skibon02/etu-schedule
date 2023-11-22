@@ -1,6 +1,7 @@
 use anyhow::Context;
+use rocket::time::PrimitiveDateTime;
 use rocket_db_pools::Connection;
-use sqlx::{Acquire, Sqlite};
+use sqlx::{Acquire, Postgres};
 use sqlx::pool::PoolConnection;
 use crate::models::Db;
 
@@ -64,38 +65,41 @@ impl Into<String> for WeekDay {
     }
 }
 
-#[derive(sqlx::FromRow, Default, Debug, Clone)]
+#[derive(sqlx::FromRow, Debug, Clone)]
 pub struct ScheduleObjModel {
-    pub schedule_obj_id: u32,
+    pub schedule_obj_id: i32,
 
-    pub last_known_orig_sched_obj_id: u32,
+    pub last_known_orig_sched_obj_id: i32,
 
-    pub group_id: u32,
-    pub link_id: u32,
+    pub group_id: i32,
+    pub time_link_id: i32,
+    pub prev_time_link_id: Option<i32>,
 
-    pub subject_id: u32,
-    pub subject_gen_id: u32,
-    pub teacher_id: Option<u32>,
-    pub teacher_gen_id: Option<u32>,
-    pub second_teacher_id: Option<u32>,
-    pub third_teacher_id: Option<u32>,
-    pub fourth_teacher_id: Option<u32>,
+
+    pub subject_id: i32,
+    pub subject_gen_id: i32,
+    pub teacher_id: Option<i32>,
+    pub teacher_gen_id: Option<i32>,
+    pub second_teacher_id: Option<i32>,
+    pub third_teacher_id: Option<i32>,
+    pub fourth_teacher_id: Option<i32>,
 
     pub auditorium: Option<String>,
-    pub updated_at: String,
+    pub created_timestamp: PrimitiveDateTime,
+    pub modified_timestamp: PrimitiveDateTime,
 
-    pub time: u32,
+    pub time: i32,
     pub week_day: WeekDay,
     pub week_parity: String,
 
-    pub gen_start: u32,
-    pub gen_end: Option<u32>,
+    pub gen_start: i32,
+    pub gen_end: Option<i32>,
     pub existence_diff: String
 }
 
 impl ScheduleObjModel {
-    pub fn get_lesson_pos(&self) -> u32 {
-        let mut res = self.week_day.as_num() as u32;
+    pub fn get_lesson_pos(&self) -> i32 {
+        let mut res = self.week_day.as_num() as i32;
         if self.week_parity == "2" {
             res += 7;
         }
@@ -108,27 +112,31 @@ impl ScheduleObjModel {
 
 #[derive(sqlx::FromRow, Default, Debug, Clone)]
 pub struct ScheduleGenerationModel {
-    pub gen_id: u32,
-    pub creation_time: u32,
-    pub group_id: u32,
+    pub gen_id: i32,
+    pub creation_time: chrono::NaiveDateTime,
+    pub group_id: i32,
 }
 
 
-pub async fn get_current_schedule_for_group(con: &mut PoolConnection<Sqlite>, group_id: u32) -> anyhow::Result<Vec<ScheduleObjModel>> {
-    let res = sqlx::query_as(
-        "SELECT * FROM schedule_objs WHERE group_id = ? and gen_end IS NULL",
+pub async fn get_current_schedule_for_group(con: &mut PoolConnection<Postgres>, group_id: i32) -> anyhow::Result<Vec<ScheduleObjModel>> {
+    let res = sqlx::query_as!(ScheduleObjModel,
+        "SELECT week_day as \"week_day: WeekDay\", auditorium, created_timestamp, modified_timestamp,
+            existence_diff, teacher_id, second_teacher_id, third_teacher_id, fourth_teacher_id,
+            teacher_gen_id, subject_id, subject_gen_id, gen_end, gen_start, schedule_obj_id,
+            group_id, prev_time_link_id, time_link_id, last_known_orig_sched_obj_id,
+            time, week_parity FROM schedule_objs WHERE group_id = $1 and gen_end IS NULL",
+        group_id
     )
-        .bind(group_id)
         .fetch_all(&mut *con).await?;
 
     Ok(res)
 }
 
-pub async fn get_current_schedule_link_ids(con: &mut PoolConnection<Sqlite>, group_id: u32) -> anyhow::Result<Vec<u32>> {
-    let res = sqlx::query_scalar(
-        "SELECT schedule_objs.link_id FROM schedule_objs WHERE group_id = ? and gen_end IS NULL",
+pub async fn get_current_schedule_link_ids(con: &mut PoolConnection<Postgres>, group_id: i32) -> anyhow::Result<Vec<i32>> {
+    let res = sqlx::query_scalar!(
+        "SELECT schedule_objs.time_link_id FROM schedule_objs WHERE group_id = $1 and gen_end IS NULL",
+        group_id
     )
-        .bind(group_id)
         .fetch_all(&mut *con).await?;
 
     //assertion to be unique
@@ -141,12 +149,14 @@ pub async fn get_current_schedule_link_ids(con: &mut PoolConnection<Sqlite>, gro
     Ok(res)
 }
 
-pub async fn get_current_schedule_for_group_with_subject(con: &mut PoolConnection<Sqlite>, group_id: u32, subject_id: u32) -> anyhow::Result<Vec<ScheduleObjModel>> {
-    let res = sqlx::query_as(
-        "SELECT * FROM schedule_objs WHERE group_id = ? and gen_end IS NULL and subject_id = ?",
-    )
-        .bind(group_id)
-        .bind(subject_id)
+pub async fn get_current_schedule_for_group_with_subject(con: &mut PoolConnection<Postgres>, group_id: i32, subject_id: i32) -> anyhow::Result<Vec<ScheduleObjModel>> {
+    let res = sqlx::query_as!(ScheduleObjModel,
+            r#"SELECT week_day as "week_day: WeekDay", auditorium, created_timestamp, modified_timestamp,
+            existence_diff, teacher_id, second_teacher_id, third_teacher_id, fourth_teacher_id,
+            teacher_gen_id, subject_id, subject_gen_id, gen_end, gen_start, schedule_obj_id,
+            group_id, prev_time_link_id, time_link_id, last_known_orig_sched_obj_id,
+            time, week_parity FROM schedule_objs WHERE group_id = $1 and gen_end IS NULL and subject_id = $2"#,
+            group_id, subject_id)
         .fetch_all(&mut *con).await?;
 
     Ok(res)
