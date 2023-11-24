@@ -10,13 +10,15 @@ use rocket::fairing::{AdHoc, Fairing, Info, Kind};
 use rocket::http::hyper::request;
 use rocket::outcome::Outcome;
 use rocket::request::FromRequest;
-use rocket::{Build, Config, fairing, Request, Response, Rocket, tokio};
+use rocket::{Build, Config, Data, fairing, Request, Response, Rocket, tokio};
 use rocket::http::{Header, Status};
 use crate::models::Db;
 use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use std::{env, fs};
 use std::collections::BTreeMap;
+use std::fs::OpenOptions;
+use std::io::Write;
 use std::sync::atomic::AtomicUsize;
 use std::time::Instant;
 
@@ -50,7 +52,7 @@ impl Fairing for CORS {
     async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
         let request_origin = _request.headers().get_one("Origin");
 
-        debug!("> CORS: request_origin: {:?}", request_origin);
+        trace!("> CORS: request_origin: {:?}", request_origin);
 
         if request_origin.is_none() {
             return;
@@ -71,6 +73,30 @@ impl Fairing for CORS {
                 Some(origin)
             })
             .next();
+    }
+}
+
+struct PanicLogger;
+
+#[rocket::async_trait]
+impl Fairing for PanicLogger {
+    fn info(&self) -> Info {
+        Info {
+            name: "Panic Logger",
+            kind: Kind::Response,
+        }
+    }
+
+    async fn on_response<'r>(&self, request: &'r Request<'_>, response: &mut Response<'r>) {
+        if let Some(panic_info) = request.local_cache(|| None::<String>) {
+            let mut file = OpenOptions::new()
+                .append(true)
+                .create(true)
+                .open("panic.log")
+                .unwrap();
+            file.write_all(panic_info.as_bytes()).unwrap();
+            response.set_status(Status::InternalServerError);
+        }
     }
 }
 
@@ -244,6 +270,7 @@ pub fn run() -> Rocket<Build> {
     info!("> with client: {}", with_client);
     let mut rocket = rocket::custom(figment)
         .attach(stage())
+        .attach(PanicLogger)
         .attach(bg_worker());
 
     if !is_production_build {

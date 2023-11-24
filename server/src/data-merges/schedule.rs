@@ -58,7 +58,7 @@ async fn single_schedule_obj_group_merge(group_id: i32, input_schedule_objs: &Ve
     let mut res = Vec::new();
 
     let latest_subject_gen = models::subjects::get_subjects_cur_gen(con).await?;
-    let latest_teachers_gen = models::subjects::get_subjects_cur_gen(con).await?;
+    let latest_teachers_gen = models::teachers::get_teachers_cur_gen(con).await?;
 
     //try to link by schedule_obj_id or get_lesson_pos
     for input_sched_obj in &input_schedule_objs {

@@ -76,11 +76,19 @@ pub async fn get_not_merged_sched_group_id_list(con: &mut PgConnection, upper_li
 // Result: is group exists?
 // Option: if merge was ever made for this group?
 pub async fn get_time_since_last_group_merge(group_id: i32, con: &mut PgConnection) -> anyhow::Result<Option<i32>> {
-    let res: Option<PgInterval> = sqlx::query_scalar!(
+    // 1 option: if we have such group and it has latest_schedule_merge_timestamp
+    //
+    let res: Option<Option<PgInterval>> = sqlx::query_scalar!(
         "SELECT NOW() - latest_schedule_merge_timestamp FROM groups WHERE group_id = $1 \
         and latest_schedule_merge_timestamp IS NOT NULL",
         group_id)
-        .fetch_optional(&mut *con).await.map(|r|r.unwrap())?;
+        .fetch_optional(&mut *con).await?;
+
+    //silly one
+    let res = match res {
+        Some(Some(res)) => Some(res),
+        _ => None
+    };
 
     match res {
         Some(res) => Ok(Some((res.microseconds/1000000) as i32)),

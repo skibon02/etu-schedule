@@ -1,7 +1,7 @@
 [default.databases.sqlx]
 url = "postgres://etu_attend_app:12346543@localhost"
 
-max_connections = 100
+max_connections = 50
 #connect_timeout = 5
 #idle_timeout = 120
 
