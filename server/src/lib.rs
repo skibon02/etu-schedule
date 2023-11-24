@@ -84,14 +84,14 @@ impl<'r> FromRequest<'r> for DocumentRequest {
         let path = req.uri().path();
         // info!("{}", path);
         if path == "/" {
-            return Outcome::Forward(());
+            return Outcome::Forward(Status::NotFound);
         }
         let fir_seg = path.segments().next().unwrap();
         if fir_seg == "static" {
-            return Outcome::Forward(());
+            return Outcome::Forward(Status::NotFound);
         }
         if fir_seg.find('.').is_some() {
-            return Outcome::Forward(());
+            return Outcome::Forward(Status::NotFound);
         }
         Outcome::Success(DocumentRequest)
     }
@@ -132,6 +132,7 @@ use lazy_static::lazy_static;
 use rand::Rng;
 use rocket::response::Responder;
 use rocket_db_pools::Database;
+use sqlx::PgConnection;
 use tokio::select;
 use crate::api::etu_api;
 use crate::api::vk_api::VK_SERVICE_TOKEN;
@@ -270,7 +271,8 @@ const SINGLE_GROUP_INTERVAL: i32 = 30;
 const FORCE_REQ_CHANNEL_SIZE: usize = 50;
 const FORCE_REQ_THROTTLE_THRESHOLD: usize = 10;
 
-async fn periodic_task(mut con: Db) {
+async fn periodic_task(con: Db) {
+    let mut con = con.acquire().await.unwrap();
     // For demonstration, use a loop with a delay
     let (tx, mut rx) = tokio::sync::mpsc::channel(FORCE_REQ_CHANNEL_SIZE);
     MERGE_REQUEST_CHANNEL.set(tx).unwrap();
@@ -278,11 +280,11 @@ async fn periodic_task(mut con: Db) {
 
     info!("BGTASK: Phase 1. Initial merge for all groups.");
     let new_groups = etu_api::get_groups_list().await;
-    data_merges::groups::groups_merge(&new_groups, &mut con.acquire().await.unwrap()).await.unwrap();
+    data_merges::groups::groups_merge(&new_groups, &mut *con).await.unwrap();
 
-    while let Ok(groups) = get_not_merged_sched_group_id_list(&mut con.acquire().await.unwrap(), 50).await {
+    while let Ok(groups) = get_not_merged_sched_group_id_list(&mut *con, 50).await {
         info!("BGTASK: received {} groups for merge", groups.len());
-        process_schedule_merge(groups, &mut con).await;
+        process_schedule_merge(groups, &mut *con).await;
     }
     info!("BGTASK: Initial merge for all groups finished.");
 
@@ -306,7 +308,7 @@ async fn periodic_task(mut con: Db) {
                 MERGE_REQUEST_CNT.fetch_sub(1, std::sync::atomic::Ordering::Relaxed);
                 info!("BGTASK: Got request for merging {} group", request);
 
-                let time = models::groups::get_time_since_last_group_merge(request, &mut con.acquire().await.unwrap()).await;
+                let time = models::groups::get_time_since_last_group_merge(request, &mut *con).await;
                 match time {
                     Ok(time) => {
                         match time {
@@ -356,16 +358,15 @@ async fn periodic_task(mut con: Db) {
     }
 }
 
-async fn process_schedule_merge(group_id_vec: Vec<i32>, con: &mut Db) {
+async fn process_schedule_merge(group_id_vec: Vec<i32>, con: &mut PgConnection) {
 
     let new_groups = etu_api::get_groups_list().await;
-    data_merges::groups::groups_merge(&new_groups, &mut con.acquire().await.unwrap()).await.unwrap();
+    data_merges::groups::groups_merge(&new_groups, &mut *con).await.unwrap();
 
     info!("BGTASK: Starting merge for groups: {:?}", group_id_vec);
     let start = Instant::now();
     let sched_objs = etu_api::get_schedule_objs_groups(group_id_vec.clone()).await.unwrap();
 
-    let con = &mut con.acquire().await.unwrap();
     let last_subjects_generation = get_subjects_cur_gen(&mut *con).await.unwrap();
     let last_teachers_generation = get_teachers_cur_gen(&mut *con).await.unwrap();
     for (group_id, sched_objs) in sched_objs {

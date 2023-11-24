@@ -35,13 +35,13 @@ impl<'r> FromRequest<'r> for UserInfo {
                         error!("Failed to get user info: {:?}", e);
                         req.cookies().remove_private(Cookie::named("token"));
                         req.cookies().remove_private(Cookie::named("token2"));
-                        request::Outcome::Forward(())
+                        request::Outcome::Forward(Status::Forbidden)
                     }
                 }
             }
             _ => {
                 warn!("Failed to get user info: no token");
-                return request::Outcome::Forward(());
+                return request::Outcome::Forward(Status::Forbidden);
             }
         }
     }
@@ -66,7 +66,7 @@ impl<'r> FromRequest<'r> for AuthorizeInfo {
                 let user_id = token.value().to_string().parse::<i32>().unwrap();
                 let access_token = token2.value().to_string();
                 if !users::user_exists(&mut db_con, user_id).await.unwrap_or(false) {
-                    return request::Outcome::Forward(());
+                    return request::Outcome::Forward(Status::Forbidden);
                 }
                 request::Outcome::Success(AuthorizeInfo {
                     access_token: Some(access_token),
@@ -74,7 +74,7 @@ impl<'r> FromRequest<'r> for AuthorizeInfo {
                 })
             }
             _ => {
-                return request::Outcome::Forward(());
+                return request::Outcome::Forward(Status::Forbidden);
             }
         }
     }
@@ -249,8 +249,8 @@ async fn process_auth(db: Connection<Db>, cookie: &CookieJar<'_>, token: &str, u
 
     debug!("adding token to cookie...");
 
-    cookie.add_private(Cookie::build("token", auth_info.1).same_site(rocket::http::SameSite::Lax).http_only(true).finish());
-    cookie.add_private(Cookie::build("token2", auth_info.0).same_site(rocket::http::SameSite::Lax).http_only(true).finish());
+    cookie.add_private(Cookie::build(("token", auth_info.1)).same_site(rocket::http::SameSite::Lax).http_only(true));
+    cookie.add_private(Cookie::build(("token2", auth_info.0)).same_site(rocket::http::SameSite::Lax).http_only(true));
     Ok(())
 }
 

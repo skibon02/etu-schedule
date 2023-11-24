@@ -1,0 +1,142 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT * FROM teachers WHERE teacher_id = $1 AND gen_end IS NULL",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "teacher_obj_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "teacher_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "initials",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "surname",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "midname",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "birthday",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "group_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "is_worker",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 10,
+        "name": "is_department_head",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 11,
+        "name": "is_department_dispatcher",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 12,
+        "name": "is_student",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 13,
+        "name": "position",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 14,
+        "name": "degree",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 15,
+        "name": "rank",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 16,
+        "name": "gen_start",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 17,
+        "name": "gen_end",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 18,
+        "name": "existence_diff",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 19,
+        "name": "created_timestamp",
+        "type_info": "Timestamp"
+      },
+      {
+        "ordinal": 20,
+        "name": "modified_timestamp",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "2920d575bbda2905646f3b09c62d05662c0ecd995f4d3eb708914250a3139a7f"
+}

@@ -1,0 +1,70 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT groups.* from groups join user_data on groups.group_id = user_data.group_id AND user_data.user_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "group_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "number",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "studying_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "education_level",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "start_year",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "end_year",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "specialty_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "department_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "latest_schedule_merge_timestamp",
+        "type_info": "Timestamp"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "816af72d1a3d27cdfb0d9e09ae062fbe1a48cdf28c03c35bf6f758a02abd8b4e"
+}

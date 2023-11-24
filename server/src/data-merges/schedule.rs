@@ -1,19 +1,18 @@
 use std::collections::BTreeMap;
 use anyhow::Context;
-use sqlx::pool::PoolConnection;
-use sqlx::Postgres;
+use sqlx::{PgConnection};
 use crate::data_merges::MergeResult;
 use crate::models;
 use crate::models::schedule::{get_current_schedule_for_group_with_subject, ScheduleObjModel, WeekDay};
 
-async fn get_new_link_id(con: &mut PoolConnection<Postgres>) -> anyhow::Result<i32> {
+async fn get_new_link_id(con: &mut PgConnection) -> anyhow::Result<i32> {
     let res: Option<i32> = sqlx::query_scalar!("SELECT MAX(time_link_id) as max FROM schedule_objs")
         .fetch_one(&mut *con).await.context("Failed to fetch max time_link_id")?;
 
     Ok(res.unwrap_or(0) + 1)
 }
 
-async fn get_last_gen_id(con: &mut PoolConnection<Postgres>, group_id: i32) -> anyhow::Result<i32> {
+async fn get_last_gen_id(con: &mut PgConnection, group_id: i32) -> anyhow::Result<i32> {
     let res: Option<i32> = sqlx::query_scalar!("SELECT MAX(gen_id) as max FROM schedule_generation \
         WHERE group_id = $1",
                  group_id)
@@ -22,7 +21,7 @@ async fn get_last_gen_id(con: &mut PoolConnection<Postgres>, group_id: i32) -> a
     Ok(res.unwrap_or(0))
 }
 
-async fn create_new_gen(con: &mut PoolConnection<Postgres>, gen_id: i32, group_id: i32) -> anyhow::Result<()> {
+async fn create_new_gen(con: &mut PgConnection, gen_id: i32, group_id: i32) -> anyhow::Result<()> {
     sqlx::query!("INSERT INTO schedule_generation (gen_id, creation_time, group_id) VALUES ($1, NOW(), $2) ON CONFLICT DO NOTHING",
         gen_id, group_id)
         .execute(&mut *con)
@@ -33,7 +32,7 @@ async fn create_new_gen(con: &mut PoolConnection<Postgres>, gen_id: i32, group_i
 
 /// group of schedule object with the same lesson
 /// last gen id is used to reuse single new generation across merges
-async fn single_schedule_obj_group_merge(group_id: i32, input_schedule_objs: &Vec<ScheduleObjModel>, subject_id: i32, last_gen_id: i32, con: &mut PoolConnection<Postgres>) -> anyhow::Result<Vec<MergeResult>> {
+async fn single_schedule_obj_group_merge(group_id: i32, input_schedule_objs: &Vec<ScheduleObjModel>, subject_id: i32, last_gen_id: i32, con: &mut PgConnection) -> anyhow::Result<Vec<MergeResult>> {
     trace!("Merging single schedule object group");
     let mut input_schedule_objs = input_schedule_objs.clone();
 
@@ -196,7 +195,7 @@ async fn single_schedule_obj_group_merge(group_id: i32, input_schedule_objs: &Ve
     Ok(res)
 }
 
-pub async fn schedule_objs_merge(group_id: i32, schedule_objs: &Vec<ScheduleObjModel>, con: &mut PoolConnection<Postgres>) -> anyhow::Result<()> {
+pub async fn schedule_objs_merge(group_id: i32, schedule_objs: &Vec<ScheduleObjModel>, con: &mut PgConnection) -> anyhow::Result<()> {
     // group by subject_id
 
     let group_name = models::groups::get_group(con, group_id).await?.number;

@@ -1,7 +1,7 @@
 use anyhow::Context;
 use rocket::time::PrimitiveDateTime;
 use sqlx::pool::PoolConnection;
-use sqlx::{Postgres, Transaction};
+use sqlx::{Acquire, PgConnection, Postgres, Transaction};
 
 #[derive(sqlx::FromRow, Debug, Clone, PartialEq)]
 pub struct SubjectModel {
@@ -28,7 +28,7 @@ pub struct SubjectModel {
     pub modified_timestamp: PrimitiveDateTime,
 }
 
-pub async fn get_subjects_cur_gen(con: &mut PoolConnection<Postgres>) -> anyhow::Result<i32> {
+pub async fn get_subjects_cur_gen(con: &mut PgConnection) -> anyhow::Result<i32> {
     let res: Option<i32> = sqlx::query_scalar!(
         "SELECT MAX(gen_id) as max FROM subjects_generation"
     )
@@ -37,7 +37,7 @@ pub async fn get_subjects_cur_gen(con: &mut PoolConnection<Postgres>) -> anyhow:
     Ok(res.unwrap_or(0))
 }
 
-pub async fn create_new_gen(transaction: &mut Transaction<'_, Postgres>, gen_id: i32) -> anyhow::Result<()> {
+pub async fn create_new_gen(transaction: &mut PgConnection, gen_id: i32) -> anyhow::Result<()> {
     // info!("Creating new subjects generation {}", gen_id);
     sqlx::query!("INSERT INTO subjects_generation (gen_id, creation_time) VALUES ($1, NOW())\
          ON CONFLICT DO NOTHING",
@@ -48,7 +48,7 @@ pub async fn create_new_gen(transaction: &mut Transaction<'_, Postgres>, gen_id:
     Ok(())
 }
 
-pub async fn get_subjects_for_group(con: &mut PoolConnection<Postgres>, group_id: i32) -> anyhow::Result<Vec<SubjectModel>>  {
+pub async fn get_subjects_for_group(con: &mut PgConnection, group_id: i32) -> anyhow::Result<Vec<SubjectModel>>  {
     let res = sqlx::query_as!(
         SubjectModel,
         "SELECT subjects.* FROM subjects join schedule_objs on \
@@ -62,12 +62,12 @@ pub async fn get_subjects_for_group(con: &mut PoolConnection<Postgres>, group_id
     Ok(res)
 }
 
-pub async fn get_cur_gen_subject_by_id(subject_id: i32, transaction: &mut Transaction<'_, Postgres>) -> anyhow::Result<Option<SubjectModel>> {
+pub async fn get_cur_gen_subject_by_id(subject_id: i32, con: &mut PgConnection) -> anyhow::Result<Option<SubjectModel>> {
     let res = sqlx::query_as!(
             SubjectModel,
             "SELECT * FROM subjects WHERE subject_id = $1 AND gen_end IS NULL",
             subject_id)
-        .fetch_optional(transaction)
+        .fetch_optional(con)
         .await.context("Failed to fetch subject in subject merge")?;
 
     Ok(res)

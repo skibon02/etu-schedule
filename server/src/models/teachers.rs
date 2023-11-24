@@ -1,7 +1,6 @@
 use anyhow::Context;
 use rocket::time::PrimitiveDateTime;
-use sqlx::pool::PoolConnection;
-use sqlx::{Row, Postgres, Transaction};
+use sqlx::{Row, PgConnection};
 
 #[derive(sqlx::FromRow, Debug, Clone, PartialEq)]
 pub struct TeacherModel {
@@ -35,7 +34,7 @@ pub struct TeacherModel {
     pub modified_timestamp: PrimitiveDateTime,
 }
 
-pub async fn get_teachers_cur_gen(con: &mut PoolConnection<Postgres>) -> anyhow::Result<i32> {
+pub async fn get_teachers_cur_gen(con: &mut PgConnection) -> anyhow::Result<i32> {
     let res: Option<i32> = sqlx::query_scalar!(
         "SELECT MAX(gen_id) as max FROM teachers_generation"
     )
@@ -44,17 +43,17 @@ pub async fn get_teachers_cur_gen(con: &mut PoolConnection<Postgres>) -> anyhow:
     Ok(res.unwrap_or(0))
 }
 
-pub async fn create_new_gen(transaction: &mut Transaction<'_, Postgres>, gen_id: i32) -> anyhow::Result<()> {
+pub async fn create_new_gen(con: &mut PgConnection, gen_id: i32) -> anyhow::Result<()> {
     // info!("Creating new teachers generation {}", gen_id);
     sqlx::query!("INSERT INTO teachers_generation (gen_id, creation_time) VALUES ($1, NOW()) ON CONFLICT DO NOTHING",
                 gen_id)
-        .execute(transaction)
+        .execute(con)
         .await.context("Failed to insert new teachers generation")?;
 
     Ok(())
 }
 
-pub async fn get_teachers_for_group(con: &mut PoolConnection<Postgres>, group_id: i32) -> anyhow::Result<Vec<TeacherModel>>  {
+pub async fn get_teachers_for_group(con: &mut PgConnection, group_id: i32) -> anyhow::Result<Vec<TeacherModel>>  {
     let res = sqlx::query_as!(TeacherModel,
         "select * from teachers where teachers.teacher_id in (SELECT DISTINCT teachers.teacher_id FROM teachers join schedule_objs on \
             (teachers.teacher_id = schedule_objs.teacher_id OR \
@@ -71,7 +70,7 @@ pub async fn get_teachers_for_group(con: &mut PoolConnection<Postgres>, group_id
     Ok(res)
 }
 
-pub async fn get_teacher_departments(teacher_id: i32, con: &mut PoolConnection<Postgres>) -> anyhow::Result<Vec<String>> {
+pub async fn get_teacher_departments(teacher_id: i32, con: &mut PgConnection) -> anyhow::Result<Vec<String>> {
     let res = sqlx::query!("select department from teachers_departments WHERE teacher_id = $1",
             teacher_id)
         .fetch_all(&mut *con).await.context("Failed to get teacher departments")?;
@@ -81,11 +80,11 @@ pub async fn get_teacher_departments(teacher_id: i32, con: &mut PoolConnection<P
     Ok(res)
 }
 
-pub async fn get_cur_gen_teacher_by_id(teacher_id: i32, transaction: &mut Transaction<'_, Postgres>) -> anyhow::Result<Option<TeacherModel>> {
+pub async fn get_cur_gen_teacher_by_id(teacher_id: i32, con: &mut PgConnection) -> anyhow::Result<Option<TeacherModel>> {
     let res = sqlx::query_as!(TeacherModel,
         "SELECT * FROM teachers WHERE teacher_id = $1 AND gen_end IS NULL",
         teacher_id)
-        .fetch_optional(transaction)
+        .fetch_optional(con)
         .await.context("Failed to fetch teacher in teacher merge")?;
 
     Ok(res)

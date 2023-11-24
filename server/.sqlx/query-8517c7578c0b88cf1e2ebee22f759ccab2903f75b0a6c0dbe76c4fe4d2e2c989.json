@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO teachers_generation (gen_id, creation_time) VALUES ($1, NOW()) ON CONFLICT DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8517c7578c0b88cf1e2ebee22f759ccab2903f75b0a6c0dbe76c4fe4d2e2c989"
+}

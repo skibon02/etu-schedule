@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select department from teachers_departments WHERE teacher_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "department",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "d20ab44604c256f0e97e87e40b11a3f16fefc3728f60ad8582572fffb9e94ab8"
+}

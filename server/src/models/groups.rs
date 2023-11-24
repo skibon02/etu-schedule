@@ -1,4 +1,4 @@
-use sqlx::{Acquire, Row, Postgres};
+use sqlx::{Acquire, Row, Postgres, PgConnection};
 
 use super::Db;
 use serde_derive::Serialize;
@@ -35,7 +35,7 @@ pub struct GroupModel {
     pub latest_schedule_merge_timestamp: Option<PrimitiveDateTime>,
 }
 
-pub async fn get_oldest_group_id_list(con: &mut Db, upper_limit: i64) -> anyhow::Result<Vec<i32>> {
+pub async fn get_oldest_group_id_list(con: &mut PgConnection, upper_limit: i64) -> anyhow::Result<Vec<i32>> {
     let res = sqlx::query_scalar!(
         "SELECT group_id FROM groups
          ORDER BY
@@ -47,7 +47,7 @@ pub async fn get_oldest_group_id_list(con: &mut Db, upper_limit: i64) -> anyhow:
          LIMIT $1",
         upper_limit
     )
-        .fetch_all(&mut con.acquire().await.unwrap()).await?;
+        .fetch_all(&mut *con).await?;
 
     if res.len() == 0 {
         return Err(anyhow::anyhow!("No groups found!"));
@@ -56,7 +56,7 @@ pub async fn get_oldest_group_id_list(con: &mut Db, upper_limit: i64) -> anyhow:
 }
 
 
-pub async fn get_not_merged_sched_group_id_list(con: &mut PoolConnection<Postgres>, upper_limit: i64) -> anyhow::Result<Vec<i32>> {
+pub async fn get_not_merged_sched_group_id_list(con: &mut PgConnection, upper_limit: i64) -> anyhow::Result<Vec<i32>> {
     let res = sqlx::query_scalar!(
         "SELECT group_id FROM groups
             WHERE latest_schedule_merge_timestamp IS NULL
@@ -65,7 +65,7 @@ pub async fn get_not_merged_sched_group_id_list(con: &mut PoolConnection<Postgre
          LIMIT $1",
         upper_limit
     )
-        .fetch_all(con).await?;
+        .fetch_all(&mut *con).await?;
 
     if res.len() == 0 {
         return Err(anyhow::anyhow!("No groups found!"));
@@ -75,7 +75,7 @@ pub async fn get_not_merged_sched_group_id_list(con: &mut PoolConnection<Postgre
 
 // Result: is group exists?
 // Option: if merge was ever made for this group?
-pub async fn get_time_since_last_group_merge(group_id: i32, con: &mut PoolConnection<Postgres>) -> anyhow::Result<Option<i32>> {
+pub async fn get_time_since_last_group_merge(group_id: i32, con: &mut PgConnection) -> anyhow::Result<Option<i32>> {
     let res: Option<PgInterval> = sqlx::query_scalar!(
         "SELECT NOW() - latest_schedule_merge_timestamp FROM groups WHERE group_id = $1 \
         and latest_schedule_merge_timestamp IS NOT NULL",
@@ -102,14 +102,14 @@ pub async fn get_time_since_last_group_merge(group_id: i32, con: &mut PoolConnec
     }
 }
 
-pub async fn set_last_group_merge(group_id: i32, con: &mut PoolConnection<Postgres>) -> anyhow::Result<()> {
+pub async fn set_last_group_merge(group_id: i32, con: &mut PgConnection) -> anyhow::Result<()> {
     sqlx::query!(
         "UPDATE groups SET latest_schedule_merge_timestamp = NOW() WHERE group_id = $1", group_id)
         .execute(&mut *con).await?;
 
     Ok(())
 }
-pub async fn get_groups(con: &mut PoolConnection<Postgres>) -> anyhow::Result<Vec<GroupModel>> {
+pub async fn get_groups(con: &mut PgConnection) -> anyhow::Result<Vec<GroupModel>> {
     let res = sqlx::query_as!(GroupModel,
         "SELECT * FROM groups"
     )
@@ -118,7 +118,7 @@ pub async fn get_groups(con: &mut PoolConnection<Postgres>) -> anyhow::Result<Ve
     Ok(res)
 }
 
-pub async fn get_group(con: &mut PoolConnection<Postgres>, group_id: i32) -> anyhow::Result<GroupModel> {
+pub async fn get_group(con: &mut PgConnection, group_id: i32) -> anyhow::Result<GroupModel> {
     let res = sqlx::query_as!(
         GroupModel,
         "SELECT * FROM groups WHERE group_id = $1",

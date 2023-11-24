@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE subjects SET semester = $1, alien_id = $2, department_id = $3 WHERE subject_id = $4",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e2b76a5117acc06da1f51c1ea47cc0eb9931dd16041e95e6497dab608b5b4bab"
+}

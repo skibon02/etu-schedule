@@ -1,7 +1,7 @@
 use anyhow::Context;
 use rocket::time::PrimitiveDateTime;
 use rocket_db_pools::Connection;
-use sqlx::{Acquire, Postgres};
+use sqlx::{Acquire, PgConnection, Postgres};
 use sqlx::pool::PoolConnection;
 use crate::models::Db;
 
@@ -118,7 +118,7 @@ pub struct ScheduleGenerationModel {
 }
 
 
-pub async fn get_current_schedule_for_group(con: &mut PoolConnection<Postgres>, group_id: i32) -> anyhow::Result<Vec<ScheduleObjModel>> {
+pub async fn get_current_schedule_for_group(con: &mut PgConnection, group_id: i32) -> anyhow::Result<Vec<ScheduleObjModel>> {
     let res = sqlx::query_as!(ScheduleObjModel,
         "SELECT week_day as \"week_day: WeekDay\", auditorium, created_timestamp, modified_timestamp,
             existence_diff, teacher_id, second_teacher_id, third_teacher_id, fourth_teacher_id,
@@ -132,7 +132,7 @@ pub async fn get_current_schedule_for_group(con: &mut PoolConnection<Postgres>, 
     Ok(res)
 }
 
-pub async fn get_current_schedule_link_ids(con: &mut PoolConnection<Postgres>, group_id: i32) -> anyhow::Result<Vec<i32>> {
+pub async fn get_current_schedule_link_ids(con: &mut PgConnection, group_id: i32) -> anyhow::Result<Vec<i32>> {
     let res = sqlx::query_scalar!(
         "SELECT schedule_objs.time_link_id FROM schedule_objs WHERE group_id = $1 and gen_end IS NULL",
         group_id
@@ -149,7 +149,7 @@ pub async fn get_current_schedule_link_ids(con: &mut PoolConnection<Postgres>, g
     Ok(res)
 }
 
-pub async fn get_current_schedule_for_group_with_subject(con: &mut PoolConnection<Postgres>, group_id: i32, subject_id: i32) -> anyhow::Result<Vec<ScheduleObjModel>> {
+pub async fn get_current_schedule_for_group_with_subject(con: &mut PgConnection, group_id: i32, subject_id: i32) -> anyhow::Result<Vec<ScheduleObjModel>> {
     let res = sqlx::query_as!(ScheduleObjModel,
             r#"SELECT week_day as "week_day: WeekDay", auditorium, created_timestamp, modified_timestamp,
             existence_diff, teacher_id, second_teacher_id, third_teacher_id, fourth_teacher_id,

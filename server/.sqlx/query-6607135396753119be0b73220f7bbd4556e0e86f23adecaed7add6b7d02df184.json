@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE from teachers_departments WHERE teacher_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6607135396753119be0b73220f7bbd4556e0e86f23adecaed7add6b7d02df184"
+}

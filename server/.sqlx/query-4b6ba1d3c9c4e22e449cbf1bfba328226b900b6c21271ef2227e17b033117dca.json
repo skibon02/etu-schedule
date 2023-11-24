@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE schedule_objs SET last_known_orig_sched_obj_id = $1, subject_gen_id = $2, teacher_gen_id = $3 WHERE schedule_obj_id = $4",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4b6ba1d3c9c4e22e449cbf1bfba328226b900b6c21271ef2227e17b033117dca"
+}

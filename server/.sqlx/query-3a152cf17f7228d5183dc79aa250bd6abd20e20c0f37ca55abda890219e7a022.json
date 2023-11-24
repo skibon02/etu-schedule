@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE subjects SET gen_end = $1 WHERE subject_id = $2 AND gen_end IS NULL",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3a152cf17f7228d5183dc79aa250bd6abd20e20c0f37ca55abda890219e7a022"
+}

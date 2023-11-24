@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE teachers SET gen_end = $1 WHERE teacher_id = $2 AND gen_end IS NULL",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "617ece33aea3136698a995f6aa5f1eeedc7f1d9324f02db430c3f0126285e00f"
+}

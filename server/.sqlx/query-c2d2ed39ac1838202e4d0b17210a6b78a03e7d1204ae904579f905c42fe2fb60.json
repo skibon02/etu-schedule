@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT user_attendance_schedule_diffs.* FROM user_attendance_schedule_diffs join schedule_objs on user_attendance_schedule_diffs.schedule_obj_time_link_id = schedule_objs.time_link_id WHERE user_id = $1 AND gen_end IS NULL",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "schedule_obj_time_link_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "week_num",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "enable_auto_attendance",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "c2d2ed39ac1838202e4d0b17210a6b78a03e7d1204ae904579f905c42fe2fb60"
+}

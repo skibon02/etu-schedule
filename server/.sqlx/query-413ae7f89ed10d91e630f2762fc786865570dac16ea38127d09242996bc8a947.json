@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select group_id from groups where group_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "group_id",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "413ae7f89ed10d91e630f2762fc786865570dac16ea38127d09242996bc8a947"
+}
