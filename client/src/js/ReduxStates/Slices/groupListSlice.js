@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import myfetch from '../../FxFetches/myfetch';
 
-const groupListFetch = createAsyncThunk('groups/groupListFetch', async () => {
+const groupListGETFetch = createAsyncThunk('groups/groupListGETFetch', async () => {
   try {
     const response = await myfetch('/api/groups');
     const data = await response.json();
@@ -17,7 +17,7 @@ const groupListFetch = createAsyncThunk('groups/groupListFetch', async () => {
 
     return groups;
   } catch (error) {
-    throw error; // Rethrow the error to be caught by groupListFetch.rejected
+    throw error; // Rethrow the error to be caught by groupListGETFetch.rejected
   }
 });
 
@@ -35,14 +35,14 @@ const groupListSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(groupListFetch.pending, (s) => {
+      .addCase(groupListGETFetch.pending, (s) => {
         s.groupListStatus = 'loading';
       })
-      .addCase(groupListFetch.fulfilled, (s, a) => {
+      .addCase(groupListGETFetch.fulfilled, (s, a) => {
         s.groupListStatus = 'succeeded';
         s.groupList = a.payload;
       })
-      .addCase(groupListFetch.rejected, (s, a) => {
+      .addCase(groupListGETFetch.rejected, (s, a) => {
         s.groupListStatus = 'failed';
         s.groupListError = a.error.message;
       });
@@ -50,5 +50,5 @@ const groupListSlice = createSlice({
 });
 
 export default groupListSlice.reducer
-export {groupListFetch}
+export {groupListGETFetch}
 export const {setGroupList} = groupListSlice.actions;

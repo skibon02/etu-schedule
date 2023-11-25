@@ -7,6 +7,7 @@ import { groupFilterOptions } from "../../Utils/Profile/makeSelectState"
 import { handleConfirmToken, handleDeleteToken } from '../../Handlers/Profile/handleAttendanceToken'
 import CROSSMARK from '../../../icons/cross-mark.svg'
 import BadAttendanceToken from './BadAttendanceToken'
+import DeleteTokenModal from './DeleteTokenModal'
 
 function FullNamePreference() {
   const dispatch = useDispatch();
@@ -61,10 +62,12 @@ function TokenPreference() {
 
   const { attendanceToken, groupChanged, badAttendanceToken } = useSelector(s => s.attendanceToken);
   const [inputV, setInputV] = useState(attendanceToken ? attendanceToken : '');
+  const [showModal, setShowModal] = useState(false);
 
   return (
     <>
     {badAttendanceToken && <BadAttendanceToken setInputV={setInputV} />}
+    {showModal && <DeleteTokenModal setShowModal={setShowModal} />}
     <div className="profile__user-preference user-preference">
       <div className="user-preference__title">
         Аксесс токен:
@@ -87,7 +90,7 @@ function TokenPreference() {
           :
           <div 
             className="user-preference__button user-preference__delete-button"
-            onClick={() => handleDeleteToken(dispatch)}>
+            onClick={() => setShowModal(true)}>
             <div className='user-preference__button-mark'>✖</div>
           </div>  
           }

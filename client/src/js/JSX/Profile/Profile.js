@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { groupListFetch } from "../../ReduxStates/Slices/groupListSlice";
+import { groupListGETFetch } from "../../ReduxStates/Slices/groupListSlice";
 import ProfileUserInfo from "./ProfileUserInfo";
 import UserPreferences from "./UserPreferences";
 
@@ -14,7 +14,7 @@ export default function Profile() {
 
   useEffect(() => {
     if (!groupList && isAuthorized) {
-      dispatch(groupListFetch())
+      dispatch(groupListGETFetch())
     };
   }, [vkData]);
 
