@@ -4,8 +4,10 @@ import { useSelector, useDispatch } from 'react-redux'
 import { makeGroupListSelect } from "../../Utils/Profile/makeGroupListSelect"
 import { handleGroupSelect, handlefullNameEnabledSelect } from "../../Handlers/Profile/handleSelect"
 import { groupFilterOptions } from "../../Utils/Profile/makeSelectState"
-import { accessTokenFetch, setAccessToken } from '../../ReduxStates/Slices/accessTokenSlice'
+import { attendanceTokenSETFetch, nullAttendanceToken, setAttendanceToken } from '../../ReduxStates/Slices/attendanceTokenSlice'
 import CROSSMARK from '../../../icons/cross-mark.svg'
+import {handleConfirmToken, handleDeleteToken} from '../../Handlers/Profile/handleAttendanceToken'
+import BadAttendanceToken from './BadAttendanceToken'
 
 function FullNamePreference() {
   const dispatch = useDispatch();
@@ -36,13 +38,14 @@ function GroupPreference() {
 
   const { groupList, groupListStatus, groupListError } = useSelector(s => s.groupList);
   const {groupNumber, groupId} = useSelector(s => s.groupNI);
+  const { attendanceToken, groupChanged, badAttendanceToken } = useSelector(s => s.attendanceToken);
 
   return (
     <div className="profile__user-preference user-preference">
       <div className="user-preference__title">
         Постоянная группа:
       </div>
-      <div className="user-preference__value">
+      <div className={!groupChanged ? "user-preference__value" : "user-preference__value user-preference__value_disabled"}>
         <Select 
           key={groupNumber} // !!!
           options={makeGroupListSelect(groupList)}
@@ -57,14 +60,12 @@ function GroupPreference() {
 function TokenPreference() {
   const dispatch = useDispatch();
 
-  const { accessToken, accessTokenStatus, accessTokenError } = useSelector(s => s.accessToken);
-  const [inputV, setInputV] = useState('');
-  const [inputClass, setInputClass] = useState(!accessToken ? 
-    'user-preference__input_enabled' : 
-    'user-preference__input_disabled');
-    
+  const { attendanceToken, groupChanged, badAttendanceToken } = useSelector(s => s.attendanceToken);
+  const [inputV, setInputV] = useState(attendanceToken ? attendanceToken : '');
+
   return (
     <>
+    {badAttendanceToken && <BadAttendanceToken setInputV={setInputV} />}
     <div className="profile__user-preference user-preference">
       <div className="user-preference__title">
         Аксесс токен:
@@ -75,18 +76,19 @@ function TokenPreference() {
             type="text" 
             placeholder='Введите токен'
             value={inputV} 
-            className="user-preference__input"
+            className={!groupChanged ? "user-preference__input" : "user-preference__input user-preference__input_disabled"}
+            disabled={groupChanged}
             onChange={(e) => setInputV(e.target.value)} />
-          {!accessToken ?
+          {!attendanceToken ?
           <div 
             className="user-preference__button user-preference__confirm-button"
-            onClick={() => dispatch(accessTokenFetch())}>
+            onClick={() => handleConfirmToken(dispatch, inputV)}>
             <img src={CROSSMARK} alt="" className="user-preference__image" draggable={false} />
           </div>
           :
           <div 
             className="user-preference__button user-preference__delete-button"
-            onClick={() => dispatch(setAccessToken(null))}>
+            onClick={() => handleDeleteToken(dispatch)}>
             <div className='user-preference__button-mark'>✖</div>
           </div>  
           }

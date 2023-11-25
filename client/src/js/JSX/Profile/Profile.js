@@ -11,7 +11,7 @@ export default function Profile() {
 
   const {groupList, groupListStatus, groupListError } = useSelector(s => s.groupList);
   const {vkData, vkDataStatus, vkDataError } = useSelector(s => s.vkData);
-
+  const { attendanceToken, groupChanged, badAttendanceToken } = useSelector(s => s.attendanceToken);
   
   const isAuthorized = vkData.is_authorized;
 
@@ -56,7 +56,7 @@ export default function Profile() {
       </div>
       {isAuthorized &&
         <div className="profile__user-preferences">
-          <TokenPreference />
+          <TokenPreference key={attendanceToken === null ? 1 : 0}  />
           <GroupPreference />
           <FullNamePreference />
         </div>

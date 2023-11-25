@@ -112,6 +112,10 @@ $BG: rgb(146, 173, 255);
 
   &__value {
     flex: 0 0 50%;
+
+    &_disabled {
+      pointer-events: none;
+    }
   }
 
   &__access-token-container {
@@ -127,6 +131,10 @@ $BG: rgb(146, 173, 255);
     border-radius: 5px;
     padding: 10px;
     color: #333333;
+
+    &_disabled {
+      color: #757575;
+    }
   }
 
   &__button {
@@ -177,10 +185,11 @@ $BG: rgb(146, 173, 255);
   height: 100%;
   display: flex;
   align-items: center;
+  color: #757575 !important;
 }
 
-.css-1dimb5e-singleValue {
-  color: #757575 !important;
+.css-1fdsijx-ValueContainer {
+  cursor: text;
 }
 
 .deauth-button-container {

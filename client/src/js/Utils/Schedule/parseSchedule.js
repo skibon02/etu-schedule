@@ -22,9 +22,9 @@ export function makeUsableSchedule(scheduleObject, fullNameEnabledValue) {
   const subjectType = subject.subject_type;
   let titleWords = title.split(' ');
   for (let i = 0; i < titleWords.length; i++) {
-    title =  titleWords[i].length > 16 ? shortTitle : title;
+    title =  titleWords[i].length > 14 ? shortTitle : title;
   }
-  title = titleWords.length > 6 ? shortTitle : title
+  title = titleWords.length > 4 ? shortTitle : title
   if (fullNameEnabledValue === 'shorten') {
     title = shortTitle;
   }

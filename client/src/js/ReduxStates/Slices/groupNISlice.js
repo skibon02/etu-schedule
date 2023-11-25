@@ -12,6 +12,16 @@ async function groupNISETFetch(groupId) {
   return data;
 }
 
+async function groupNIGETFetch(dispatch) {
+  let r = await myfetch('/api/user/get_group');
+  let d = await r.json();
+
+  dispatch(setGroupNI({
+    groupId: d.current_group.group_id,
+    groupNumber: d.current_group.number,
+  }));
+}
+
 const groupNISlice = createSlice({
   name: 'groupNI',
   initialState: {
@@ -29,5 +39,5 @@ const groupNISlice = createSlice({
 
 
 export default groupNISlice.reducer;
-export {groupNISETFetch} 
+export {groupNISETFetch, groupNIGETFetch} 
 export const {setGroupNI} = groupNISlice.actions;

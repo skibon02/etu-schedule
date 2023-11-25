@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import myfetch from '../../FxFetches/myfetch';
 import { setGroupNI } from './groupNISlice';
 import { setFullNameEnabled } from './fullNameEnabledSlice';
+import { setAttendanceToken } from './attendanceTokenSlice';
 
 const userDataGETFetch = createAsyncThunk('groups/userDataGETFetch', async (dispatch) => {
   try {
@@ -14,8 +15,8 @@ const userDataGETFetch = createAsyncThunk('groups/userDataGETFetch', async (disp
       groupId: data.group.group_id,
       groupNumber: data.group.number,
     }));
-
     dispatch(setFullNameEnabled(data.subjects_title_formatting));
+    dispatch(setAttendanceToken(data.attendance_token));
 
   } catch (error) {
     throw error;
