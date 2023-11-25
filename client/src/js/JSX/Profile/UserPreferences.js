@@ -98,8 +98,14 @@ function TokenPreference() {
   )
 }
 
-export {
-  FullNamePreference,
-  GroupPreference,
-  TokenPreference,
+export default function UserPreferences() {
+  const { attendanceToken, groupChanged, badAttendanceToken } = useSelector(s => s.attendanceToken);
+
+  return (
+    <div className="profile__user-preferences">
+      <TokenPreference key={attendanceToken === null ? 1 : 0}  />
+      <GroupPreference />
+      <FullNamePreference />
+    </div>
+  )
 }
