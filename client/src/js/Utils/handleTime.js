@@ -109,13 +109,21 @@ function makeCalendarTime(date, days) {
 
 function getWeekNumber(date) {
   const today = new Date(date);
-  const firstWeek = new Date(today.getFullYear(), 7, 27);
+  const year = today.getFullYear();
+  let startSeptember = new Date(year, 8, 1); // 1 сентября текущего года
 
-  const daysDiff = Math.floor((today - firstWeek) / (24 * 60 * 60 * 1000));
+  // Находим понедельник той недели, которая включает 1 сентября
+  let dayOfWeek = startSeptember.getDay();
+  if (dayOfWeek !== 1) {
+    startSeptember.setDate(startSeptember.getDate() - (dayOfWeek - 1) % 7);
+  }
+
+  const daysDiff = Math.floor((today - startSeptember) / (24 * 60 * 60 * 1000));
   const weeksDiff = Math.floor(daysDiff / 7);
 
-  return weeksDiff
+  return weeksDiff;
 }
+
 
 function isEvenWeek(date) {
   const weeksDiff = getWeekNumber(date);

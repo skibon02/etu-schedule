@@ -123,13 +123,14 @@ export default function makeSchedule(scheduleObjects, date) {
   let parity = isEvenWeek(date);
   let currentDayOfWeek = WEEK_DAYS[date.getDay()];
 
-  const week = parseWeek(scheduleObjects.sched_objs, parity); // -> arr contain arr
+  const week = parseWeek(scheduleObjects.sched_objs, parity); // week[] -> 6 * day[] -> schedObjs{}
 
   let weekSchedule = [];
   
   for (let i = 1; i < 7; i++) {
     weekSchedule.push(parseDays(week, WEEK_DAYS[i], date, currentDayOfWeek));
   }
+  // weekSchedule.push(parseDays(week, WEEK_DAYS[0], date, currentDayOfWeek)); // for sunday
   console.log('week Schedule is:\n', weekSchedule);
   return weekSchedule;
 }

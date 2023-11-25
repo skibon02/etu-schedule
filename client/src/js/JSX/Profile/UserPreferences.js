@@ -4,9 +4,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { makeGroupListSelect } from "../../Utils/Profile/makeGroupListSelect"
 import { handleGroupSelect, handlefullNameEnabledSelect } from "../../Handlers/Profile/handleSelect"
 import { groupFilterOptions } from "../../Utils/Profile/makeSelectState"
-import { attendanceTokenSETFetch, nullAttendanceToken, setAttendanceToken } from '../../ReduxStates/Slices/attendanceTokenSlice'
+import { handleConfirmToken, handleDeleteToken } from '../../Handlers/Profile/handleAttendanceToken'
 import CROSSMARK from '../../../icons/cross-mark.svg'
-import {handleConfirmToken, handleDeleteToken} from '../../Handlers/Profile/handleAttendanceToken'
 import BadAttendanceToken from './BadAttendanceToken'
 
 function FullNamePreference() {
