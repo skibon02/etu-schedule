@@ -198,7 +198,11 @@ async fn single_schedule_obj_group_merge(group_id: i32, input_schedule_objs: &Ve
 pub async fn schedule_objs_merge(group_id: i32, schedule_objs: &Vec<ScheduleObjModel>, con: &mut PgConnection) -> anyhow::Result<()> {
     // group by subject_id
 
-    let group_name = models::groups::get_group(con, group_id).await?.number;
+    let group_name = models::groups::get_group(con, group_id).await?.map(|r| r.number);
+    if group_name.is_none() {
+        return Err(anyhow::anyhow!("Group with id {} not found!", group_id));
+    }
+    let group_name = group_name.unwrap();
     info!("MERGE::SCHEDULE_OBJ_GROUP Merging started! Group: ({}): {}", group_id, group_name);
     let start = std::time::Instant::now();
     let mut subj_id_to_sched_objs: std::collections::HashMap<i32, Vec<ScheduleObjModel>> = std::collections::HashMap::new();

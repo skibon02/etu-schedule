@@ -137,7 +137,7 @@ async fn get_data(mut db: Connection<Db>, auth: Option<AuthorizeInfo>) -> GetUse
             if let Some(group_id) = res.group_id {
                 let group = models::groups::get_group(&mut db, group_id).await;
                 match group {
-                    Ok(group) => GetUserDataResult::Success(Json((res, Some(group)).into())),
+                    Ok(group) => GetUserDataResult::Success(Json((res, Some(group.unwrap())).into())),
                     Err(e) => {
                         error!("Failed to get user group: {:?}", e);
                         GetUserDataResult::Failed(Json(ResponseErrorMessage::new("не скажу".to_string())))
@@ -220,8 +220,21 @@ pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<Authorize
         }
 
         let attendance_token = body.attendance_token.clone().unwrap();
-        let user_group = models::users::get_user_group(&mut db, auth.user_id).await.unwrap().unwrap();
-        group_changed = user_group.group_id != attendance_token.parse().unwrap_or(0);
+        let user_group = models::users::get_user_group(&mut db, auth.user_id).await.unwrap();
+        if let Some(user_group) = user_group {
+            let attendance_token_group_id = attendance_token.parse().unwrap_or(0);
+            if user_group.group_id != attendance_token_group_id {
+                group_changed = true;
+                //check if new group valid
+                let group = models::groups::get_group(&mut db, attendance_token_group_id).await.unwrap();
+                if group.is_none() {
+                    return SetAttendanceTokenResult::Failed(Json(ResponseErrorMessage::new("чел пчел ты неправильную группу ввел".to_string())));
+                }
+                else {
+                    models::users::set_user_group(&mut db, auth.user_id, attendance_token_group_id).await.unwrap();
+                }
+            }
+        }
     }
 
     let res = models::users::set_attendance_token(&mut db, auth.user_id, body.attendance_token.clone()).await;

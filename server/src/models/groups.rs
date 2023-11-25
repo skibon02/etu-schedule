@@ -126,13 +126,13 @@ pub async fn get_groups(con: &mut PgConnection) -> anyhow::Result<Vec<GroupModel
     Ok(res)
 }
 
-pub async fn get_group(con: &mut PgConnection, group_id: i32) -> anyhow::Result<GroupModel> {
+pub async fn get_group(con: &mut PgConnection, group_id: i32) -> anyhow::Result<Option<GroupModel>> {
     let res = sqlx::query_as!(
         GroupModel,
         "SELECT * FROM groups WHERE group_id = $1",
         group_id
     )
-        .fetch_one(&mut *con).await?;
+        .fetch_optional(&mut *con).await?;
 
     Ok(res)
 }
