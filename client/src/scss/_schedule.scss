@@ -165,7 +165,7 @@
 }
 .lesson {
   display: flex;
-  gap: pxToEm(10px);
+  gap: pxToEm(25px);
   margin-bottom: pxToEm(8px);
   border-bottom: .8px solid #0000004a;
   padding-bottom: pxToEm(8px);
@@ -183,57 +183,57 @@
     }
   }
 
-    &__info {
-      flex: 1;
+  &__info {
+    flex: 1;
 
-      border-radius: pxToEm(10px);
-      padding: pxToEm(8px) pxToEm(20px, ) pxToEm(0px, ) 0;
+    border-radius: pxToEm(10px);
+    padding: pxToEm(8px) pxToEm(0px, ) pxToEm(0px, ) 0;
 
-      display: flex;
+    display: flex;
+  }
+
+  &__time {
+    width: pxToEm(80px, );
+    flex-shrink: 0;
+    text-align: center;
+  }
+
+  &__start {
+    margin-bottom: pxToEm(5px);
+    font-weight: 700;
+    color: #0b2376;
+  }
+
+  &__end {
+    font-size: 0.9em;
+  }
+
+  &__about {
+  }
+
+  &__name {
+    font-weight: 700;
+    margin-bottom: pxToEm(5px);
+  }
+
+  &__teachers {
+  }
+
+  &__teacher {
+    margin-bottom: pxToEm(5px);
+
+    &:last-child {
+      margin-bottom: 0;
     }
+  }
 
-    &__time {
-      width: pxToEm(80px, );
-      flex-shrink: 0;
-      text-align: center;
-    }
+  &__type-room {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
 
-    &__start {
-      margin-bottom: pxToEm(5px);
-      font-weight: 700;
-      color: #0b2376;
-    }
-
-    &__end {
-      font-size: 0.9em;
-    }
-
-    &__about {
-    }
-
-    &__name {
-      font-weight: 700;
-      margin-bottom: pxToEm(5px);
-    }
-
-    &__teachers {
-    }
-
-    &__teacher {
-      margin-bottom: pxToEm(5px);
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-
-    &__type-room {
-      margin-left: auto;
-      flex-shrink: 0;
-    }
-
-    &__attendance {
-    }
+  &__attendance {
+  }
 }
 
 .lesson-type-room {
@@ -403,6 +403,7 @@
     font-size: 0.6em;
   }
 }
+
 @media screen and (max-width: 500px) {
   .schedule {
     width: 95%;
@@ -430,6 +431,26 @@
         &:hover {
           background: #2DB694;
         }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 350px) {
+  .lesson {
+    &__time {
+      width: pxToEm(50px, );
+    }
+  }
+
+  .no-schedule {
+    font-size: 0.6em;
+  }
+
+  .lesson-type-room {
+    &__rooms {
+      &_room {
+        margin-left: pxToEm(5px);
       }
     }
   }

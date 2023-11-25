@@ -669,7 +669,7 @@ body {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  gap: 0.625em;
+  gap: 1.5625em;
   margin-bottom: 0.5em;
   border-bottom: 0.8px solid rgba(0, 0, 0, 0.2901960784);
   padding-bottom: 0.5em;
@@ -690,7 +690,7 @@ body {
       -ms-flex: 1;
           flex: 1;
   border-radius: 0.625em;
-  padding: 0.5em 1.25em 0em 0;
+  padding: 0.5em 0em 0em 0;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -927,6 +927,17 @@ body {
   }
   .attendance__body_green:hover {
     background: #2DB694;
+  }
+}
+@media screen and (max-width: 350px) {
+  .lesson__time {
+    width: 3.125em;
+  }
+  .no-schedule {
+    font-size: 0.6em;
+  }
+  .lesson-type-room__rooms_room {
+    margin-left: 0.3125em;
   }
 }
 * {
