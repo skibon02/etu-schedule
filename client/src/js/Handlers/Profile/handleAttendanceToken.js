@@ -9,7 +9,7 @@ async function handleConfirmToken(dispatch, inputV) {
 }
 
 async function handleDeleteToken(dispatch) {
-  await attendanceTokenSETFetch(dispatch, null);
+  attendanceTokenSETFetch(dispatch, null);
   dispatch(nullAttendanceToken())
 }
 
