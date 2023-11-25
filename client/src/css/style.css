@@ -599,10 +599,10 @@ body {
   max-width: 1000px;
   margin: 0 auto;
   padding-top: 4.375em;
+  margin-bottom: 0.9375em;
 }
 
 .schedule-info {
-  margin-bottom: 0.9375em;
   border: 1px solid rgba(0, 0, 0, 0.2901960784);
   border-radius: 0.9375em;
   text-align: center;
@@ -642,6 +642,11 @@ body {
   padding: 0.3125em;
   border-radius: 0.3125em;
   border-bottom: 0.8px solid rgba(0, 0, 0, 0.2901960784);
+}
+.day__schedule-string {
+  margin-top: 0.3125em;
+  font-size: 0.8em;
+  font-weight: 300;
 }
 .day__empty {
   display: -webkit-box;
@@ -1612,6 +1617,44 @@ h1, h2, h3, h4, h5, h6 {
   text-align: right;
 }
 
+.planning-all-mark {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+.planning-all-mark__container {
+  margin-top: 0.625em;
+}
+.planning-all-mark__button {
+  cursor: pointer;
+  border-radius: 1.25em;
+  color: #fff;
+  padding: 0.625em 0.9375em;
+  font-weight: 300;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+.planning-all-mark__button_green {
+  background: #2DB694;
+}
+.planning-all-mark__button_green:hover {
+  background: #7fccb9;
+}
+.planning-all-mark__button_red {
+  background: rgba(214, 0, 0, 0.9568627451);
+  margin-right: 0.625em;
+}
+.planning-all-mark__button_red:hover {
+  background: rgba(237, 106, 106, 0.9568627451);
+}
+
 .auto-planning {
   min-height: 100%;
 }
@@ -1702,5 +1745,17 @@ h1, h2, h3, h4, h5, h6 {
   }
   .planning-thead__lesson {
     padding-left: 3.75em;
+  }
+  .planning-all-mark__button_green:hover {
+    background: #2DB694;
+  }
+  .planning-all-mark__button_green:active {
+    background: #7fccb9;
+  }
+  .planning-all-mark__button_red:hover {
+    background: rgba(214, 0, 0, 0.9568627451);
+  }
+  .planning-all-mark__button_red:active {
+    background: rgba(237, 106, 106, 0.9568627451);
   }
 }

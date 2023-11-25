@@ -51,6 +51,42 @@ body {
   }
 }
 
+.planning-all-mark {
+  display: flex;
+  justify-content: center;
+
+  &__container {
+    margin-top: pxToEm(10px);
+  }
+
+  &__button {
+    cursor: pointer;
+    border-radius: pxToEm(20px);
+    color: #fff;
+    padding: pxToEm(10px) pxToEm(15px);
+    font-weight: 300;
+    transition: all .3s ease;
+    user-select: none;
+
+    &_green {
+      background: #2DB694;
+      
+      &:hover {
+        background: #7fccb9;
+      }
+    }
+
+    &_red {
+      background: #d60000f4;
+      margin-right: pxToEm(10px);
+
+      &:hover {
+        background: #ed6a6af4;
+      }
+    }
+  }
+}
+
 .auto-planning {
   min-height: 100%;
 }
@@ -138,6 +174,28 @@ body {
 
     &__lesson {
       padding-left: pxToEm(60px);
+    }
+  }
+
+  .planning-all-mark {
+    &__button {
+      &_green {
+        &:hover {
+          background: #2DB694;
+        }
+        &:active {
+          background: #7fccb9;
+        }
+      }
+  
+      &_red {
+        &:hover {
+          background: #d60000f4;
+        }
+        &:active {
+          background: #ed6a6af4;
+        }
+      }
     }
   }
 }

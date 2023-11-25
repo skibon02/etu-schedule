@@ -27,9 +27,12 @@ const rootReducer = combineReducers({
   scheduleDiffs: scheduleDiffsSlice,
 });
 
-export default configureStore({
+const store = configureStore({
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) => (
     getDefaultMiddleware().concat(thunk)
   )
 });
+
+export { store }
+

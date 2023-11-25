@@ -1,4 +1,4 @@
-import { planningDataSETFetch } from '../../ReduxStates/Slices/planningDataSlice';
+import { planningDataSETOneFetch } from '../../ReduxStates/Slices/planningDataSlice';
 
 function createQueueProcessor() {
   let isProcessing = false;
@@ -12,7 +12,7 @@ function createQueueProcessor() {
     const nextRequest = queue.shift();
     
     isProcessing = true;
-    await planningDataSETFetch(dispatch, ...nextRequest)
+    await planningDataSETOneFetch(dispatch, ...nextRequest)
     isProcessing = false;
 
     processQueue(dispatch); 

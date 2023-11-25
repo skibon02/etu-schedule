@@ -55,6 +55,6 @@ const groupScheduleSlice = createSlice({
   },
 });
 
-export default groupScheduleSlice.reducer
+export default groupScheduleSlice.reducer;
 export {groupScheduleFetch}
 export const {setGroupSchedule} = groupScheduleSlice.actions;

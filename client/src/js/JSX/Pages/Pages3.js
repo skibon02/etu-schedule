@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux'
 import { routingFx } from "../../FxFetches/Pages/routingFx";
@@ -20,10 +20,16 @@ export function Pages() {
   const {active} = useSelector(s => s.active);
   const {groupNumber, groupId} = useSelector(s => s.groupNI);
   const { vkData, vkDataStatus, vkDataError } = useSelector(s => s.vkData);
-  sessionStorage.setItem('fish', 0);
+
+  const [fish, setFish] = useState(false);
 
   useEffect(() => {
     dispatch(vkDataFetch());
+    const handleFish = () => setFish(true);
+    window.addEventListener('fish', handleFish);
+    return () => {
+      window.removeEventListener('fish', handleFish);
+    };
   }, [dispatch]);
 
   useEffect(() => {
@@ -41,7 +47,7 @@ export function Pages() {
     setActiveByLocationFx(dispatch, location)
   }, [dispatch, location]);
 
-  if (vkData && !(sessionStorage.getItem('fish') === '1')) {
+  if (vkData && !fish) {
     return (
       <div className='container'>
         <div className='under-header-box'></div>

@@ -1,11 +1,16 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { weekHeaderTime, isEvenWeek } from "../../Utils/handleTime";
 import { useState, useEffect } from "react";
+import { planningDataSETAllFetch, planningDataSETOneFetch, setAllPlanningData } from "../../ReduxStates/Slices/planningDataSlice";
+import { handlePlanning } from "../../Handlers/Schedule/weekHeader/handleWeekHeader";
 
 export function WeekHeader({weekParity}) {
+  const dispatch = useDispatch();
+
   const {active} = useSelector(s => s.active);
   const {date, weekNumber} = useSelector(s => s.date);
   const {groupNumber, groupId} = useSelector(s => s.groupNI);
+  const { groupSchedule, groupScheduleStatus, groupScheduleError } = useSelector(s => s.groupSchedule);
 
   const [clock, setClock] = useState(weekHeaderTime(new Date()));
 
@@ -19,7 +24,6 @@ export function WeekHeader({weekParity}) {
     };
   }, []);
   
-
   return (
     <>
     <div className="schedule-info-container">
@@ -34,6 +38,18 @@ export function WeekHeader({weekParity}) {
           }
         </div>
       </div>
+      {active === 'planning' &&
+      <div className="planning-all-mark planning-all-mark__container">
+        <div onClick={() => {handlePlanning(dispatch, groupSchedule, false)}} 
+             className="planning-all-mark__button planning-all-mark__button_red">
+          Не посещать все пары
+        </div>
+        <div onClick={() => {handlePlanning(dispatch, groupSchedule, true)}} 
+             className="planning-all-mark__button planning-all-mark__button_green">
+          Посещать все пары
+        </div>
+      </div>
+      }
     </div>
     </>
   )

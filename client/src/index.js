@@ -7,8 +7,7 @@ import reportWebVitals from './reportWebVitals';
 import { backendHost } from './js/FxFetches/util';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-// import store from './js/testRedux/store'
-import store from './js/ReduxStates/store'
+import {store} from './js/ReduxStates/store'
 
 // redirect to backend if we're on the authorize page
 if (window.location.pathname === '/api/auth/redirect') {

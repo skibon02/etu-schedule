@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import myfetch from '../../FxFetches/myfetch';
 
 async function groupNISETFetch(groupId) {
@@ -26,6 +26,7 @@ const groupNISlice = createSlice({
     }
   },
 });
+
 
 export default groupNISlice.reducer;
 export {groupNISETFetch} 

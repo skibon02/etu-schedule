@@ -89,10 +89,10 @@
   max-width: 1000px;
   margin: 0 auto;
   padding-top: pxToEm(70px);
+  margin-bottom: pxToEm(15px);
 }
 
 .schedule-info {
-  margin-bottom: pxToEm(15px);
   border: 1px solid #0000004a;
   border-radius: pxToEm(15px);
   text-align: center;
@@ -130,33 +130,38 @@
     margin-bottom: 0;
   }
 
-    &__date {
-      margin-bottom: pxToEm(8px);
-      font-weight: 700;
-      font-size: 1.2em;
-      padding: pxToEm(5px, );
-      border-radius: pxToEm(5px, );
-      border-bottom: .8px solid #0000004a;
+  &__date {
+    margin-bottom: pxToEm(8px);
+    font-weight: 700;
+    font-size: 1.2em;
+    padding: pxToEm(5px, );
+    border-radius: pxToEm(5px, );
+    border-bottom: .8px solid #0000004a;
+  }
 
-    }
+  &__schedule-string {
+    margin-top: pxToEm(5px);
+    font-size: 0.8em;
+    font-weight: 300;
+  }
 
-    &__lessons {
-    }
+  &__lessons {
+  }
 
-    &__lesson {
-    }
+  &__lesson {
+  }
 
-    &__empty {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: pxToEm(100px);
-    }
+  &__empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: pxToEm(100px);
+  }
 
-    &__empty-text {
-      font-size: 3em;
-      color: #828282;
-    }
+  &__empty-text {
+    font-size: 3em;
+    color: #828282;
+  }
 }
 .lesson {
   display: flex;

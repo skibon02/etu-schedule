@@ -3,37 +3,46 @@ import myfetch from '../../FxFetches/myfetch';
 import { scheduleDiffsGETFetch } from './scheduleDiffsSlice';
 
 const planningDataGETFetch = createAsyncThunk('groups/planningDataGETFetch', async () => {
-  try {
-    let response = await myfetch(`/api/attendance/schedule`);
-    let data = await response.json();
+  let response = await myfetch(`/api/attendance/schedule`);
+  let data = await response.json();
 
-    return data;
-  } catch (error) {
-    throw error; 
-  }
+  return data;
 });
 
-async function planningDataSETFetch(dispatch, time_link_id, flag) {
-  try {
-    let r = await myfetch(`/api/attendance/schedule/update`, {
+async function planningDataSETOneFetch(dispatch, time_link_id, flag) {
+  let r = await myfetch(`/api/attendance/schedule/update`, {
+    body: JSON.stringify({
+      schedule_obj_time_link_id: +time_link_id, 
+      enable_auto_attendance: flag
+    }),
+    method: "POST",
+    credentials: "include",
+  });
+  let d = await r.json();
+
+  console.log('result of changing planning Data\n', d);
+
+  if (d.ok) {
+    dispatch(scheduleDiffsGETFetch());
+  }
+}
+
+async function planningDataSETAllFetch(dispatch, groupSchedule, flag) {
+  let arr = groupSchedule.sched_objs;
+  
+  for (let i = 0; i < arr.length; i++) {
+    await myfetch(`/api/attendance/schedule/update`, {
       body: JSON.stringify({
-        schedule_obj_time_link_id: +time_link_id, 
+        schedule_obj_time_link_id: arr[i].time_link_id, 
         enable_auto_attendance: flag
       }),
       method: "POST",
       credentials: "include",
     });
-    let d = await r.json();
-  
-    console.log('result of changing planning Data\n', d);
-
-    if (d.ok) {
-      dispatch(planningDataGETFetch());
-      dispatch(scheduleDiffsGETFetch());
-    }
-  } catch (error) {
-    console.error(error.message);
   }
+
+  dispatch(planningDataGETFetch());
+  dispatch(scheduleDiffsGETFetch());
 }
 
 const planningDataSlice = createSlice({
@@ -46,7 +55,15 @@ const planningDataSlice = createSlice({
   reducers: {
     setPlanningData: (s, a) => {
       s.planningData = a.payload;
-    }
+    },
+    setAllPlanningData(s, a) {
+      for (let k of Object.keys(s.planningData)) {
+        s.planningData[k].auto_attendance_enabled = a.payload;
+      }
+    },
+    setOnePlanningData(s, a) {
+      s.planningData[a.payload.t_l_id].auto_attendance_enabled = a.payload.f;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -67,5 +84,5 @@ const planningDataSlice = createSlice({
 
 export default planningDataSlice.reducer
 export {planningDataGETFetch}
-export {planningDataSETFetch}
-export const {setPlanningData} = planningDataSlice.actions;
+export {planningDataSETOneFetch, planningDataSETAllFetch}
+export const {setPlanningData, setAllPlanningData, setOnePlanningData} = planningDataSlice.actions;

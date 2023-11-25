@@ -30,7 +30,7 @@ export default function Planning() {
     return (
       <>  
       <PlanningHeader weekParity={weekParity} setWeekParity={setWeekParity} />
-  
+
       {weekParity === '1' ?
       <>
       <WeekHeader weekParity={weekParity} />
