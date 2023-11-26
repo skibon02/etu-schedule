@@ -134,6 +134,62 @@ pub async fn set_user_attendance_schedule(mut db: Connection<Db>, auth: Option<A
     SetUserAttendanceScheduleResult::Success(Json(SetUserAttendanceScheduleResultSuccess { ok: true }))
 }
 
+#[derive(Serialize)]
+pub struct SetUserAttendanceScheduleAllResultSuccess {
+    ok: bool,
+}
+#[derive(Responder)]
+pub enum SetUserAttendanceScheduleAllResult {
+    #[response(status = 200, content_type = "json")]
+    Success(Json<SetUserAttendanceScheduleAllResultSuccess>),
+    #[response(status = 400, content_type = "json")]
+    Failed(Json<ResponseErrorMessage>),
+}
+
+#[derive(Deserialize)]
+pub struct SetUserAttendanceScheduleAllRequest {
+    enable_auto_attendance: bool,
+}
+
+#[post("/attendance/schedule/update_all", data = "<data>")]
+pub async fn set_user_attendance_schedule_all(mut db: Connection<Db>, auth: Option<AuthorizeInfo>,
+                                          data: Json<SetUserAttendanceScheduleAllRequest>) -> SetUserAttendanceScheduleAllResult {
+    if auth.is_none() {
+        return SetUserAttendanceScheduleAllResult::Failed(Json(ResponseErrorMessage::new("User is not authorized!".to_string())));
+    }
+    let auth = auth.unwrap();
+
+    // get user saved attendance schedule elements
+    let group_id = models::users::get_user_group(&mut db, auth.user_id).await;
+    if let Err(e) = group_id {
+        error!("Failed to get user group: {:?}", e);
+        return SetUserAttendanceScheduleAllResult::Failed(Json(ResponseErrorMessage::new("Failed to get user group!".to_string())));
+    }
+    let group_id = group_id.unwrap();
+
+    if group_id.is_none() {
+        return SetUserAttendanceScheduleAllResult::Failed(Json(ResponseErrorMessage::new("User has no group!".to_string())));
+    }
+    let group_id = group_id.unwrap().group_id;
+
+    // get user group link_id elements
+    let schedule_link_ids = models::schedule::get_current_schedule_link_ids(&mut db, group_id).await;
+
+    if let Err(e) = schedule_link_ids {
+        error!("Failed to get user group schedule link ids: {:?}", e);
+        return SetUserAttendanceScheduleAllResult::Failed(Json(ResponseErrorMessage::new("Failed to get user group schedule link ids!".to_string())));
+    }
+    let schedule_link_ids = schedule_link_ids.unwrap();
+
+    let res = models::attendance::set_attendance_schedule_all(&mut db, auth.user_id, schedule_link_ids, data.enable_auto_attendance).await;
+
+    if let Err(e) = res {
+        error!("Failed to set user attendance schedule: {:?}", e);
+        return SetUserAttendanceScheduleAllResult::Failed(Json(ResponseErrorMessage::new("Failed to set user attendance schedule!".to_string())));
+    }
+
+    SetUserAttendanceScheduleAllResult::Success(Json(SetUserAttendanceScheduleAllResultSuccess { ok: true }))
+}
 
 
 #[derive(Serialize)]
@@ -268,5 +324,6 @@ pub async fn set_user_attendance_schedule_diffs(mut db: Connection<Db>, auth: Op
 
 pub fn get_routes() -> Vec<Route> {
     routes![get_user_attendance_schedule, set_user_attendance_schedule,
-        get_user_attendance_schedule_diffs, set_user_attendance_schedule_diffs]
+        get_user_attendance_schedule_diffs, set_user_attendance_schedule_diffs,
+        set_user_attendance_schedule_all]
 }

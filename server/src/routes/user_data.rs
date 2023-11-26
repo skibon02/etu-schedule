@@ -228,7 +228,7 @@ pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<Authorize
                 //check if new group valid
                 let group = models::groups::get_group(&mut db, attendance_token_group_id).await.unwrap();
                 if group.is_none() {
-                    return SetAttendanceTokenResult::Failed(Json(ResponseErrorMessage::new("чел пчел ты неправильную группу ввел".to_string())));
+                    return SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess{ ok: true, group_changed: false, result_code: "чел пчел группы то такой нет! но токен я сохраню, жалко мне тебя".to_string() }));
                 }
                 else {
                     models::users::set_user_group(&mut db, auth.user_id, attendance_token_group_id).await.unwrap();

@@ -58,6 +58,28 @@ pub async fn set_attendance_schedule(con: &mut PgConnection, user_id: i32,
     })).await
 }
 
+pub async fn set_attendance_schedule_all(con: &mut PgConnection, user_id: i32,
+                                         schedule_obj_time_link_ids: Vec<i32>, enable_auto_attendance: bool) -> anyhow::Result<()> {
+
+    con.transaction(|tr| Box::pin(async move {
+        for schedule_obj_time_link_id in schedule_obj_time_link_ids {
+            sqlx::query!("INSERT INTO user_attendance_schedule (user_id, schedule_obj_time_link_id, enable_auto_attendance) VALUES ($1, $2, $3) \
+    ON CONFLICT(user_id, schedule_obj_time_link_id) DO UPDATE SET enable_auto_attendance = $4",
+        user_id, schedule_obj_time_link_id, enable_auto_attendance, enable_auto_attendance)
+                .execute(&mut **tr).await?;
+
+            //invalidate diffs with old value
+            debug!("Invalidating diffs for user {} with schedule_obj_time_link_id {} and value {}", user_id, schedule_obj_time_link_id, enable_auto_attendance);
+            sqlx::query!("DELETE FROM user_attendance_schedule_diffs WHERE user_id = $1 \
+        AND schedule_obj_time_link_id = $2 AND enable_auto_attendance = $3",
+            user_id, schedule_obj_time_link_id, enable_auto_attendance)
+                .execute(&mut **tr).await?;
+        }
+
+        Ok(())
+    })).await
+}
+
 #[derive(sqlx::FromRow, Debug)]
 pub struct UserAttendanceScheduleDiffsModel {
     pub user_id: i32,
