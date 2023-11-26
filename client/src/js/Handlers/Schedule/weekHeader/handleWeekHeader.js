@@ -1,8 +1,8 @@
 import { planningDataSETAllFetch, setAllPlanningData } from "../../../ReduxStates/Slices/planningDataSlice";
 
-function handlePlanning(dispatch, groupSchedule, flag) {
+function handlePlanning(dispatch, flag) {
   dispatch(setAllPlanningData(flag));
-  planningDataSETAllFetch(dispatch, groupSchedule, flag);
+  planningDataSETAllFetch(dispatch, flag);
 }
 
 export {

@@ -1,14 +1,14 @@
 import { WeekHeader } from "./WeekHeader";
 import { useSelector } from "react-redux";
-import NoSchedule from "./NoSchedule";import makeSchedule from "../../Utils/Schedule/parseSchedule";
+import makeSchedule from "../../Utils/Schedule/parseSchedule";
+import NoSchedule from "./NoSchedule";
 import Week from "./Week";
 
 export default function Schedule() {
 
-  const {date, weekNumber} = useSelector(s => s.date);
-  const {active} = useSelector(s => s.active);
-  const {groupNumber, groupId} = useSelector(s => s.groupNI);
-  const { groupSchedule, groupScheduleStatus, groupScheduleError } = useSelector(s => s.groupSchedule);
+  const { date } = useSelector(s => s.date);
+  const { groupNumber } = useSelector(s => s.groupNI);
+  const { groupSchedule } = useSelector(s => s.groupSchedule);
 
   if (!groupSchedule) {
     return (

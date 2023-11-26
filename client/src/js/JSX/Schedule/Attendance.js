@@ -1,6 +1,5 @@
 import { useSelector } from 'react-redux'
 import { useState } from 'react';
-
 import CLOCK from '../../../icons/icons8-clock.svg'
 import * as handlers from '../../Handlers/Schedule/Subject/handlers'
 import { addToQueue } from '../../FxFetches/Schedule/processScheduleQueue';
@@ -12,7 +11,8 @@ export default function Attendance({
   schedule_diffs_value,
   planning_time_link_id_value
 }) {
-  const {date, weekNumber} = useSelector(s => s.date);
+
+  const { weekNumber } = useSelector(s => s.date);
 
   const [toggleClock, setToggleClock] = useState(false);
   const [init, setInit] = useState(schedule_diffs_value !== null ? schedule_diffs_value : planning_time_link_id_value);

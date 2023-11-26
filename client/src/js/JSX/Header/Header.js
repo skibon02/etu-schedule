@@ -17,7 +17,7 @@ export default function Header() {
 
   const {active} = useSelector(s => s.active);
   const {date, weekNumber} = useSelector(s => s.date);
-  const { groupSchedule, groupScheduleStatus, groupScheduleError } = useSelector(s => s.groupSchedule);
+  const { groupSchedule } = useSelector(s => s.groupSchedule);
 
   return (
     <div className="header">

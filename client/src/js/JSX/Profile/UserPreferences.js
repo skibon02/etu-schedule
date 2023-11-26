@@ -4,10 +4,11 @@ import { useSelector, useDispatch } from 'react-redux'
 import { makeGroupListSelect } from "../../Utils/Profile/makeGroupListSelect"
 import { handleGroupSelect, handlefullNameEnabledSelect } from "../../Handlers/Profile/handleSelect"
 import { groupFilterOptions } from "../../Utils/Profile/makeSelectState"
-import { handleConfirmToken, handleDeleteToken } from '../../Handlers/Profile/handleAttendanceToken'
+import { handleConfirmToken } from '../../Handlers/Profile/handleAttendanceToken'
 import CROSSMARK from '../../../icons/cross-mark.svg'
 import BadAttendanceToken from './BadAttendanceToken'
 import DeleteTokenModal from './DeleteTokenModal'
+import { handleEnterUp } from '../../Handlers/Profile/handleEnterUp'
 
 function FullNamePreference() {
   const dispatch = useDispatch();
@@ -36,9 +37,9 @@ function FullNamePreference() {
 function GroupPreference() {
   const dispatch = useDispatch();
 
-  const { groupList, groupListStatus, groupListError } = useSelector(s => s.groupList);
-  const {groupNumber, groupId} = useSelector(s => s.groupNI);
-  const { attendanceToken, groupChanged, badAttendanceToken } = useSelector(s => s.attendanceToken);
+  const { groupList } = useSelector(s => s.groupList);
+  const { groupNumber } = useSelector(s => s.groupNI);
+  const { groupChanged } = useSelector(s => s.attendanceToken);
 
   return (
     <div className="profile__user-preference user-preference">
@@ -75,12 +76,13 @@ function TokenPreference() {
       <div className="user-preference__value">
         <div className="user-preference__access-token-container">
           <input 
+            className={!groupChanged ? "user-preference__input" : "user-preference__input user-preference__input_disabled"}
             type="text" 
             placeholder='Введите токен'
-            value={inputV} 
-            className={!groupChanged ? "user-preference__input" : "user-preference__input user-preference__input_disabled"}
             disabled={groupChanged}
-            onChange={(e) => setInputV(e.target.value)} />
+            value={inputV} 
+            onChange={(e) => setInputV(e.target.value)}
+            onKeyUp={(e) => handleEnterUp(dispatch, inputV, e)} />
           {!attendanceToken ?
           <div 
             className="user-preference__button user-preference__confirm-button"
@@ -102,7 +104,7 @@ function TokenPreference() {
 }
 
 export default function UserPreferences() {
-  const { attendanceToken, groupChanged, badAttendanceToken } = useSelector(s => s.attendanceToken);
+  const { attendanceToken } = useSelector(s => s.attendanceToken);
 
   return (
     <div className="profile__user-preferences">

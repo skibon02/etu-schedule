@@ -8,9 +8,9 @@ import Week from "../Schedule/Week";
 
 export default function Planning() {
 
-  const {groupNumber, groupId} = useSelector(s => s.groupNI);
+  const { groupNumber } = useSelector(s => s.groupNI);
   const { groupSchedule, parsedSchedule1, parsedSchedule2 } = useSelector(s => s.groupSchedule);
-  const {planningData, planningDataStatus, planningDataError} = useSelector(s => s.planningData);
+  const { planningData } = useSelector(s => s.planningData);
 
   const [weekParity, setWeekParity] = useState(isEvenWeek(new Date));
 

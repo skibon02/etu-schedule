@@ -7,8 +7,8 @@ import UserPreferences from "./UserPreferences";
 export default function Profile() {
   const dispatch = useDispatch();
 
-  const {groupList, groupListStatus, groupListError } = useSelector(s => s.groupList);
-  const {vkData, vkDataStatus, vkDataError } = useSelector(s => s.vkData);
+  const { groupList } = useSelector(s => s.groupList);
+  const { vkData } = useSelector(s => s.vkData);
   
   const isAuthorized = vkData.is_authorized;
 

@@ -4,7 +4,7 @@ import VKButton_old_v from "./VKButton_old_v";
 import DeAuthButton from "./DeAuthButton";
 
 export default function ProfileUserInfo() {
-  const {vkData, vkDataStatus, vkDataError } = useSelector(s => s.vkData);
+  const { vkData } = useSelector(s => s.vkData);
   
   const isAuthorized = vkData.is_authorized;
 

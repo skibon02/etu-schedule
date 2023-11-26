@@ -17,9 +17,9 @@ export function Pages() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const {active} = useSelector(s => s.active);
-  const {groupNumber, groupId} = useSelector(s => s.groupNI);
-  const { vkData, vkDataStatus, vkDataError } = useSelector(s => s.vkData);
+  const { active } = useSelector(s => s.active);
+  const { groupId } = useSelector(s => s.groupNI);
+  const { vkData } = useSelector(s => s.vkData);
 
   const [fish, setFish] = useState(false);
 

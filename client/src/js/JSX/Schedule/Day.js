@@ -5,11 +5,11 @@ import { makeCalendarTime } from "../../Utils/handleTime";
 import { scheduleString } from "../../Utils/Schedule/Day/scheduleString";
 
 export function Day({daySchedule}) {
-  const {active} = useSelector(s => s.active);
-  const {fullNameEnabledValue, fullNameEnabledLabel} = useSelector(s => s.fullNameEnabled);
-  const {planningData, planningDataStatus, planningDataError} = useSelector(s => s.planningData);
-  const {scheduleDiffs, scheduleDiffsStatus, scheduleDiffsError} = useSelector(s => s.scheduleDiffs);
-  const {date, weekNumber} = useSelector(s => s.date);
+  const { active } = useSelector(s => s.active);
+  const { fullNameEnabledValue } = useSelector(s => s.fullNameEnabled);
+  const { planningData } = useSelector(s => s.planningData);
+  const { scheduleDiffs } = useSelector(s => s.scheduleDiffs);
+  const { weekNumber } = useSelector(s => s.date);
 
   const dayOfWeek = makeCalendarTime(daySchedule[0].date, DAYS)
 

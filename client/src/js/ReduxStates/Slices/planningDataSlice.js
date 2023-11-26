@@ -27,22 +27,21 @@ async function planningDataSETOneFetch(dispatch, time_link_id, flag) {
   }
 }
 
-async function planningDataSETAllFetch(dispatch, groupSchedule, flag) {
-  let arr = groupSchedule.sched_objs;
-  
-  for (let i = 0; i < arr.length; i++) {
-    await myfetch(`/api/attendance/schedule/update`, {
-      body: JSON.stringify({
-        schedule_obj_time_link_id: arr[i].time_link_id, 
-        enable_auto_attendance: flag
-      }),
-      method: "POST",
-      credentials: "include",
-    });
-  }
+async function planningDataSETAllFetch(dispatch, flag) {
+  let r = await myfetch('/api/attendance/schedule/update_all', {
+    method: "POST",
+    credentials: "include",
+    body: JSON.stringify({
+      enable_auto_attendance: flag
+    })
+  });
+  let d = await r.json();
+  console.log('result of updating all planning:', d);
 
-  dispatch(planningDataGETFetch());
-  dispatch(scheduleDiffsGETFetch());
+  if (d.ok) {
+    dispatch(planningDataGETFetch());
+    dispatch(scheduleDiffsGETFetch());
+  }
 }
 
 const planningDataSlice = createSlice({

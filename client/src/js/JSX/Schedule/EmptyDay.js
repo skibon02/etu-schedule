@@ -15,7 +15,7 @@ export default function EmptyDay({weekSchedule}) {
         makeCalendarTime(weekSchedule, DAYS)
         }
         <div className="day__schedule-string">
-          Пар нет
+          0 пар
         </div>
       </div>
       <div className="day__lessons">

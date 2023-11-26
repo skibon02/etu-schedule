@@ -10,7 +10,14 @@ function getLessonTimes(lessonNumber) {
   return [formatTime(st.getHours(), st.getMinutes()), formatTime(endt.getHours(), endt.getMinutes())];
 }
 
-function scheduleString(lessons) {
+function scheduleString(l) {
+
+  let lessons = [l[0]];
+  for (let i = 1; i < l.length; i++) {
+    if (l[i].auditorium_reservation.time !== l[i - 1].auditorium_reservation.time) {
+      lessons.push(l[i]);
+    }
+  }
 
   let intervals = [];
   let currentInterval = [lessons[0].auditorium_reservation.time, lessons[0].auditorium_reservation.time];
