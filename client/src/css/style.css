@@ -1036,13 +1036,15 @@ h1, h2, h3, h4, h5, h6 {
 .profile__user-preferences {
   padding: 1.875em;
   border-radius: 1.875em;
-  background: rgb(146, 173, 255);
+  background: -webkit-gradient(linear, left bottom, left top, color-stop(30%, rgb(169, 200, 241)), to(rgb(237, 255, 247)));
+  background: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%);
 }
 .user-info {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  background: rgb(146, 173, 255);
+  background: -webkit-gradient(linear, left bottom, left top, from(rgb(237, 255, 247)), color-stop(70%, rgb(169, 200, 241)));
+  background: linear-gradient(0deg, rgb(237, 255, 247) 0%, rgb(169, 200, 241) 70%);
   border-radius: 1.875em;
   padding: 1.25em;
 }
