@@ -2,16 +2,12 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import myfetch from '../../FxFetches/myfetch';
 
 const vkDataFetch = createAsyncThunk('groups/vkDataFetch', async () => {
-  try {
-    let response = await myfetch('/api/auth/data');
-    let data = await response.json();
+  let response = await myfetch('/api/auth/data');
+  let data = await response.json();
 
-    console.log('vk data:\n', data);
+  console.log('vk data:\n', data);
 
-    return data;
-  } catch (error) {
-    throw error; // Rethrow the error to be caught by vkDataFetch.rejected
-  }
+  return data;
 });
 
 const vkDataSlice = createSlice({

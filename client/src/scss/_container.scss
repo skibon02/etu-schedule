@@ -50,6 +50,10 @@ body {
   flex-direction: column;
 }
 
+.fish-image {
+  width: pxToEm(100px);
+}
+
 .no-match-link {
    color: #0b2376;
    text-decoration: underline;

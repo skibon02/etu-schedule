@@ -2,35 +2,27 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import myfetch from '../../FxFetches/myfetch';
 // scheduleDiffs
 const scheduleDiffsGETFetch = createAsyncThunk('groups/scheduleDiffsGETFetch', async () => {
-  try {
-    let response = await myfetch('/api/attendance/schedule_diffs');
-    let data = await response.json();
+  let response = await myfetch('/api/attendance/schedule_diffs');
+  let data = await response.json();
 
-    console.log('schedule diffs is:\n', data);
+  console.log('schedule diffs is:\n', data);
 
-    return data;
-  } catch (error) {
-    throw error;
-  }
+  return data;
 });
 
 async function scheduleDiffsSETFetch(time_link_id, weekNumber, flag) {
-  try {
-    let r = await myfetch('/api/attendance/schedule_diffs/update', {
-      body: JSON.stringify({
-        schedule_obj_time_link_id: time_link_id,
-        week_num: +weekNumber,
-        enable_auto_attendance: flag,
-      }),
-      credentials: "include",
-      method: "POST",
-    });
-    let d = await r.json();
+  let r = await myfetch('/api/attendance/schedule_diffs/update', {
+    body: JSON.stringify({
+      schedule_obj_time_link_id: time_link_id,
+      week_num: +weekNumber,
+      enable_auto_attendance: flag,
+    }),
+    credentials: "include",
+    method: "POST",
+  });
+  let d = await r.json();
 
-    console.log('result of schedule diffs fetch:\n', d);
-  } catch(error) {
-    console.error(error.message)
-  }
+  console.log('result of schedule diffs fetch:\n', d);
 }
 
 const scheduleDiffsSlice = createSlice({

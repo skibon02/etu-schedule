@@ -6,6 +6,7 @@ import { setActiveByLocationFx } from "../../FxFetches/Pages/setActiveByLocation
 import { groupScheduleFx } from "../../FxFetches/Pages/groupScheduleFx";
 import { vkDataFetch } from "../../ReduxStates/Slices/vkDataSlice";
 import { userDataGETFetch } from "../../ReduxStates/Slices/userDataSlice";
+import FISH from '../../../icons/fish.svg'
 import Header from "../Header/Header";
 import Schedule from '../Schedule/Schedule'
 import Planning from "../Planning/Planning";
@@ -72,6 +73,6 @@ export function Pages() {
       </div>
     )
   } else {
-    return <div className="fish">fish</div>
+    return <div className="fish"><img className="fish-image" src={FISH} alt="fish" draggable={false} /></div>
   }
 }

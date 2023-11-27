@@ -2,23 +2,19 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import myfetch from '../../FxFetches/myfetch';
 
 const groupListGETFetch = createAsyncThunk('groups/groupListGETFetch', async () => {
-  try {
-    const response = await myfetch('/api/groups');
-    const data = await response.json();
+  const response = await myfetch('/api/groups');
+  const data = await response.json();
 
-    let groups = [];
-    for (let k of Object.keys(data)) {
-      groups.push({
-        ...data[k],
-        id: k
-      });
-    }
-    console.log('groups:\n', groups);
-
-    return groups;
-  } catch (error) {
-    throw error; // Rethrow the error to be caught by groupListGETFetch.rejected
+  let groups = [];
+  for (let k of Object.keys(data)) {
+    groups.push({
+      ...data[k],
+      id: k
+    });
   }
+  console.log('groups:\n', groups);
+
+  return groups;
 });
 
 const groupListSlice = createSlice({

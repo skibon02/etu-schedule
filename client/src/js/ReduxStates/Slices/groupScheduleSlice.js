@@ -4,16 +4,11 @@ import makeSchedule from '../../Utils/Schedule/parseSchedule';
 import { isEvenWeek } from '../../Utils/handleTime';
 
 const groupScheduleFetch = createAsyncThunk('groups/groupScheduleFetch', async (groupId) => {
-  try {
-    const response = await myfetch(`/api/scheduleObjs/group/${groupId}`);
-    const data = await response.json();
-    console.log('successful fetch on Schedule\nresponse.json():\n', data);
+  const response = await myfetch(`/api/scheduleObjs/group/${groupId}`);
+  const data = await response.json();
+  console.log('successful fetch on Schedule\nresponse.json():\n', data);
 
-    return data;
-
-  } catch (error) {
-    throw error; // Rethrow the error to be caught by groupScheduleFetch.rejected
-  }
+  return data;
 });
 
 const groupScheduleSlice = createSlice({

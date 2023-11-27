@@ -98,53 +98,43 @@ body {
   width: pxToEm(70px);
   height: 100%;
 
-
-  &__body-false {
+  &__body {
     box-sizing: content-box;
     cursor: pointer;
     width: pxToEm(60px);
     height: pxToEm(30px);
-    background: linear-gradient(90deg, rgba(205,40,40,1) 0%, rgba(219,64,64,1) 47%, rgba(162,0,0,1) 100%);
     border: pxToEm(2px) solid #e4e4e4;
     border-radius: pxToEm(20px);
     position: relative;
     transition: all .3s ease;
+
+    &_false {
+      background: linear-gradient(90deg, rgba(205,40,40,1) 0%, rgba(219,64,64,1) 47%, rgba(162,0,0,1) 100%);
+    }
+
+    &_true {
+      background: linear-gradient(90deg, rgba(68,102,93,1) 0%, rgba(45,182,148,1) 64%, rgba(33,133,108,1) 100%);
+    }
   }
 
-  &__circle-false {
+  &__circle {
     z-index: 1;
     position: absolute;
     top: 0;
-    left: -1px;
     transition: all .3s ease;
     width: pxToEm(30px);
     height: pxToEm(30px);
+    border-radius: 50%;
     background: radial-gradient(circle, rgba(255,255,255,1) 43%, rgba(199,199,199,1) 100%);
-    border-radius: 50%;
-  }
 
-  &__body-true {
-    box-sizing: content-box;
-    cursor: pointer;
-    width: pxToEm(60px);
-    height: pxToEm(30px);
-    border: pxToEm(2px) solid #e4e4e4;
-    border-radius: pxToEm(20px);
-    position: relative;
-    transition: all .3s ease;
-    background: linear-gradient(90deg, rgba(68,102,93,1) 0%, rgba(45,182,148,1) 64%, rgba(33,133,108,1) 100%) !important;
-  }
+    &_false {
+      left: -1px;
+    }
 
-  &__circle-true {
-    z-index: 1;
-    position: absolute;
-    width: pxToEm(30px);
-    height: pxToEm(30px);
-    background: radial-gradient(circle, rgba(255,255,255,1) 43%, rgba(199,199,199,1) 100%) !important;
-    border-radius: 50%;
-    transition: all .3s ease;
-    right: -1px !important;
-    left: auto !important;
+    &_true {
+      right: -1px;
+      left: auto;
+    }
   }
 }
 

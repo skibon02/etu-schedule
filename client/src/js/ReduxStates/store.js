@@ -36,3 +36,4 @@ const store = configureStore({
 
 export { store }
 
+export const {dispatch} = store.dispatch;

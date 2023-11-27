@@ -5,38 +5,29 @@ import { setFullNameEnabled } from './fullNameEnabledSlice';
 import { setAttendanceToken } from './attendanceTokenSlice';
 
 const userDataGETFetch = createAsyncThunk('groups/userDataGETFetch', async (dispatch) => {
-  try {
-    let response = await myfetch('/api/user/get_data');
-    let data = await response.json();
+  let response = await myfetch('/api/user/get_data');
+  let data = await response.json();
 
-    console.log('user data:\n', data);
+  console.log('user data:\n', data);
 
-    dispatch(setGroupNI({
-      groupId: data.group.group_id,
-      groupNumber: data.group.number,
-    }));
-    dispatch(setFullNameEnabled(data.subjects_title_formatting));
-    dispatch(setAttendanceToken(data.attendance_token));
-
-  } catch (error) {
-    throw error;
-  }
+  dispatch(setGroupNI({
+    groupId: data.group.group_id,
+    groupNumber: data.group.number,
+  }));
+  dispatch(setFullNameEnabled(data.subjects_title_formatting));
+  dispatch(setAttendanceToken(data.attendance_token));
 });
 
 async function userDataSETFetch(preferences) {
-  try {
-    let r = await myfetch('/api/user/set_data', {
-      method: "POST",
-      credentials: "include", 
-      body: JSON.stringify({
-        subjects_title_formatting: preferences.fullNameEnabled,
-      }),
-    });
-    let data = await r.json();
-    console.log('user set_data fetch:\n', data);
-  } catch (error) {
-    console.error(error.message);
-  }
+  let r = await myfetch('/api/user/set_data', {
+    method: "POST",
+    credentials: "include", 
+    body: JSON.stringify({
+      subjects_title_formatting: preferences.fullNameEnabled,
+    }),
+  });
+  let data = await r.json();
+  console.log('user set_data fetch:\n', data);
 }
 
 const userDataSlice = createSlice({
