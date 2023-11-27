@@ -71,7 +71,7 @@ function TokenPreference() {
     {showModal && <DeleteTokenModal setShowModal={setShowModal} />}
     <div className="profile__user-preference user-preference">
       <div className="user-preference__title">
-        Аксесс токен:
+        Токен посещаемости:
       </div>
       <div className="user-preference__value">
         <div className="user-preference__access-token-container">
