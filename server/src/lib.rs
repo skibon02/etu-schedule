@@ -1,6 +1,7 @@
 pub mod api;
 pub mod routes;
 pub mod models;
+pub mod bg_workers;
 
 #[macro_use]
 extern crate rocket;
@@ -17,6 +18,7 @@ use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use std::{env, fs};
 use std::collections::BTreeMap;
+use std::fmt::Arguments;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::sync::atomic::AtomicUsize;
@@ -142,24 +144,34 @@ pub fn stage() -> AdHoc {
     })
 }
 
-pub fn bg_worker() -> AdHoc {
+pub fn bg_worker(shutdown_notifier: Arc<Notify>) -> AdHoc {
+    let notifier_r1 = shutdown_notifier.clone();
+    let notifier_r2 = shutdown_notifier.clone();
     AdHoc::on_liftoff("Background Worker", |rocket| Box::pin(async {
         // Launch periodic task after Rocket ignition but before blocking on Rocket's server
-        let db_ref = rocket.state::<Db>().unwrap().clone();
+        let db_ref1 = rocket.state::<Db>().unwrap().clone();
+        let db_ref2 = db_ref1.clone();
         tokio::task::spawn(async move {
-            periodic_task(db_ref).await;
+            bg_workers::periodic_schedule_merge_task(db_ref1, notifier_r1).await;
+        });
+        tokio::task::spawn(async move {
+            bg_workers::priority_schedule_merge_task(db_ref2, notifier_r2).await;
         });
     }))
 }
 
 use chrono::Local;
 use colored::*;
+use fern::{Dispatch, FormatCallback};
 use lazy_static::lazy_static;
+use log::{LevelFilter, Record};
 use rand::Rng;
 use rocket::response::Responder;
 use rocket_db_pools::Database;
 use sqlx::PgConnection;
 use tokio::select;
+use regex::Regex;
+use tokio::sync::Notify;
 use crate::api::etu_api;
 use crate::api::vk_api::VK_SERVICE_TOKEN;
 use crate::models::groups::{DepartmentModel, get_not_merged_sched_group_id_list};
@@ -178,8 +190,14 @@ fn loglevel_formatter(level: &log::Level) -> ColoredString {
     }
 }
 
+
+fn strip_colors(message: String) -> String {
+    let re = Regex::new("\x1B\\[[;\\d]*m").unwrap();
+    re.replace_all(&message, "").to_string()
+}
+
 fn setup_logger() -> Result<(), fern::InitError> {
-    fern::Dispatch::new()
+    let console_log = Dispatch::new()
         .format(|out, message, record| {
             out.finish(format_args!(
                 "[{} {}] {}",
@@ -191,11 +209,73 @@ fn setup_logger() -> Result<(), fern::InitError> {
                 message
             ))
         })
-        .level(log::LevelFilter::Debug)
-        .chain(std::io::stdout())
-        .chain(fern::log_file("output.log")?)
+        .level(LevelFilter::Info)
+        .chain(std::io::stdout());
+
+    let file_formatter = |out: FormatCallback, message: &Arguments, record: &Record| {
+        out.finish(format_args!(
+            "[{} {}] {}",
+            Local::now().format("%Y-%m-%d %H:%M:%S").to_string(),
+            &record.level(),
+            &strip_colors(message.to_string())
+        ))
+    };
+
+    let trace_file_log = fern::Dispatch::new()
+        .format(file_formatter)
+        .level(LevelFilter::Trace)
+        .chain(fern::log_file("output_trace.log")?);
+
+    let info_file_log = fern::Dispatch::new()
+        .format(file_formatter)
+        .level(LevelFilter::Info)
+        .chain(fern::log_file("output_info.log")?);
+
+    let warn_file_log = fern::Dispatch::new()
+        .format(file_formatter)
+        .level(LevelFilter::Warn)
+        .chain(fern::log_file("output_warn.log")?);
+
+    let combined_log = Dispatch::new()
+        .chain(console_log)
+        .chain(trace_file_log)
+        .chain(info_file_log)
+        .chain(warn_file_log)
         .apply()?;
+
     Ok(())
+}
+
+use std::panic;
+use std::fs::File;
+use std::sync::Mutex;
+
+lazy_static::lazy_static! {
+    static ref PANIC_LOG_FILE: Mutex<File> = Mutex::new(File::create("panics.log").unwrap());
+}
+
+fn setup_panic_logger() {
+    panic::set_hook(Box::new(|panic_info| {
+        let timestamp = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+
+        let message = match panic_info.payload().downcast_ref::<&str>() {
+            Some(s) => *s,
+            None => match panic_info.payload().downcast_ref::<String>() {
+                Some(s) => &s[..],
+                None => "Panic occurred but no message available.",
+            },
+        };
+
+        let location = panic_info.location().unwrap();
+        let panic_message = format!("{}: Panic occurred in file '{}' at line {}: {}\n", timestamp, location.file(), location.line(), message);
+
+        // Write the panic message to the log file
+        let mut file = PANIC_LOG_FILE.lock().unwrap();
+        writeln!(file, "{}", panic_message).unwrap();
+
+        // Additionally, you might want to print the panic message to stderr
+        eprintln!("{}", panic_message);
+    }));
 }
 
 async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
@@ -214,6 +294,10 @@ async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
 pub fn run() -> Rocket<Build> {
 
     setup_logger().unwrap();
+    setup_panic_logger();
+
+    // panic!("let's test this shit!");
+
     let args: Vec<String> = env::args().collect();
     let mut figment = rocket::Config::figment();
 
@@ -266,12 +350,17 @@ pub fn run() -> Rocket<Build> {
         }
     }
 
+    let shutdown_notify = Arc::new(Notify::new());
+
     let with_client = args.contains(&"--with-client".to_string());
     info!("> with client: {}", with_client);
     let mut rocket = rocket::custom(figment)
         .attach(stage())
         .attach(PanicLogger)
-        .attach(bg_worker());
+        .attach(bg_worker(shutdown_notify.clone()))
+        .attach(AdHoc::on_shutdown("Notify shutdown", |_rocket|  Box::pin(async move {
+            shutdown_notify.notify_waiters();
+        })));
 
     if !is_production_build {
         rocket = rocket.attach(CORS);
@@ -286,154 +375,6 @@ pub fn run() -> Rocket<Build> {
     } else {
         rocket
     }
-}
-pub static MERGE_REQUEST_CHANNEL: OnceLock<tokio::sync::mpsc::Sender<i32>> = OnceLock::new();
-pub static MERGE_REQUEST_CNT: AtomicUsize = AtomicUsize::new(0);
-
-const GROUPS_MERGE_INTERVAL: u64 = 60*5;
-const ETU_REQUEST_INTERVAL: u64 = 5;
-
-const SINGLE_GROUP_INTERVAL: i32 = 30;
-
-const FORCE_REQ_CHANNEL_SIZE: usize = 50;
-const FORCE_REQ_THROTTLE_THRESHOLD: usize = 10;
-
-async fn periodic_task(con: Db) {
-    let mut con = con.acquire().await.unwrap();
-    // For demonstration, use a loop with a delay
-    let (tx, mut rx) = tokio::sync::mpsc::channel(FORCE_REQ_CHANNEL_SIZE);
-    MERGE_REQUEST_CHANNEL.set(tx).unwrap();
-
-
-    info!("BGTASK: Phase 1. Initial merge for all groups.");
-    let new_groups = etu_api::get_groups_list().await;
-    data_merges::groups::groups_merge(&new_groups, &mut *con).await.unwrap();
-
-    while let Ok(groups) = get_not_merged_sched_group_id_list(&mut *con, 50).await {
-        info!("BGTASK: received {} groups for merge", groups.len());
-        process_schedule_merge(groups, &mut *con).await;
-    }
-    info!("BGTASK: Initial merge for all groups finished.");
-
-    info!("BGTASK: Phase 2. Starting merge routine...");
-    // for balancing forced requests
-    let mut last_etu_request = Instant::now() - tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL);
-
-    let mut forced_request_skip = false;
-    loop {
-        select! {
-            _ = tokio::time::sleep(tokio::time::Duration::from_secs(GROUPS_MERGE_INTERVAL)) => {
-                info!("BGTASK: {} secs passed, starting merge routine...", GROUPS_MERGE_INTERVAL);
-
-                let group_id_range = models::groups::get_oldest_group_id_list(&mut con, 30).await.unwrap();
-
-                process_schedule_merge(group_id_range, &mut con).await;
-                last_etu_request = Instant::now();
-                forced_request_skip = false;
-            },
-            Some(request) = rx.recv() => {
-                MERGE_REQUEST_CNT.fetch_sub(1, std::sync::atomic::Ordering::Relaxed);
-                info!("BGTASK: Got request for merging {} group", request);
-
-                let time = models::groups::get_time_since_last_group_merge(request, &mut *con).await;
-                match time {
-                    Ok(time) => {
-                        match time {
-                            Some(time) => {
-                                if time < SINGLE_GROUP_INTERVAL {
-                                    warn!("BGTASK: Last merge for group {} was {} seconds ago, skipping...", request, time);
-                                    continue;
-                                }
-                            },
-                            None => {
-                                warn!("BGTASK: Group schedule was never requested! Launching merge...");
-                            }
-                        }
-                    },
-                    Err(_) => {
-                        error!("BGTASK: Non-existing group merge requested!");
-                        continue;
-                    }
-                }
-
-
-                if Instant::now() - last_etu_request < tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL) {
-                    warn!("BGTASK: Last ETU request was {} seconds ago, waiting...", (Instant::now() - last_etu_request).as_secs());
-                    tokio::time::sleep(tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL) - (Instant::now() - last_etu_request)).await;
-                }
-
-                info!("BGTASK: Starting default background mering routime...");
-
-                let group_id_range = if forced_request_skip {
-                    models::groups::get_oldest_group_id_list(&mut con, 10).await.unwrap()
-                } else {
-                    vec![request]
-                };
-
-                process_schedule_merge(group_id_range, &mut con).await;
-                last_etu_request = Instant::now();
-                if MERGE_REQUEST_CNT.load(std::sync::atomic::Ordering::Relaxed) > FORCE_REQ_THROTTLE_THRESHOLD {
-                    warn!("BGTASK: Forced request throttle threshold reached, starting to skip some forced requests...");
-                    forced_request_skip = !forced_request_skip;
-                }
-                else {
-                    forced_request_skip = false;
-                }
-            }
-        }
-
-    }
-}
-
-async fn process_schedule_merge(group_id_vec: Vec<i32>, con: &mut PgConnection) {
-
-    let new_groups = etu_api::get_groups_list().await;
-    data_merges::groups::groups_merge(&new_groups, &mut *con).await.unwrap();
-
-    info!("BGTASK: Starting merge for groups: {:?}", group_id_vec);
-    let start = Instant::now();
-    let sched_objs = etu_api::get_schedule_objs_groups(group_id_vec.clone()).await.unwrap();
-
-    let last_subjects_generation = get_subjects_cur_gen(&mut *con).await.unwrap();
-    let last_teachers_generation = get_teachers_cur_gen(&mut *con).await.unwrap();
-    for (group_id, sched_objs) in sched_objs {
-        info!("BGTASK: Starting merge for group id {}", group_id);
-        let mut sched_objs_models: Vec<ScheduleObjModel> = Vec::new();
-        let mut subjects: BTreeMap<i32, Vec<SubjectModel>> = BTreeMap::new();
-        let mut departments: Vec<DepartmentModel> = Vec::new();
-        let mut teachers: BTreeMap<i32, (TeacherModel, Vec<String>)> = BTreeMap::new();
-
-        for sched_obj_orig in sched_objs.scheduleObjects {
-            sched_objs_models.push(sched_obj_orig.clone().try_into().unwrap());
-            subjects.entry(sched_obj_orig.lesson.subject.id).or_default().push(sched_obj_orig.lesson.subject.clone().into());
-            departments.push(sched_obj_orig.lesson.subject.department.into());
-
-            if let Some(teacher) = sched_obj_orig.lesson.teacher {
-                let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
-                teachers.insert(teacher_model.0.teacher_id, teacher_model);
-            }
-            if let Some(teacher) = sched_obj_orig.lesson.secondTeacher {
-                let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
-                teachers.insert(teacher_model.0.teacher_id, teacher_model);
-            }
-            if let Some(teacher) = sched_obj_orig.lesson.thirdTeacher {
-                let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
-                teachers.insert(teacher_model.0.teacher_id, teacher_model);
-            }
-            if let Some(teacher) = sched_obj_orig.lesson.fourthTeacher {
-                let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
-                teachers.insert(teacher_model.0.teacher_id, teacher_model);
-            }
-        }
-        for department in departments {
-            data_merges::groups::department_single_merge(department, None, &mut *con).await.unwrap();
-        }
-
-        data_merges::subjects::subjects_merge(&subjects, last_subjects_generation, &mut *con).await.unwrap();
-        data_merges::teachers::teachers_merge(teachers, last_teachers_generation, &mut *con).await.unwrap();
-        data_merges::schedule::schedule_objs_merge(group_id, &sched_objs_models, &mut *con).await.unwrap();
-    }
-    info!("BGTASK: Merge for {} groups finished in {:?}", group_id_vec.len(), (Instant::now() - start));
 }
 
 #[options("/<_path..>")]

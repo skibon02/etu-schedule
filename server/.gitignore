@@ -2,4 +2,5 @@ target
 tls
 secret_key.txt
 vk_service_token.txt
-output.log
+output*.log
+panics.log

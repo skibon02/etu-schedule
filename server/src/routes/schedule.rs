@@ -4,7 +4,8 @@ use std::ops::DerefMut;
 use rocket::{serde::json::Json, Route};
 use rocket_db_pools::Connection;
 
-use crate::{models::groups::GroupModel, models, MERGE_REQUEST_CHANNEL, MERGE_REQUEST_CNT};
+use crate::{models::groups::GroupModel, models};
+use crate::bg_workers::{MERGE_REQUEST_CHANNEL, MERGE_REQUEST_CNT};
 use crate::models::Db;
 use crate::models::schedule::{ScheduleObjModel};
 use crate::models::subjects::SubjectModel;
@@ -175,13 +176,14 @@ async fn get_group_schedule_objects(group_id: i32, mut con: Connection<Db>) -> G
                         teachers_map.insert(teacher.teacher_id, (teacher, teacher_departments));
                     }
 
-                    let channel = MERGE_REQUEST_CHANNEL.get().unwrap();
-                    //check if it is full
-                    if channel.try_send(group_id).is_err() {
-                        warn!("Channel is full, skipping merge request for group {}", group_id);
-                    }
-                    else {
-                        MERGE_REQUEST_CNT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                    if let Some(channel) = MERGE_REQUEST_CHANNEL.get(){
+                        //check if it is full
+                        if channel.try_send(group_id).is_err() {
+                            warn!("Channel is full, skipping merge request for group {}", group_id);
+                        }
+                        else {
+                            MERGE_REQUEST_CNT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                        }
                     }
 
                     let output_objs: Vec<OutputScheduleObjectModel> = sched_objects.into_iter().map(|s| (s, &subjects_map, &teachers_map).try_into().unwrap()).collect();
@@ -195,13 +197,14 @@ async fn get_group_schedule_objects(group_id: i32, mut con: Connection<Db>) -> G
                 },
                 None => {
                     warn!("Group {} is not yet ready!", group_id);
-                    let channel = MERGE_REQUEST_CHANNEL.get().unwrap();
-                    //check if it is full
-                    if channel.try_send(group_id).is_err() {
-                        warn!("Channel is full, skipping merge request for group {}", group_id);
-                    }
-                    else {
-                        MERGE_REQUEST_CNT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                    if let Some(channel) = MERGE_REQUEST_CHANNEL.get(){
+                        //check if it is full
+                        if channel.try_send(group_id).is_err() {
+                            warn!("Channel is full, skipping merge request for group {}", group_id);
+                        }
+                        else {
+                            MERGE_REQUEST_CNT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                        }
                     }
 
                     let output = OutputGroupScheduleModel {
