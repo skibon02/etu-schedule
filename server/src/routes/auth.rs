@@ -4,6 +4,7 @@ use rocket::{
     serde::json::Json,
     Route, request::{FromRequest, self, Request},
 };
+use rocket::outcome::Outcome;
 use rocket::time::PrimitiveDateTime;
 use rocket_db_pools::Connection;
 use serde_derive::{Deserialize, Serialize};
@@ -59,22 +60,26 @@ pub struct AuthorizeInfo {
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for AuthorizeInfo {
     type Error = ();
-    async fn from_request(req: &'r Request<'_>) -> request::Outcome<Self, Self::Error> { 
-        let mut db_con = req.guard::<Connection<Db>>().await.unwrap();
+    async fn from_request(req: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
+        let db_con = req.guard::<Connection<Db>>().await;
+        let Outcome::Success(mut db_con) = db_con else {
+            error!("Failed to get db connection: {:?}", db_con);
+            return Outcome::Forward(Status::InternalServerError);
+        };
         match (req.cookies().get_private("token"), req.cookies().get_private("token2")) {
             (Some(token), Some(token2)) => {
                 let user_id = token.value().to_string().parse::<i32>().unwrap();
                 let access_token = token2.value().to_string();
                 if !users::user_exists(&mut db_con, user_id).await.unwrap_or(false) {
-                    return request::Outcome::Forward(Status::Forbidden);
+                    return Outcome::Forward(Status::Forbidden);
                 }
-                request::Outcome::Success(AuthorizeInfo {
+                Outcome::Success(AuthorizeInfo {
                     access_token: Some(access_token),
                     user_id,
                 })
             }
             _ => {
-                return request::Outcome::Forward(Status::Forbidden);
+                return Outcome::Forward(Status::Forbidden);
             }
         }
     }
