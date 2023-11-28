@@ -1,3 +1,5 @@
+#![feature(try_trait_v2)]
+
 pub mod api;
 pub mod routes;
 pub mod models;
@@ -30,6 +32,7 @@ use rocket::fs::{FileServer, NamedFile};
 #[path="data-merges/mod.rs"]
 pub mod data_merges;
 
+const LOGGING_LEVEL: LevelFilter = LevelFilter::Info;
 
 #[derive(Debug, Clone)]
 pub enum FrontendPort {
@@ -147,15 +150,20 @@ pub fn stage() -> AdHoc {
 pub fn bg_worker(shutdown_notifier: Arc<Notify>) -> AdHoc {
     let notifier_r1 = shutdown_notifier.clone();
     let notifier_r2 = shutdown_notifier.clone();
+    let notifier_r3 = shutdown_notifier.clone();
     AdHoc::on_liftoff("Background Worker", |rocket| Box::pin(async {
         // Launch periodic task after Rocket ignition but before blocking on Rocket's server
         let db_ref1 = rocket.state::<Db>().unwrap().clone();
         let db_ref2 = db_ref1.clone();
+        let db_ref3 = db_ref1.clone();
         tokio::task::spawn(async move {
             bg_workers::periodic_schedule_merge_task(db_ref1, notifier_r1).await;
         });
         tokio::task::spawn(async move {
             bg_workers::priority_schedule_merge_task(db_ref2, notifier_r2).await;
+        });
+        tokio::task::spawn(async move {
+            bg_workers::attendance_worker_task(db_ref3, notifier_r3).await;
         });
     }))
 }
@@ -209,7 +217,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
                 message
             ))
         })
-        .level(LevelFilter::Info)
+        .level(LOGGING_LEVEL)
         .chain(std::io::stdout());
 
     let file_formatter = |out: FormatCallback, message: &Arguments, record: &Record| {

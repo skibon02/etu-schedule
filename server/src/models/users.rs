@@ -138,7 +138,7 @@ pub struct UserDataOptionalModel {
     pub subjects_title_formatting: Option<SubjectsTitleFormatting>,
 }
 
-#[derive(sqlx::FromRow, Debug)]
+#[derive(sqlx::FromRow, Debug, Clone)]
 pub struct UserDataModel {
     pub user_id: i32,
     pub group_id: Option<i32>,
@@ -180,6 +180,14 @@ pub async fn set_attendance_token(con: &mut PgConnection, user_id: i32, attendan
     sqlx::query!("UPDATE user_data SET attendance_token=$1 WHERE user_id = $2",
     attendance_token, user_id)
         .execute(&mut *con).await.context("Failed to set new user attendance token")?;
+
+    Ok(())
+}
+
+pub async fn invalidate_attendance_token(con: &mut PgConnection, user_id: i32) -> anyhow::Result<()> {
+    sqlx::query!("UPDATE user_data SET attendance_token=NULL WHERE user_id = $1",
+        user_id)
+        .execute(&mut *con).await.context("Failed to clear previous user attendance token")?;
 
     Ok(())
 }

@@ -1,2 +1,2 @@
-DATABASE_URL="sqlite:db/sqlite.db" cargo build --release
-ROCKET_PROFILE=prod DATABASE_URL="sqlite:db/sqlite.db" ./target/release/etu_attendance --with-client $@
+DATABASE_URL=postgres://etu_attend_app:12346543@localhost cargo build --release
+ROCKET_PROFILE=prod DATABASE_URL=postgres://etu_attend_app:12346543@localhost ./target/release/etu_attendance --with-client $@

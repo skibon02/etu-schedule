@@ -82,7 +82,7 @@ async fn single_schedule_obj_group_merge(group_id: i32, input_schedule_objs: &Ve
 
 
                 if diff {
-                    trace!("Detected diff in schedule object, updating...");
+                    debug!("Detected diff in schedule object, updating...");
 
                     // invalidate old sched_obj (update gen_id)
 
@@ -121,7 +121,7 @@ async fn single_schedule_obj_group_merge(group_id: i32, input_schedule_objs: &Ve
                     if input_sched_obj.last_known_orig_sched_obj_id != existing_sched_obj.last_known_orig_sched_obj_id
                         || existing_sched_obj.subject_gen_id != latest_subject_gen
                         || existing_sched_obj.teacher_gen_id.map(|id| id != latest_teachers_gen).unwrap_or(false) {
-                        info!("Updating untracked information for schedule object");
+                        debug!("Updating untracked information for schedule object");
 
                         let new_teacher_gen_id = existing_sched_obj.teacher_id.map(|id| latest_teachers_gen);
                         sqlx::query!("UPDATE schedule_objs SET \
@@ -141,7 +141,7 @@ async fn single_schedule_obj_group_merge(group_id: i32, input_schedule_objs: &Ve
             }
         }
         if !found {
-            trace!("Schedule object not found, inserting...");
+            debug!("Schedule object not found, inserting...");
             //process new schedule object
             let new_link_id = get_new_link_id(con).await?;
             let new_gen_id = last_gen_id + 1;

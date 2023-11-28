@@ -25,8 +25,8 @@ pub struct OutputAuditoriumReservationModel {
 pub struct OutputSubjectModel {
     pub alien_id: i32,
     pub title: String,
-    pub short_title: Option<String>,
-    pub subject_type: Option<String>,
+    pub short_title: String,
+    pub subject_type: String,
     pub control_type: Option<String>,
     pub department_id: i32
 }

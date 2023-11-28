@@ -51,6 +51,23 @@ impl TryFrom<String> for WeekDay {
     }
 }
 
+
+impl TryFrom<u32> for WeekDay {
+    type Error = ();
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(WeekDay::Mon),
+            1 => Ok(WeekDay::Tue),
+            2 => Ok(WeekDay::Wed),
+            3 => Ok(WeekDay::Thu),
+            4 => Ok(WeekDay::Fri),
+            5 => Ok(WeekDay::Sat),
+            6 => Ok(WeekDay::Sun),
+            _ => Err(())
+        }
+    }
+}
+
 impl Into<String> for WeekDay {
     fn into(self) -> String {
         match self {

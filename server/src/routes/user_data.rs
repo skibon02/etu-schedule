@@ -2,7 +2,8 @@ use rocket::Route;
 use rocket::serde::json::Json;
 use rocket_db_pools::Connection;
 use serde_derive::{Deserialize, Serialize};
-use crate::models;
+use crate::{api, models};
+use crate::api::etu_attendance_api::GetCurrentUserResult;
 use crate::models::Db;
 use crate::models::groups::GroupModel;
 use crate::models::users::{SubjectsTitleFormatting, UserDataModel, UserDataOptionalModel};
@@ -198,8 +199,18 @@ pub struct SetAttendanceTokenBody {
     attendance_token: Option<String>,
 }
 
+static LAST_ATTENDANCE_FETCH_TIME: std::sync::atomic::AtomicI64 = std::sync::atomic::AtomicI64::new(0);
+
 #[post("/user/set_attendance_token", data = "<body>")]
 pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Option<Json<SetAttendanceTokenBody>>) -> SetAttendanceTokenResult {
+    let timestamp = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs() as i64;
+
+    if timestamp - LAST_ATTENDANCE_FETCH_TIME.load(std::sync::atomic::Ordering::Relaxed) < 3 {
+        warn!("Too many requests to attendance api!");
+        return SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "too_many_requests".to_string() }));
+    }
+    LAST_ATTENDANCE_FETCH_TIME.store(timestamp, std::sync::atomic::Ordering::Relaxed);
+
     if body.is_none() {
         return SetAttendanceTokenResult::Failed(Json(ResponseErrorMessage::new("Invalid body!".to_string())));
     }
@@ -212,28 +223,48 @@ pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<Authorize
     //check if token is valid
     let mut group_changed = false;
     if let Some(token) = &body.attendance_token {
-        //if digits - valid
-        if token.chars().all(|c| c.is_ascii_digit()) {
-            //ok
-        } else {
-            return SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "invalid_token".to_string() }));
-        }
+        // check if token is valid
 
-        let attendance_token = body.attendance_token.clone().unwrap();
-        let user_group = models::users::get_user_group(&mut db, auth.user_id).await.unwrap();
-        if let Some(user_group) = user_group {
-            let attendance_token_group_id = attendance_token.parse().unwrap_or(0);
-            if user_group.group_id != attendance_token_group_id {
-                group_changed = true;
-                //check if new group valid
-                let group = models::groups::get_group(&mut db, attendance_token_group_id).await.unwrap();
-                if group.is_none() {
-                    return SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess{ ok: true, group_changed: false, result_code: "чел пчел группы то такой нет! но токен я сохраню, жалко мне тебя".to_string() }));
+        info!("Acquiring information about user token...");
+        let attendance_user_info = api::etu_attendance_api::get_current_user(token.clone()).await;
+        let group = match attendance_user_info {
+            GetCurrentUserResult::Ok(res) => {
+                debug!("User info for user_id {} request result: {:?}", auth.user_id, res);
+                if res.groups.len() == 0 {
+                        return SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "no_groups".to_string() }));
                 }
-                else {
-                    models::users::set_user_group(&mut db, auth.user_id, attendance_token_group_id).await.unwrap();
+                if res.groups.len() > 1 {
+                    return SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "too_many_groups".to_string() }));
                 }
+                res.groups[0].name.clone()
             }
+            GetCurrentUserResult::WrongToken => {
+                warn!("Wrong token: {}", token);
+                return SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "wrong_token".to_string() }));
+            }
+            GetCurrentUserResult::Error(e) => {
+                error!("Failed to get user info: {:?}", e);
+                return SetAttendanceTokenResult::Failed(Json(ResponseErrorMessage::new("не скажу".to_string())));
+            }
+        };
+
+        //search if such group exists
+        info!("searching for group match: {}...", group);
+        let new_user_group = models::groups::find_group_by_name(&mut db, &group).await.unwrap();
+        if let Some(new_user_group) = new_user_group {
+            info!("group found: id {}", new_user_group.group_id);
+            let new_user_group_id = new_user_group.group_id;
+
+            let own_group = models::users::get_user_group(&mut db, auth.user_id).await.unwrap().unwrap();
+            if own_group.group_id != new_user_group_id {
+                group_changed = true;
+
+                models::users::set_user_group(&mut db, auth.user_id, new_user_group_id).await.unwrap();
+            }
+        }
+        else {
+            warn!("Group was {} not found!", group);
+            return SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "group_not_found".to_string() }));
         }
     }
 

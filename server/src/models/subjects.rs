@@ -10,8 +10,8 @@ pub struct SubjectModel {
 
     // tracked with versioning
     pub title: String,
-    pub short_title: Option<String>,
-    pub subject_type: Option<String>,
+    pub short_title: String,
+    pub subject_type: String,
     pub control_type: Option<String>,
 
     // untracked_info

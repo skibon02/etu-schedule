@@ -1,8 +1,13 @@
+use std::collections::btree_map::Entry::Vacant;
 use std::collections::BTreeMap;
 use std::sync::atomic::AtomicBool;
 use std::sync::Mutex;
 use sqlx::pool::PoolConnection;
 use sqlx::{Acquire, Connection, PgConnection, Postgres};
+use crate::models;
+use crate::models::schedule::WeekDay;
+use crate::models::subjects::SubjectModel;
+use crate::models::users::UserDataModel;
 
 #[derive(sqlx::FromRow)]
 pub struct UserAttendanceScheduleModel {
@@ -134,4 +139,71 @@ pub async fn set_attendance_schedule_diff(con: &mut PgConnection, user_id: i32,
 
 
     Ok(())
+}
+
+/// Panicking!
+/// Panic if user doesn't have attendance token set
+pub async fn get_active_attendance_objs_at_time(con: &mut PgConnection, user_id: i32, week: i64, week_parity: String, week_day: WeekDay, time: i32) -> anyhow::Result<Vec<(i32, i32)>> {
+    let user_group = models::users::get_user_group(con, user_id).await?.unwrap().group_id;
+    let res = sqlx::query!("SELECT schedule_objs.time_link_id, schedule_objs.subject_id FROM schedule_objs \
+    WHERE schedule_objs.group_id = $5 AND schedule_objs.time = $4 AND week_day = $3 AND week_parity = $6 AND \
+    schedule_objs.gen_end IS NULL AND \
+    CASE WHEN EXISTS(SELECT enable_auto_attendance FROM user_attendance_schedule_diffs \
+    WHERE user_id = $1 AND week_num = $2 AND schedule_objs.time_link_id = user_attendance_schedule_diffs.schedule_obj_time_link_id)\
+    THEN (SELECT enable_auto_attendance FROM user_attendance_schedule_diffs \
+    WHERE user_id = $1 AND week_num = $2 AND schedule_objs.time_link_id = user_attendance_schedule_diffs.schedule_obj_time_link_id)
+    ELSE (SELECT enable_auto_attendance FROM user_attendance_schedule \
+    WHERE user_id = $1 AND schedule_objs.time_link_id = user_attendance_schedule.schedule_obj_time_link_id) END",
+    user_id, week as i32, week_day as WeekDay, time, user_group, week_parity)
+        .fetch_all(&mut *con).await?;
+
+
+    Ok(res.iter().map(|x| (x.time_link_id, x.subject_id)).collect())
+}
+
+#[derive(Debug)]
+pub struct UserAttendanceScheduleInfo {
+    pub user_id: i32,
+    pub user_data: UserDataModel,
+    // time_link_id, subject_id
+    pub attend_lessons: Vec<(i32, i32)>,
+}
+
+/// Requires external transaction!
+pub async fn get_current_pending_attendance_marks(con: &mut PgConnection, week: i64, week_day: WeekDay, time: i32) -> anyhow::Result<(Vec<UserAttendanceScheduleInfo>, BTreeMap<i32, SubjectModel>)> {
+    let week_parity =
+    if week % 2 == 0 {
+        "1".to_string()
+    }
+    else {
+        "2".to_string()
+    };
+    info!("get_current_pending_attendance_marks: using week_parity: {}", week_parity);
+
+    // get users with attendance enabled
+    let users: Vec<i32> = sqlx::query_scalar!("SELECT user_id FROM user_data \
+    WHERE attendance_token IS NOT NULL")
+        .fetch_all(&mut *con).await?;
+
+    let mut res = Vec::new();
+    let mut subjects = BTreeMap::new();
+
+    // get schedule for users
+    for user in users {
+        let user_schedule = get_active_attendance_objs_at_time(con, user, week, week_parity.clone(), week_day, time).await?;
+        let user_data = models::users::get_user_data(con, user).await?;
+        for (time_link_id, subject_id) in &user_schedule {
+            if let Vacant(e) = subjects.entry(*subject_id) {
+                let subject = models::subjects::get_cur_gen_subject_by_id(*subject_id, con).await?.unwrap();
+                e.insert(subject);
+            }
+        }
+        res.push(UserAttendanceScheduleInfo {
+            user_id: user,
+            user_data,
+            attend_lessons: user_schedule,
+        });
+    }
+
+    Ok((res, subjects))
 }

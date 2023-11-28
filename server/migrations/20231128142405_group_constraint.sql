@@ -1,0 +1,1 @@
+ALTER TABLE groups ADD CONSTRAINT unique_group_number UNIQUE(number);

@@ -136,3 +136,14 @@ pub async fn get_group(con: &mut PgConnection, group_id: i32) -> anyhow::Result<
 
     Ok(res)
 }
+
+pub async fn find_group_by_name(con: &mut PgConnection, group_name: &str) -> anyhow::Result<Option<GroupModel>> {
+    let res = sqlx::query_as!(
+        GroupModel,
+        "SELECT * FROM groups WHERE number = $1",
+        group_name
+    )
+        .fetch_optional(&mut *con).await?;
+
+    Ok(res)
+}

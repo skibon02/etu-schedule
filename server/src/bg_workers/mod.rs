@@ -1,11 +1,17 @@
 pub mod periodic_schedule_merge;
+pub use periodic_schedule_merge::*;
+pub mod priority_schedule_merge;
+pub use priority_schedule_merge::*;
+pub mod attendance_keep_alive;
+pub use attendance_keep_alive::*;
+pub mod attendance_worker;
+pub use attendance_worker::*;
+
 
 use std::collections::BTreeMap;
 use std::time::Instant;
 use sqlx::PgConnection;
-pub use periodic_schedule_merge::*;
-pub mod priority_schedule_merge;
-pub use priority_schedule_merge::*;
+
 use crate::api::etu_api;
 use crate::data_merges;
 use crate::models::groups::DepartmentModel;
@@ -27,6 +33,8 @@ async fn process_schedule_merge(group_id_vec: Vec<i32>, con: &mut PgConnection) 
 
     let last_subjects_generation = get_subjects_cur_gen(&mut *con).await.unwrap();
     let last_teachers_generation = get_teachers_cur_gen(&mut *con).await.unwrap();
+
+    //TODO: parallelize with rayon
     for (group_id, sched_objs) in sched_objs {
         info!("BGTASK: Starting merge for group id {}", group_id);
         let mut sched_objs_models: Vec<ScheduleObjModel> = Vec::new();
