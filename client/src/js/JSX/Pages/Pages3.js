@@ -48,7 +48,7 @@ export function Pages() {
     setActiveByLocationFx(dispatch, location)
   }, [dispatch, location]);
 
-  if (!fish) {
+  if (!fish && vkData) {
     return (
       <div className='container'>
         <div className='under-header-box'></div>

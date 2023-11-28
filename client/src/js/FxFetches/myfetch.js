@@ -1,5 +1,17 @@
 import {isdev, simulateFetches, backendHost} from './util'
-import {groups_request_example, schedule_request_example} from './mock_data' 
+
+let groups_request_example = null;
+let schedule_request_example = null;
+
+async function loadMockData() {
+    if (simulateFetches) {
+        const m = await import('./mock_data');
+        groups_request_example = m.groups_request_example;
+        schedule_request_example = m.schedule_request_example;
+    }
+}
+
+loadMockData().catch(console.error);
 
 async function myfetch(path, param = {}) {
     let initialPath = path;
