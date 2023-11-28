@@ -255,8 +255,9 @@ pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<Authorize
             info!("group found: id {}", new_user_group.group_id);
             let new_user_group_id = new_user_group.group_id;
 
-            let own_group = models::users::get_user_group(&mut db, auth.user_id).await.unwrap().unwrap();
-            if own_group.group_id != new_user_group_id {
+            // -1 in case when group is not set will not be equal to any valid group
+            let own_group = models::users::get_user_group(&mut db, auth.user_id).await.unwrap().map(|g| g.group_id).unwrap_or(-1);
+            if own_group != new_user_group_id {
                 group_changed = true;
 
                 models::users::set_user_group(&mut db, auth.user_id, new_user_group_id).await.unwrap();
