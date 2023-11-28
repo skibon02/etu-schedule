@@ -61,11 +61,12 @@ pub struct AuthorizeInfo {
 impl<'r> FromRequest<'r> for AuthorizeInfo {
     type Error = ();
     async fn from_request(req: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
-        let db_con = req.guard::<Connection<Db>>().await;
-        let Outcome::Success(mut db_con) = db_con else {
-            error!("Failed to get db connection: {:?}", db_con);
+        let db = req.guard::<&Db>().await;
+        let Outcome::Success(mut db) = db else {
+            error!("Failed to get db: {:?}", db);
             return Outcome::Forward(Status::InternalServerError);
         };
+        let mut db_con = db.acquire().await.unwrap();
         match (req.cookies().get_private("token"), req.cookies().get_private("token2")) {
             (Some(token), Some(token2)) => {
                 let user_id = token.value().to_string().parse::<i32>().unwrap();
