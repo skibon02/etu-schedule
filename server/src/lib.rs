@@ -81,30 +81,6 @@ impl Fairing for CORS {
     }
 }
 
-struct PanicLogger;
-
-#[rocket::async_trait]
-impl Fairing for PanicLogger {
-    fn info(&self) -> Info {
-        Info {
-            name: "Panic Logger",
-            kind: Kind::Response,
-        }
-    }
-
-    async fn on_response<'r>(&self, request: &'r Request<'_>, response: &mut Response<'r>) {
-        if let Some(panic_info) = request.local_cache(|| None::<String>) {
-            let mut file = OpenOptions::new()
-                .append(true)
-                .create(true)
-                .open("panic.log")
-                .unwrap();
-            file.write_all(panic_info.as_bytes()).unwrap();
-            response.set_status(Status::InternalServerError);
-        }
-    }
-}
-
 pub struct DocumentRequest;
 
 #[async_trait]
@@ -230,6 +206,11 @@ fn setup_logger() -> Result<(), fern::InitError> {
         ))
     };
 
+    let debug_file_log = fern::Dispatch::new()
+        .format(file_formatter)
+        .level(LevelFilter::Debug)
+        .chain(fern::log_file("output_debug.log")?);
+
     let info_file_log = fern::Dispatch::new()
         .format(file_formatter)
         .level(LevelFilter::Info)
@@ -242,6 +223,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
 
     let combined_log = Dispatch::new()
         .chain(console_log)
+        .chain(debug_file_log)
         .chain(info_file_log)
         .chain(warn_file_log)
         .apply()?;
@@ -359,7 +341,6 @@ pub fn run() -> Rocket<Build> {
     info!("> with client: {}", with_client);
     let mut rocket = rocket::custom(figment)
         .attach(stage())
-        .attach(PanicLogger)
         .attach(bg_worker(shutdown_notify.clone()))
         .attach(AdHoc::on_shutdown("Notify shutdown", |_rocket|  Box::pin(async move {
             shutdown_notify.notify_waiters();

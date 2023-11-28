@@ -14,8 +14,9 @@ enable = true
 
 [default]
 port=5443
-log_level="info"
+log_level="normal"
 
 [production]
 address="0.0.0.0"
 port=443
+log_level="critical"
