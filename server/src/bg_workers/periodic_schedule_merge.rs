@@ -1,5 +1,7 @@
 use std::sync::Arc;
 use std::time::Instant;
+use sqlx::pool::PoolConnection;
+use sqlx::Postgres;
 use tokio::select;
 use tokio::sync::Notify;
 use crate::api::etu_api;
@@ -10,9 +12,7 @@ use crate::models::groups::get_not_merged_sched_group_id_list;
 
 const GROUPS_MERGE_INTERVAL: u64 = 60*5;
 
-pub async fn periodic_schedule_merge_task(con: Db, shutdown_notifier: Arc<Notify>) {
-
-    let mut con = con.acquire().await.unwrap();
+pub async fn periodic_schedule_merge_task(mut con: &mut PoolConnection<Postgres>, shutdown_notifier: Arc<Notify>) {
 
     info!("PERIODIC_MERGE_TASK: Phase 1. Initial merge for all groups.");
     let new_groups = etu_api::get_groups_list().await;

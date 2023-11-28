@@ -1,6 +1,8 @@
 use std::sync::atomic::AtomicUsize;
 use std::sync::{Arc, OnceLock};
 use std::time::Instant;
+use sqlx::pool::PoolConnection;
+use sqlx::Postgres;
 use tokio::select;
 use tokio::sync::Notify;
 use crate::{models};
@@ -13,8 +15,7 @@ const FORCE_REQ_CHANNEL_SIZE: usize = 50;
 pub static MERGE_REQUEST_CHANNEL: OnceLock<tokio::sync::mpsc::Sender<i32>> = OnceLock::new();
 pub static MERGE_REQUEST_CNT: AtomicUsize = AtomicUsize::new(0);
 
-pub async fn priority_schedule_merge_task(con: Db, shutdown_notifier: Arc<Notify>) {
-    let mut con = con.acquire().await.unwrap();
+pub async fn priority_schedule_merge_task(mut con: &mut PoolConnection<Postgres>, shutdown_notifier: Arc<Notify>) {
     // For demonstration, use a loop with a delay
     let (tx, mut rx) = tokio::sync::mpsc::channel(FORCE_REQ_CHANNEL_SIZE);
     MERGE_REQUEST_CHANNEL.set(tx).unwrap();

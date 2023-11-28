@@ -3,7 +3,8 @@ use std::sync::Arc;
 use anyhow::Context;
 use chrono::{Datelike, NaiveTime, Timelike, TimeZone};
 use chrono_tz::Tz;
-use sqlx::Connection;
+use sqlx::{Connection, Postgres};
+use sqlx::pool::PoolConnection;
 use tokio::select;
 use tokio::sync::Notify;
 use crate::{api, models};
@@ -32,9 +33,7 @@ fn time_to_lesson_time_num(time: NaiveTime) -> Option<i32> {
     lesson_time_num
 }
 
-pub async fn attendance_worker_task(con: Db, shutdown_notifier: Arc<Notify>) {
-    let mut con = con.acquire().await.unwrap();
-
+pub async fn attendance_worker_task(mut con: &mut PoolConnection<Postgres>, shutdown_notifier: Arc<Notify>) {
 
     //test attendance
 

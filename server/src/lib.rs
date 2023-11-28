@@ -153,17 +153,18 @@ pub fn bg_worker(shutdown_notifier: Arc<Notify>) -> AdHoc {
     let notifier_r3 = shutdown_notifier.clone();
     AdHoc::on_liftoff("Background Worker", |rocket| Box::pin(async {
         // Launch periodic task after Rocket ignition but before blocking on Rocket's server
-        let db_ref1 = rocket.state::<Db>().unwrap().clone();
-        let db_ref2 = db_ref1.clone();
-        let db_ref3 = db_ref1.clone();
+        let db = rocket.state::<Db>().unwrap();
+        let mut db_con1 = db.acquire().await.unwrap();
+        let mut db_con2 = db.acquire().await.unwrap();
+        let mut db_con3 = db.acquire().await.unwrap();
         tokio::task::spawn(async move {
-            bg_workers::periodic_schedule_merge_task(db_ref1, notifier_r1).await;
+            bg_workers::periodic_schedule_merge_task(&mut db_con1, notifier_r1).await;
         });
         tokio::task::spawn(async move {
-            bg_workers::priority_schedule_merge_task(db_ref2, notifier_r2).await;
+            bg_workers::priority_schedule_merge_task(&mut db_con2, notifier_r2).await;
         });
         tokio::task::spawn(async move {
-            bg_workers::attendance_worker_task(db_ref3, notifier_r3).await;
+            bg_workers::attendance_worker_task(&mut db_con3, notifier_r3).await;
         });
     }))
 }
