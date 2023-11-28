@@ -230,11 +230,6 @@ fn setup_logger() -> Result<(), fern::InitError> {
         ))
     };
 
-    let trace_file_log = fern::Dispatch::new()
-        .format(file_formatter)
-        .level(LevelFilter::Trace)
-        .chain(fern::log_file("output_trace.log")?);
-
     let info_file_log = fern::Dispatch::new()
         .format(file_formatter)
         .level(LevelFilter::Info)
@@ -247,7 +242,6 @@ fn setup_logger() -> Result<(), fern::InitError> {
 
     let combined_log = Dispatch::new()
         .chain(console_log)
-        .chain(trace_file_log)
         .chain(info_file_log)
         .chain(warn_file_log)
         .apply()?;
