@@ -288,7 +288,7 @@ pub fn run() -> Rocket<Build> {
 
     figment = figment.merge(("databases.postgres", rocket_db_pools::Config {
         url: "postgres://etu_attend_app:12346543@localhost".into(),
-        max_connections: 150,
+        max_connections: 80,
         min_connections: None,
         connect_timeout: 3,
         idle_timeout: Some(120)
