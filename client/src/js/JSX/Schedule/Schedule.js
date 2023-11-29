@@ -7,12 +7,12 @@ import Week from "./Week";
 export default function Schedule() {
 
   const { date } = useSelector(s => s.date);
-  const { groupNumber } = useSelector(s => s.groupNI);
+  const { groupNumber, groupNILoading } = useSelector(s => s.groupNI);
   const { groupSchedule } = useSelector(s => s.groupSchedule);
 
   if (!groupSchedule) {
     return (
-      <NoSchedule groupNumber={groupNumber} />
+      <NoSchedule groupNumber={groupNumber} groupNILoading={groupNILoading} />
     )
   }
   

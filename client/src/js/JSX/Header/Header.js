@@ -2,21 +2,19 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setActive } from '../../ReduxStates/Slices/activeSlice'
 import CALENDAR from './../../../icons/calendar-pen.svg'
 import NAVCLOCK from './../../../icons/clock-for-nav.svg'
-import SEARCH from '../../../icons/search_2-for-nav.svg'
-// import VK from '../../../icons/vk-for-nav.svg'
-import VK from '../../../icons/profile.svg'
 import { NavLink } from 'react-router-dom'
 
 import { NavButton } from './NavButton'
 import { ScheduleButton } from './ScheduleButton'
 
 import { handleCurrentWeek, handleNextWeek, handlePrevWeek } from '../../Handlers/Header/handlers'
+import ProfileButton from './ProfileButton'
 
 export default function Header() {
   const dispatch = useDispatch();
 
-  const {active} = useSelector(s => s.active);
-  const {date, weekNumber} = useSelector(s => s.date);
+  const { active } = useSelector(s => s.active);
+  const { date, weekNumber } = useSelector(s => s.date);
   const { groupSchedule } = useSelector(s => s.groupSchedule);
 
   return (
@@ -43,11 +41,7 @@ export default function Header() {
         <NavLink to='/profile' className={active === 'profile' ? 
         "nav__item header-active" :
         "nav__item header-hover"}>
-          <NavButton
-            imageSrc={VK}
-            text={'Профиль'}
-            onClick={() => dispatch(setActive('profile'))}
-          />
+          <ProfileButton />
         </NavLink>
       </div>
       {active === 'schedule' && groupSchedule && groupSchedule.is_ready &&

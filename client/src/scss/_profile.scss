@@ -2,11 +2,54 @@
 
 $GREEN: #2DB694;
 $RED: #d60000f4;
-// $BG: rgb(141, 163, 229);
 $BG: linear-gradient(0deg, rgb(237, 255, 247) 0%, rgb(169, 200, 241) 70%);
 $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%);
 
+@keyframes pulseTokenInput {
+  0% {
+    border: pxToEm(1px) solid #ff4d00;
+  }
+  50% {
+    border: pxToEm(1px) solid #CCCCCC;
+  }
+  100% {
+    border: pxToEm(1px) solid #ff4d00;
+  }
+}
+
+@keyframes bellSwing {
+  0%, 10% {
+    transform-origin: top center;
+    transform: rotate(-15deg);
+  }
+  10%, 20% {
+    transform-origin: top center;
+    transform: rotate(15deg);
+  }
+  20%, 30% {
+    transform-origin: top center;
+    transform: rotate(-15deg);
+  }
+  30%, 40% {
+    transform-origin: top center;
+    transform: rotate(15deg);
+  }
+  40%, 50% {
+    transform-origin: top center;
+    transform: rotate(0deg);
+  }
+  50%, 90% {
+    transform-origin: top center;
+    transform: rotate(0deg);
+  }
+  99%, 100% {
+    transform-origin: top center;
+    transform: rotate(-15deg);
+  }
+}
+
 .profile {
+  position: relative;
   // border: 1px solid #000;
   display: flex;
   flex-direction: column;
@@ -109,6 +152,12 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
   &__title {
     flex: 0 0 50%;
     line-height: 1em;
+
+    // &_underline {
+    //   text-decoration: underline;
+    //   text-decoration-color: #ff4d00;
+    //   text-decoration-thickness: pxToEm(.1px);
+    // }
   }
 
   &__value {
@@ -133,8 +182,19 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
     padding: 10px;
     color: #333333;
 
+    &:focus {
+      // box-shadow: inset 0 0 pxToEm(1px) #000;
+    }
+
     &_disabled {
       color: #757575;
+    }
+
+    &_notification {
+      animation: pulseTokenInput 2.5s infinite;
+      &:focus {
+        animation: none;
+      }
     }
   }
 
@@ -181,6 +241,47 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
     }
   }
 }
+
+.profile-notifications {
+  cursor: pointer;
+  position: absolute;
+  top: pxToEm(35px);
+  right: pxToEm(20px);
+  padding: pxToEm(10px);
+  width: pxToEm(60px);
+  height: pxToEm(60px);
+  background: #fff;
+  border-radius: 50%;
+  transition: all .3s ease;
+
+  &_true {
+    border: pxToEm(1px) solid #ff4d00;
+  }
+
+  &:hover {
+    // background: #000;
+  }
+
+  &__body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  &__notification {
+    z-index: 1000;
+  }
+
+  &__image {
+    width: pxToEm(35px);
+    animation: bellSwing 5s infinite;
+  }
+}
+
+// background: #ff4d00;
 
 .css-1dimb5e-singleValue {
   height: 100%;
@@ -265,9 +366,9 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
   align-items: center;
 
   &__body {
-    width: pxToEm(200px);
-    height: pxToEm(120px);
-    padding: pxToEm(30px);
+    width: pxToEm(220px);
+    height: pxToEm(140px);
+    padding: pxToEm(10px);
     background: #fff;
     border-radius: pxToEm(10px);
     display: flex;

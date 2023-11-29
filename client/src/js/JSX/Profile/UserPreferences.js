@@ -38,7 +38,7 @@ function GroupPreference() {
   const dispatch = useDispatch();
 
   const { groupList } = useSelector(s => s.groupList);
-  const { groupNumber } = useSelector(s => s.groupNI);
+  const { groupNumber, groupNILoading } = useSelector(s => s.groupNI);
   const { groupChanged } = useSelector(s => s.attendanceToken);
 
   return (
@@ -48,10 +48,11 @@ function GroupPreference() {
       </div>
       <div className={!groupChanged ? "user-preference__value" : "user-preference__value user-preference__value_disabled"}>
         <Select 
-          key={groupNumber} // !!!
+          key={groupNILoading || groupNumber} // !!!
+          noOptionsMessage={() => 'Загрузка...'}
           options={makeGroupListSelect(groupList)}
           onChange={(option) => handleGroupSelect(dispatch, option)}
-          defaultValue={groupNumber ? {label: groupNumber} : {label: 'Группа не выбрана'}}
+          defaultValue={groupNumber ? {label: groupNumber} : groupNILoading ? {label: 'Загрузка...'} : {label: 'Группа не выбрана'}}
           filterOption={groupFilterOptions} />
       </div>
     </div>
@@ -61,7 +62,7 @@ function GroupPreference() {
 function TokenPreference() {
   const dispatch = useDispatch();
 
-  const { attendanceToken, groupChanged, badAttendanceToken } = useSelector(s => s.attendanceToken);
+  const { attendanceToken, groupChanged, badAttendanceToken, attendanceTokenLoading } = useSelector(s => s.attendanceToken);
   const [inputV, setInputV] = useState(attendanceToken ? attendanceToken : '');
   const [showModal, setShowModal] = useState(false);
 
@@ -70,17 +71,17 @@ function TokenPreference() {
     {badAttendanceToken && <BadAttendanceToken setInputV={setInputV} />}
     {showModal && <DeleteTokenModal setShowModal={setShowModal} />}
     <div className="profile__user-preference user-preference">
-      <div className="user-preference__title">
+      <div className={!attendanceToken && !attendanceTokenLoading ? "user-preference__title user-preference__title_underline" : "user-preference__title"}>
         Токен посещаемости:
       </div>
       <div className="user-preference__value">
         <div className="user-preference__access-token-container">
           <input 
-            className={!groupChanged ? "user-preference__input" : "user-preference__input user-preference__input_disabled"}
+            className={!attendanceToken && !attendanceTokenLoading ? "user-preference__input user-preference__input_notification" : "user-preference__input user-preference__input_disabled"}
             type="text" 
             placeholder='Введите токен'
             disabled={groupChanged}
-            value={inputV} 
+            value={attendanceTokenLoading ? 'Загрузка...' : inputV} 
             onChange={(e) => setInputV(e.target.value)}
             onKeyUp={(e) => handleEnterUp(dispatch, inputV, e)} />
           {!attendanceToken ?

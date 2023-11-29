@@ -10,10 +10,18 @@ const userDataGETFetch = createAsyncThunk('groups/userDataGETFetch', async (disp
 
   console.log('user data:\n', data);
 
-  dispatch(setGroupNI({
-    groupId: data.group.group_id,
-    groupNumber: data.group.number,
-  }));
+  if (data.group) {
+    dispatch(setGroupNI({
+      groupId: data.group.group_id,
+      groupNumber: data.group.number,
+    }));
+  } else {
+    dispatch(setGroupNI({
+      groupId: null,
+      groupNumber: null,
+    }));
+  }
+
   dispatch(setFullNameEnabled(data.subjects_title_formatting));
   dispatch(setAttendanceToken(data.attendance_token));
 });

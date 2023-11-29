@@ -107,6 +107,7 @@ $HALF-HEIGHT: 75px;
   }
 
   &__icon-container {
+    position: relative;
     width: pxToEm(40px);
     height: pxToEm(40px);
     border-radius: 50%;
@@ -115,6 +116,11 @@ $HALF-HEIGHT: 75px;
     justify-content: center;
     align-items: center;
     box-shadow: inset 0 0 pxToEm(4px) #000;
+
+    &_notification {
+      border: pxToEm(2px) solid #ff4d00;
+      box-shadow: none;
+    }
   }
 
   &__icon {
@@ -122,6 +128,22 @@ $HALF-HEIGHT: 75px;
     margin-right: pxToEm(-0.5px);
     margin-top: pxToEm(-0.1px);
   }
+}
+
+.attendance-token-notification {
+  font-size: 0.8em;
+  font-weight: 400;
+  position: absolute;
+  width: pxToEm(22px);
+  height: pxToEm(22px);
+  background: #ff4d00;
+  color: #fff;
+  border-radius: 50%;
+  top: pxToEm(-2px);
+  right: pxToEm(-2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .nav__shitty-clock {

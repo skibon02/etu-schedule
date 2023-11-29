@@ -27,11 +27,13 @@ const groupNISlice = createSlice({
   initialState: {
     groupNumber: null,
     groupId: null,
+    groupNILoading: true
   },
   reducers: {
     setGroupNI: (s, a) => {
       s.groupNumber = a.payload.groupNumber;
       s.groupId = a.payload.groupId;
+      s.groupNILoading = false;
       console.log('setted id:', s.groupId);
     }
   },

@@ -9,7 +9,7 @@ export default function BadAttendanceToken({setInputV}) {
     <div style={{fontSize: "2.5em"}} className="are-you-sure">
       <div className="are-you-sure__body">
         <div className="are-you-sure__text">
-          Некорректный токен
+          Похоже, что этот токен больше не подходит. Попробуйте ввести новый.
         </div>
         <div className="are-you-sure__buttons">
           <div className="are-you-sure__button are-you-sure__button_confirm"
