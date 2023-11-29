@@ -8,5 +8,5 @@ pub mod attendance;
 use rocket_db_pools::{sqlx, Database};
 
 #[derive(Database, Clone)]
-#[database("sqlx")]
+#[database("postgres")]
 pub struct Db(sqlx::PgPool);

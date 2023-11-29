@@ -286,20 +286,29 @@ pub fn run() -> Rocket<Build> {
     let args: Vec<String> = env::args().collect();
     let mut figment = rocket::Config::figment();
 
+    figment = figment.merge(("databases.postgres", rocket_db_pools::Config {
+        url: "postgres://etu_attend_app:12346543@localhost".into(),
+        max_connections: 150,
+        min_connections: None,
+        connect_timeout: 3,
+        idle_timeout: Some(120)
+    }));
+
     let rocket_config: Config = figment.extract().unwrap();
 
     info!("ROCKET CONFIG:");
-    info!("> is custom profile: {}", rocket_config.profile.is_custom());
-    info!("> profile: {}", rocket_config.profile);
-    let is_production_build = rocket_config.profile.is_custom() && rocket_config.profile == "prod";
+    info!("{:#?}", rocket_config);
+    let profile = env::var("ROCKET_PROFILE").unwrap_or("default".into());
+    info!("> profile: {}", profile);
+    let is_production_build = profile == "production";
     if is_production_build {
         // running profile prod
         FRONTEND_PORT.set(FrontendPort::Same).unwrap();
-        info!("> running profile prod");
+        info!("> running production profile");
     } else {
         // dev server, port is different
         FRONTEND_PORT.set(FrontendPort::Https).unwrap();
-        info!("> running profile dev");
+        info!("> running development profile");
     }
 
     // check vk service key
