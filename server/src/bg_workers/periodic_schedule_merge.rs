@@ -3,7 +3,7 @@ use std::time::Instant;
 use sqlx::pool::PoolConnection;
 use sqlx::Postgres;
 use tokio::select;
-use tokio::sync::Notify;
+use tokio::sync::watch::Receiver;
 use crate::api::etu_api;
 use crate::bg_workers::{ETU_REQUEST_INTERVAL, process_schedule_merge};
 use crate::{data_merges, models};
@@ -12,7 +12,7 @@ use crate::models::groups::get_not_merged_sched_group_id_list;
 
 const GROUPS_MERGE_INTERVAL: u64 = 60*5;
 
-pub async fn periodic_schedule_merge_task(mut con: &mut PoolConnection<Postgres>, shutdown_notifier: Arc<Notify>) {
+pub async fn periodic_schedule_merge_task(mut con: &mut PoolConnection<Postgres>, mut shutdown_watcher: Receiver<bool>) {
 
     info!("PERIODIC_MERGE_TASK: Phase 1. Initial merge for all groups.");
     let new_groups = etu_api::get_groups_list().await;
@@ -32,10 +32,9 @@ pub async fn periodic_schedule_merge_task(mut con: &mut PoolConnection<Postgres>
 
         process_schedule_merge(group_id_range, &mut con).await;
 
-
         select!(
             _ = tokio::time::sleep(tokio::time::Duration::from_secs(GROUPS_MERGE_INTERVAL)) => {}
-            _ = shutdown_notifier.notified() => {
+            _ = shutdown_watcher.changed() => {
                 warn!("PERIODIC_MERGE_TASK: Shutdown notification recieved! exiting task...");
                 return
             }

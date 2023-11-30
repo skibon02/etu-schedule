@@ -111,19 +111,7 @@ async fn frontend_page(path: PathBuf, document: DocumentRequest) -> Option<Named
     NamedFile::open(path).await.ok()
 }
 
-pub fn stage() -> AdHoc {
-    AdHoc::on_ignite("SQLx Stage", |rocket| async {
-        let mut routes = routes::get_api_routes();
-        routes.append(&mut routes![options_handler]);
-        rocket
-            .attach(Db::init())
-            .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
-            .mount("/api", routes)
-            .mount("/", routes![frontend_page])
-    })
-}
-
-pub fn bg_worker(shutdown_notifier: Arc<Notify>) -> AdHoc {
+pub fn bg_worker(shutdown_notifier: watch::Receiver<bool>) -> AdHoc {
     let notifier_r1 = shutdown_notifier.clone();
     let notifier_r2 = shutdown_notifier.clone();
     let notifier_r3 = shutdown_notifier.clone();
@@ -156,7 +144,7 @@ use rocket_db_pools::Database;
 use sqlx::PgConnection;
 use tokio::select;
 use regex::Regex;
-use tokio::sync::Notify;
+use tokio::sync::{Notify, watch};
 use crate::api::etu_api;
 use crate::api::vk_api::VK_SERVICE_TOKEN;
 use crate::models::groups::{DepartmentModel, get_not_merged_sched_group_id_list};
@@ -297,7 +285,7 @@ pub fn run() -> Rocket<Build> {
     let rocket_config: Config = figment.extract().unwrap();
 
     info!("ROCKET CONFIG:");
-    info!("{:#?}", rocket_config);
+    info!("{:?}", rocket_config);
     let profile = env::var("ROCKET_PROFILE").unwrap_or("default".into());
     info!("> profile: {}", profile);
     let is_production_build = profile == "production";
@@ -344,23 +332,28 @@ pub fn run() -> Rocket<Build> {
         }
     }
 
-    let shutdown_notify = Arc::new(Notify::new());
+    let (tx, rx) = watch::channel(false);
 
     let with_client = args.contains(&"--with-client".to_string());
     info!("> with client: {}", with_client);
     let mut rocket = rocket::custom(figment)
-        .attach(stage())
-        .attach(bg_worker(shutdown_notify.clone()))
+        .attach(Db::init())
+        .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
+        .attach(bg_worker(rx))
         .attach(AdHoc::on_shutdown("Notify shutdown", |_rocket|  Box::pin(async move {
-            shutdown_notify.notify_waiters();
+            tx.send(true).unwrap();
         })));
 
     if !is_production_build {
         rocket = rocket.attach(CORS);
     }
 
-    // let pool = tokio::block_on(async {SqlitePool::connect("sqlite::memory:").await.unwrap()});
+    let mut routes = routes::get_api_routes();
+    routes.append(&mut routes![options_handler]);
 
+    rocket = rocket
+        .mount("/api", routes)
+        .mount("/", routes![frontend_page]);
 
     if with_client {
         rocket

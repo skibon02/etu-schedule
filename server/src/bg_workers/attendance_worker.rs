@@ -7,6 +7,7 @@ use sqlx::{Connection, Postgres};
 use sqlx::pool::PoolConnection;
 use tokio::select;
 use tokio::sync::Notify;
+use tokio::sync::watch::Receiver;
 use crate::{api, models};
 use crate::api::etu_attendance_api::{CheckInResult, GetScheduleResult};
 use crate::models::Db;
@@ -33,7 +34,7 @@ fn time_to_lesson_time_num(time: NaiveTime) -> Option<i32> {
     lesson_time_num
 }
 
-pub async fn attendance_worker_task(mut con: &mut PoolConnection<Postgres>, shutdown_notifier: Arc<Notify>) {
+pub async fn attendance_worker_task(mut con: &mut PoolConnection<Postgres>, mut shutdown_watcher: Receiver<bool>) {
 
     //test attendance
 
@@ -168,7 +169,7 @@ pub async fn attendance_worker_task(mut con: &mut PoolConnection<Postgres>, shut
                     }
                 }
             }
-            _ = shutdown_notifier.notified() => {
+            _ = shutdown_watcher.changed() => {
                 warn!("ATTENDANCE_WORKER_TASK: Shutdown notification recieved! exiting task...");
                 return;
             }

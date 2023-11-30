@@ -5,6 +5,7 @@ use sqlx::pool::PoolConnection;
 use sqlx::Postgres;
 use tokio::select;
 use tokio::sync::Notify;
+use tokio::sync::watch::Receiver;
 use crate::{models};
 use crate::bg_workers::{ETU_REQUEST_INTERVAL, process_schedule_merge};
 use crate::models::Db;
@@ -15,7 +16,7 @@ const FORCE_REQ_CHANNEL_SIZE: usize = 50;
 pub static MERGE_REQUEST_CHANNEL: OnceLock<tokio::sync::mpsc::Sender<i32>> = OnceLock::new();
 pub static MERGE_REQUEST_CNT: AtomicUsize = AtomicUsize::new(0);
 
-pub async fn priority_schedule_merge_task(mut con: &mut PoolConnection<Postgres>, shutdown_notifier: Arc<Notify>) {
+pub async fn priority_schedule_merge_task(mut con: &mut PoolConnection<Postgres>, mut shutdown_watcher: Receiver<bool>) {
     // For demonstration, use a loop with a delay
     let (tx, mut rx) = tokio::sync::mpsc::channel(FORCE_REQ_CHANNEL_SIZE);
     MERGE_REQUEST_CHANNEL.set(tx).unwrap();
@@ -53,7 +54,7 @@ pub async fn priority_schedule_merge_task(mut con: &mut PoolConnection<Postgres>
                     warn!("PRIORITY_MERGE_TASK: Last ETU request was {} seconds ago, waiting...", (Instant::now() - last_etu_request).as_secs());
                     select!(
                         _ = tokio::time::sleep(tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL) - (Instant::now() - last_etu_request)) => {}
-                        _ = shutdown_notifier.notified() => {
+                        _ = shutdown_watcher.changed() => {
                             warn!("PRIORITY_MERGE_TASK: Shutdown notification recieved! exiting task...");
                             return
                         }
@@ -63,7 +64,7 @@ pub async fn priority_schedule_merge_task(mut con: &mut PoolConnection<Postgres>
 
                 process_schedule_merge(vec![request], &mut con).await;
             }
-            _ = shutdown_notifier.notified() => {
+            _ = shutdown_watcher.changed() => {
                 warn!("PRIORITY_MERGE_TASK: Shutdown notification recieved! exiting task...");
                 return
             }
