@@ -64,18 +64,28 @@ function TokenPreference() {
 
   const { attendanceToken, groupChanged, badAttendanceToken, attendanceTokenLoading } = useSelector(s => s.attendanceToken);
   const [inputV, setInputV] = useState(attendanceToken ? attendanceToken : '');
-  const [showModal, setShowModal] = useState(false);
+  const [showDeleteTokenModal, setShowDeleteTokenModal] = useState(false);
+  const [showDescription, setShowDescription] = useState(false);
+
+  const handleTokenDescription = () => {
+    setShowDescription(true);
+  }
 
   return (
     <>
     {badAttendanceToken && <BadAttendanceToken setInputV={setInputV} />}
-    {showModal && <DeleteTokenModal setShowModal={setShowModal} />}
+    {showDeleteTokenModal && <DeleteTokenModal setShowDeleteTokenModal={setShowDeleteTokenModal} />}
     <div className="profile__user-preference user-preference">
       <div className={!attendanceToken && !attendanceTokenLoading ? "user-preference__title user-preference__title_underline" : "user-preference__title"}>
         Токен посещаемости:
+        <div className='attendance-token__description-container'>
+          <div className="attendance-token__description" onClick={handleTokenDescription}>
+            Как получить токен?
+          </div>
+        </div>
       </div>
       <div className="user-preference__value">
-        <div className="user-preference__access-token-container">
+        <div className="user-preference__attendance-token-container">
           <input 
             className={!attendanceToken && !attendanceTokenLoading ? "user-preference__input user-preference__input_notification" : "user-preference__input user-preference__input_disabled"}
             type="text" 
@@ -93,7 +103,7 @@ function TokenPreference() {
           :
           <div 
             className="user-preference__button user-preference__delete-button"
-            onClick={() => setShowModal(true)}>
+            onClick={() => setShowDeleteTokenModal(true)}>
             <div className='user-preference__button-mark'>✖</div>
           </div>  
           }

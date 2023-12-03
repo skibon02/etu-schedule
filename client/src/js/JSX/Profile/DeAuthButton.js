@@ -1,18 +1,16 @@
 import EXIT from '../../../icons/exit.svg'
-import AreYouSure from './AreYouSure';
 import { useState } from 'react';
+import DeauthModal from './DeauthModal';
 
 export default function DeAuthButton() {
-  const [areYouSure, setAreYouSure] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   return (
     <>
-    {areYouSure &&
-    <AreYouSure areYouSure={areYouSure} setAreYouSure={setAreYouSure} />
-    }
+    {showModal && <DeauthModal setShowModal={setShowModal} />}
     <div 
       className='deauth-button-container'
-      onClick={() => setAreYouSure(!areYouSure)} >
+      onClick={() => setShowModal(true)} >
       <div className="deauth-button">
         <img src={EXIT} alt="" className='deauth-button__image' />
         <div className="deauth-button__text-container"><div className='deauth-button__text'>Выйти из профиля</div></div>

@@ -1,25 +1,52 @@
-import {deauthFetch} from '../../FxFetches/Profile/deauthFetch'
-import { useDispatch } from 'react-redux'
+import { useEffect } from "react";
 
-export default function AreYouSure({areYouSure, setAreYouSure}) {
-  const dispatch = useDispatch();
+export default function AreYouSure({
+  showDecline = true,
+  titleText,
+  confirmText,
+  declineText,
+  handleConfirm,
+  handleDecline
+}) {
+
+  // esc / enter listeners
+  useEffect(() => {
+    const handleEnterUp = (e) => {
+      if (e.key === 'Enter') {
+        handleConfirm();
+      }
+    }
+    const handleEscUp = (e) => {
+      if (e.key === 'Escape') {
+        handleDecline();
+      }
+    }
+    
+    window.addEventListener('keyup', handleEnterUp);
+    window.addEventListener('keyup', handleEscUp);
+
+    return () => {
+      window.removeEventListener('keyup', handleEnterUp);
+      window.removeEventListener('keyup', handleEscUp)
+    }
+  }, []);
 
   return (
     <>
-    <div className="are-you-sure">
-      <div className="are-you-sure__body">
+    <div className="are-you-sure" onClick={handleDecline}>
+      <div className="are-you-sure__body" onClick={(e) => e.stopPropagation()}>
         <div className="are-you-sure__text">
-          Вы уверены, что хотите выйти?
+          {titleText}
         </div>
         <div className="are-you-sure__buttons">
           <div className="are-you-sure__button are-you-sure__button_confirm"
-               onClick={() => deauthFetch(dispatch)}>
-            Да
+               onClick={handleConfirm}>
+            {confirmText}
           </div>
-          <div className="are-you-sure__button are-you-sure__button_cancel"
-               onClick={() => setAreYouSure(!areYouSure)}>
-            Отмена
-          </div>
+          {showDecline && <div className="are-you-sure__button are-you-sure__button_cancel"
+               onClick={handleDecline}>
+            {declineText}
+          </div>}
         </div>
       </div>
     </div>

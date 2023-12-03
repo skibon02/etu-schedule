@@ -46,7 +46,5 @@ export default function Planning() {
       <div className="under-planning-thead-box-mobile"></div>
       </>
     );
-  } else {
-    return <div>123</div>
   }
 }

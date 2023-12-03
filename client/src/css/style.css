@@ -1287,7 +1287,7 @@ h1, h2, h3, h4, h5, h6 {
 .user-preference__value_disabled {
   pointer-events: none;
 }
-.user-preference__access-token-container {
+.user-preference__attendance-token-container {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1359,6 +1359,44 @@ h1, h2, h3, h4, h5, h6 {
 }
 .user-preference__delete-button:hover {
   background: rgba(255, 143, 143, 0.9568627451);
+}
+
+.attendance-token__description-container {
+  font-size: 1em;
+  margin-top: 0.25em;
+}
+
+.attendance-token__description {
+  display: inline-block;
+  cursor: pointer;
+  position: relative;
+  color: #0b2376;
+  font-weight: 300;
+  font-size: 0.8em;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+.attendance-token__description:hover::after {
+  -webkit-transform: scaleX(1);
+      -ms-transform: scaleX(1);
+          transform: scaleX(1);
+}
+.attendance-token__description::after {
+  content: "";
+  -webkit-transform-origin: left center;
+      -ms-transform-origin: left center;
+          transform-origin: left center;
+  -webkit-transform: scaleX(0);
+      -ms-transform: scaleX(0);
+          transform: scaleX(0);
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+  position: absolute;
+  width: 100%;
+  height: 0.00625em;
+  background: #0b2376;
+  bottom: 0;
+  left: 0;
 }
 
 .profile-notifications {
@@ -1487,6 +1525,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .are-you-sure {
+  font-size: 4vmin;
   position: fixed;
   z-index: 100000000;
   top: 0;
@@ -1528,6 +1567,10 @@ h1, h2, h3, h4, h5, h6 {
 .are-you-sure__text {
   line-height: 1.1em;
   text-align: center;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 .are-you-sure__buttons {
   display: -webkit-box;
@@ -1684,6 +1727,12 @@ h1, h2, h3, h4, h5, h6 {
   }
   .user-info__text-info {
     padding-bottom: 0;
+  }
+  .attendance-token__description-container {
+    font-size: 1.2em;
+  }
+  .are-you-sure {
+    font-size: 5vmin;
   }
 }
 * {
