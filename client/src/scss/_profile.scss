@@ -248,31 +248,20 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
 }
 
 .attendance-token__description {
+  user-select: none;
   display: inline-block;
   cursor: pointer;
-  position: relative;
   color: #0b2376;
   font-weight: 300;
   font-size: 0.8em;
   transition: all .3s ease;
+  padding: pxToEm(5px);
+  border: pxToEm(.1px) solid #0b2376;
+  border-radius: pxToEm(5px);
 
   &:hover {
-    &::after {
-      transform: scaleX(1);
-    }
-  }
-
-  &::after {
-    content: '';
-    transform-origin: left center;
-    transform: scaleX(0);
-    transition: all .3s ease;
-    position: absolute;
-    width: 100%;
-    height: pxToEm(.1px);
     background: #0b2376;
-    bottom: 0;
-    left: 0;
+    color: #fff;
   }
 }
 
@@ -572,8 +561,18 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
     font-size: 1.2em;
   }
 
+  .attendance-token__description {
+    &:hover {
+      background: #fff;
+      color: #0b2376;
+    }
+    &:active {
+      background: #0b2376;
+      color: #fff;
+    }
+  }
   
-.are-you-sure {
-  font-size: 5vmin;
-}
+  .are-you-sure {
+    font-size: 5vmin;
+  }
 }

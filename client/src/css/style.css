@@ -1367,36 +1367,24 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .attendance-token__description {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   display: inline-block;
   cursor: pointer;
-  position: relative;
   color: #0b2376;
   font-weight: 300;
   font-size: 0.8em;
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
+  padding: 0.3125em;
+  border: 0.00625em solid #0b2376;
+  border-radius: 0.3125em;
 }
-.attendance-token__description:hover::after {
-  -webkit-transform: scaleX(1);
-      -ms-transform: scaleX(1);
-          transform: scaleX(1);
-}
-.attendance-token__description::after {
-  content: "";
-  -webkit-transform-origin: left center;
-      -ms-transform-origin: left center;
-          transform-origin: left center;
-  -webkit-transform: scaleX(0);
-      -ms-transform: scaleX(0);
-          transform: scaleX(0);
-  -webkit-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-  position: absolute;
-  width: 100%;
-  height: 0.00625em;
+.attendance-token__description:hover {
   background: #0b2376;
-  bottom: 0;
-  left: 0;
+  color: #fff;
 }
 
 .profile-notifications {
@@ -1730,6 +1718,14 @@ h1, h2, h3, h4, h5, h6 {
   }
   .attendance-token__description-container {
     font-size: 1.2em;
+  }
+  .attendance-token__description:hover {
+    background: #fff;
+    color: #0b2376;
+  }
+  .attendance-token__description:active {
+    background: #0b2376;
+    color: #fff;
   }
   .are-you-sure {
     font-size: 5vmin;
