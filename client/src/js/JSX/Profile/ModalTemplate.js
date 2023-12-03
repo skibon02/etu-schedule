@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export default function AreYouSure({
+export default function ModalTemplate({
   showDecline = true,
   titleText,
   confirmText,

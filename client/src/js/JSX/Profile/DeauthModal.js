@@ -1,12 +1,12 @@
 import { useDispatch } from "react-redux";
 import { deauthFetch } from "../../FxFetches/Profile/deauthFetch";
-import AreYouSure from "./AreYouSure";
+import ModalTemplate from "./ModalTemplate";
 
 export default function DeauthModal({setShowModal}) {
   const dispatch = useDispatch();
 
   return (
-    <AreYouSure
+    <ModalTemplate
       titleText={'Вы уверены, что хотите выйти?'}
       confirmText={'Да'}
       declineText={'Отмена'}

@@ -1,12 +1,12 @@
 import { useDispatch } from 'react-redux'
 import { handleDeleteToken } from '../../Handlers/Profile/handleAttendanceToken';
-import AreYouSure from './AreYouSure';
+import ModalTemplate from './ModalTemplate';
 
 export default function DeleteTokenModal({setShowDeleteTokenModal}) {
   const dispatch = useDispatch();
 
   return (
-    <AreYouSure
+    <ModalTemplate
       titleText={'Вы уверены, что хотите удалить токен?'}
       confirmText={'Да'}
       declineText={'Отмена'}
