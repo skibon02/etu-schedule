@@ -4,7 +4,7 @@ import Header from "../Header/Header";
 import Schedule from '../Schedule/Schedule'
 import Planning from "../Planning/Planning";
 import Profile from "../Profile/Profile";
-import NoMatchRoute from "../NoMatchRoute/NoMatchRoute";
+import NoMatchRoute from "./NoMatchRoute";
 import Fish from './Fish';
 import NoVkData from './NoVkData';
 
