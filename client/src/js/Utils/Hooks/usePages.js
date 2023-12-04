@@ -47,6 +47,6 @@ export function usePages() {
     setActiveByLocationFx(dispatch, location)
   }, [dispatch, location]);
 
-  return { active, vkData, fish };
+  return { vkData, fish };
 }
 

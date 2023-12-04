@@ -13,6 +13,7 @@ export default function Planning() {
   const { groupNumber } = useSelector(s => s.groupNI);
   const { groupSchedule, parsedSchedule1, parsedSchedule2 } = useSelector(s => s.groupSchedule);
   const { planningData } = useSelector(s => s.planningData);
+  const { active } = useSelector(s => s.active);
 
   const [weekParity, setWeekParity] = useState(isEvenWeek(new Date));
   const inCSST = useInCSSTransition(weekParity)
@@ -31,6 +32,7 @@ export default function Planning() {
 
   if (planningData) {
     return (
+      <CSSTransition in={active === 'planning'} timeout={300} classNames={'modal-transition'} unmountOnExit>
       <div className="modal-transition">
         <PlanningHeader weekParity={weekParity} setWeekParity={setWeekParity} />
   
@@ -43,6 +45,7 @@ export default function Planning() {
   
         <div className="under-planning-thead-box-mobile"></div>
       </div>
+      </CSSTransition>
     );
   }
 }

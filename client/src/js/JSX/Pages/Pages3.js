@@ -1,5 +1,4 @@
 import { Route, Routes } from 'react-router-dom';
-import { CSSTransition } from "react-transition-group";
 import { usePages } from "../../Utils/Hooks/usePages";
 import FISH from '../../../icons/fish.svg'
 import Header from "../Header/Header";
@@ -10,7 +9,7 @@ import NoMatchRoute from "../NoMatchRoute/NoMatchRoute";
 import NoSchedule from "../Schedule/NoSchedule";
 
 export default function Pages() {
-  const { active, vkData, fish } = usePages();
+  const { vkData, fish } = usePages();
 
   if (fish) {
     return <div className="fish"><img className="fish-image" src={FISH} alt="fish" draggable={false} /></div>
@@ -25,18 +24,9 @@ export default function Pages() {
         {vkData.is_authorized && <Header />}
         <Routes>
           <Route path="*" element={<NoMatchRoute />} />
-          <Route path="/profile" element={
-            <CSSTransition in={active === 'profile'} timeout={300} classNames={'modal-transition'} unmountOnExit>
-              <Profile />
-            </CSSTransition>} />
-          <Route path="/schedule" element={
-            <CSSTransition in={active === 'schedule'} timeout={300} classNames={'modal-transition'} unmountOnExit>
-              <Schedule />
-            </CSSTransition>} />
-          <Route path="/planning" element={
-            <CSSTransition in={active === 'planning'} timeout={300} classNames={'modal-transition'} unmountOnExit>
-              <Planning />
-            </CSSTransition>} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/schedule" element={<Schedule />} />
+          <Route path="/planning" element={<Planning />} />
         </Routes>
         <div className='under-header-box-mobile'></div>
       </div>
