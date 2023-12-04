@@ -129,6 +129,24 @@ body {
   }
 }
 
+.week-transition-enter {
+  opacity: 0.6;
+}
+
+.week-transition-enter-active {
+  opacity: 1;
+  transition: all 0.5s ease;
+}
+
+// .week-transition-exit {
+//   opacity: 1;
+// }
+
+// .week-transition-exit-active {
+//   opacity: 0;
+//   transition: all 0.5s ease;
+// }
+
 
 @media screen and (max-width: 1000px) {
   .planning-thead {

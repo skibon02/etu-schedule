@@ -28,8 +28,7 @@ export default function Schedule() {
     return (
       <div className="modal-transition">
         <WeekHeader weekParity={null} />
-        <Week
-          weekSchedule={weekSchedule} />
+        <Week weekSchedule={weekSchedule} />
       </div>
     )
   }

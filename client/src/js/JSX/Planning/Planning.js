@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import NoSchedule from "../Schedule/NoSchedule";
 import PlanningHeader from "./PlanningHeader";
 import Week from "../Schedule/Week";
+import { CSSTransition } from "react-transition-group";
 
 export default function Planning() {
 
@@ -13,6 +14,16 @@ export default function Planning() {
   const { planningData } = useSelector(s => s.planningData);
 
   const [weekParity, setWeekParity] = useState(isEvenWeek(new Date));
+  const [inCSST, setInCSST] = useState(true);
+
+  useEffect(() => {
+    setInCSST(false)
+    let interval = setTimeout(() => {
+      setInCSST(true);
+    }, 0);
+
+    return () => clearInterval(interval)
+  }, [weekParity]);
 
   if (!groupSchedule) {
     return (
@@ -31,17 +42,12 @@ export default function Planning() {
       <div className="modal-transition">
         <PlanningHeader weekParity={weekParity} setWeekParity={setWeekParity} />
   
-        {weekParity === '1' ?
-        <>
-        <WeekHeader weekParity={weekParity} />
-        <Week weekSchedule={parsedSchedule1} />
-        </>
-        :
-        <>
-        <WeekHeader weekParity={weekParity} />
-        <Week weekSchedule={parsedSchedule2} />
-        </>
-        }
+        <CSSTransition in={inCSST} timeout={500} classNames={'week-transition'} unmountOnExit>
+          <div className="week-transition">
+            <WeekHeader weekParity={weekParity} />
+            <Week weekSchedule={weekParity === '1' ? parsedSchedule1 : parsedSchedule2} />
+          </div>
+        </CSSTransition>
   
         <div className="under-planning-thead-box-mobile"></div>
       </div>

@@ -1986,6 +1986,16 @@ h1, h2, h3, h4, h5, h6 {
           transform: translateX(-2%);
 }
 
+.week-transition-enter {
+  opacity: 0.6;
+}
+
+.week-transition-enter-active {
+  opacity: 1;
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
 @media screen and (max-width: 1000px) {
   .planning-thead__body {
     width: calc(100% - 80px);

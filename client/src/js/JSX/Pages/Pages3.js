@@ -75,15 +75,15 @@ export function Pages() {
             <Routes>
               <Route path="*" element={<NoMatchRoute />} />
               <Route path="/profile" element={
-                <CSSTransition in={active === 'profile'} timeout={TRANSITION_TIMEOUT} classNames={'modal-transition'}>
+                <CSSTransition in={active === 'profile'} timeout={TRANSITION_TIMEOUT} classNames={'modal-transition'} unmountOnExit>
                   <Profile />
                 </CSSTransition>} />
               <Route path="/schedule" element={
-                <CSSTransition in={active === 'schedule'} timeout={TRANSITION_TIMEOUT} classNames={'modal-transition'}>
+                <CSSTransition in={active === 'schedule'} timeout={TRANSITION_TIMEOUT} classNames={'modal-transition'} unmountOnExit>
                   <Schedule />
                 </CSSTransition>} />
               <Route path="/planning" element={
-                <CSSTransition in={active === 'planning'} timeout={TRANSITION_TIMEOUT} classNames={'modal-transition'}>
+                <CSSTransition in={active === 'planning'} timeout={TRANSITION_TIMEOUT} classNames={'modal-transition'} unmountOnExit>
                   <Planning />
                 </CSSTransition>} />
             </Routes>
