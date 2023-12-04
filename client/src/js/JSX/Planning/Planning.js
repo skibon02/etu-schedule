@@ -36,7 +36,7 @@ export default function Planning() {
       <div className="modal-transition">
         <PlanningHeader weekParity={weekParity} setWeekParity={setWeekParity} />
   
-        <CSSTransition in={inCSST} timeout={500} classNames={'week-transition'} unmountOnExit>
+        <CSSTransition in={inCSST} timeout={500} classNames={'week-transition'} unmountOnExit key={weekParity}>
           <div className="week-transition">
             <WeekHeader weekParity={weekParity} />
             <Week weekSchedule={weekParity === '1' ? parsedSchedule1 : parsedSchedule2} />

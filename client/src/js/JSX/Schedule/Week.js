@@ -12,7 +12,7 @@ export default function Week({weekSchedule}) {
   const week = makeWeek(weekSchedule);
 
   return (
-    <CSSTransition in={inCSST} timeout={500} classNames={'week-transition'} unmountOnExit>
+    <CSSTransition in={inCSST} timeout={500} classNames={'week-transition'} unmountOnExit key={weekNumber}>
       <div className="schedule week-transition">
         {week}
       </div>
