@@ -2,7 +2,7 @@ import { useDispatch } from 'react-redux'
 import { handleDeleteToken } from '../../Handlers/Profile/handleAttendanceToken';
 import ModalTemplate from './ModalTemplate';
 
-export default function DeleteTokenModal({setShowDeleteTokenModal}) {
+export default function DeleteTokenModal({setShowDeleteTokenModal, inCSST}) {
   const dispatch = useDispatch();
 
   return (
@@ -14,6 +14,9 @@ export default function DeleteTokenModal({setShowDeleteTokenModal}) {
         handleDeleteToken(dispatch);
         setShowDeleteTokenModal(false);
       }}
-      handleDecline={() => setShowDeleteTokenModal(false)} />
+      handleDecline={() => {
+        setShowDeleteTokenModal(false)
+      }}
+      inCSST={inCSST} />
   )
 }

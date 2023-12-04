@@ -7,7 +7,7 @@ export default function DeAuthButton() {
 
   return (
     <>
-    {showModal && <DeauthModal setShowModal={setShowModal} />}
+    <DeauthModal setShowModal={setShowModal} showModal={showModal} />
     <div 
       className='deauth-button-container'
       onClick={() => setShowModal(true)} >

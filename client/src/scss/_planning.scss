@@ -106,35 +106,26 @@ body {
     border: pxToEm(2px) solid #e4e4e4;
     border-radius: pxToEm(20px);
     position: relative;
-    transition: all .3s ease;
-
-    &_false {
-      background: linear-gradient(90deg, rgba(205,40,40,1) 0%, rgba(219,64,64,1) 47%, rgba(162,0,0,1) 100%);
-    }
-
-    &_true {
-      background: linear-gradient(90deg, rgba(68,102,93,1) 0%, rgba(45,182,148,1) 64%, rgba(33,133,108,1) 100%);
-    }
-  }
+    background: linear-gradient(90deg, rgba(68,102,93,1) 0%, rgba(45,182,148,1) 64%, rgba(33,133,108,1) 100%);
+}
 
   &__circle {
     z-index: 1;
     position: absolute;
-    top: 0;
-    transition: all .3s ease;
     width: pxToEm(30px);
     height: pxToEm(30px);
     border-radius: 50%;
     background: radial-gradient(circle, rgba(255,255,255,1) 43%, rgba(199,199,199,1) 100%);
+    transform: translateX(102%);
+    transition: all .15s ease;
+  }
+}
 
-    &_false {
-      left: -1px;
-    }
+.switch__body_false {
+  background: linear-gradient(90deg, rgba(205,40,40,1) 0%, rgba(219,64,64,1) 47%, rgba(162,0,0,1) 100%);
 
-    &_true {
-      right: -1px;
-      left: auto;
-    }
+  .switch__circle {
+    transform: translateX(-2%);
   }
 }
 

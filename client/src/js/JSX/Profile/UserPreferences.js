@@ -4,11 +4,10 @@ import { useSelector, useDispatch } from 'react-redux'
 import { makeGroupListSelect } from "../../Utils/Profile/makeGroupListSelect"
 import { handleGroupSelect, handlefullNameEnabledSelect } from "../../Handlers/Profile/handleSelect"
 import { groupFilterOptions } from "../../Utils/Profile/makeSelectState"
-import { handleConfirmToken } from '../../Handlers/Profile/handleAttendanceToken'
-import CROSSMARK from '../../../icons/cross-mark.svg'
-import BadAttendanceToken from './BadAttendanceToken'
-import DeleteTokenModal from './DeleteTokenModal'
 import { handleEnterUp } from '../../Handlers/Profile/handleEnterUp'
+import { handleConfirmToken } from '../../Handlers/Profile/handleAttendanceToken'
+import BadAttendanceTokenModal from './BadAttendanceTokenModal'
+import DeleteTokenModal from './DeleteTokenModal'
 
 function FullNamePreference() {
   const dispatch = useDispatch();
@@ -18,7 +17,7 @@ function FullNamePreference() {
   return (
     <div className="profile__user-preference user-preference">
       <div className="user-preference__title">
-        Отображение названий предметов
+        Отображение названий предметов:
       </div>
       <div className="user-preference__value">
         <Select 
@@ -49,8 +48,8 @@ function GroupPreference() {
       <div className={!groupChanged ? "user-preference__value" : "user-preference__value user-preference__value_disabled"}>
         <Select 
           key={groupNILoading || groupNumber} // !!!
-          noOptionsMessage={() => 'Загрузка...'}
-          options={makeGroupListSelect(groupList)}
+          noOptionsMessage={() => 'Похоже, что такой группы нет'}
+          options={groupList ? makeGroupListSelect(groupList) : [{label: 'Загрузка...'}]}
           onChange={(option) => handleGroupSelect(dispatch, option)}
           defaultValue={groupNumber ? {label: groupNumber} : groupNILoading ? {label: 'Загрузка...'} : {label: 'Группа не выбрана'}}
           filterOption={groupFilterOptions} />
@@ -73,8 +72,8 @@ function TokenPreference() {
 
   return (
     <>
-    {badAttendanceToken && <BadAttendanceToken setInputV={setInputV} />}
-    {showDeleteTokenModal && <DeleteTokenModal setShowDeleteTokenModal={setShowDeleteTokenModal} />}
+    <BadAttendanceTokenModal setInputV={setInputV} inCSST={badAttendanceToken} />
+    <DeleteTokenModal setShowDeleteTokenModal={setShowDeleteTokenModal} inCSST={showDeleteTokenModal} />
     <div className="profile__user-preference user-preference">
       <div className={!attendanceToken && !attendanceTokenLoading ? "user-preference__title user-preference__title_underline" : "user-preference__title"}>
         Токен посещаемости:
@@ -90,7 +89,7 @@ function TokenPreference() {
             className={!attendanceToken && !attendanceTokenLoading ? "user-preference__input user-preference__input_notification" : "user-preference__input user-preference__input_disabled"}
             type="text" 
             placeholder='Введите токен'
-            disabled={groupChanged}
+            disabled={groupChanged || badAttendanceToken}
             value={attendanceTokenLoading ? 'Загрузка...' : inputV} 
             onChange={(e) => setInputV(e.target.value)}
             onKeyUp={(e) => handleEnterUp(dispatch, inputV, e)} />
@@ -98,7 +97,6 @@ function TokenPreference() {
           <div 
             className="user-preference__button user-preference__confirm-button"
             onClick={() => handleConfirmToken(dispatch, inputV)}>
-            <img src={CROSSMARK} alt="" className="user-preference__image" draggable={false} />
           </div>
           :
           <div 

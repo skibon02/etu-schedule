@@ -865,7 +865,8 @@ body {
   height: 80%;
 }
 .attendance__body:active .attendance-icon__image {
-  width: 80%;
+  width: 2.5em;
+  height: 2.5em;
 }
 .attendance__body_red {
   background: rgba(214, 0, 0, 0.9568627451);
@@ -913,9 +914,11 @@ body {
           align-items: center;
 }
 .attendance-icon__image {
-  -webkit-transition: width 0.05s ease, height 0.05s ease;
-  transition: width 0.05s ease, height 0.05s ease;
+  -webkit-transition: all 0.05s ease;
+  transition: all 0.05s ease;
   width: 3.125em;
+  height: 3.125em;
+  background: url("../icons//icons8-clock.svg") center/100% no-repeat;
   -webkit-box-shadow: inset 0 0 0.3125em black;
           box-shadow: inset 0 0 0.3125em black;
   border-radius: 50%;
@@ -1261,14 +1264,13 @@ h1, h2, h3, h4, h5, h6 {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  grid-template-columns: 1fr 1fr;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
   padding: 0.625em;
   border-radius: 0.3125em;
   background: #fff;
   margin-bottom: 0.625em;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 .user-preference:last-child {
   margin-bottom: 0;
@@ -1278,11 +1280,15 @@ h1, h2, h3, h4, h5, h6 {
       -ms-flex: 0 0 50%;
           flex: 0 0 50%;
   line-height: 1em;
+  -ms-flex-item-align: baseline;
+      align-self: baseline;
 }
 .user-preference__value {
   -webkit-box-flex: 0;
       -ms-flex: 0 0 50%;
           flex: 0 0 50%;
+  -ms-flex-item-align: baseline;
+      align-self: baseline;
 }
 .user-preference__value_disabled {
   pointer-events: none;
@@ -1349,10 +1355,10 @@ h1, h2, h3, h4, h5, h6 {
   width: 0.9375em;
 }
 .user-preference__confirm-button {
-  background: #2DB694;
+  background: url("../icons/check-mark.svg") 50% 50%/60% no-repeat, #2DB694;
 }
 .user-preference__confirm-button:hover {
-  background: #7fccb9;
+  background-color: #7fccb9;
 }
 .user-preference__delete-button {
   background: rgba(214, 0, 0, 0.9568627451);
@@ -1513,7 +1519,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .are-you-sure {
-  font-size: 4vmin;
+  font-size: min(4vmin, 2.5rem);
   position: fixed;
   z-index: 100000000;
   top: 0;
@@ -1603,6 +1609,26 @@ h1, h2, h3, h4, h5, h6 {
 .are-you-sure__button_confirm:hover, .are-you-sure__button_confirm :active {
   -webkit-box-shadow: 0 0 0.125em #000;
           box-shadow: 0 0 0.125em #000;
+}
+
+.modal-transition-enter {
+  opacity: 0;
+}
+
+.modal-transition-enter-active {
+  opacity: 1;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.modal-transition-exit {
+  opacity: 1;
+}
+
+.modal-transition-exit-active {
+  opacity: 0;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 @-webkit-keyframes spin {
@@ -1933,34 +1959,31 @@ h1, h2, h3, h4, h5, h6 {
   border: 0.125em solid #e4e4e4;
   border-radius: 1.25em;
   position: relative;
-  -webkit-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-}
-.switch__body_false {
-  background: -webkit-gradient(linear, left top, right top, from(rgb(205, 40, 40)), color-stop(47%, rgb(219, 64, 64)), to(rgb(162, 0, 0)));
-  background: linear-gradient(90deg, rgb(205, 40, 40) 0%, rgb(219, 64, 64) 47%, rgb(162, 0, 0) 100%);
-}
-.switch__body_true {
   background: -webkit-gradient(linear, left top, right top, from(rgb(68, 102, 93)), color-stop(64%, rgb(45, 182, 148)), to(rgb(33, 133, 108)));
   background: linear-gradient(90deg, rgb(68, 102, 93) 0%, rgb(45, 182, 148) 64%, rgb(33, 133, 108) 100%);
 }
 .switch__circle {
   z-index: 1;
   position: absolute;
-  top: 0;
-  -webkit-transition: all 0.3s ease;
-  transition: all 0.3s ease;
   width: 1.875em;
   height: 1.875em;
   border-radius: 50%;
   background: radial-gradient(circle, rgb(255, 255, 255) 43%, rgb(199, 199, 199) 100%);
+  -webkit-transform: translateX(102%);
+      -ms-transform: translateX(102%);
+          transform: translateX(102%);
+  -webkit-transition: all 0.15s ease;
+  transition: all 0.15s ease;
 }
-.switch__circle_false {
-  left: -1px;
+
+.switch__body_false {
+  background: -webkit-gradient(linear, left top, right top, from(rgb(205, 40, 40)), color-stop(47%, rgb(219, 64, 64)), to(rgb(162, 0, 0)));
+  background: linear-gradient(90deg, rgb(205, 40, 40) 0%, rgb(219, 64, 64) 47%, rgb(162, 0, 0) 100%);
 }
-.switch__circle_true {
-  right: -1px;
-  left: auto;
+.switch__body_false .switch__circle {
+  -webkit-transform: translateX(-2%);
+      -ms-transform: translateX(-2%);
+          transform: translateX(-2%);
 }
 
 @media screen and (max-width: 1000px) {

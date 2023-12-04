@@ -1,6 +1,5 @@
 import { useSelector } from 'react-redux'
 import { useState } from 'react';
-import CLOCK from '../../../icons/icons8-clock.svg'
 import * as handlers from '../../Handlers/Schedule/Subject/handlers'
 import { addToQueue } from '../../FxFetches/Schedule/processScheduleQueue';
 import { scheduleDiffsSETFetch } from '../../ReduxStates/Slices/scheduleDiffsSlice';
@@ -38,7 +37,7 @@ export default function Attendance({
     <>
     <div className={"lesson__attendance attendance"}>
       <div className="attendance__container" >
-        <div 
+        <div  
           className='attendance__pseudo-body' 
           onClick={() => {
             handlers.handleClockClick(
@@ -63,12 +62,7 @@ export default function Attendance({
               clockClassNamePulsing 
             } >
             <div className="attendance__icon attendance-icon">
-              <img
-                className="attendance-icon__image"
-                src={CLOCK}
-                alt="ico"
-                draggable="false"
-              />
+              <div className="attendance-icon__image"></div>
             </div>
           </div>
         </div>

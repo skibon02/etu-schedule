@@ -20,7 +20,7 @@ export default function Profile() {
 
   return (
     <>
-    <div className="profile schedule">
+    <div className="profile schedule modal-transition">
       <ProfileUserInfo />
       {isAuthorized && <UserPreferences />}
     </div>

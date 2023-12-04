@@ -2,7 +2,7 @@ import { useDispatch } from "react-redux";
 import { deauthFetch } from "../../FxFetches/Profile/deauthFetch";
 import ModalTemplate from "./ModalTemplate";
 
-export default function DeauthModal({setShowModal}) {
+export default function DeauthModal({setShowModal, showModal}) {
   const dispatch = useDispatch();
 
   return (
@@ -14,6 +14,7 @@ export default function DeauthModal({setShowModal}) {
         deauthFetch(dispatch);
         setShowModal(false);
       }}
-      handleDecline={() => setShowModal(false)} />
+      handleDecline={() => setShowModal(false)}
+      inCSST={showModal} />
   )
 }

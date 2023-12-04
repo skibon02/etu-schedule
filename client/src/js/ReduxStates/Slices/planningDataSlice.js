@@ -39,7 +39,6 @@ async function planningDataSETAllFetch(dispatch, flag) {
   console.log('result of updating all planning:', d);
 
   if (d.ok) {
-    dispatch(planningDataGETFetch());
     dispatch(scheduleDiffsGETFetch());
   }
 }

@@ -2,7 +2,7 @@ import { useDispatch } from "react-redux";
 import { nullAttendanceToken } from "../../ReduxStates/Slices/attendanceTokenSlice";
 import ModalTemplate from "./ModalTemplate";
 
-export default function BadAttendanceToken({setInputV}) {
+export default function BadAttendanceTokenModal({setInputV, inCSST}) {
   const dispatch = useDispatch()
 
   return (
@@ -12,14 +12,12 @@ export default function BadAttendanceToken({setInputV}) {
       confirmText={'Отмена'}
       handleConfirm={() => {
         setInputV('');
-        setTimeout(() => {
-          dispatch(nullAttendanceToken());
-        }, 50); // bc input have onKeyUp binded to Enter and when you click Enter 
-        // to close modal it automatically calls setFetch func, bc of async setInputV nature
+        dispatch(nullAttendanceToken());
       }}
       handleDecline={() => {
         setInputV('');
         dispatch(nullAttendanceToken());
-      }} />
+      }}
+      inCSST={inCSST} />
   )
 }

@@ -26,11 +26,11 @@ export default function Schedule() {
   
   if (weekSchedule) {
     return (
-      <>
-      <WeekHeader weekParity={null} />
-      <Week
-        weekSchedule={weekSchedule} />
-      </>
+      <div className="modal-transition">
+        <WeekHeader weekParity={null} />
+        <Week
+          weekSchedule={weekSchedule} />
+      </div>
     )
   }
 }

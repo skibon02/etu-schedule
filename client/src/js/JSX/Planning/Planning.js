@@ -28,23 +28,23 @@ export default function Planning() {
 
   if (planningData) {
     return (
-      <>  
-      <PlanningHeader weekParity={weekParity} setWeekParity={setWeekParity} />
-
-      {weekParity === '1' ?
-      <>
-      <WeekHeader weekParity={weekParity} />
-      <Week weekSchedule={parsedSchedule1} />
-      </>
-      :
-      <>
-      <WeekHeader weekParity={weekParity} />
-      <Week weekSchedule={parsedSchedule2} />
-      </>
-      }
-
-      <div className="under-planning-thead-box-mobile"></div>
-      </>
+      <div className="modal-transition">
+        <PlanningHeader weekParity={weekParity} setWeekParity={setWeekParity} />
+  
+        {weekParity === '1' ?
+        <>
+        <WeekHeader weekParity={weekParity} />
+        <Week weekSchedule={parsedSchedule1} />
+        </>
+        :
+        <>
+        <WeekHeader weekParity={weekParity} />
+        <Week weekSchedule={parsedSchedule2} />
+        </>
+        }
+  
+        <div className="under-planning-thead-box-mobile"></div>
+      </div>
     );
   }
 }

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { CSSTransition } from "react-transition-group";
 
 export default function ModalTemplate({
   showDecline = true,
@@ -6,50 +7,56 @@ export default function ModalTemplate({
   confirmText,
   declineText,
   handleConfirm,
-  handleDecline
+  handleDecline,
+  inCSST
 }) {
 
   // esc / enter listeners
   useEffect(() => {
-    const handleEnterUp = (e) => {
-      if (e.key === 'Enter') {
-        handleConfirm();
+    if (inCSST) {
+      const handleKeyUp = (e) => {
+        if (e.key === 'Enter') {
+          handleConfirm();
+          return;
+        }
+        if (e.key === 'Escape') {
+          handleDecline();
+          return;
+        }
+      }
+      window.addEventListener('keyup', handleKeyUp);
+  
+      return () => {
+        window.removeEventListener('keyup', handleKeyUp);
       }
     }
-    const handleEscUp = (e) => {
-      if (e.key === 'Escape') {
-        handleDecline();
-      }
-    }
-    
-    window.addEventListener('keyup', handleEnterUp);
-    window.addEventListener('keyup', handleEscUp);
-
-    return () => {
-      window.removeEventListener('keyup', handleEnterUp);
-      window.removeEventListener('keyup', handleEscUp)
-    }
-  }, []);
+  }, [inCSST]);
 
   return (
     <>
-    <div className="are-you-sure" onClick={handleDecline}>
-      <div className="are-you-sure__body" onClick={(e) => e.stopPropagation()}>
-        <div className="are-you-sure__text">
-          {titleText}
-        </div>
-        <div className="are-you-sure__buttons">
-          <div className="are-you-sure__button are-you-sure__button_confirm"
-               onClick={handleConfirm}>
-            {confirmText}
+    <CSSTransition 
+      in={inCSST}
+      timeout={300}
+      classNames={'modal-transition'}
+      unmountOnExit >
+      <div className="are-you-sure modal-transition" onClick={handleDecline}>
+        <div className="are-you-sure__body" onClick={(e) => e.stopPropagation()}>
+          <div className="are-you-sure__text">
+            {titleText}
           </div>
-          {showDecline && <div className="are-you-sure__button are-you-sure__button_cancel"
-               onClick={handleDecline}>
-            {declineText}
-          </div>}
+          <div className="are-you-sure__buttons">
+            <div className="are-you-sure__button are-you-sure__button_confirm"
+                 onClick={handleConfirm}>
+              {confirmText}
+            </div>
+            {showDecline && <div className="are-you-sure__button are-you-sure__button_cancel"
+                 onClick={handleDecline}>
+              {declineText}
+            </div>}
+          </div>
         </div>
       </div>
-    </div>
+    </CSSTransition>
     </>
   )
 }

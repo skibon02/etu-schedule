@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux'
-import { useOnlineStatus } from "../../Handlers/Pages/useOnlineStatus";
+import { useOnlineStatus } from "../../Utils/useOnlineStatus";
+import { useDisableImageContextMenu } from "../../Utils/useDisableImageContextMenu";
 import { routingFx } from "../../FxFetches/Pages/routingFx";
 import { setActiveByLocationFx } from "../../FxFetches/Pages/setActiveByLocationFx";
 import { groupScheduleFx } from "../../FxFetches/Pages/groupScheduleFx";
@@ -14,12 +15,16 @@ import Planning from "../Planning/Planning";
 import Profile from "../Profile/Profile";
 import NoMatchRoute from "../NoMatchRoute/NoMatchRoute";
 import NoSchedule from "../Schedule/NoSchedule";
+import { CSSTransition } from "react-transition-group";
+
+const TRANSITION_TIMEOUT = 300;
 
 export function Pages() {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
   const online = useOnlineStatus();
+  useDisableImageContextMenu();
 
   const { active } = useSelector(s => s.active);
   const { groupId, groupNILoading } = useSelector(s => s.groupNI);
@@ -56,31 +61,36 @@ export function Pages() {
   if (!fish) {
     if (!vkData) {
       return <div className="schedule"><NoSchedule groupNumber={1} /></div>
-    } else {
+    } else if (!vkData.is_authorized) {
       return (
-        <div className='container'>
-          <div className='under-header-box'></div>
-          {vkData.is_authorized && <Header />}
-          <Routes>
-            <Route path="*" element={<NoMatchRoute />} />
-            {(!vkData.is_authorized || active === 'profile') &&
-              <Route path="/profile" element={<Profile />} />
-            }
-            {vkData.is_authorized &&
-            <>
-            {active === 'schedule' &&
-              <Route path="/schedule" element={<Schedule />} />
-            }
-            {active === 'planning' && 
-              <Route path="/planning" element={<Planning />} />
-            }
-            </>
-            }
-          </Routes>
-          <div className='under-header-box-mobile'></div>
-        </div>
+      <CSSTransition in={active === 'profile'} timeout={TRANSITION_TIMEOUT} classNames={'modal-transition'}>
+        <Profile />
+      </CSSTransition>
       )
-    }
+    } else {
+        return (
+          <div className='container'>
+            <div className='under-header-box'></div>
+            {vkData.is_authorized && <Header />}
+            <Routes>
+              <Route path="*" element={<NoMatchRoute />} />
+              <Route path="/profile" element={
+                <CSSTransition in={active === 'profile'} timeout={TRANSITION_TIMEOUT} classNames={'modal-transition'}>
+                  <Profile />
+                </CSSTransition>} />
+              <Route path="/schedule" element={
+                <CSSTransition in={active === 'schedule'} timeout={TRANSITION_TIMEOUT} classNames={'modal-transition'}>
+                  <Schedule />
+                </CSSTransition>} />
+              <Route path="/planning" element={
+                <CSSTransition in={active === 'planning'} timeout={TRANSITION_TIMEOUT} classNames={'modal-transition'}>
+                  <Planning />
+                </CSSTransition>} />
+            </Routes>
+            <div className='under-header-box-mobile'></div>
+          </div>
+        )
+      }
   } else {
     return <div className="fish"><img className="fish-image" src={FISH} alt="fish" draggable={false} /></div>
   }
