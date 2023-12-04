@@ -17,7 +17,6 @@ export function usePages() {
 
   useDisableImageContextMenu(); 
 
-  const { active } = useSelector(s => s.active);
   const { groupId, groupNILoading } = useSelector(s => s.groupNI);
   const { vkData } = useSelector(s => s.vkData);
 

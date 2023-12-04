@@ -1,20 +1,20 @@
 import { Route, Routes } from 'react-router-dom';
 import { usePages } from "../../Utils/Hooks/usePages";
-import FISH from '../../../icons/fish.svg'
 import Header from "../Header/Header";
 import Schedule from '../Schedule/Schedule'
 import Planning from "../Planning/Planning";
 import Profile from "../Profile/Profile";
 import NoMatchRoute from "../NoMatchRoute/NoMatchRoute";
-import NoSchedule from "../Schedule/NoSchedule";
+import Fish from './Fish';
+import NoVkData from './NoVkData';
 
 export default function Pages() {
   const { vkData, fish } = usePages();
 
   if (fish) {
-    return <div className="fish"><img className="fish-image" src={FISH} alt="fish" draggable={false} /></div>
+    return <Fish />
   } else if (!vkData) {
-    return <div className="container"><NoSchedule groupNumber={1} /></div>
+    return <NoVkData />
   } else if (!vkData.is_authorized) {
     return <Profile />
   } else {
