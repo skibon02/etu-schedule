@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux'
-import { useOnlineStatus } from "../../Utils/useOnlineStatus";
-import { useDisableImageContextMenu } from "../../Utils/useDisableImageContextMenu";
+import { useOnlineStatus } from "../../Utils/Hooks/useOnlineStatus";
+import { useDisableImageContextMenu } from "../../Utils/Hooks/useDisableImageContextMenu";
 import { routingFx } from "../../FxFetches/Pages/routingFx";
 import { setActiveByLocationFx } from "../../FxFetches/Pages/setActiveByLocationFx";
 import { groupScheduleFx } from "../../FxFetches/Pages/groupScheduleFx";

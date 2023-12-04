@@ -6,6 +6,7 @@ import NoSchedule from "../Schedule/NoSchedule";
 import PlanningHeader from "./PlanningHeader";
 import Week from "../Schedule/Week";
 import { CSSTransition } from "react-transition-group";
+import { useInCSSTransition } from "../../Utils/Hooks/useInCSSTransition";
 
 export default function Planning() {
 
@@ -14,16 +15,7 @@ export default function Planning() {
   const { planningData } = useSelector(s => s.planningData);
 
   const [weekParity, setWeekParity] = useState(isEvenWeek(new Date));
-  const [inCSST, setInCSST] = useState(true);
-
-  useEffect(() => {
-    setInCSST(false)
-    let interval = setTimeout(() => {
-      setInCSST(true);
-    }, 0);
-
-    return () => clearInterval(interval)
-  }, [weekParity]);
+  const inCSST = useInCSSTransition(weekParity)
 
   if (!groupSchedule) {
     return (
