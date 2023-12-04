@@ -9,13 +9,13 @@ import Profile from "../Profile/Profile";
 import NoMatchRoute from "../NoMatchRoute/NoMatchRoute";
 import NoSchedule from "../Schedule/NoSchedule";
 
-export function Pages() {
+export default function Pages() {
   const { active, vkData, fish } = usePages();
 
   if (fish) {
     return <div className="fish"><img className="fish-image" src={FISH} alt="fish" draggable={false} /></div>
   } else if (!vkData) {
-    return <div className="schedule"><NoSchedule groupNumber={1} /></div>
+    return <div className="container"><NoSchedule groupNumber={1} /></div>
   } else if (!vkData.is_authorized) {
     return <Profile />
   } else {

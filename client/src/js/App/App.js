@@ -1,4 +1,4 @@
-import { Pages } from "../JSX/Pages/Pages3"
+import Pages from "../JSX/Pages/Pages3"
 
 export default function App() {
 
