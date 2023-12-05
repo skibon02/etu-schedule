@@ -34,7 +34,7 @@ export function usePages() {
     if (vkData && vkData.is_authorized && online) {
       dispatch(userDataGETFetch(dispatch));
     }
-  }, [dispatch, navigate, location, vkData, online]);
+  }, [dispatch, vkData, online]);
 
   useEffect(() => {
     if (online) {

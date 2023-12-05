@@ -10,7 +10,7 @@ import { useInCSSTransition } from "../../Hooks/useInCSSTransition";
 
 export default function Planning() {
 
-  const { groupNumber } = useSelector(s => s.groupNI);
+  const { groupNumber, groupNILoading } = useSelector(s => s.groupNI);
   const { groupSchedule, parsedSchedule1, parsedSchedule2 } = useSelector(s => s.groupSchedule);
   const { planningData } = useSelector(s => s.planningData);
   const { active } = useSelector(s => s.active);
@@ -20,8 +20,8 @@ export default function Planning() {
 
   if (!groupSchedule) {
     return (
-      <NoSchedule groupNumber={groupNumber} />
-    );
+      <NoSchedule groupNumber={groupNumber} groupNILoading={groupNILoading} />
+    )
   }
   
   if (!groupSchedule.is_ready) {
