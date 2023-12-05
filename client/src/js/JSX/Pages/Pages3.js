@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
-import { usePages } from "../../Utils/Hooks/usePages";
+import { usePages } from "../../Hooks/Pages/usePages";
 import Header from "../Header/Header";
 import Schedule from '../Schedule/Schedule'
 import Planning from "../Planning/Planning";
@@ -21,7 +21,7 @@ export default function Pages() {
     return (
       <div className='container'>
         <div className='under-header-box'></div>
-        {vkData.is_authorized && <Header />}
+        <Header />
         <Routes>
           <Route path="*" element={<NoMatchRoute />} />
           <Route path="/profile" element={<Profile />} />

@@ -27,6 +27,7 @@ body {
   height: pxToEm(50px);
   color: #0b2376;
   font-size: 1.1em;
+  user-select: none;
 
   &__body {
     width: 60%;

@@ -2,7 +2,7 @@ import { CSSTransition } from "react-transition-group";
 import { makeWeek } from "../../Utils/Schedule/Week/makeWeek";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { useInCSSTransition } from "../../Utils/Hooks/useInCSSTransition";
+import { useInCSSTransition } from "../../Hooks/useInCSSTransition";
 
 export default function Week({weekSchedule}) {
 

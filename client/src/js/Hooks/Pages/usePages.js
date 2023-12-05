@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useOnlineStatus } from './useOnlineStatus';
-import { useDisableImageContextMenu } from './useDisableImageContextMenu';
+import { useOnlineStatus } from '../useOnlineStatus';
+import { useDisableImageContextMenu } from '../useDisableImageContextMenu';
 import { useState, useEffect } from 'react';
 import { vkDataFetch } from '../../ReduxStates/Slices/vkDataSlice';
 import { routingFx } from '../../FxFetches/Pages/routingFx';

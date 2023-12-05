@@ -9,7 +9,6 @@ export function WeekHeader({weekParity}) {
   const { active } = useSelector(s => s.active);
   const { date } = useSelector(s => s.date);
   const { groupNumber } = useSelector(s => s.groupNI);
-  const { groupSchedule } = useSelector(s => s.groupSchedule);
 
   const [clock, setClock] = useState(weekHeaderTime(new Date()));
 

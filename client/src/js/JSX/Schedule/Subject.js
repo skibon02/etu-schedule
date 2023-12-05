@@ -1,34 +1,15 @@
-import { useState, useEffect } from "react";
-import { makeRooms } from "../../Utils/Schedule/Subject/makeRooms";
-import { makeTeachers } from "../../Utils/Schedule/Subject/makeTeachers";
-import { checkTimeAndSetTheme } from "../../Utils/Schedule/Subject/checkTimeAndSetTheme";
-import { makeClockTime, knowSubjectTime } from "../../Utils/handleTime";
+import { makeClockTime } from "../../Utils/handleTime";
+import { useSubject } from "../../Hooks/Schedule/useSubject";
 import Attendance from "./Attendance";
 import PlanningSwitch from "../Planning/PlanningSwitch";
-import { useSelector } from "react-redux";
 
 export function Subject({subjectData, orderNumber, planning_time_link_id_value, schedule_diffs_value}) {
-  const {active} = useSelector(s => s.active);
-
-  const [lessonStart, lessonEnd, checkInDeadline] = knowSubjectTime(orderNumber, new Date(subjectData.date));
-  const lessonName = subjectData.title;
-  const lessonType = subjectData.subjectType;
-  const teachers = makeTeachers(subjectData.teachers);
-  const time_link_id = subjectData.time_link_id;
-
-  const [isDead, setIsDead] = useState(checkTimeAndSetTheme(checkInDeadline));
-  
-  const roomName = makeRooms(subjectData.number, isDead, active);
-
-  useEffect(() => {
-    setIsDead(checkTimeAndSetTheme(checkInDeadline));
-
-    const intervalId = setInterval(() => {
-      setIsDead(checkTimeAndSetTheme(checkInDeadline));
-    }, 1000 * 60 * 1);
-
-    return () => clearInterval(intervalId);
-  }, [checkInDeadline]);
+  const { 
+    lessonStart, lessonEnd, 
+    lessonName, lessonType, 
+    teachers, roomName,
+    time_link_id, isDead, active 
+  } = useSubject(subjectData, orderNumber);
 
   return (
     <div className={active === 'schedule' && isDead ? 

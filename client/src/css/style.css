@@ -1867,6 +1867,10 @@ h1, h2, h3, h4, h5, h6 {
   height: 3.125em;
   color: #0b2376;
   font-size: 1.1em;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 .planning-thead__body {
   width: 60%;

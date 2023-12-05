@@ -1,24 +1,10 @@
-import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { groupListGETFetch } from "../../ReduxStates/Slices/groupListSlice";
+import { CSSTransition } from "react-transition-group";
+import { useProfile } from "../../Hooks/Profile/useProfile";
 import ProfileUserInfo from "./ProfileUserInfo";
 import UserPreferences from "./UserPreferences";
-import { CSSTransition } from "react-transition-group";
 
 export default function Profile() {
-  const dispatch = useDispatch();
-
-  const { groupList } = useSelector(s => s.groupList);
-  const { vkData } = useSelector(s => s.vkData);
-  const { active } = useSelector(s => s.active);
-  
-  const isAuthorized = vkData.is_authorized;
-
-  useEffect(() => {
-    if (!groupList && isAuthorized) {
-      dispatch(groupListGETFetch())
-    };
-  }, [vkData]);
+  const { active, isAuthorized } = useProfile();
 
   return (
     <>

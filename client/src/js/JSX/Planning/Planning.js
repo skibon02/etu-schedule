@@ -6,7 +6,7 @@ import NoSchedule from "../Schedule/NoSchedule";
 import PlanningHeader from "./PlanningHeader";
 import Week from "../Schedule/Week";
 import { CSSTransition } from "react-transition-group";
-import { useInCSSTransition } from "../../Utils/Hooks/useInCSSTransition";
+import { useInCSSTransition } from "../../Hooks/useInCSSTransition";
 
 export default function Planning() {
 
