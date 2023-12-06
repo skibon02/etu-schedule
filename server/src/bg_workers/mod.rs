@@ -24,7 +24,7 @@ const ETU_REQUEST_INTERVAL: u64 = 15;
 
 async fn process_schedule_merge(group_id_vec: Vec<i32>, con: &mut PgConnection) {
 
-    let new_groups = etu_api::get_groups_list().await;
+    let new_groups = etu_api::get_groups_list().await.unwrap();
     data_merges::groups::groups_merge(&new_groups, &mut *con).await.unwrap();
 
     info!("BGTASK: Starting merge for groups: {:?}", group_id_vec);

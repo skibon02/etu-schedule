@@ -61,7 +61,11 @@ pub async fn attendance_worker_task(mut con: &mut PoolConnection<Postgres>, mut 
         select!(
             _ = tokio::time::sleep(tokio::time::Duration::from_secs(60)) => {
                 info!("ATTENDANCE_WORKER_TASK: 60 secs passed, starting attendance worker routine...");
-                let time = api::etu_attendance_api::get_time().await.unwrap();
+                let time = api::etu_attendance_api::get_time().await;
+                let Ok(time) = time else {
+                    error!("Failed to get time from etu attendance! Unknown response: {:#?}", time);
+                    continue;
+                };
 
                 let local_time_utc = time.time.parse::<chrono::DateTime<chrono::Utc>>().unwrap();
 
@@ -95,6 +99,8 @@ pub async fn attendance_worker_task(mut con: &mut PoolConnection<Postgres>, mut 
 
                     //wait 5s
                     tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
+
+                    //make request
                     let schedule = api::etu_attendance_api::get_cur_schedule(token.clone()).await;
                     if let GetScheduleResult::WrongToken = schedule {
                         warn!("Wrong token for user_id: {:?} (group_id: {:?})! Invalidating user token...",
@@ -103,7 +109,7 @@ pub async fn attendance_worker_task(mut con: &mut PoolConnection<Postgres>, mut 
                         continue;
                     }
                     let GetScheduleResult::Ok(schedule) = schedule else {
-                        warn!("Failed to get schedule for user_id: {:?} (group_id: {:?})! Unknown response: {:?}",
+                        error!("Failed to get schedule for user_id: {:?} (group_id: {:?})! Unknown response: {:?}",
                             user_schedule.user_data.user_id, user_schedule.user_data.group_id, schedule);
                         continue;
                     };

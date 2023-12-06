@@ -280,32 +280,32 @@ pub struct GroupScheduleOriginal {
     pub group_id: i32
 }
 
-pub async fn get_schedule_objs_group(group: u32) -> Option<GroupScheduleOriginal> {
+pub async fn get_schedule_objs_group(group: u32) -> anyhow::Result<Option<GroupScheduleOriginal>> {
     let url = format!(
         "{}objects/publicated?subjectType=%D0%9B%D0%B5%D0%BA&subjectType=%D0%9F%D1%80&subjectType=%D0%9B%D0%B0%D0%B1&subjectType=%D0%9A%D0%9F&subjectType=%D0%9A%D0%A0&subjectType=%D0%94%D0%BE%D0%B1&subjectType=%D0%9C%D0%AD%D0%BA&subjectType=%D0%9F%D1%80%D0%B0%D0%BA&subjectType=%D0%A2%D0%B5%D1%81%D1%82&withSubjectCode=true&withURL=true&groups={}",
         BASE_URL_SCHEDULE,
         group
     );
-    let response = reqwest::get(&url).await.unwrap();
-    let body = response.text().await.unwrap();
+    let response = reqwest::get(&url).await?;
+    let body = response.text().await?;
 
-    let parsed_objs = parse_schedule_objs_groups(body).unwrap();
-    parsed_objs.get(0).cloned()
+    let parsed_objs = parse_schedule_objs_groups(body)?;
+    Ok(parsed_objs.get(0).cloned())
 }
 
-pub async fn get_schedule_objs_groups(groups: Vec<i32>) -> Option<BTreeMap<i32, GroupScheduleOriginal>> {
+pub async fn get_schedule_objs_groups(groups: Vec<i32>) -> anyhow::Result<BTreeMap<i32, GroupScheduleOriginal>> {
     let url = format!(
         "{}objects/publicated?subjectType=%D0%9B%D0%B5%D0%BA&subjectType=%D0%9F%D1%80&subjectType=%D0%9B%D0%B0%D0%B1&subjectType=%D0%9A%D0%9F&subjectType=%D0%9A%D0%A0&subjectType=%D0%94%D0%BE%D0%B1&subjectType=%D0%9C%D0%AD%D0%BA&subjectType=%D0%9F%D1%80%D0%B0%D0%BA&subjectType=%D0%A2%D0%B5%D1%81%D1%82&withSubjectCode=true&withURL=true&{}",
         BASE_URL_SCHEDULE,
         groups.iter().map(|g| "groups=".to_string()+&g.to_string()).collect::<Vec<String>>().join("&")
     );
-    let response = reqwest::get(&url).await.unwrap();
-    let body = response.text().await.unwrap();
+    let response = reqwest::get(&url).await?;
+    let body = response.text().await?;
 
-    let parsed_objs = parse_schedule_objs_groups(body).unwrap();
+    let parsed_objs = parse_schedule_objs_groups(body)?;
     let res = parsed_objs.into_iter().map(|g| (g.group_id, g)).collect::<BTreeMap<i32, GroupScheduleOriginal>>();
 
-    Some(res)
+    Ok(res)
 }
 
 fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleOriginal>> {
@@ -445,12 +445,12 @@ fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleO
     Ok(res)
 }
 
-pub async fn get_groups_list() -> Vec<GroupOriginal> {
+pub async fn get_groups_list() -> anyhow::Result<Vec<GroupOriginal>> {
     let url = format!("{}dicts/groups?scheduleId=594&withFaculty=true&withSemesterSeasons=false&withFlows=false", BASE_URL_GENERAL);
-    let response = reqwest::get(&url).await.unwrap();
-    let body = response.text().await.unwrap();
+    let response = reqwest::get(&url).await?;
+    let body = response.text().await?;
 
-    parse_groups(body).unwrap()
+    parse_groups(body)
 }
 
 fn parse_groups(data: String) -> anyhow::Result<Vec<GroupOriginal>> {

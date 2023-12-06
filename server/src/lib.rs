@@ -63,7 +63,7 @@ impl Fairing for CORS {
             return;
         }
 
-        let allowed_origins = ["https://localhost", "https://212.118.37.143"];
+        let allowed_origins = ["https://localhost", "https://77.246.107.64/", "https://etu-schedule.ru/"];
 
         allowed_origins
             .iter()
@@ -93,7 +93,9 @@ impl<'r> FromRequest<'r> for DocumentRequest {
         if path == "/" {
             return Outcome::Forward(Status::NotFound);
         }
-        let fir_seg = path.segments().next().unwrap();
+        let Some(fir_seg) = path.segments().next() else {
+            return Outcome::Forward(Status::NotFound);
+        };
         if fir_seg == "static" {
             return Outcome::Forward(Status::NotFound);
         }
@@ -209,11 +211,17 @@ fn setup_logger() -> Result<(), fern::InitError> {
         .level(LevelFilter::Warn)
         .chain(fern::log_file("output_warn.log")?);
 
+    let error_file_log = fern::Dispatch::new()
+        .format(file_formatter)
+        .level(LevelFilter::Error)
+        .chain(fern::log_file("output_error.log")?);
+
     let combined_log = Dispatch::new()
         .chain(console_log)
         .chain(debug_file_log)
         .chain(info_file_log)
         .chain(warn_file_log)
+        .chain(error_file_log)
         .apply()?;
 
     Ok(())

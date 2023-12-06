@@ -127,11 +127,11 @@ impl<T: Debug> FromResidual<Result<T, anyhow::Error>> for CheckInResult {
 }
 
 pub async fn check_in(token: String, lesson_instance_id: i32) -> CheckInResult {
-    let response: Response = reqwest::Client::new()
+    let response = reqwest::Client::new()
         .post(route(&format!("schedule/check-in/{}", lesson_instance_id)))
         .header("Cookie", format!("connect.digital-attendance={}", token))
         .send()
-        .await.unwrap();
+        .await.context("Failed to perform check_in request to schedule api!")?;
 
     let err_code = response.status().as_u16();
     if response.status().is_success() {
@@ -231,5 +231,4 @@ pub async fn get_current_user(token: String) -> GetCurrentUserResult {
     else {
         return GetCurrentUserResult::WrongToken;
     }
-
 }

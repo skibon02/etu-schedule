@@ -15,7 +15,7 @@ const GROUPS_MERGE_INTERVAL: u64 = 60*5;
 pub async fn periodic_schedule_merge_task(mut con: &mut PoolConnection<Postgres>, mut shutdown_watcher: Receiver<bool>) {
 
     info!("PERIODIC_MERGE_TASK: Phase 1. Initial merge for all groups.");
-    let new_groups = etu_api::get_groups_list().await;
+    let new_groups = etu_api::get_groups_list().await.unwrap();
     data_merges::groups::groups_merge(&new_groups, &mut *con).await.unwrap();
 
     while let Ok(groups) = get_not_merged_sched_group_id_list(&mut *con, 50).await {
