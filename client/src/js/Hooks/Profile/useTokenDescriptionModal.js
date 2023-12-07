@@ -65,5 +65,4 @@ export function useTokenDescriptionModal(showDescription, setShowDescription) {
   }, [showDescription, currentImage]);
 
   return { imageIndex, close, inCSST }
-
 }
