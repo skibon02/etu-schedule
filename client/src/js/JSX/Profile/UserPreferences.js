@@ -67,10 +67,6 @@ function TokenPreference() {
   const [showDeleteTokenModal, setShowDeleteTokenModal] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
 
-  const handleTokenDescription = () => {
-    setShowDescription(true);
-  }
-
   return (
     <>
     <BadAttendanceTokenModal setInputV={setInputV} inCSST={badAttendanceToken} />
@@ -80,7 +76,7 @@ function TokenPreference() {
       <div className={!attendanceToken && !attendanceTokenLoading ? "user-preference__title user-preference__title_underline" : "user-preference__title"}>
         Токен посещаемости:
         <div className='attendance-token__description-container'>
-          <div className="attendance-token__description" onClick={handleTokenDescription}>
+          <div className="attendance-token__description" onClick={() => setShowDescription(true)}>
             Как получить токен?
           </div>
         </div>
