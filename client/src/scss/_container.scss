@@ -6,8 +6,8 @@
 
 body {
   overflow-y: scroll;
-  // font-family: 'Poppins', sans-serif;
   font-family: 'Montserrat', sans-serif;
+  scroll-behavior: smooth;
 }
 
 ::-webkit-scrollbar {
@@ -110,4 +110,6 @@ body {
     height: pxToEm(35px);
   }
 }
+
+
 

@@ -49,7 +49,7 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
 }
 
 .profile {
-  position: relative;
+  // position: relative;
   // border: 1px solid #000;
   display: flex;
   flex-direction: column;
@@ -255,7 +255,7 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
   color: #0b2376;
   font-weight: 300;
   font-size: 0.8em;
-  transition: all .3s ease;
+  transition: all .15s ease;
   padding: pxToEm(5px);
   border: pxToEm(.1px) solid #0b2376;
   border-radius: pxToEm(5px);
@@ -446,6 +446,146 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
   }
 }
 
+.images-carousel-modal {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000000;
+  background: rgba(0, 0, 0, 0.937)000;
+  color: #8c8c8c;
+  display: flex;
+  flex-direction: column;
+
+  &__button {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    font-size: 3em;
+    transition: all .3s ease;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  &__close {
+    width: pxToEm(40px);
+    height: pxToEm(40px);
+    margin-left: auto;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+  }
+
+  &__current {
+  }
+
+  &__all {
+  }
+}
+.carousel-current {
+  width: 100%;
+  height: 86%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: pxToEm(20px);
+
+  &__prev {
+    width: 10%;
+    height: 100%;
+  }
+
+  &__image-container {
+    width: 60%;
+    max-width: pxToEm(2000px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #fff;
+    border-top-right-radius: pxToEm(30px);
+    border-top-left-radius: pxToEm(30px);
+  }
+
+  &__image-description {
+    width: 100%;
+    height: pxToEm(75px);
+    display: flex;
+    gap: pxToEm(20px);
+    font-size: 2em;
+    line-height: 1.2em;
+    padding: pxToEm(10px) pxToEm(20px);
+  }
+
+  &__image-description-number {
+    flex-shrink: 0;
+    color: #000;
+    display: flex;
+    width: pxToEm(20px);
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      width: pxToEm(1.5px);
+      height: pxToEm(25px);
+      background: #0b2376;
+      top: pxToEm(15px);
+      right: pxToEm(-10px)
+    }
+  }
+
+  &__image-description-text {
+    display: flex;
+    align-items: center;
+    color: #000;
+  }
+
+  &__image {
+    width: 100%;
+  }
+
+  &__next {
+    width: 10%;
+    height: 100%;
+  }
+}
+
+.carousel-all {
+  display: flex;
+  gap: pxToEm(20px);
+  height: pxToEm(65px);
+
+  &__image {
+    cursor: pointer;
+    transition: all .3s ease;
+    border-radius: pxToEm(5px);
+    border: pxToEm(2px) solid #5a5a5a;
+    width: pxToEm(100px);
+    opacity: 0.5;
+
+    &:hover {
+      opacity: 0.9;
+    }
+
+    &_active {
+      border: pxToEm(5px) solid #e0e0e0;
+      opacity: 1;
+    }
+  }
+}
+
 .modal-transition-enter {
   opacity: 0;
 }
@@ -473,6 +613,14 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
 @media screen and (max-width: 1200px) {
   .profile {
     width: calc(100% - 80px);
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .carousel-current {
+    &__image-description {
+      font-size: 1.2em;
+    }
   }
 }
 
@@ -594,5 +742,33 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
   
   .are-you-sure {
     font-size: 5vmin;
+  }
+  .images-carousel-modal {
+    color: #8c8c8c;
+  
+    &__button {
+      
+      &:hover {
+        color: #8c8c8c;
+      }
+
+      &:active {
+        color: #fff;
+      }
+    }
+  }
+
+  .carousel-current {
+    &__image-description {
+      font-size: 1.5em;
+      height: pxToEm(100px);
+      padding: pxToEm(10px) pxToEm(10px);
+    }
+
+    &__image-description-number {
+      &::after {
+        top: pxToEm(27px)
+      }
+    }
   }
 }

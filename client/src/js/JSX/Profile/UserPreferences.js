@@ -8,6 +8,7 @@ import { handleEnterUp } from '../../Handlers/Profile/handleEnterUp'
 import { handleConfirmToken } from '../../Handlers/Profile/handleAttendanceToken'
 import BadAttendanceTokenModal from './BadAttendanceTokenModal'
 import DeleteTokenModal from './DeleteTokenModal'
+import TokenDescriptionModal from './TokenDescriptionModal'
 
 function FullNamePreference() {
   const dispatch = useDispatch();
@@ -74,6 +75,7 @@ function TokenPreference() {
     <>
     <BadAttendanceTokenModal setInputV={setInputV} inCSST={badAttendanceToken} />
     <DeleteTokenModal setShowDeleteTokenModal={setShowDeleteTokenModal} inCSST={showDeleteTokenModal} />
+    <TokenDescriptionModal setShowDescription={setShowDescription} showDescription={showDescription} />
     <div className="profile__user-preference user-preference">
       <div className={!attendanceToken && !attendanceTokenLoading ? "user-preference__title user-preference__title_underline" : "user-preference__title"}>
         Токен посещаемости:

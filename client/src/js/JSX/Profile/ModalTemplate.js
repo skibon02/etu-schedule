@@ -13,7 +13,15 @@ export default function ModalTemplate({
 
   // esc / enter listeners
   useEffect(() => {
+    let scrollPosition = window.pageYOffset; 
+
     if (inCSST) {
+      document.body.style.overflowY = 'scroll';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollPosition}px`;
+      document.body.style.width = '100%';
+
+
       const handleKeyUp = (e) => {
         if (e.key === 'Enter') {
           handleConfirm();
@@ -29,6 +37,11 @@ export default function ModalTemplate({
       return () => {
         window.removeEventListener('keyup', handleKeyUp);
       }
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      window.scrollTo(0, scrollPosition); 
     }
   }, [inCSST]);
 
