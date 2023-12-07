@@ -10,19 +10,11 @@ export function useTokenDescriptionModal(showDescription, setShowDescription) {
   }
 
   function next() {
-    if (currentImage === 4) {
-      setCurrentImage(0)
-    } else {
-      setCurrentImage(currentImage + 1)
-    }
+    setCurrentImage(currentImage === 4 ? 0 : currentImage + 1);
   }
 
   function prev() {
-    if (currentImage === 0) {
-      setCurrentImage(4)
-    } else {
-      setCurrentImage(currentImage - 1)
-    }
+    setCurrentImage(currentImage === 0 ? 4 : currentImage - 1);
   }
 
   function current(i) {
@@ -49,6 +41,14 @@ export function useTokenDescriptionModal(showDescription, setShowDescription) {
           close();
           return;
         }
+        if (e.key === 'ArrowLeft') {
+          prev();
+          return;
+        }
+        if (e.key === 'ArrowRight') {
+          next();
+          return;
+        }
       }
       window.addEventListener('keyup', handleKeyUp);
   
@@ -62,7 +62,7 @@ export function useTokenDescriptionModal(showDescription, setShowDescription) {
       window.scrollTo(0, scrollPosition); 
       setCurrentImage(0);
     }
-  }, [showDescription]);
+  }, [showDescription, currentImage]);
 
   return { imageIndex, close, inCSST }
 

@@ -1,10 +1,11 @@
 import { CSSTransition } from "react-transition-group";
 import { images, descriptions } from "../../Utils/Profile/infoTokenDescriptionModal";
 import { useTokenDescriptionModal } from "../../Hooks/Profile/useTokenDescriptionModal";
+import { useEffect } from "react";
 
 export default function TokenDescriptionModal({setShowDescription, showDescription}) {
 
-  const { imageIndex, close, inCSST } = useTokenDescriptionModal(showDescription, setShowDescription)
+  const { imageIndex, close, inCSST } = useTokenDescriptionModal(showDescription, setShowDescription);
 
   return (
     <CSSTransition
