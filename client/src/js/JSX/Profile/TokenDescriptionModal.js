@@ -12,7 +12,7 @@ export default function TokenDescriptionModal({setShowDescription, showDescripti
       timeout={300}
       classNames={'modal-transition'}
       unmountOnExit >
-        <div className="modal-transition images-carousel-modal" onClick={close}>
+        <div className="modal-transition images-carousel-modal">
           <div className="images-carousel-modal__close images-carousel-modal__button" onClick={close}>
             ✖
           </div>
