@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { CSSTransition } from "react-transition-group";
 import { useInCSSTransition } from "../useInCSSTransition";
 
 export function useTokenDescriptionModal(showDescription, setShowDescription) {

@@ -18,7 +18,7 @@ const descriptions = [
   'В открывшемся меню выберите вкладу Network.',
   'Во вкладке Network перейдите в раздел Fetch/XHR и обновите страницу.',
   'В появившемся списке выберете "check-in".',
-  'В разделе Headers пролистайте вниз, пока не увидите "Cookie". Скопируйте всё, что идёт после "connect.digital-attendance=".',
+  'В разделе "Headers" пролистайте вниз, пока не увидите "Cookie". Скопируйте всё, что идёт после "connect.digital-attendance=".',
 ]
 
 export { images, descriptions }
