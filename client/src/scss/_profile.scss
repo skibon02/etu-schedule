@@ -511,9 +511,20 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: #fff;
-    border-top-right-radius: pxToEm(30px);
-    border-top-left-radius: pxToEm(30px);
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: pxToEm(150px);
+      background: #fff;
+      border-top-right-radius: pxToEm(30px);
+      border-top-left-radius: pxToEm(30px);
+    }
   }
 
   &__image-description {
@@ -584,6 +595,24 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
       opacity: 1;
     }
   }
+}
+
+.carousel-transition-enter {
+  opacity: 0;
+}
+
+.carousel-transition-enter-active {
+  opacity: 1;
+  transition: all .3s ease;
+}
+
+.carousel-transition-exit {
+  opacity: 1;
+}
+
+.carousel-transition-exit-active {
+  opacity: 0;
+  transition: all .3s ease;
 }
 
 .modal-transition-enter {
@@ -743,6 +772,7 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
   .are-you-sure {
     font-size: 5vmin;
   }
+
   .images-carousel-modal {
     color: #8c8c8c;
   
@@ -758,16 +788,24 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
     }
   }
 
+
   .carousel-current {
+    &__image-container {
+  
+      &::after {
+        height: pxToEm(195px);
+      }
+    }
+
     &__image-description {
       font-size: 1.5em;
-      height: pxToEm(100px);
+      height: pxToEm(130px);
       padding: pxToEm(10px) pxToEm(10px);
     }
 
     &__image-description-number {
       &::after {
-        top: pxToEm(27px)
+        top: pxToEm(42px)
       }
     }
   }

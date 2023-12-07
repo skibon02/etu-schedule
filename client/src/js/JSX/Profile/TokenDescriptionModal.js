@@ -22,16 +22,18 @@ export default function TokenDescriptionModal({setShowDescription, showDescripti
                 {'<'}
               </div>
               <div className="carousel-current__image-container">
-                <CSSTransition in={inCSST} timeout={300} classNames={'modal-transition'} unmountOnExit>
+                <CSSTransition in={inCSST} timeout={300} classNames={'carousel-transition'} unmountOnExit>
                   <>
-                  <div className="modal-transition carousel-current__image-description">
-                    <div className="carousel-current__image-description-number">{imageIndex.value + 1}</div>
-                    <div className="carousel-current__image-description-text">{descriptions[imageIndex.value]}</div>
+                  <div className="carousel-transition">
+                    <div className="carousel-current__image-description">
+                      <div className="carousel-current__image-description-number">{imageIndex.value + 1}</div>
+                      <div className="carousel-current__image-description-text">{descriptions[imageIndex.value]}</div>
+                    </div>
+                    <img 
+                      className="carousel-current__image" 
+                      src={images[imageIndex.value]} 
+                      key={imageIndex.value} />
                   </div>
-                  <img 
-                    className="modal-transition carousel-current__image" 
-                    src={images[imageIndex.value]} 
-                    key={imageIndex.value} />
                   </>
                 </CSSTransition>
               </div>

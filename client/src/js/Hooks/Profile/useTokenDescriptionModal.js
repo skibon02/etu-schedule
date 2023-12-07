@@ -3,7 +3,7 @@ import { useInCSSTransition } from "../useInCSSTransition";
 
 export function useTokenDescriptionModal(showDescription, setShowDescription) {
   const [currentImage, setCurrentImage] = useState(0);
-  const inCSST = useInCSSTransition(currentImage);
+  const inCSST = useInCSSTransition(currentImage, 0);
 
   function close() {
     setShowDescription(false)

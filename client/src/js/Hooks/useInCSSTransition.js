@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export function useInCSSTransition(dependency) {
+export function useInCSSTransition(dependency, time = 100) {
   const [inCSST, setInCSST] = useState(true);
 
   useEffect(() => {
@@ -8,7 +8,7 @@ export function useInCSSTransition(dependency) {
 
     const timeout = setTimeout(() => {
       setInCSST(true);
-    }, 0);
+    }, time);
 
     return () => clearTimeout(timeout);
   }, [dependency]);

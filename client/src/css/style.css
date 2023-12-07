@@ -1702,6 +1702,16 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+  position: relative;
+}
+.carousel-current__image-container::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 9.375em;
   background: #fff;
   border-top-right-radius: 1.875em;
   border-top-left-radius: 1.875em;
@@ -1781,6 +1791,26 @@ h1, h2, h3, h4, h5, h6 {
 .carousel-all__image_active {
   border: 0.3125em solid #e0e0e0;
   opacity: 1;
+}
+
+.carousel-transition-enter {
+  opacity: 0;
+}
+
+.carousel-transition-enter-active {
+  opacity: 1;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.carousel-transition-exit {
+  opacity: 1;
+}
+
+.carousel-transition-exit-active {
+  opacity: 0;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .modal-transition-enter {
@@ -1942,13 +1972,16 @@ h1, h2, h3, h4, h5, h6 {
   .images-carousel-modal__button:active {
     color: #fff;
   }
+  .carousel-current__image-container::after {
+    height: 12.1875em;
+  }
   .carousel-current__image-description {
     font-size: 1.5em;
-    height: 6.25em;
+    height: 8.125em;
     padding: 0.625em 0.625em;
   }
   .carousel-current__image-description-number::after {
-    top: 1.6875em;
+    top: 2.625em;
   }
 }
 * {
@@ -2190,8 +2223,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .week-transition-enter-active {
   opacity: 1;
-  -webkit-transition: all 0.5s ease;
-  transition: all 0.5s ease;
+  -webkit-transition: all 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 @media screen and (max-width: 1000px) {
