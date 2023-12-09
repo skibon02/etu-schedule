@@ -1,7 +1,6 @@
 import { CSSTransition } from "react-transition-group";
-import { images, descriptions, origins } from "../../Utils/Profile/infoTokenDescriptionModal";
+import { images, descriptions, origins, minies } from "../../Utils/Profile/infoTokenDescriptionModal";
 import { useTokenDescriptionModal } from "../../Hooks/Profile/useTokenDescriptionModal";
-import { useState } from "react";
 
 export default function TokenDescriptionModal({setShowDescription, showDescription}) {
 
@@ -43,7 +42,7 @@ export default function TokenDescriptionModal({setShowDescription, showDescripti
               </div>
             </div>
             <div className="images-carousel-modal__all carousel-all">
-              {images.map((e, i) => 
+              {minies.map((e, i) => 
                 <img 
                   className={imageIndex.value === i ? "carousel-all__image carousel-all__image_active" : "carousel-all__image"} 
                   src={e} 

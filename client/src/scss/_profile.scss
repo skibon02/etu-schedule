@@ -509,7 +509,7 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
   }
 
   &__image-container {
-    width: 60%;
+    width: 65%;
     max-width: pxToEm(2000px);
     display: flex;
     flex-direction: column;
@@ -526,7 +526,7 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
         top: 0;
         left: 0;
         width: 100%;
-        height: pxToEm(150px);
+        height: pxToEm(200px);
         background: #fff;
         border-top-right-radius: pxToEm(30px);
         border-top-left-radius: pxToEm(30px);
@@ -536,7 +536,7 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
 
   &__image-description {
     width: 100%;
-    height: pxToEm(75px);
+    height: pxToEm(100px);
     display: flex;
     gap: pxToEm(20px);
     font-size: 2em;
@@ -559,12 +559,13 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
       width: pxToEm(1.5px);
       height: pxToEm(25px);
       background: #0b2376;
-      top: pxToEm(15px);
+      top: pxToEm(27px);
       right: pxToEm(-10px)
     }
   }
 
   &__image-description-text {
+    font-size: 0.85em;
     display: flex;
     align-items: center;
     color: #000;
@@ -663,18 +664,18 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
   .carousel-current {
     &__image-container {
       &::after {
-        height: pxToEm(170px);
+        height: pxToEm(238px);
       }
     }
 
     &__image-description {
       font-size: 1.7em;
-      height: pxToEm(100px);
+      height: pxToEm(140px);
     }
 
     &__image-description-number {
       &::after {
-        top: pxToEm(28px)
+        top: pxToEm(48px)
       }
     }
   }
@@ -821,19 +822,19 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
       width: 70%;
   
       &::after {
-        height: pxToEm(300px);
+        height: pxToEm(479px);
       }
     }
 
     &__image-description {
       font-size: 2em;
-      height: pxToEm(150px);
+      height: pxToEm(240px);
       padding: pxToEm(10px) pxToEm(10px);
     }
 
     &__image-description-number {
       &::after {
-        top: pxToEm(52px)
+        top: pxToEm(97px)
       }
     }
   }

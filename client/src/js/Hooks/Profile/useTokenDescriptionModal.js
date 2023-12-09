@@ -19,7 +19,7 @@ export function useTokenDescriptionModal(showDescription, setShowDescription) {
     setShowOrigin(false);
     setTimeout(() => {
       setInCSST(true)
-      setCurrentImage(currentImage === 4 ? 0 : currentImage + 1)
+      setCurrentImage(currentImage === 5 ? 0 : currentImage + 1)
     }, 180);
   }
 
@@ -28,7 +28,7 @@ export function useTokenDescriptionModal(showDescription, setShowDescription) {
     setShowOrigin(false);
     setTimeout(() => {
       setInCSST(true)
-      setCurrentImage(currentImage === 0 ? 4 : currentImage - 1)
+      setCurrentImage(currentImage === 0 ? 5 : currentImage - 1)
     }, 180);
   }
 

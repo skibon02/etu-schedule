@@ -1694,7 +1694,7 @@ h1, h2, h3, h4, h5, h6 {
   height: 100%;
 }
 .carousel-current__image-container {
-  width: 60%;
+  width: 65%;
   max-width: 125em;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1720,14 +1720,14 @@ h1, h2, h3, h4, h5, h6 {
   top: 0;
   left: 0;
   width: 100%;
-  height: 9.375em;
+  height: 12.5em;
   background: #fff;
   border-top-right-radius: 1.875em;
   border-top-left-radius: 1.875em;
 }
 .carousel-current__image-description {
   width: 100%;
-  height: 4.6875em;
+  height: 6.25em;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1758,10 +1758,11 @@ h1, h2, h3, h4, h5, h6 {
   width: 0.09375em;
   height: 1.5625em;
   background: #0b2376;
-  top: 0.9375em;
+  top: 1.6875em;
   right: -0.625em;
 }
 .carousel-current__image-description-text {
+  font-size: 0.85em;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1881,14 +1882,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 @media screen and (max-width: 1000px) {
   .carousel-current__image-container::after {
-    height: 10.625em;
+    height: 14.875em;
   }
   .carousel-current__image-description {
     font-size: 1.7em;
-    height: 6.25em;
+    height: 8.75em;
   }
   .carousel-current__image-description-number::after {
-    top: 1.75em;
+    top: 3em;
   }
 }
 @media screen and (max-width: 700px) {
@@ -2003,15 +2004,15 @@ h1, h2, h3, h4, h5, h6 {
     width: 70%;
   }
   .carousel-current__image-container::after {
-    height: 18.75em;
+    height: 29.9375em;
   }
   .carousel-current__image-description {
     font-size: 2em;
-    height: 9.375em;
+    height: 15em;
     padding: 0.625em 0.625em;
   }
   .carousel-current__image-description-number::after {
-    top: 3.25em;
+    top: 6.0625em;
   }
 }
 * {
