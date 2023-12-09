@@ -100,7 +100,6 @@ function TokenPreference() {
           <div 
             className="user-preference__button user-preference__delete-button"
             onClick={() => setShowDeleteTokenModal(true)}>
-            <div className='user-preference__button-mark'>✖</div>
           </div>  
           }
         </div>  

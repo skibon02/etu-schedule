@@ -1,6 +1,22 @@
 import { PlanningButton } from "./PlanningButton";
 
-export default function PlanningHeader({weekParity, setWeekParity}) {
+export default function PlanningHeader({weekParity, setWeekParity, setInCSST}) {
+
+  function handle2() {
+    setInCSST(false);
+    setWeekParity('2');
+    setTimeout(() => {
+      setInCSST(true);
+    }, 100);
+  }
+
+  function handle1() {
+    setInCSST(false);
+    setWeekParity('1');
+    setTimeout(() => {
+      setInCSST(true);
+    }, 100);
+  }
 
   return (
     <>
@@ -9,12 +25,12 @@ export default function PlanningHeader({weekParity, setWeekParity}) {
         parity={'1'}
         selectedParity={weekParity}
         text={'Первая неделя'}
-        handleClick={() => setWeekParity('1')} />
+        handleClick={handle1} />
       <PlanningButton
         parity={'2'}
         selectedParity={weekParity}
         text={'Вторая неделя'}
-        handleClick={() => setWeekParity('2')} />
+        handleClick={handle2} />
     </div>
     <div className="planning-thead">
       <div className="planning-thead__body">

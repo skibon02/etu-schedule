@@ -223,9 +223,6 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
     width: pxToEm(15px);
   }
 
-  &__button-mark {
-  }
-
   &__confirm-button {
     background: url('../icons/check-mark.svg') 50% 50% / 60% no-repeat, #2DB694;
 
@@ -235,10 +232,10 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
   }
 
   &__delete-button {
+    background: url('../icons/cross-mark.svg') 50% 50% / 50% no-repeat, #d60000f4;
 
-    background: #d60000f4;
     &:hover {
-      background: #ff8f8ff4;
+      background-color: #ff8f8ff4;
     }
   }
 }
@@ -473,9 +470,15 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
   }
 
   &__close {
-    width: pxToEm(40px);
+    background: url('../icons/cross-mark.svg') center / 20% no-repeat;
+    filter: brightness(0.7);
+    width: pxToEm(50px);
     height: pxToEm(40px);
     margin-left: auto;
+
+    &:hover {
+      filter: brightness(1);
+    }
   }
 
   &__body {
@@ -491,6 +494,7 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
   &__all {
   }
 }
+
 .carousel-current {
   width: 100%;
   height: 86%;
@@ -511,19 +515,22 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    position: relative;
 
-    &::after {
-      content: '';
-      position: absolute;
-      z-index: -1;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: pxToEm(150px);
-      background: #fff;
-      border-top-right-radius: pxToEm(30px);
-      border-top-left-radius: pxToEm(30px);
+    &_description {
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: pxToEm(150px);
+        background: #fff;
+        border-top-right-radius: pxToEm(30px);
+        border-top-left-radius: pxToEm(30px);
+      }
     }
   }
 
@@ -565,6 +572,13 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
 
   &__image {
     width: 100%;
+    cursor: zoom-in;
+    transition: all .3s ease;
+
+    &_zoom-out {
+      transform: scale(1.4);
+      cursor: zoom-out;
+    }
   }
 
   &__next {
@@ -603,7 +617,7 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
 
 .carousel-transition-enter-active {
   opacity: 1;
-  transition: all .3s ease;
+  transition: all .18s ease;
 }
 
 .carousel-transition-exit {
@@ -612,7 +626,7 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
 
 .carousel-transition-exit-active {
   opacity: 0;
-  transition: all .3s ease;
+  transition: all .18s ease;
 }
 
 .modal-transition-enter {
@@ -647,8 +661,21 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
 
 @media screen and (max-width: 1000px) {
   .carousel-current {
+    &__image-container {
+      &::after {
+        height: pxToEm(170px);
+      }
+    }
+
     &__image-description {
-      font-size: 1.2em;
+      font-size: 1.7em;
+      height: pxToEm(100px);
+    }
+
+    &__image-description-number {
+      &::after {
+        top: pxToEm(28px)
+      }
     }
   }
 }
@@ -791,21 +818,22 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
 
   .carousel-current {
     &__image-container {
+      width: 70%;
   
       &::after {
-        height: pxToEm(195px);
+        height: pxToEm(300px);
       }
     }
 
     &__image-description {
-      font-size: 1.5em;
-      height: pxToEm(130px);
+      font-size: 2em;
+      height: pxToEm(150px);
       padding: pxToEm(10px) pxToEm(10px);
     }
 
     &__image-description-number {
       &::after {
-        top: pxToEm(42px)
+        top: pxToEm(52px)
       }
     }
   }

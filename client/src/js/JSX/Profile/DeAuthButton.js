@@ -12,7 +12,7 @@ export default function DeAuthButton() {
       className='deauth-button-container'
       onClick={() => setShowModal(true)} >
       <div className="deauth-button">
-        <img src={EXIT} alt="" className='deauth-button__image' />
+        <img onContextMenu={(e) => e.preventDefault()} src={EXIT} alt="" className='deauth-button__image' />
         <div className="deauth-button__text-container"><div className='deauth-button__text'>Выйти из профиля</div></div>
         <div className="loader"></div>
       </div>

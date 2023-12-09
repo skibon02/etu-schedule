@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useOnlineStatus } from '../useOnlineStatus';
-import { useDisableImageContextMenu } from '../useDisableImageContextMenu';
 import { useState, useEffect } from 'react';
 import { vkDataFetch } from '../../ReduxStates/Slices/vkDataSlice';
 import { routingFx } from '../../FxFetches/Pages/routingFx';
@@ -14,8 +13,6 @@ export function usePages() {
   const location = useLocation();
   const navigate = useNavigate();
   const online = useOnlineStatus();
-
-  useDisableImageContextMenu(); 
 
   const { groupId, groupNILoading } = useSelector(s => s.groupNI);
   const { vkData } = useSelector(s => s.vkData);

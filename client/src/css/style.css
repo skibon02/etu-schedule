@@ -1361,10 +1361,10 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #7fccb9;
 }
 .user-preference__delete-button {
-  background: rgba(214, 0, 0, 0.9568627451);
+  background: url("../icons/cross-mark.svg") 50% 50%/50% no-repeat, rgba(214, 0, 0, 0.9568627451);
 }
 .user-preference__delete-button:hover {
-  background: rgba(255, 143, 143, 0.9568627451);
+  background-color: rgba(255, 143, 143, 0.9568627451);
 }
 
 .attendance-token__description-container {
@@ -1651,9 +1651,16 @@ h1, h2, h3, h4, h5, h6 {
   color: #fff;
 }
 .images-carousel-modal__close {
-  width: 2.5em;
+  background: url("../icons/cross-mark.svg") center/20% no-repeat;
+  -webkit-filter: brightness(0.7);
+          filter: brightness(0.7);
+  width: 3.125em;
   height: 2.5em;
   margin-left: auto;
+}
+.images-carousel-modal__close:hover {
+  -webkit-filter: brightness(1);
+          filter: brightness(1);
 }
 .images-carousel-modal__body {
   display: -webkit-box;
@@ -1702,9 +1709,11 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+}
+.carousel-current__image-container_description {
   position: relative;
 }
-.carousel-current__image-container::after {
+.carousel-current__image-container_description::after {
   content: "";
   position: absolute;
   z-index: -1;
@@ -1763,6 +1772,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 .carousel-current__image {
   width: 100%;
+  cursor: -webkit-zoom-in;
+  cursor: zoom-in;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+.carousel-current__image_zoom-out {
+  -webkit-transform: scale(1.4);
+      -ms-transform: scale(1.4);
+          transform: scale(1.4);
+  cursor: -webkit-zoom-out;
+  cursor: zoom-out;
 }
 .carousel-current__next {
   width: 10%;
@@ -1799,8 +1819,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .carousel-transition-enter-active {
   opacity: 1;
-  -webkit-transition: all 0.3s ease;
-  transition: all 0.3s ease;
+  -webkit-transition: all 0.18s ease;
+  transition: all 0.18s ease;
 }
 
 .carousel-transition-exit {
@@ -1809,8 +1829,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .carousel-transition-exit-active {
   opacity: 0;
-  -webkit-transition: all 0.3s ease;
-  transition: all 0.3s ease;
+  -webkit-transition: all 0.18s ease;
+  transition: all 0.18s ease;
 }
 
 .modal-transition-enter {
@@ -1860,8 +1880,15 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 @media screen and (max-width: 1000px) {
+  .carousel-current__image-container::after {
+    height: 10.625em;
+  }
   .carousel-current__image-description {
-    font-size: 1.2em;
+    font-size: 1.7em;
+    height: 6.25em;
+  }
+  .carousel-current__image-description-number::after {
+    top: 1.75em;
   }
 }
 @media screen and (max-width: 700px) {
@@ -1972,16 +1999,19 @@ h1, h2, h3, h4, h5, h6 {
   .images-carousel-modal__button:active {
     color: #fff;
   }
+  .carousel-current__image-container {
+    width: 70%;
+  }
   .carousel-current__image-container::after {
-    height: 12.1875em;
+    height: 18.75em;
   }
   .carousel-current__image-description {
-    font-size: 1.5em;
-    height: 8.125em;
+    font-size: 2em;
+    height: 9.375em;
     padding: 0.625em 0.625em;
   }
   .carousel-current__image-description-number::after {
-    top: 2.625em;
+    top: 3.25em;
   }
 }
 * {
@@ -2218,13 +2248,23 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .week-transition-enter {
-  opacity: 0.6;
+  opacity: 0;
 }
 
 .week-transition-enter-active {
   opacity: 1;
-  -webkit-transition: all 0.2s ease;
-  transition: all 0.2s ease;
+  -webkit-transition: all 0.1s ease;
+  transition: all 0.1s ease;
+}
+
+.week-transition-exit {
+  opacity: 1;
+}
+
+.week-transition-exit-active {
+  opacity: 0;
+  -webkit-transition: all 0.1s ease;
+  transition: all 0.1s ease;
 }
 
 @media screen and (max-width: 1000px) {

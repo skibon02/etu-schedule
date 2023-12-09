@@ -1,24 +1,46 @@
 import { useState, useEffect } from "react";
-import { useInCSSTransition } from "../useInCSSTransition";
+// import { useInCSSTransition } from "../useInCSSTransition";
 
 export function useTokenDescriptionModal(showDescription, setShowDescription) {
   const [currentImage, setCurrentImage] = useState(0);
-  const inCSST = useInCSSTransition(currentImage, 0);
+  const [inCSST, setInCSST] = useState(true);
+  const [showOrigin, setShowOrigin] = useState(false);
+
+  function toggleShowOrigin() {
+    setShowOrigin(!showOrigin);
+  }
 
   function close() {
     setShowDescription(false)
   }
 
   function next() {
-    setCurrentImage(currentImage === 4 ? 0 : currentImage + 1);
+    setInCSST(false);
+    setShowOrigin(false);
+    setTimeout(() => {
+      setInCSST(true)
+      setCurrentImage(currentImage === 4 ? 0 : currentImage + 1)
+    }, 180);
   }
 
   function prev() {
-    setCurrentImage(currentImage === 0 ? 4 : currentImage - 1);
+    setInCSST(false);
+    setShowOrigin(false);
+    setTimeout(() => {
+      setInCSST(true)
+      setCurrentImage(currentImage === 0 ? 4 : currentImage - 1)
+    }, 180);
   }
 
   function current(i) {
-    return () => setCurrentImage(i);
+    return () => {
+      setInCSST(false);
+      setShowOrigin(false);
+      setTimeout(() => {
+        setInCSST(true)
+        setCurrentImage(i)
+      }, 180);
+    };
   }
 
   const imageIndex = {
@@ -64,5 +86,5 @@ export function useTokenDescriptionModal(showDescription, setShowDescription) {
     }
   }, [showDescription, currentImage]);
 
-  return { imageIndex, close, inCSST }
+  return { imageIndex, close, inCSST, showOrigin, toggleShowOrigin }
 }

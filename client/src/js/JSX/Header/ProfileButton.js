@@ -13,7 +13,7 @@ export default function ProfileButton() {
           1
         </div>
         }
-        <img className='nav__icon' src={PROFILE} draggable={false} />
+        <img onContextMenu={(e) => e.preventDefault()} className='nav__icon' src={PROFILE} draggable={false} />
       </div>
       <span className='nav__text'>Профиль</span>
     </>

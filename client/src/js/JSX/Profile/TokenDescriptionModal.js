@@ -1,10 +1,11 @@
 import { CSSTransition } from "react-transition-group";
-import { images, descriptions } from "../../Utils/Profile/infoTokenDescriptionModal";
+import { images, descriptions, origins } from "../../Utils/Profile/infoTokenDescriptionModal";
 import { useTokenDescriptionModal } from "../../Hooks/Profile/useTokenDescriptionModal";
+import { useState } from "react";
 
 export default function TokenDescriptionModal({setShowDescription, showDescription}) {
 
-  const { imageIndex, close, inCSST } = useTokenDescriptionModal(showDescription, setShowDescription);
+  const { imageIndex, close, inCSST, showOrigin, toggleShowOrigin } = useTokenDescriptionModal(showDescription, setShowDescription);
 
   return (
     <CSSTransition
@@ -14,24 +15,24 @@ export default function TokenDescriptionModal({setShowDescription, showDescripti
       unmountOnExit >
         <div className="modal-transition images-carousel-modal">
           <div className="images-carousel-modal__close images-carousel-modal__button" onClick={close}>
-            ✖
           </div>
           <div className="images-carousel-modal__body" onClick={(e) => e.stopPropagation()}>
             <div className="images-carousel-modal__current carousel-current">
               <div className="carousel-current__prev images-carousel-modal__button" onClick={imageIndex.prev}>
                 {'<'}
               </div>
-              <div className="carousel-current__image-container">
-                <CSSTransition in={inCSST} timeout={300} classNames={'carousel-transition'} unmountOnExit>
+              <div className={showOrigin ? "carousel-current__image-container" : "carousel-current__image-container carousel-current__image-container_description"}>
+                <CSSTransition in={inCSST} timeout={180} classNames={'carousel-transition'} unmountOnExit>
                   <>
                   <div className="carousel-transition">
-                    <div className="carousel-current__image-description">
+                    {!showOrigin && <div className="carousel-current__image-description">
                       <div className="carousel-current__image-description-number">{imageIndex.value + 1}</div>
                       <div className="carousel-current__image-description-text">{descriptions[imageIndex.value]}</div>
-                    </div>
-                    <img 
-                      className="carousel-current__image" 
-                      src={images[imageIndex.value]} 
+                    </div>}
+                    <img
+                      onClick={toggleShowOrigin}
+                      className={showOrigin ? "carousel-current__image carousel-current__image_zoom-out" : "carousel-current__image"}
+                      src={showOrigin ? origins[imageIndex.value] : images[imageIndex.value]} 
                       key={imageIndex.value} />
                   </div>
                   </>
