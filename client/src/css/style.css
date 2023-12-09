@@ -2014,6 +2014,9 @@ h1, h2, h3, h4, h5, h6 {
   .carousel-current__image-description-number::after {
     top: 6.0625em;
   }
+  .carousel-current__image-description-text {
+    font-size: 1em;
+  }
 }
 * {
   padding: 0;

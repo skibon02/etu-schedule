@@ -837,5 +837,9 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
         top: pxToEm(97px)
       }
     }
+
+    &__image-description-text {
+      font-size: 1em;
+    }
   }
 }
