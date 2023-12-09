@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { images, minies, origins } from "../../Utils/Profile/infoTokenDescriptionModal";
 // import { useInCSSTransition } from "../useInCSSTransition";
 
 export function useTokenDescriptionModal(showDescription, setShowDescription) {
@@ -49,6 +50,18 @@ export function useTokenDescriptionModal(showDescription, setShowDescription) {
     prev: prev,
     current: current,
   }
+
+  useEffect(() => {
+    function preloadImages(urls) {
+      urls.forEach((url) => {
+        const img = new Image();
+        img.src = url;
+      });
+    }
+    preloadImages(images);
+    preloadImages(minies);
+    preloadImages(origins);
+  }, []);
 
   useEffect(() => {
     let scrollPosition = window.pageYOffset; 
