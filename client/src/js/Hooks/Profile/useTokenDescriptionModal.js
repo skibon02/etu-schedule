@@ -83,6 +83,7 @@ export function useTokenDescriptionModal(showDescription, setShowDescription) {
       document.body.style.top = '';
       window.scrollTo(0, scrollPosition); 
       setCurrentImage(0);
+      setShowOrigin(false)
     }
   }, [showDescription, currentImage]);
 
