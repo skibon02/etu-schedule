@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 export default function Week({weekSchedule}) {
 
   const weekNumber = useSelector(s => s.date.weekNumber);
-  const [inCSST, setInCSST] = useState(true);
+  const [inCSST, setInCSST] = useState(false);
   const [week, setWeek] = useState(makeWeek(weekSchedule));
 
   useEffect(() => {

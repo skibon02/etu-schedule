@@ -15,7 +15,13 @@ export default function Planning() {
   const { active } = useSelector(s => s.active);
 
   const [weekParity, setWeekParity] = useState(isEvenWeek(new Date));
-  const [inCSST, setInCSST] = useState(true);
+  const [inCSST, setInCSST] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setInCSST(true);
+    }, 100);
+  }, []);
 
   if (!groupSchedule) {
     return (

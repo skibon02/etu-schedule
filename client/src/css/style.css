@@ -1718,8 +1718,8 @@ h1, h2, h3, h4, h5, h6 {
   position: absolute;
   z-index: -1;
   top: 0;
-  left: 0;
   width: 100%;
+  max-width: 84.6875em;
   height: 12.5em;
   background: #fff;
   border-top-right-radius: 1.875em;
