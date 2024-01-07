@@ -191,3 +191,21 @@ pub async fn invalidate_attendance_token(con: &mut PgConnection, user_id: i32) -
 
     Ok(())
 }
+pub async fn confirm_privilege_level(con: &mut PgConnection, user_id: i32, group_id: i32) -> anyhow::Result<()> {
+    sqlx::query!("UPDATE user_data SET leader_for_group=$1 WHERE user_id = $2",
+        group_id, user_id)
+        .execute(&mut *con).await.context("Failed to clear previous user attendance token")?;
+
+    Ok(())
+}
+
+pub async fn check_privilege_level(con: &mut PgConnection, user_id: i32, group_id: i32) -> anyhow::Result<bool> {
+    let res = sqlx::query_scalar!("SELECT leader_for_group FROM user_data WHERE user_id = $1",
+        user_id)
+        .fetch_optional(&mut *con).await.context("Failed to check privilege level")?;
+
+    match res {
+        Some(leader_for_group) => Ok(leader_for_group == Some(group_id)),
+        None => Ok(false)
+    }
+}

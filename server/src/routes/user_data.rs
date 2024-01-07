@@ -227,7 +227,7 @@ pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<Authorize
 
         info!("Acquiring information about user token...");
         let attendance_user_info = api::etu_attendance_api::get_current_user(token.clone()).await;
-        let group = match attendance_user_info {
+        let (is_leader, group) = match attendance_user_info {
             GetCurrentUserResult::Ok(res) => {
                 debug!("User info for user_id {} request result: {:?}", auth.user_id, res);
                 if res.groups.len() == 0 {
@@ -236,7 +236,7 @@ pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<Authorize
                 if res.groups.len() > 1 {
                     return SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "too_many_groups".to_string() }));
                 }
-                res.groups[0].name.clone()
+                (res.groups[0].UserGroup.role == "leader", res.groups[0].name.clone())
             }
             GetCurrentUserResult::WrongToken => {
                 warn!("Wrong token: {}", token);
@@ -254,6 +254,13 @@ pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<Authorize
         if let Some(new_user_group) = new_user_group {
             info!("group found: id {}", new_user_group.group_id);
             let new_user_group_id = new_user_group.group_id;
+
+            //confirm group leader role
+            if is_leader {
+                info!("User {} is confirmed to be a leader for group {}", auth.user_id, new_user_group_id);
+                // save privilege level to db
+                models::users::confirm_privilege_level(&mut db, new_user_group_id, auth.user_id);
+            }
 
             // -1 in case when group is not set will not be equal to any valid group
             let own_group = models::users::get_user_group(&mut db, auth.user_id).await.unwrap().map(|g| g.group_id).unwrap_or(-1);
