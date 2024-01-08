@@ -97,6 +97,7 @@ pub struct OutputUserDataModel {
     pub group: Option<GroupModel>,
     pub subjects_title_formatting: SubjectsTitleFormatting,
     pub attendance_token: Option<String>,
+    pub leader_for_group: Option<i32>
 }
 
 
@@ -107,6 +108,7 @@ impl Into<OutputUserDataModel> for (UserDataModel, Option<GroupModel>) {
             group: self.0.group_id.map(|_| self.1.unwrap()),
             subjects_title_formatting: self.0.subjects_title_formatting,
             attendance_token: self.0.attendance_token,
+            leader_for_group: self.0.leader_for_group
         }
     }
 }

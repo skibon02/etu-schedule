@@ -1,9 +1,6 @@
 use std::collections::btree_map::Entry::Vacant;
 use std::collections::BTreeMap;
-use std::sync::atomic::AtomicBool;
-use std::sync::Mutex;
-use sqlx::pool::PoolConnection;
-use sqlx::{Acquire, Connection, PgConnection, Postgres};
+use sqlx::{Acquire, Connection, PgConnection};
 use crate::models;
 use crate::models::schedule::WeekDay;
 use crate::models::subjects::SubjectModel;

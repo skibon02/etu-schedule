@@ -144,7 +144,8 @@ pub struct UserDataModel {
     pub group_id: Option<i32>,
     pub subjects_title_formatting: SubjectsTitleFormatting,
     pub last_known_schedule_generation: Option<i32>,
-    pub attendance_token: Option<String>
+    pub attendance_token: Option<String>,
+    pub leader_for_group: Option<i32>
 }
 
 
@@ -161,7 +162,7 @@ pub async fn set_user_data(con: &mut PgConnection, user_id: i32,  data: UserData
 pub async fn get_user_data(con: &mut PgConnection, user_id: i32) -> anyhow::Result<UserDataModel> {
     let res = sqlx::query_as!(UserDataModel,
         "SELECT subjects_title_formatting as \"subjects_title_formatting: SubjectsTitleFormatting\",\
-         user_id, group_id, last_known_schedule_generation, attendance_token FROM user_data WHERE user_id = $1",
+         user_id, group_id, last_known_schedule_generation, attendance_token, leader_for_group FROM user_data WHERE user_id = $1",
         user_id
     )
         .fetch_one(&mut *con).await?;

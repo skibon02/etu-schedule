@@ -4,6 +4,7 @@ pub mod schedule;
 pub mod subjects;
 pub mod teachers;
 pub mod attendance;
+pub mod notes;
 
 use rocket_db_pools::{sqlx, Database};
 

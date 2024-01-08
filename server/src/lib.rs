@@ -10,21 +10,16 @@ extern crate rocket;
 
 use rocket::data::FromData;
 use rocket::fairing::{AdHoc, Fairing, Info, Kind};
-use rocket::http::hyper::request;
 use rocket::outcome::Outcome;
 use rocket::request::FromRequest;
-use rocket::{Build, Config, Data, fairing, Request, Response, Rocket, tokio};
+use rocket::{Build, Config, fairing, Request, Response, Rocket, tokio};
 use rocket::http::{Header, Status};
 use crate::models::Db;
 use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use std::{env, fs};
-use std::collections::BTreeMap;
 use std::fmt::Arguments;
-use std::fs::OpenOptions;
 use std::io::Write;
-use std::sync::atomic::AtomicUsize;
-use std::time::Instant;
 
 use rocket::fs::{FileServer, NamedFile};
 
@@ -143,16 +138,9 @@ use log::{LevelFilter, Record};
 use rand::Rng;
 use rocket::response::Responder;
 use rocket_db_pools::Database;
-use sqlx::PgConnection;
-use tokio::select;
 use regex::Regex;
-use tokio::sync::{Notify, watch};
-use crate::api::etu_api;
+use tokio::sync::watch;
 use crate::api::vk_api::VK_SERVICE_TOKEN;
-use crate::models::groups::{DepartmentModel, get_not_merged_sched_group_id_list};
-use crate::models::schedule::{ScheduleObjModel};
-use crate::models::subjects::{get_subjects_cur_gen, SubjectModel};
-use crate::models::teachers::{get_teachers_cur_gen, TeacherModel};
 
 
 fn loglevel_formatter(level: &log::Level) -> ColoredString {
