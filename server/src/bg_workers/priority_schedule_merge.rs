@@ -45,7 +45,7 @@ pub async fn priority_schedule_merge_task(mut con: &mut PoolConnection<Postgres>
                         }
                     },
                     Err(_) => {
-                        error!("PRIORITY_MERGE_TASK: Non-existing group merge requested!");
+                        warn!("PRIORITY_MERGE_TASK: Non-existing group merge requested: {}!", request);
                         continue;
                     }
                 }
