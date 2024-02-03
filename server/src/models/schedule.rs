@@ -1,9 +1,12 @@
 use anyhow::Context;
+use rocket::serde::json::Json;
 use rocket::time::PrimitiveDateTime;
 use rocket_db_pools::Connection;
 use sqlx::{Acquire, PgConnection, Postgres};
 use sqlx::pool::PoolConnection;
+use crate::models;
 use crate::models::Db;
+use crate::routes::ResponseErrorMessage;
 
 #[derive(sqlx::Type, Default, Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 #[sqlx(type_name="week_day", rename_all="UPPERCASE")]
@@ -177,4 +180,40 @@ pub async fn get_current_schedule_for_group_with_subject(con: &mut PgConnection,
         .fetch_all(&mut *con).await?;
 
     Ok(res)
+}
+
+pub enum TimeLinkValidResult {
+    Success(bool),
+    ErrorUserMessage(String)
+}
+
+pub async fn is_time_link_id_valid_for_user(con: &mut PgConnection, time_link_id: i32, user_id: i32) -> anyhow::Result<TimeLinkValidResult> {
+
+    // get user saved attendance schedule elements
+    let group_id = models::users::get_user_group(con, user_id).await;
+    if let Err(e) = group_id {
+        error!("Failed to get user group: {:?}", e);
+        return Ok(TimeLinkValidResult::ErrorUserMessage("Failed to get user group!".to_string()));
+    }
+    let group_id = group_id.unwrap();
+
+    if group_id.is_none() {
+        return Ok(TimeLinkValidResult::ErrorUserMessage("User has no group!".to_string()));
+    }
+    let group_id = group_id.unwrap().group_id;
+
+    // get user group link_id elements
+    let schedule_link_ids = models::schedule::get_current_schedule_link_ids(con, group_id).await;
+
+    if let Err(e) = schedule_link_ids {
+        error!("Failed to get user group schedule link ids: {:?}", e);
+        return Ok(TimeLinkValidResult::ErrorUserMessage("Failed to get user group schedule link ids!".to_string()));
+    }
+    let schedule_link_ids = schedule_link_ids.unwrap();
+
+    if !schedule_link_ids.contains(&time_link_id) {
+        return Ok(TimeLinkValidResult::Success(false))
+    }
+
+    Ok(TimeLinkValidResult::Success(true))
 }

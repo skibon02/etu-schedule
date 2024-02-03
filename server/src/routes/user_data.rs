@@ -261,7 +261,7 @@ pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<Authorize
             if is_leader {
                 info!("User {} is confirmed to be a leader for group {}", auth.user_id, new_user_group_id);
                 // save privilege level to db
-                models::users::confirm_privilege_level(&mut db, new_user_group_id, auth.user_id);
+                models::users::confirm_privilege_level(&mut db, new_user_group_id, auth.user_id).await.unwrap();
             }
 
             // -1 in case when group is not set will not be equal to any valid group

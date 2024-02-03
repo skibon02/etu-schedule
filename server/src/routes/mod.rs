@@ -5,6 +5,7 @@ pub mod auth;
 pub mod schedule;
 mod user_data;
 mod attendance;
+mod notes;
 
 
 #[derive(Serialize)]
@@ -26,5 +27,6 @@ pub fn get_api_routes() -> Vec<Route> {
     routes.append(&mut schedule::get_routes());
     routes.append(&mut user_data::get_routes());
     routes.append(&mut attendance::get_routes());
+    routes.append(&mut notes::get_routes());
     routes
 }

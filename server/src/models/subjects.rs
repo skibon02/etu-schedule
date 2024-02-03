@@ -1,6 +1,5 @@
 use anyhow::Context;
 use rocket::time::PrimitiveDateTime;
-use sqlx::pool::PoolConnection;
 use sqlx::{Acquire, PgConnection, Postgres, Transaction};
 
 #[derive(sqlx::FromRow, Debug, Clone, PartialEq)]
