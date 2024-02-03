@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
+use std::time::Duration;
 
 use crate::models::groups::{DepartmentModel, FacultyModel, GroupModel};
 use crate::models::schedule::{ScheduleObjModel, WeekDay};
@@ -37,13 +38,13 @@ pub struct SubjectDepartmentOriginal {
     pub _type: String,
 }
 
-impl Into<DepartmentModel> for SubjectDepartmentOriginal {
-    fn into(self) -> DepartmentModel {
+impl From<SubjectDepartmentOriginal> for DepartmentModel {
+    fn from(other: SubjectDepartmentOriginal) -> DepartmentModel {
         DepartmentModel {
-            department_id: self.id,
-            title: self.title,
-            long_title: self.long_title,
-            department_type: self._type,
+            department_id: other.id,
+            title: other.title,
+            long_title: other.long_title,
+            department_type: other._type,
             faculty_id: None,
         }
     }
@@ -306,11 +307,15 @@ pub async fn get_schedule_objs_group(group: u32) -> anyhow::Result<Option<GroupS
         BASE_URL_SCHEDULE,
         group
     );
-    let response = reqwest::get(&url).await?;
+    let response = reqwest::Client::new()
+        .get(&url)
+        .timeout(Duration::from_secs(5))
+        .send()
+        .await?;
     let body = response.text().await?;
 
     let parsed_objs = parse_schedule_objs_groups(body)?;
-    Ok(parsed_objs.get(0).cloned())
+    Ok(parsed_objs.first().cloned())
 }
 
 pub async fn get_schedule_objs_groups(
@@ -321,7 +326,11 @@ pub async fn get_schedule_objs_groups(
         BASE_URL_SCHEDULE,
         groups.iter().map(|g| "groups=".to_string()+&g.to_string()).collect::<Vec<String>>().join("&")
     );
-    let response = reqwest::get(&url).await?;
+    let response = reqwest::Client::new()
+        .get(&url)
+        .timeout(Duration::from_secs(5))
+        .send()
+        .await?;
     let body = response.text().await?;
 
     let parsed_objs = parse_schedule_objs_groups(body)?;
@@ -574,7 +583,11 @@ pub async fn get_groups_list() -> anyhow::Result<Vec<GroupOriginal>> {
         "{}dicts/groups?scheduleId=594&withFaculty=true&withSemesterSeasons=false&withFlows=false",
         BASE_URL_GENERAL
     );
-    let response = reqwest::get(&url).await?;
+    let response = reqwest::Client::new()
+        .get(&url)
+        .timeout(Duration::from_secs(5))
+        .send()
+        .await?;
     let body = response.text().await?;
 
     parse_groups(body)

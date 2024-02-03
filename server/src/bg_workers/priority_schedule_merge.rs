@@ -26,6 +26,7 @@ pub async fn priority_schedule_merge_task(
     // for balancing forced requests
     let mut last_etu_request =
         Instant::now() - tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL);
+    let mut fail_counter = 0;
     loop {
         select!(
             Some(request) = rx.recv() => {
@@ -38,12 +39,12 @@ pub async fn priority_schedule_merge_task(
                         match time {
                             Some(time) => {
                                 if time < SINGLE_GROUP_INTERVAL {
-                                    warn!("PRIORITY_MERGE_TASK: Last merge for group {} was {} seconds ago, skipping...", request, time);
+                                    info!("PRIORITY_MERGE_TASK: Last merge for group {} was {} seconds ago, skipping...", request, time);
                                     continue;
                                 }
                             },
                             None => {
-                                warn!("PRIORITY_MERGE_TASK: Group schedule was never requested! Launching merge...");
+                                info!("PRIORITY_MERGE_TASK: Group schedule was never requested! Launching merge...");
                             }
                         }
                     },
@@ -54,7 +55,7 @@ pub async fn priority_schedule_merge_task(
                 }
 
                 if Instant::now() - last_etu_request < tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL) {
-                    warn!("PRIORITY_MERGE_TASK: Last ETU request was {} seconds ago, waiting...", (Instant::now() - last_etu_request).as_secs());
+                    info!("PRIORITY_MERGE_TASK: Last ETU request was {} seconds ago, waiting...", (Instant::now() - last_etu_request).as_secs());
                     select!(
                         _ = tokio::time::sleep(tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL) - (Instant::now() - last_etu_request)) => {}
                         _ = shutdown_watcher.changed() => {
@@ -65,7 +66,14 @@ pub async fn priority_schedule_merge_task(
                 }
                 last_etu_request = Instant::now();
 
-                process_schedule_merge(vec![request], &mut con).await;
+                if let Err(e) = process_schedule_merge(vec![request], &mut con).await {
+                    warn!("PRIORITY_MERGE_TASK: Error while merging group {}: {:?}", request, e);
+                    fail_counter += 1;
+                    if fail_counter > 5 {
+                        error!("PRIORITY_MERGE_TASK: Too many fails, interrupting task...");
+                        return;
+                    }
+                }
             }
             _ = shutdown_watcher.changed() => {
                 warn!("PRIORITY_MERGE_TASK: Shutdown notification recieved! exiting task...");

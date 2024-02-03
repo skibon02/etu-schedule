@@ -2,6 +2,7 @@ use reqwest::Response;
 use rocket::serde::json::Json;
 use serde_json::Value;
 use std::sync::{Arc, OnceLock};
+use std::time::Duration;
 
 #[allow(dead_code)]
 static VK_APP_ID: &str = "7918120";
@@ -19,6 +20,7 @@ pub async fn users_get(access_token: &str, fields: &str) -> Option<Json<Value>> 
             ("access_token", access_token),
             ("v", "5.131"),
         ])
+        .timeout(Duration::from_secs(3))
         .send()
         .await
         .ok()?;
@@ -30,7 +32,7 @@ pub async fn users_get(access_token: &str, fields: &str) -> Option<Json<Value>> 
 }
 
 /// takes silent token and returns access token
-pub async fn exchange_access_token(silent_token: &str, uuid: &str) -> String {
+pub async fn exchange_access_token(silent_token: &str, uuid: &str) -> Option<String> {
     let response: Response = reqwest::Client::new()
         .get("https://api.vk.com/method/auth.exchangeSilentAuthToken")
         .query(&[
@@ -39,6 +41,7 @@ pub async fn exchange_access_token(silent_token: &str, uuid: &str) -> String {
             ("access_token", &get_app_service_token()),
             ("v", "5.131"),
         ])
+        .timeout(Duration::from_secs(2))
         .send()
         .await
         .unwrap();
@@ -47,5 +50,5 @@ pub async fn exchange_access_token(silent_token: &str, uuid: &str) -> String {
     debug!("> VK: exchange_access_token response: {:?}", json);
     let access_token = json["response"]["access_token"].as_str().unwrap();
 
-    access_token.to_string()
+    Some(access_token.to_string())
 }

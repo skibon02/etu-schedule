@@ -1,9 +1,9 @@
 use std::fmt::Debug;
+use std::time::Duration;
 
 use anyhow::Context;
 use reqwest::Response;
 
-use crate::models::DbResult;
 use serde_json::Value;
 
 #[derive(serde::Deserialize, Debug)]
@@ -15,9 +15,10 @@ pub struct TimeResponse {
 fn route(query: &str) -> String {
     format!("https://digital.etu.ru/attendance/api/{}", query)
 }
-pub async fn get_time() -> DbResult<TimeResponse> {
+pub async fn get_time() -> anyhow::Result<TimeResponse> {
     let response: Response = reqwest::Client::new()
         .get(route("settings/time"))
+        .timeout(Duration::from_secs(1))
         .send()
         .await?;
 
@@ -68,10 +69,11 @@ pub enum GetScheduleResult {
     WrongToken,
 }
 
-pub async fn get_cur_schedule(token: String) -> DbResult<GetScheduleResult> {
+pub async fn get_cur_schedule(token: String) -> anyhow::Result<GetScheduleResult> {
     let response: Response = reqwest::Client::new()
         .get(route("schedule/check-in"))
         .header("Cookie", format!("connect.digital-attendance={}", token))
+        .timeout(Duration::from_secs(1))
         .send()
         .await
         .context("Cannot make fetch to schedule from etu attendance")?;
@@ -123,10 +125,11 @@ pub enum CheckInResult {
     WrongToken,
 }
 
-pub async fn check_in(token: String, lesson_instance_id: i32) -> DbResult<CheckInResult> {
+pub async fn check_in(token: String, lesson_instance_id: i32) -> anyhow::Result<CheckInResult> {
     let response = reqwest::Client::new()
         .post(route(&format!("schedule/check-in/{}", lesson_instance_id)))
         .header("Cookie", format!("connect.digital-attendance={}", token))
+        .timeout(Duration::from_secs(1))
         .send()
         .await
         .context("Failed to perform check_in request to schedule api!")?;
@@ -223,10 +226,11 @@ pub enum GetCurrentUserResult {
     Ok(UserResponse),
     WrongToken,
 }
-pub async fn get_current_user(token: String) -> DbResult<GetCurrentUserResult> {
+pub async fn get_current_user(token: String) -> anyhow::Result<GetCurrentUserResult> {
     let response: Response = reqwest::Client::new()
         .get(route("auth/current-user"))
         .header("Cookie", format!("connect.digital-attendance={}", token))
+        .timeout(Duration::from_secs(1))
         .send()
         .await
         .context("Cannot make fetch to current user from etu attendance")?;

@@ -7,6 +7,7 @@ pub use attendance_keep_alive::*;
 pub mod attendance_worker;
 pub use attendance_worker::*;
 
+use anyhow::Context;
 use sqlx::PgConnection;
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -20,20 +21,23 @@ use crate::models::teachers::{get_teachers_cur_gen, TeacherModel};
 
 const ETU_REQUEST_INTERVAL: u64 = 15;
 
-async fn process_schedule_merge(group_id_vec: Vec<i32>, con: &mut PgConnection) {
-    let new_groups = etu_api::get_groups_list().await.unwrap();
-    data_merges::groups::groups_merge(&new_groups, &mut *con)
+async fn process_schedule_merge(
+    group_id_vec: Vec<i32>,
+    con: &mut PgConnection,
+) -> anyhow::Result<()> {
+    let new_groups = etu_api::get_groups_list()
         .await
-        .unwrap();
+        .context("Getting ETU groups list from process_schedule_merge")?;
+    data_merges::groups::groups_merge(&new_groups, &mut *con).await?;
 
     info!("BGTASK: Starting merge for groups: {:?}", group_id_vec);
     let start = Instant::now();
     let sched_objs = etu_api::get_schedule_objs_groups(group_id_vec.clone())
         .await
-        .unwrap();
+        .context("Getting schedule objs groups from process_schedule_merge")?;
 
-    let last_subjects_generation = get_subjects_cur_gen(&mut *con).await.unwrap();
-    let last_teachers_generation = get_teachers_cur_gen(&mut *con).await.unwrap();
+    let last_subjects_generation = get_subjects_cur_gen(&mut *con).await?;
+    let last_teachers_generation = get_teachers_cur_gen(&mut *con).await?;
 
     //TODO: parallelize with rayon
     for (group_id, sched_objs) in sched_objs {
@@ -70,23 +74,21 @@ async fn process_schedule_merge(group_id_vec: Vec<i32>, con: &mut PgConnection) 
         }
         for department in departments {
             data_merges::groups::department_single_merge(department, None, &mut *con)
-                .await
-                .unwrap();
+                .await?;
         }
 
         data_merges::subjects::subjects_merge(&subjects, last_subjects_generation, &mut *con)
-            .await
-            .unwrap();
+            .await?;
         data_merges::teachers::teachers_merge(teachers, last_teachers_generation, &mut *con)
-            .await
-            .unwrap();
+            .await?;
         data_merges::schedule::schedule_objs_merge(group_id, &sched_objs_models, &mut *con)
-            .await
-            .unwrap();
+            .await?;
     }
     info!(
         "BGTASK: Merge for {} groups finished in {:?}",
         group_id_vec.len(),
         Instant::now() - start
     );
+
+    Ok(())
 }

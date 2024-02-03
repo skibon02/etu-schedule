@@ -1,3 +1,4 @@
+use anyhow::bail;
 use std::collections::BTreeSet;
 
 use chrono::{Datelike, NaiveTime, TimeZone};
@@ -61,121 +62,16 @@ pub async fn attendance_worker_task(
     // user_id, time_link_id, week_num
     let mut processed_check_ins = BTreeSet::<(i32, i32, i32)>::new();
 
+    let mut fail_counter = 0;
     loop {
         select!(
             _ = tokio::time::sleep(tokio::time::Duration::from_secs(60)) => {
-                debug!("ATTENDANCE_WORKER_TASK: 60 secs passed, starting attendance worker routine...");
-                let time = api::etu_attendance_api::get_time().await;
-                let Ok(time) = time else {
-                    error!("Failed to get time from etu attendance! Unknown response: {:#?}", time);
-                    continue;
-                };
-
-                let local_time_utc = time.time.parse::<chrono::DateTime<chrono::Utc>>().unwrap();
-
-                let local_time = local_time_utc.with_timezone(&chrono_tz::Europe::Moscow);
-                let day_of_week = local_time.weekday().num_days_from_monday() as u64;
-                let day_of_week = models::schedule::WeekDay::try_from(day_of_week as u32).unwrap();
-                let week_parity = time.week;
-                let week_num = (local_time - semester_start_week).num_weeks();
-                let lesson_time_num = time_to_lesson_time_num(local_time.time());
-                let Some(lesson_time_num) = lesson_time_num else {
-                    debug!("No lesson at this time! Skipping...");
-                    continue;
-                };
-
-                debug!("Ready for attendance check! Current time: {:#?}", local_time);
-                debug!("day_of_week: {:#?}", day_of_week);
-                debug!("week_parity: {:#?}", week_parity);
-                debug!("week_num: {:#?}", week_num);
-                debug!("lesson_time_num: {:#?}", lesson_time_num);
-                debug!("Time: {:#?}", local_time.time());
-
-                let (user_schedule_info, subjects) =
-                    models::attendance::get_current_pending_attendance_marks(&mut *con, week_num, day_of_week, lesson_time_num).await.unwrap();
-                trace!("objs: {:#?}", user_schedule_info);
-                for user_schedule in user_schedule_info {
-                    let Some(token) = user_schedule.user_data.clone().attendance_token else {
-                        error!("User {} has no attendance token!", user_schedule.user_id);
-                        error!("Shutting down ATTENDANCE_WORKER_TASK...");
+                if let Err(e) = attendance_set_marks(semester_start_week, &mut *con, &mut processed_check_ins).await {
+                    warn!("attendance_set_marks failed: {:#?}", e);
+                    fail_counter += 1;
+                    if fail_counter > 5 {
+                        warn!("attendance_set_marks failed 5 times in a row! Exiting task...");
                         return;
-                    };
-
-                    //wait 5s
-                    tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
-
-                    //make request
-                    let schedule = api::etu_attendance_api::get_cur_schedule(token.clone()).await.unwrap();
-                    if let GetScheduleResult::WrongToken = schedule {
-                        warn!("Wrong token for user_id: {:?} (group_id: {:?})! Invalidating user token...",
-                            user_schedule.user_data.user_id, user_schedule.user_data.group_id);
-                        models::users::invalidate_attendance_token(&mut *con, user_schedule.user_id).await.unwrap();
-                        continue;
-                    }
-                    let GetScheduleResult::Ok(schedule) = schedule else {
-                        error!("Failed to get schedule for user_id: {:?} (group_id: {:?})! Unknown response: {:?}",
-                            user_schedule.user_data.user_id, user_schedule.user_data.group_id, schedule);
-                        continue;
-                    };
-
-                    let current_subjects: Vec<_> = schedule.iter().filter(|x| {
-                        x.check_in_start.parse::<chrono::DateTime<chrono::Utc>>().unwrap() <= local_time_utc &&
-                        x.check_in_deadline.parse::<chrono::DateTime<chrono::Utc>>().unwrap() >= local_time_utc
-                    }).collect();
-                    debug!("current_subjects: {:#?}", current_subjects);
-
-                    info!("User_id: {:?} (group_id: {:?}), user_schedule.attend_lessons: {:#?}", user_schedule.user_data.user_id, user_schedule.user_data.group_id, user_schedule.attend_lessons.iter().map(|(_, subject_id)| {
-                        let subject = subjects.get(&subject_id).unwrap();
-                        subject.title.clone()
-                    }).collect::<Vec<_>>());
-
-                    //iterate over lessons
-                    for (time_link_id, subject_id) in user_schedule.attend_lessons {
-                        let subject_title = subjects[&subject_id].title.clone();
-                        let subject_type = subjects[&subject_id].subject_type.clone();
-                        let short_title = subjects[&subject_id].short_title.clone();
-
-                        if processed_check_ins.contains(&(user_schedule.user_id, time_link_id, week_num as i32)) {
-                            debug!("Check in for user_id: {:?} (group_id: {:?}), time_link_id: {:?} already processed! Skipping...", user_schedule.user_data.user_id, user_schedule.user_data.group_id, time_link_id);
-                            continue;
-                        }
-
-                        info!("finding match for subject_title: {:#?}...", subject_title);
-
-                        let mut found_id = None;
-                        for current_subject in &current_subjects {
-                            if current_subject.lesson.title == subject_title && current_subject.lesson.subject_type == subject_type
-                            && current_subject.lesson.short_title == short_title {
-                                found_id = Some(current_subject.id);
-                                break;
-                            }
-                        }
-                        if let Some(id) = found_id {
-                            info!("Found subject from attendance system: {:#?}", id);
-                            info!("Processing check_in...");
-                            let check_in_res = api::etu_attendance_api::check_in(token.clone(), id).await.unwrap();
-                            match check_in_res {
-                                CheckInResult::Ok => {
-                                    info!("Check in success!");
-                                    // models::attendance::set_attendance_mark(&mut *trx, time_link_id, true).await.unwrap();
-                                    processed_check_ins.insert((user_schedule.user_id, time_link_id, week_num as i32));
-                                }
-                                CheckInResult::WrongToken => {
-                                    warn!("Wrong token for user_id: {:?} (group_id: {:?})! Invalidating user token...",
-                                        user_schedule.user_data.user_id, user_schedule.user_data.group_id);
-                                    models::users::invalidate_attendance_token(&mut *con, user_schedule.user_id).await.unwrap();
-                                    continue;
-                                }
-                                other => {
-                                    warn!("Check in failed: Unknown response: {:#?}", other);
-                                    error!("Shutting down ATTENDANCE_WORKER_TASK...");
-                                    return;
-                                }
-                            }
-                        }
-                        else {
-                            warn!("Failed to find subject from attendance system!");
-                        }
                     }
                 }
             }
@@ -185,4 +81,161 @@ pub async fn attendance_worker_task(
             }
         );
     }
+}
+
+pub async fn attendance_set_marks(
+    semester_start_week: chrono::DateTime<chrono_tz::Tz>,
+    con: &mut PoolConnection<Postgres>,
+    processed_check_ins: &mut BTreeSet<(i32, i32, i32)>,
+) -> anyhow::Result<()> {
+    trace!("ATTENDANCE_WORKER_TASK: 60 secs passed, starting attendance worker routine...");
+    let time = api::etu_attendance_api::get_time().await?;
+
+    let local_time_utc = time.time.parse::<chrono::DateTime<chrono::Utc>>().unwrap();
+
+    let local_time = local_time_utc.with_timezone(&chrono_tz::Europe::Moscow);
+    let day_of_week = local_time.weekday().num_days_from_monday() as u64;
+    let day_of_week = models::schedule::WeekDay::try_from(day_of_week as u32).unwrap();
+    let week_parity = time.week;
+    let week_num = (local_time - semester_start_week).num_weeks();
+    let lesson_time_num = time_to_lesson_time_num(local_time.time());
+    let Some(lesson_time_num) = lesson_time_num else {
+        debug!("No lesson at this time! Skipping...");
+        bail!("No lesson at this time! Skipping...");
+    };
+
+    debug!(
+        "Ready for attendance check! Current time: {:#?}",
+        local_time
+    );
+    debug!("day_of_week: {:#?}", day_of_week);
+    debug!("week_parity: {:#?}", week_parity);
+    debug!("week_num: {:#?}", week_num);
+    debug!("lesson_time_num: {:#?}", lesson_time_num);
+    debug!("Time: {:#?}", local_time.time());
+
+    let (user_schedule_info, subjects) = models::attendance::get_current_pending_attendance_marks(
+        &mut *con,
+        week_num,
+        day_of_week,
+        lesson_time_num,
+    )
+    .await?;
+    trace!("objs: {:#?}", user_schedule_info);
+    'users: for user_schedule in user_schedule_info {
+        let Some(token) = user_schedule.user_data.clone().attendance_token else {
+            error!("User {} has no attendance token!", user_schedule.user_id);
+            bail!("No attendance token");
+        };
+
+        //wait 5s
+        tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
+
+        //make request
+        let schedule = api::etu_attendance_api::get_cur_schedule(token.clone()).await?;
+        if let GetScheduleResult::WrongToken = schedule {
+            warn!(
+                "Wrong token for user_id: {:?} (group_id: {:?})! Invalidating user token...",
+                user_schedule.user_data.user_id, user_schedule.user_data.group_id
+            );
+            models::users::invalidate_attendance_token(&mut *con, user_schedule.user_id).await?;
+            continue;
+        }
+        let GetScheduleResult::Ok(schedule) = schedule else {
+            error!(
+                "Failed to get schedule for user_id: {:?} (group_id: {:?})! Unknown response: {:?}",
+                user_schedule.user_data.user_id, user_schedule.user_data.group_id, schedule
+            );
+            continue;
+        };
+
+        let current_subjects: Vec<_> = schedule
+            .iter()
+            .filter(|x| {
+                x.check_in_start
+                    .parse::<chrono::DateTime<chrono::Utc>>()
+                    .unwrap()
+                    <= local_time_utc
+                    && x.check_in_deadline
+                        .parse::<chrono::DateTime<chrono::Utc>>()
+                        .unwrap()
+                        >= local_time_utc
+            })
+            .collect();
+        debug!("current_subjects: {:#?}", current_subjects);
+
+        info!(
+            "User_id: {:?} (group_id: {:?}), user_schedule.attend_lessons: {:#?}",
+            user_schedule.user_data.user_id,
+            user_schedule.user_data.group_id,
+            user_schedule
+                .attend_lessons
+                .iter()
+                .map(|(_, subject_id)| {
+                    let subject = subjects.get(&subject_id).unwrap();
+                    subject.title.clone()
+                })
+                .collect::<Vec<_>>()
+        );
+
+        //iterate over lessons
+        'lessons: for (time_link_id, subject_id) in user_schedule.attend_lessons {
+            let subject_title = subjects[&subject_id].title.clone();
+            let subject_type = subjects[&subject_id].subject_type.clone();
+            let short_title = subjects[&subject_id].short_title.clone();
+
+            if processed_check_ins.contains(&(user_schedule.user_id, time_link_id, week_num as i32))
+            {
+                debug!("Check in for user_id: {:?} (group_id: {:?}), time_link_id: {:?} already processed! Skipping...", user_schedule.user_data.user_id, user_schedule.user_data.group_id, time_link_id);
+                continue;
+            }
+
+            info!("finding match for subject_title: {:#?}...", subject_title);
+
+            let mut found_id = None;
+            for current_subject in &current_subjects {
+                if current_subject.lesson.title == subject_title
+                    && current_subject.lesson.subject_type == subject_type
+                    && current_subject.lesson.short_title == short_title
+                {
+                    found_id = Some(current_subject.id);
+                    break;
+                }
+            }
+            if let Some(id) = found_id {
+                info!("Found subject from attendance system: {:#?}", id);
+                info!("Processing check_in...");
+                let check_in_res = api::etu_attendance_api::check_in(token.clone(), id).await?;
+                match check_in_res {
+                    CheckInResult::Ok => {
+                        info!("Check in success!");
+                        // models::attendance::set_attendance_mark(&mut *trx, time_link_id, true).await.unwrap();
+                        processed_check_ins.insert((
+                            user_schedule.user_id,
+                            time_link_id,
+                            week_num as i32,
+                        ));
+                    }
+                    CheckInResult::WrongToken => {
+                        warn!("Wrong token for user_id: {:?} (group_id: {:?})! Invalidating user token...",
+                                        user_schedule.user_data.user_id, user_schedule.user_data.group_id);
+                        models::users::invalidate_attendance_token(
+                            &mut *con,
+                            user_schedule.user_id,
+                        )
+                        .await?;
+                        continue 'users;
+                    }
+                    other => {
+                        warn!("Check in failed: Unknown response: {:#?}", other);
+                        bail!("Check in failed: Unknown response");
+                    }
+                }
+            } else {
+                warn!("Failed to find subject from attendance system!");
+            }
+        }
+    }
+
+    Ok(())
 }
