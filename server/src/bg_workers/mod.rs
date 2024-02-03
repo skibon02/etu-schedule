@@ -7,10 +7,9 @@ pub use attendance_keep_alive::*;
 pub mod attendance_worker;
 pub use attendance_worker::*;
 
-
+use sqlx::PgConnection;
 use std::collections::BTreeMap;
 use std::time::Instant;
-use sqlx::PgConnection;
 
 use crate::api::etu_api;
 use crate::data_merges;
@@ -19,17 +18,19 @@ use crate::models::schedule::ScheduleObjModel;
 use crate::models::subjects::{get_subjects_cur_gen, SubjectModel};
 use crate::models::teachers::{get_teachers_cur_gen, TeacherModel};
 
-
 const ETU_REQUEST_INTERVAL: u64 = 15;
 
 async fn process_schedule_merge(group_id_vec: Vec<i32>, con: &mut PgConnection) {
-
     let new_groups = etu_api::get_groups_list().await.unwrap();
-    data_merges::groups::groups_merge(&new_groups, &mut *con).await.unwrap();
+    data_merges::groups::groups_merge(&new_groups, &mut *con)
+        .await
+        .unwrap();
 
     info!("BGTASK: Starting merge for groups: {:?}", group_id_vec);
     let start = Instant::now();
-    let sched_objs = etu_api::get_schedule_objs_groups(group_id_vec.clone()).await.unwrap();
+    let sched_objs = etu_api::get_schedule_objs_groups(group_id_vec.clone())
+        .await
+        .unwrap();
 
     let last_subjects_generation = get_subjects_cur_gen(&mut *con).await.unwrap();
     let last_teachers_generation = get_teachers_cur_gen(&mut *con).await.unwrap();
@@ -44,7 +45,10 @@ async fn process_schedule_merge(group_id_vec: Vec<i32>, con: &mut PgConnection) 
 
         for sched_obj_orig in sched_objs.schedule_objects {
             sched_objs_models.push(sched_obj_orig.clone().try_into().unwrap());
-            subjects.entry(sched_obj_orig.lesson.subject.id).or_default().push(sched_obj_orig.lesson.subject.clone().into());
+            subjects
+                .entry(sched_obj_orig.lesson.subject.id)
+                .or_default()
+                .push(sched_obj_orig.lesson.subject.clone().into());
             departments.push(sched_obj_orig.lesson.subject.department.into());
 
             if let Some(teacher) = sched_obj_orig.lesson.teacher {
@@ -65,12 +69,24 @@ async fn process_schedule_merge(group_id_vec: Vec<i32>, con: &mut PgConnection) 
             }
         }
         for department in departments {
-            data_merges::groups::department_single_merge(department, None, &mut *con).await.unwrap();
+            data_merges::groups::department_single_merge(department, None, &mut *con)
+                .await
+                .unwrap();
         }
 
-        data_merges::subjects::subjects_merge(&subjects, last_subjects_generation, &mut *con).await.unwrap();
-        data_merges::teachers::teachers_merge(teachers, last_teachers_generation, &mut *con).await.unwrap();
-        data_merges::schedule::schedule_objs_merge(group_id, &sched_objs_models, &mut *con).await.unwrap();
+        data_merges::subjects::subjects_merge(&subjects, last_subjects_generation, &mut *con)
+            .await
+            .unwrap();
+        data_merges::teachers::teachers_merge(teachers, last_teachers_generation, &mut *con)
+            .await
+            .unwrap();
+        data_merges::schedule::schedule_objs_merge(group_id, &sched_objs_models, &mut *con)
+            .await
+            .unwrap();
     }
-    info!("BGTASK: Merge for {} groups finished in {:?}", group_id_vec.len(), (Instant::now() - start));
+    info!(
+        "BGTASK: Merge for {} groups finished in {:?}",
+        group_id_vec.len(),
+        (Instant::now() - start)
+    );
 }

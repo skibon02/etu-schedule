@@ -1,16 +1,14 @@
 use std::collections::BTreeSet;
 
-
 use chrono::{Datelike, NaiveTime, TimeZone};
 
-use sqlx::{Postgres};
 use sqlx::pool::PoolConnection;
+use sqlx::Postgres;
 use tokio::select;
 
-use tokio::sync::watch::Receiver;
-use crate::{api, models};
 use crate::api::etu_attendance_api::{CheckInResult, GetScheduleResult};
-
+use crate::{api, models};
+use tokio::sync::watch::Receiver;
 
 fn time_to_lesson_time_num(time: NaiveTime) -> Option<i32> {
     let mut lesson_time_ranges = vec![
@@ -34,21 +32,26 @@ fn time_to_lesson_time_num(time: NaiveTime) -> Option<i32> {
     lesson_time_num
 }
 
-pub async fn attendance_worker_task(con: &mut PoolConnection<Postgres>, mut shutdown_watcher: Receiver<bool>) {
-
+pub async fn attendance_worker_task(
+    con: &mut PoolConnection<Postgres>,
+    mut shutdown_watcher: Receiver<bool>,
+) {
     //test attendance
 
     // let token = "s%3ATxJu9AAItcHgZne_fGX4TJkHgEjL3XzK.WeP0viYduOVh4%2BUJ90Jwf%2Fe5gEhYKULZs45P1Gx2%2F6E";
     // let schedule_test = api::etu_attendance_api::get_cur_schedule(token.to_string()).await.unwrap();
     // info!("schedule_test: {:#?}", schedule_test);
 
-
     // let check_in_test = api::etu_attendance_api::check_in(token.to_string(), 32).await;
     // info!("check_in_test: {:#?}", check_in_test);
 
-    let semester_start = chrono_tz::Europe::Moscow.with_ymd_and_hms(2023, 9, 1, 0, 0, 0).unwrap();
+    let semester_start = chrono_tz::Europe::Moscow
+        .with_ymd_and_hms(2023, 9, 1, 0, 0, 0)
+        .unwrap();
     let day_of_week = semester_start.weekday().num_days_from_monday() as u64;
-    let semester_start_week = semester_start.checked_sub_days(chrono::Days::new(day_of_week)).unwrap();
+    let semester_start_week = semester_start
+        .checked_sub_days(chrono::Days::new(day_of_week))
+        .unwrap();
 
     warn!("Semester start: {:#?}", semester_start);
     warn!("Semester start week: {:#?}", semester_start_week);

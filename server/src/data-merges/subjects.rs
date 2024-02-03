@@ -1,12 +1,17 @@
-use std::collections::BTreeMap;
 use anyhow::Context;
+use std::collections::BTreeMap;
 
-use sqlx::{Connection, PgConnection};
 use crate::data_merges::MergeResult;
 use crate::models;
-use crate::models::subjects::{SubjectModel};
+use crate::models::subjects::SubjectModel;
+use sqlx::{Connection, PgConnection};
 
-async fn single_subject_merge(subject_id: i32, subject: &SubjectModel, last_gen_id: i32, con: &mut PgConnection) -> anyhow::Result<MergeResult> {
+async fn single_subject_merge(
+    subject_id: i32,
+    subject: &SubjectModel,
+    last_gen_id: i32,
+    con: &mut PgConnection,
+) -> anyhow::Result<MergeResult> {
     trace!("Merging single subject {}", subject_id);
     let subject = subject.clone();
 
@@ -92,8 +97,15 @@ async fn single_subject_merge(subject_id: i32, subject: &SubjectModel, last_gen_
     res
 }
 
-pub async fn subjects_merge(subjects: &BTreeMap<i32, Vec<SubjectModel>>, last_gen_id: i32, con: &mut PgConnection) -> anyhow::Result<()> {
-    info!("MERGE::SUBJECTS Merging subjects started! Last generation: {}", last_gen_id);
+pub async fn subjects_merge(
+    subjects: &BTreeMap<i32, Vec<SubjectModel>>,
+    last_gen_id: i32,
+    con: &mut PgConnection,
+) -> anyhow::Result<()> {
+    info!(
+        "MERGE::SUBJECTS Merging subjects started! Last generation: {}",
+        last_gen_id
+    );
     let start = std::time::Instant::now();
 
     let mut changed_cnt = 0;
@@ -101,7 +113,10 @@ pub async fn subjects_merge(subjects: &BTreeMap<i32, Vec<SubjectModel>>, last_ge
     for (&subj_id, subjects) in subjects {
         for s in subjects.iter().skip(1) {
             if *s != subjects[0] {
-                error!("Subjects with same ID are not the same! first: {:?}, second: {:?}", subjects[0], s);
+                error!(
+                    "Subjects with same ID are not the same! first: {:?}, second: {:?}",
+                    subjects[0], s
+                );
                 anyhow::bail!("Cannot merge subjects! Subjects with same ID are not the same!")
             }
         }
@@ -119,11 +134,13 @@ pub async fn subjects_merge(subjects: &BTreeMap<i32, Vec<SubjectModel>>, last_ge
         info!("MERGE::SUBJECTS Merging subjects finished with changes! New generation created with id {}", last_gen_id + 1);
         info!("\tinserted: {}", inserted_cnt);
         info!("\tchanged: {}", changed_cnt);
-    }
-    else {
+    } else {
         info!("MERGE::SUBJECTS Merging subjects: \tno changes")
     }
-    info!("MERGE::SUBJECTS Merging subjects finished in {:?}!", start.elapsed());
+    info!(
+        "MERGE::SUBJECTS Merging subjects finished in {:?}!",
+        start.elapsed()
+    );
     info!("");
 
     Ok(())

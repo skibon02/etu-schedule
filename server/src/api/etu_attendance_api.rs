@@ -3,8 +3,8 @@ use std::fmt::Debug;
 use anyhow::Context;
 use reqwest::Response;
 
-use serde_json::Value;
 use crate::models::DbResult;
+use serde_json::Value;
 
 #[derive(serde::Deserialize, Debug)]
 pub struct TimeResponse {
@@ -73,25 +73,32 @@ pub async fn get_cur_schedule(token: String) -> DbResult<GetScheduleResult> {
         .get(route("schedule/check-in"))
         .header("Cookie", format!("connect.digital-attendance={}", token))
         .send()
-        .await.context("Cannot make fetch to schedule from etu attendance")?;
+        .await
+        .context("Cannot make fetch to schedule from etu attendance")?;
 
     info!("Result code: {:?}", response.status().as_u16());
 
     if response.status().is_success() {
         let result: Vec<LessonInstanceResponse> = response.json().await.context("Cannot parse get_cur_schedule result with success code as LessonInstanceResponse json!")?;
         Ok(GetScheduleResult::Ok(result))
-    }
-    else {
-        warn!("Cannot get schedule: status code: {:?}", response.status().as_str());
+    } else {
+        warn!(
+            "Cannot get schedule: status code: {:?}",
+            response.status().as_str()
+        );
 
         if response.status().as_u16() == 401 {
             return Ok(GetScheduleResult::WrongToken);
         }
 
-        let result: Value = response.json().await.context("Cannot parse get_cur_schedule response as json")?;
-        if let Ok(result) = serde_json::from_value::<AttendanceCheckInResponseError>(result.clone()) {
+        let result: Value = response
+            .json()
+            .await
+            .context("Cannot parse get_cur_schedule response as json")?;
+        if let Ok(result) = serde_json::from_value::<AttendanceCheckInResponseError>(result.clone())
+        {
             match result.message.as_str() {
-                _ => unimplemented!("Cannot parse error: {:?}", result)
+                _ => unimplemented!("Cannot parse error: {:?}", result),
             }
         } else {
             unimplemented!("Cannot parse error: {:?}", result)
@@ -121,30 +128,45 @@ pub async fn check_in(token: String, lesson_instance_id: i32) -> DbResult<CheckI
         .post(route(&format!("schedule/check-in/{}", lesson_instance_id)))
         .header("Cookie", format!("connect.digital-attendance={}", token))
         .send()
-        .await.context("Failed to perform check_in request to schedule api!")?;
+        .await
+        .context("Failed to perform check_in request to schedule api!")?;
 
     let err_code = response.status().as_u16();
     if response.status().is_success() {
-        let result: AttendanceCheckInResponse = response.json().await.context("Cannot parse check_in result with success code as json!")?;
+        let result: AttendanceCheckInResponse = response
+            .json()
+            .await
+            .context("Cannot parse check_in result with success code as json!")?;
         if result.ok {
             Ok(CheckInResult::Ok)
         } else {
             Err(anyhow::anyhow!("Cannot make check-in: ok is not true!"))
         }
     } else {
-        warn!("Cannot make check-in: status code: {:?}", response.status().as_str());
+        warn!(
+            "Cannot make check-in: status code: {:?}",
+            response.status().as_str()
+        );
 
         if err_code == 401 {
             return Ok(CheckInResult::WrongToken);
         }
 
-        let result: Value = response.json().await.context("Cannot parse check_in response as json")?;
-        if let Ok(result) = serde_json::from_value::<AttendanceCheckInResponseError>(result.clone()) {
+        let result: Value = response
+            .json()
+            .await
+            .context("Cannot parse check_in response as json")?;
+        if let Ok(result) = serde_json::from_value::<AttendanceCheckInResponseError>(result.clone())
+        {
             match result.message.as_str() {
                 "Время для отметки истекло" => Ok(CheckInResult::TooLate),
-                "Время для отметки ещё не наступило" => Ok(CheckInResult::TooEarly),
-                "Не найдено" => Err(anyhow::anyhow!("Cannot make check-in: lesson instance was not found!")),
-                _ => unimplemented!("Cannot parse error: {:?}", result)
+                "Время для отметки ещё не наступило" => {
+                    Ok(CheckInResult::TooEarly)
+                }
+                "Не найдено" => Err(anyhow::anyhow!(
+                    "Cannot make check-in: lesson instance was not found!"
+                )),
+                _ => unimplemented!("Cannot parse error: {:?}", result),
             }
         } else {
             unimplemented!("Cannot parse error: {:?}", result)
@@ -206,15 +228,18 @@ pub async fn get_current_user(token: String) -> DbResult<GetCurrentUserResult> {
         .get(route("auth/current-user"))
         .header("Cookie", format!("connect.digital-attendance={}", token))
         .send()
-        .await.context("Cannot make fetch to current user from etu attendance")?;
+        .await
+        .context("Cannot make fetch to current user from etu attendance")?;
 
     let _status_code = response.status().as_u16();
 
-    let result: CurrentUserResponse = response.json().await.context("Cannot parse get_current_user result with success code as json!")?;
+    let result: CurrentUserResponse = response
+        .json()
+        .await
+        .context("Cannot parse get_current_user result with success code as json!")?;
     if let Some(result) = result.user {
         Ok(GetCurrentUserResult::Ok(result))
-    }
-    else {
+    } else {
         Ok(GetCurrentUserResult::WrongToken)
     }
 }

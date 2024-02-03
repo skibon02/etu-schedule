@@ -1,14 +1,13 @@
-use std::sync::atomic::AtomicUsize;
-use std::sync::{OnceLock};
-use std::time::Instant;
 use sqlx::pool::PoolConnection;
 use sqlx::Postgres;
+use std::sync::atomic::AtomicUsize;
+use std::sync::OnceLock;
+use std::time::Instant;
 use tokio::select;
 
+use crate::bg_workers::{process_schedule_merge, ETU_REQUEST_INTERVAL};
+use crate::models;
 use tokio::sync::watch::Receiver;
-use crate::{models};
-use crate::bg_workers::{ETU_REQUEST_INTERVAL, process_schedule_merge};
-
 
 const SINGLE_GROUP_INTERVAL: i32 = 30;
 const FORCE_REQ_CHANNEL_SIZE: usize = 50;
@@ -16,13 +15,17 @@ const FORCE_REQ_CHANNEL_SIZE: usize = 50;
 pub static MERGE_REQUEST_CHANNEL: OnceLock<tokio::sync::mpsc::Sender<i32>> = OnceLock::new();
 pub static MERGE_REQUEST_CNT: AtomicUsize = AtomicUsize::new(0);
 
-pub async fn priority_schedule_merge_task(mut con: &mut PoolConnection<Postgres>, mut shutdown_watcher: Receiver<bool>) {
+pub async fn priority_schedule_merge_task(
+    mut con: &mut PoolConnection<Postgres>,
+    mut shutdown_watcher: Receiver<bool>,
+) {
     // For demonstration, use a loop with a delay
     let (tx, mut rx) = tokio::sync::mpsc::channel(FORCE_REQ_CHANNEL_SIZE);
     MERGE_REQUEST_CHANNEL.set(tx).unwrap();
 
     // for balancing forced requests
-    let mut last_etu_request = Instant::now() - tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL);
+    let mut last_etu_request =
+        Instant::now() - tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL);
     loop {
         select!(
             Some(request) = rx.recv() => {

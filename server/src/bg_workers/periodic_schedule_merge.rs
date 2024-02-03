@@ -1,25 +1,30 @@
-
-
+use crate::api::etu_api;
+use crate::bg_workers::process_schedule_merge;
+use crate::{data_merges, models};
 use sqlx::pool::PoolConnection;
 use sqlx::Postgres;
 use tokio::select;
 use tokio::sync::watch::Receiver;
-use crate::api::etu_api;
-use crate::bg_workers::{process_schedule_merge};
-use crate::{data_merges, models};
 
 use crate::models::groups::get_not_merged_sched_group_id_list;
 
-const GROUPS_MERGE_INTERVAL: u64 = 60*5;
+const GROUPS_MERGE_INTERVAL: u64 = 60 * 5;
 
-pub async fn periodic_schedule_merge_task(mut con: &mut PoolConnection<Postgres>, mut shutdown_watcher: Receiver<bool>) {
-
+pub async fn periodic_schedule_merge_task(
+    mut con: &mut PoolConnection<Postgres>,
+    mut shutdown_watcher: Receiver<bool>,
+) {
     info!("PERIODIC_MERGE_TASK: Phase 1. Initial merge for all groups.");
     let new_groups = etu_api::get_groups_list().await.unwrap();
-    data_merges::groups::groups_merge(&new_groups, &mut *con).await.unwrap();
+    data_merges::groups::groups_merge(&new_groups, &mut *con)
+        .await
+        .unwrap();
 
     while let Ok(groups) = get_not_merged_sched_group_id_list(&mut *con, 50).await {
-        info!("PERIODIC_MERGE_TASK: received {} groups for merge", groups.len());
+        info!(
+            "PERIODIC_MERGE_TASK: received {} groups for merge",
+            groups.len()
+        );
         process_schedule_merge(groups, &mut *con).await;
     }
     info!("PERIODIC_MERGE_TASK: Initial merge for all groups finished.");
@@ -28,7 +33,9 @@ pub async fn periodic_schedule_merge_task(mut con: &mut PoolConnection<Postgres>
 
     info!("PERIODIC_MERGE_TASK: starting merge routine...");
     loop {
-        let group_id_range = models::groups::get_oldest_group_id_list(&mut con, 30).await.unwrap();
+        let group_id_range = models::groups::get_oldest_group_id_list(&mut con, 30)
+            .await
+            .unwrap();
 
         process_schedule_merge(group_id_range, &mut con).await;
 
@@ -39,7 +46,9 @@ pub async fn periodic_schedule_merge_task(mut con: &mut PoolConnection<Postgres>
                 return
             }
         );
-        info!("PERIODIC_MERGE_TASK: {} secs passed, starting merge routine...", GROUPS_MERGE_INTERVAL);
-
+        info!(
+            "PERIODIC_MERGE_TASK: {} secs passed, starting merge routine...",
+            GROUPS_MERGE_INTERVAL
+        );
     }
 }

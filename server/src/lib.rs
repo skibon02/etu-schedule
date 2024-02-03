@@ -1,30 +1,28 @@
 #![feature(try_trait_v2)]
 
 pub mod api;
-pub mod routes;
-pub mod models;
 pub mod bg_workers;
+pub mod models;
+pub mod routes;
 
 #[macro_use]
 extern crate rocket;
 
-
+use crate::models::Db;
 use rocket::fairing::{AdHoc, Fairing, Info, Kind};
+use rocket::http::{Header, Status};
 use rocket::outcome::Outcome;
 use rocket::request::FromRequest;
-use rocket::{Build, Config, fairing, Request, Response, Rocket, tokio};
-use rocket::http::{Header, Status};
-use crate::models::Db;
+use rocket::{fairing, tokio, Build, Config, Request, Response, Rocket};
+use std::fmt::Arguments;
+use std::io::Write;
 use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use std::{env, fs};
-use std::fmt::Arguments;
-use std::io::Write;
 
 use rocket::fs::{FileServer, NamedFile};
 
-
-#[path="data-merges/mod.rs"]
+#[path = "data-merges/mod.rs"]
 pub mod data_merges;
 
 const LOGGING_LEVEL: LevelFilter = LevelFilter::Info;
@@ -58,7 +56,11 @@ impl Fairing for CORS {
             return;
         }
 
-        let allowed_origins = ["https://localhost", "https://77.246.107.64/", "https://etu-schedule.ru/"];
+        let allowed_origins = [
+            "https://localhost",
+            "https://77.246.107.64/",
+            "https://etu-schedule.ru/",
+        ];
 
         allowed_origins
             .iter()
@@ -82,7 +84,7 @@ pub struct DocumentRequest;
 impl<'r> FromRequest<'r> for DocumentRequest {
     type Error = ();
 
-    async fn from_request(req: &'r Request<'_>) -> rocket::request::Outcome<Self, Self::Error> { 
+    async fn from_request(req: &'r Request<'_>) -> rocket::request::Outcome<Self, Self::Error> {
         let path = req.uri().path();
         // info!("{}", path);
         if path == "/" {
@@ -103,7 +105,7 @@ impl<'r> FromRequest<'r> for DocumentRequest {
 
 static FRONTEND_ROUTES: &[&str] = &["schedule", "planning", "profile"];
 
-#[get("/<path..>", rank=5)]
+#[get("/<path..>", rank = 5)]
 async fn frontend_page(path: PathBuf, _document: DocumentRequest) -> Option<NamedFile> {
     info!("> frontend_page: {:?}", path);
     // whitelist
@@ -120,36 +122,37 @@ pub fn bg_worker(shutdown_notifier: watch::Receiver<bool>) -> AdHoc {
     let notifier_r1 = shutdown_notifier.clone();
     let notifier_r2 = shutdown_notifier.clone();
     let notifier_r3 = shutdown_notifier.clone();
-    AdHoc::on_liftoff("Background Worker", |rocket| Box::pin(async {
-        // Launch periodic task after Rocket ignition but before blocking on Rocket's server
-        let db = rocket.state::<Db>().unwrap();
-        let mut db_con1 = db.acquire().await.unwrap();
-        let mut db_con2 = db.acquire().await.unwrap();
-        let mut db_con3 = db.acquire().await.unwrap();
-        tokio::task::spawn(async move {
-            bg_workers::periodic_schedule_merge_task(&mut db_con1, notifier_r1).await;
-        });
-        tokio::task::spawn(async move {
-            bg_workers::priority_schedule_merge_task(&mut db_con2, notifier_r2).await;
-        });
-        tokio::task::spawn(async move {
-            bg_workers::attendance_worker_task(&mut db_con3, notifier_r3).await;
-        });
-    }))
+    AdHoc::on_liftoff("Background Worker", |rocket| {
+        Box::pin(async {
+            // Launch periodic task after Rocket ignition but before blocking on Rocket's server
+            let db = rocket.state::<Db>().unwrap();
+            let mut db_con1 = db.acquire().await.unwrap();
+            let mut db_con2 = db.acquire().await.unwrap();
+            let mut db_con3 = db.acquire().await.unwrap();
+            tokio::task::spawn(async move {
+                bg_workers::periodic_schedule_merge_task(&mut db_con1, notifier_r1).await;
+            });
+            tokio::task::spawn(async move {
+                bg_workers::priority_schedule_merge_task(&mut db_con2, notifier_r2).await;
+            });
+            tokio::task::spawn(async move {
+                bg_workers::attendance_worker_task(&mut db_con3, notifier_r3).await;
+            });
+        })
+    })
 }
 
 use chrono::Local;
 use colored::*;
 use fern::{Dispatch, FormatCallback};
 
+use crate::api::vk_api::VK_SERVICE_TOKEN;
 use log::{LevelFilter, Record};
 use rand::Rng;
+use regex::Regex;
 use rocket::response::Responder;
 use rocket_db_pools::Database;
-use regex::Regex;
 use tokio::sync::watch;
-use crate::api::vk_api::VK_SERVICE_TOKEN;
-
 
 fn loglevel_formatter(level: &log::Level) -> ColoredString {
     match level {
@@ -160,7 +163,6 @@ fn loglevel_formatter(level: &log::Level) -> ColoredString {
         log::Level::Trace => level.to_string().dimmed(),
     }
 }
-
 
 fn strip_colors(message: String) -> String {
     let re = Regex::new("\x1B\\[[;\\d]*m").unwrap();
@@ -223,12 +225,12 @@ fn setup_logger() -> Result<(), fern::InitError> {
     Ok(())
 }
 
-use std::panic;
-use std::fs::File;
-use std::sync::Mutex;
-use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
+use base64::Engine;
 use rocket::serde::json::json;
+use std::fs::File;
+use std::panic;
+use std::sync::Mutex;
 
 lazy_static::lazy_static! {
     static ref PANIC_LOG_FILE: Mutex<File> = Mutex::new(File::create("panics.log").unwrap());
@@ -248,7 +250,13 @@ fn setup_panic_logger() {
         };
 
         let location = panic_info.location().unwrap();
-        let panic_message = format!("{}: Panic occurred in file '{}' at line {}: {}\n", timestamp, location.file(), location.line(), message);
+        let panic_message = format!(
+            "{}: Panic occurred in file '{}' at line {}: {}\n",
+            timestamp,
+            location.file(),
+            location.line(),
+            message
+        );
 
         // Write the panic message to the log file
         let mut file = PANIC_LOG_FILE.lock().unwrap();
@@ -273,7 +281,6 @@ async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
 }
 
 pub fn run() -> Rocket<Build> {
-
     setup_logger().unwrap();
     setup_panic_logger();
 
@@ -282,13 +289,16 @@ pub fn run() -> Rocket<Build> {
     let args: Vec<String> = env::args().collect();
     let mut figment = rocket::Config::figment();
 
-    figment = figment.merge(("databases.postgres", rocket_db_pools::Config {
-        url: "postgres://etu_attend_app:12346543@localhost".into(),
-        max_connections: 80,
-        min_connections: None,
-        connect_timeout: 3,
-        idle_timeout: Some(120)
-    }));
+    figment = figment.merge((
+        "databases.postgres",
+        rocket_db_pools::Config {
+            url: "postgres://etu_attend_app:12346543@localhost".into(),
+            max_connections: 80,
+            min_connections: None,
+            connect_timeout: 3,
+            idle_timeout: Some(120),
+        },
+    ));
 
     let rocket_config: Config = figment.extract().unwrap();
 
@@ -348,9 +358,11 @@ pub fn run() -> Rocket<Build> {
         .attach(Db::init())
         .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
         .attach(bg_worker(rx))
-        .attach(AdHoc::on_shutdown("Notify shutdown", |_rocket|  Box::pin(async move {
-            tx.send(true).unwrap();
-        })));
+        .attach(AdHoc::on_shutdown("Notify shutdown", |_rocket| {
+            Box::pin(async move {
+                tx.send(true).unwrap();
+            })
+        }));
 
     if !is_production_build {
         rocket = rocket.attach(CORS);
@@ -365,8 +377,7 @@ pub fn run() -> Rocket<Build> {
         .register("/", catchers![not_found, default_catcher]);
 
     if with_client {
-        rocket
-            .mount("/", FileServer::from("../client/build"))
+        rocket.mount("/", FileServer::from("../client/build"))
     } else {
         rocket
     }
@@ -374,9 +385,20 @@ pub fn run() -> Rocket<Build> {
 #[catch(404)]
 fn not_found(req: &Request<'_>) -> serde_json::Value {
     if let Some(ip) = req.remote() {
-        info!("Route not found from client with IP: {}, route: {}", ip, req.uri());
+        info!(
+            "Route not found from client with IP: {}, route: {}",
+            ip,
+            req.uri()
+        );
         let mut file = IP_LOG_FILE.lock().unwrap();
-        writeln!(file, "{}: Route not found from client with IP: {}, route: {}", Local::now().format("%Y-%m-%d %H:%M:%S").to_string(), ip, req.uri()).unwrap();
+        writeln!(
+            file,
+            "{}: Route not found from client with IP: {}, route: {}",
+            Local::now().format("%Y-%m-%d %H:%M:%S").to_string(),
+            ip,
+            req.uri()
+        )
+        .unwrap();
     }
 
     json! ({
@@ -384,13 +406,18 @@ fn not_found(req: &Request<'_>) -> serde_json::Value {
     })
 }
 
-
 #[catch(default)]
 fn default_catcher(status: Status, req: &Request<'_>) -> serde_json::Value {
     if let Some(ip) = req.remote() {
         error!("Error from client with IP: {}", ip);
         let mut file = IP_LOG_FILE.lock().unwrap();
-        writeln!(file, "{}: Error from client with IP: {}", Local::now().format("%Y-%m-%d %H:%M:%S").to_string(), ip).unwrap();
+        writeln!(
+            file,
+            "{}: Error from client with IP: {}",
+            Local::now().format("%Y-%m-%d %H:%M:%S").to_string(),
+            ip
+        )
+        .unwrap();
     }
 
     json! ({

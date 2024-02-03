@@ -1,18 +1,21 @@
-use std::ops::FromResidual;
-use rocket::Route;
-use rocket::serde::json::Json;
-use serde_derive::Serialize;
 use crate::models::DbResult;
+use rocket::serde::json::Json;
+use rocket::Route;
+use serde_derive::Serialize;
+use std::ops::FromResidual;
 
+mod attendance;
 pub mod auth;
+mod notes;
 pub mod schedule;
 mod user_data;
-mod attendance;
-mod notes;
 
 #[derive(Responder)]
 pub enum GenericResponder<Success, Failure>
-    where Success: serde::Serialize, Failure: serde::Serialize {
+where
+    Success: serde::Serialize,
+    Failure: serde::Serialize,
+{
     #[response(status = 200, content_type = "json")]
     Success(Json<Success>),
     #[response(status = 400, content_type = "json")]
@@ -42,7 +45,9 @@ impl<T: serde::Serialize> ResponderWithSuccess<T> {
 }
 
 /// database error is internal error: do not expose it to the client
-impl<T: serde::Serialize, R: std::fmt::Debug> FromResidual<DbResult<R>> for ResponderWithSuccess<T> {
+impl<T: serde::Serialize, R: std::fmt::Debug> FromResidual<DbResult<R>>
+    for ResponderWithSuccess<T>
+{
     fn from_residual(residual: DbResult<R>) -> Self {
         error!("Failed to execute database operation: {:?}", residual);
         ResponderWithSuccess::internal_error("не скажу")
@@ -51,14 +56,12 @@ impl<T: serde::Serialize, R: std::fmt::Debug> FromResidual<DbResult<R>> for Resp
 
 #[derive(Serialize)]
 pub struct ResponseErrorMessage {
-    message: String
+    message: String,
 }
 
 impl ResponseErrorMessage {
     pub fn new(message: String) -> Self {
-        ResponseErrorMessage {
-            message
-        }
+        ResponseErrorMessage { message }
     }
 }
 

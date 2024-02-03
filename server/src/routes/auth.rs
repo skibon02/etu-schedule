@@ -1,17 +1,24 @@
-use rocket::{
-    http::{uri::Host, Cookie, CookieJar, Status},
-    response::Redirect,
-    serde::json::Json,
-    Route, request::{FromRequest, self, Request},
-};
 use rocket::outcome::Outcome;
 use rocket::time::PrimitiveDateTime;
+use rocket::{
+    http::{uri::Host, Cookie, CookieJar, Status},
+    request::{self, FromRequest, Request},
+    response::Redirect,
+    serde::json::Json,
+    Route,
+};
 use rocket_db_pools::Connection;
 use serde_derive::{Deserialize, Serialize};
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 
-use crate::{FRONTEND_PORT, FrontendPort, models::{users::{self, UserInfo}, Db}};
 use crate::api::vk_api;
+use crate::{
+    models::{
+        users::{self, UserInfo},
+        Db,
+    },
+    FrontendPort, FRONTEND_PORT,
+};
 
 #[post("/auth/deauth")]
 fn deauth(cookie: &CookieJar) -> Status {
@@ -19,13 +26,15 @@ fn deauth(cookie: &CookieJar) -> Status {
     Status::Ok
 }
 
-
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for UserInfo {
     type Error = ();
-    async fn from_request(req: &'r Request<'_>) -> request::Outcome<Self, Self::Error> { 
+    async fn from_request(req: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
         let mut db_con = req.guard::<Connection<Db>>().await.unwrap();
-        match (req.cookies().get_private("token"), req.cookies().get_private("token2")) {
+        match (
+            req.cookies().get_private("token"),
+            req.cookies().get_private("token2"),
+        ) {
             (Some(token), Some(_)) => {
                 let user_id = token.value().to_string().parse::<i32>().unwrap();
                 let user_info = users::get_user_info(&mut db_con, user_id).await;
@@ -45,12 +54,9 @@ impl<'r> FromRequest<'r> for UserInfo {
             }
         }
     }
-
 }
 
-
-#[derive(Serialize)]
-#[derive(Default, Debug)]
+#[derive(Serialize, Default, Debug)]
 pub struct AuthorizeInfo {
     pub access_token: Option<String>,
     pub user_id: i32,
@@ -66,11 +72,17 @@ impl<'r> FromRequest<'r> for AuthorizeInfo {
             return Outcome::Forward(Status::InternalServerError);
         };
         let mut db_con = db.acquire().await.unwrap();
-        match (req.cookies().get_private("token"), req.cookies().get_private("token2")) {
+        match (
+            req.cookies().get_private("token"),
+            req.cookies().get_private("token2"),
+        ) {
             (Some(token), Some(token2)) => {
                 let user_id = token.value().to_string().parse::<i32>().unwrap();
                 let access_token = token2.value().to_string();
-                if !users::user_exists(&mut db_con, user_id).await.unwrap_or(false) {
+                if !users::user_exists(&mut db_con, user_id)
+                    .await
+                    .unwrap_or(false)
+                {
                     return Outcome::Forward(Status::Forbidden);
                 }
                 Outcome::Success(AuthorizeInfo {
@@ -182,8 +194,17 @@ async fn auth_redirect(
 
     match FRONTEND_PORT.get().unwrap() {
         FrontendPort::Same => Redirect::to(format!("https://{}/profile{}", host, optional_query)),
-        FrontendPort::Https => Redirect::to(format!("https://{}:443/profile{}", host.domain(), optional_query)),
-        FrontendPort::Custom(port) => Redirect::to(format!("https://{}:{}/profile{}", host.domain(), port, optional_query)),
+        FrontendPort::Https => Redirect::to(format!(
+            "https://{}:443/profile{}",
+            host.domain(),
+            optional_query
+        )),
+        FrontendPort::Custom(port) => Redirect::to(format!(
+            "https://{}:{}/profile{}",
+            host.domain(),
+            port,
+            optional_query
+        )),
     }
 }
 
@@ -238,13 +259,20 @@ fn parse_auth_info(inp: serde_json::Value) -> UserInfo {
 
         // not used
         created_timestamp: PrimitiveDateTime::MIN,
-        last_vk_fetch_timestamp:PrimitiveDateTime::MIN,
+        last_vk_fetch_timestamp: PrimitiveDateTime::MIN,
     }
 }
-async fn process_auth(db: Connection<Db>, cookie: &CookieJar<'_>, token: &str, uuid: &str) -> Result<(), AuthorizeError> {
-    let access_token =  vk_api::exchange_access_token(token, uuid).await;
+async fn process_auth(
+    db: Connection<Db>,
+    cookie: &CookieJar<'_>,
+    token: &str,
+    uuid: &str,
+) -> Result<(), AuthorizeError> {
+    let access_token = vk_api::exchange_access_token(token, uuid).await;
 
-    let user_info = vk_api::users_get(&access_token, "photo_200,sex,bdate").await.ok_or(AuthorizeError::FailedVkRequest)?;
+    let user_info = vk_api::users_get(&access_token, "photo_200,sex,bdate")
+        .await
+        .ok_or(AuthorizeError::FailedVkRequest)?;
     info!("VK user: {:?}", user_info);
     let auth_info = (access_token, user_info["id"].to_string());
     let user_info = parse_auth_info(user_info.into_inner());
@@ -256,13 +284,27 @@ async fn process_auth(db: Connection<Db>, cookie: &CookieJar<'_>, token: &str, u
 
     debug!("adding token to cookie...");
 
-    cookie.add_private(Cookie::build(("token", auth_info.1)).same_site(rocket::http::SameSite::Lax).http_only(true));
-    cookie.add_private(Cookie::build(("token2", auth_info.0)).same_site(rocket::http::SameSite::Lax).http_only(true));
+    cookie.add_private(
+        Cookie::build(("token", auth_info.1))
+            .same_site(rocket::http::SameSite::Lax)
+            .http_only(true),
+    );
+    cookie.add_private(
+        Cookie::build(("token2", auth_info.0))
+            .same_site(rocket::http::SameSite::Lax)
+            .http_only(true),
+    );
     Ok(())
 }
 
 pub fn get_routes() -> Vec<Route> {
-    routes![check_auth, check_auth_fallback, 
-    auth_data, auth_data_fallback,
-    auth_redirect, authorize, deauth]
+    routes![
+        check_auth,
+        check_auth_fallback,
+        auth_data,
+        auth_data_fallback,
+        auth_redirect,
+        authorize,
+        deauth
+    ]
 }

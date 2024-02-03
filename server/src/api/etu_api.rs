@@ -1,5 +1,5 @@
-use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 use crate::models::groups::{DepartmentModel, FacultyModel, GroupModel};
 use crate::models::schedule::{ScheduleObjModel, WeekDay};
@@ -26,7 +26,6 @@ impl FacultyOriginal {
         }
     }
 }
-
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -58,7 +57,7 @@ pub struct DepartmentOriginal {
     pub long_title: Option<String>,
     #[serde(rename = "type")]
     pub _type: String,
-    pub faculty: FacultyOriginal
+    pub faculty: FacultyOriginal,
 }
 
 impl DepartmentOriginal {
@@ -73,8 +72,6 @@ impl DepartmentOriginal {
     }
 }
 
-
-
 #[derive(Deserialize, Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupOriginal {
@@ -87,7 +84,7 @@ pub struct GroupOriginal {
     pub specialty_id: i32,
     pub start_year: i32,
     pub end_year: i32,
-    pub department: DepartmentOriginal
+    pub department: DepartmentOriginal,
 }
 
 impl GroupOriginal {
@@ -154,7 +151,6 @@ impl Into<SubjectModel> for SubjectOriginal {
             control_type: self.control_type,
             department_id: self.department.id,
             semester: self.semester,
-
 
             // missing info
             subject_obj_id: Default::default(),
@@ -259,9 +255,25 @@ impl TryInto<ScheduleObjModel> for ScheduleObjectOriginal {
             third_teacher_id: self.lesson.third_teacher.as_ref().map(|t| t.id),
             fourth_teacher_id: self.lesson.fourth_teacher.as_ref().map(|t| t.id),
             auditorium: self.lesson.auditorium_reservation.auditorium_number.clone(),
-            time: self.lesson.auditorium_reservation.reservation_time.start_time,
-            week_day: WeekDay::try_from(self.lesson.auditorium_reservation.reservation_time.week_day.clone()).map_err(|_| "Cannot parse week day!".to_string())?,
-            week_parity: self.lesson.auditorium_reservation.reservation_time.week.clone(),
+            time: self
+                .lesson
+                .auditorium_reservation
+                .reservation_time
+                .start_time,
+            week_day: WeekDay::try_from(
+                self.lesson
+                    .auditorium_reservation
+                    .reservation_time
+                    .week_day
+                    .clone(),
+            )
+            .map_err(|_| "Cannot parse week day!".to_string())?,
+            week_parity: self
+                .lesson
+                .auditorium_reservation
+                .reservation_time
+                .week
+                .clone(),
 
             // unrelated info
             subject_gen_id: Default::default(),
@@ -280,13 +292,12 @@ impl TryInto<ScheduleObjModel> for ScheduleObjectOriginal {
     }
 }
 
-
 #[derive(Deserialize, Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupScheduleOriginal {
     pub schedule_objects: Vec<ScheduleObjectOriginal>,
     #[serde(rename = "id")]
-    pub group_id: i32
+    pub group_id: i32,
 }
 
 pub async fn get_schedule_objs_group(group: u32) -> anyhow::Result<Option<GroupScheduleOriginal>> {
@@ -302,7 +313,9 @@ pub async fn get_schedule_objs_group(group: u32) -> anyhow::Result<Option<GroupS
     Ok(parsed_objs.get(0).cloned())
 }
 
-pub async fn get_schedule_objs_groups(groups: Vec<i32>) -> anyhow::Result<BTreeMap<i32, GroupScheduleOriginal>> {
+pub async fn get_schedule_objs_groups(
+    groups: Vec<i32>,
+) -> anyhow::Result<BTreeMap<i32, GroupScheduleOriginal>> {
     let url = format!(
         "{}objects/publicated?subjectType=%D0%9B%D0%B5%D0%BA&subjectType=%D0%9F%D1%80&subjectType=%D0%9B%D0%B0%D0%B1&subjectType=%D0%9A%D0%9F&subjectType=%D0%9A%D0%A0&subjectType=%D0%94%D0%BE%D0%B1&subjectType=%D0%9C%D0%AD%D0%BA&subjectType=%D0%9F%D1%80%D0%B0%D0%BA&subjectType=%D0%A2%D0%B5%D1%81%D1%82&withSubjectCode=true&withURL=true&{}",
         BASE_URL_SCHEDULE,
@@ -312,7 +325,10 @@ pub async fn get_schedule_objs_groups(groups: Vec<i32>) -> anyhow::Result<BTreeM
     let body = response.text().await?;
 
     let parsed_objs = parse_schedule_objs_groups(body)?;
-    let res = parsed_objs.into_iter().map(|g| (g.group_id, g)).collect::<BTreeMap<i32, GroupScheduleOriginal>>();
+    let res = parsed_objs
+        .into_iter()
+        .map(|g| (g.group_id, g))
+        .collect::<BTreeMap<i32, GroupScheduleOriginal>>();
 
     Ok(res)
 }
@@ -326,21 +342,64 @@ fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleO
     // 1) by group
     for group_schedule in sched_objs.iter() {
         trace!("Parsing group {}", group_schedule.group_id);
-        let mut group_schedule_res = GroupScheduleOriginal { schedule_objects: Vec::new(), group_id: group_schedule.group_id};
+        let mut group_schedule_res = GroupScheduleOriginal {
+            schedule_objects: Vec::new(),
+            group_id: group_schedule.group_id,
+        };
 
         // 2) by subject and placement
-        let mut unique_subject_positions = BTreeMap::<(i32, WeekDay, String, i32), Vec<ScheduleObjectOriginal>>::new();
+        let mut unique_subject_positions =
+            BTreeMap::<(i32, WeekDay, String, i32), Vec<ScheduleObjectOriginal>>::new();
         for schedule_obj in &group_schedule.schedule_objects {
             // 3) subdivide start/end time
-            for time in (schedule_obj.lesson.auditorium_reservation.reservation_time.start_time%10)..(schedule_obj.lesson.auditorium_reservation.reservation_time.end_time %10+1) {
+            for time in (schedule_obj
+                .lesson
+                .auditorium_reservation
+                .reservation_time
+                .start_time
+                % 10)
+                ..(schedule_obj
+                    .lesson
+                    .auditorium_reservation
+                    .reservation_time
+                    .end_time
+                    % 10
+                    + 1)
+            {
                 let mut sched_obj_clone = schedule_obj.clone();
-                sched_obj_clone.lesson.auditorium_reservation.reservation_time.start_time = time;
-                sched_obj_clone.lesson.auditorium_reservation.reservation_time.end_time = time;
+                sched_obj_clone
+                    .lesson
+                    .auditorium_reservation
+                    .reservation_time
+                    .start_time = time;
+                sched_obj_clone
+                    .lesson
+                    .auditorium_reservation
+                    .reservation_time
+                    .end_time = time;
 
-                unique_subject_positions.entry((schedule_obj.lesson.subject.id,
-                                                WeekDay::try_from(schedule_obj.lesson.auditorium_reservation.reservation_time.week_day.clone()).unwrap(),
-                                                schedule_obj.lesson.auditorium_reservation.reservation_time.week.clone(),
-                                                time)).or_default().push(sched_obj_clone);
+                unique_subject_positions
+                    .entry((
+                        schedule_obj.lesson.subject.id,
+                        WeekDay::try_from(
+                            schedule_obj
+                                .lesson
+                                .auditorium_reservation
+                                .reservation_time
+                                .week_day
+                                .clone(),
+                        )
+                        .unwrap(),
+                        schedule_obj
+                            .lesson
+                            .auditorium_reservation
+                            .reservation_time
+                            .week
+                            .clone(),
+                        time,
+                    ))
+                    .or_default()
+                    .push(sched_obj_clone);
             }
         }
 
@@ -348,98 +407,160 @@ fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleO
         for (_, uniq_placement_elements) in unique_subject_positions.iter_mut() {
             if uniq_placement_elements.len() > 1 {
                 //merge
-                warn!("During parse sched objs for group id {}...", group_schedule.group_id);
+                warn!(
+                    "During parse sched objs for group id {}...",
+                    group_schedule.group_id
+                );
                 warn!("Found more than one schedule object for subject at single time placement");
-                info!("\tsubject_id: {}", uniq_placement_elements[0].lesson.subject.id);
-                info!("\tweek_parity: {}", uniq_placement_elements[0].lesson.auditorium_reservation.reservation_time.week);
-                info!("\tweek_day: {}", uniq_placement_elements[0].lesson.auditorium_reservation.reservation_time.week_day);
-                info!("\ttime: {}", uniq_placement_elements[0].lesson.auditorium_reservation.reservation_time.start_time);
+                info!(
+                    "\tsubject_id: {}",
+                    uniq_placement_elements[0].lesson.subject.id
+                );
+                info!(
+                    "\tweek_parity: {}",
+                    uniq_placement_elements[0]
+                        .lesson
+                        .auditorium_reservation
+                        .reservation_time
+                        .week
+                );
+                info!(
+                    "\tweek_day: {}",
+                    uniq_placement_elements[0]
+                        .lesson
+                        .auditorium_reservation
+                        .reservation_time
+                        .week_day
+                );
+                info!(
+                    "\ttime: {}",
+                    uniq_placement_elements[0]
+                        .lesson
+                        .auditorium_reservation
+                        .reservation_time
+                        .start_time
+                );
 
                 let mut auditoriums = Vec::new();
-                if let Some(auditorium) = uniq_placement_elements[0].lesson.auditorium_reservation.auditorium_number.clone() {
+                if let Some(auditorium) = uniq_placement_elements[0]
+                    .lesson
+                    .auditorium_reservation
+                    .auditorium_number
+                    .clone()
+                {
                     auditoriums.push(auditorium);
                 }
 
-                let mut fir: ScheduleObjModel  = uniq_placement_elements[0].clone().try_into().map_err(|e: String| anyhow::anyhow!(e.clone()))?;
+                let mut fir: ScheduleObjModel = uniq_placement_elements[0]
+                    .clone()
+                    .try_into()
+                    .map_err(|e: String| anyhow::anyhow!(e.clone()))?;
                 // ensure everything is the same except auditorium
                 for i in 1..uniq_placement_elements.len() {
-
-                    if let Some(auditorium) = uniq_placement_elements[i].lesson.auditorium_reservation.auditorium_number.clone() {
+                    if let Some(auditorium) = uniq_placement_elements[i]
+                        .lesson
+                        .auditorium_reservation
+                        .auditorium_number
+                        .clone()
+                    {
                         auditoriums.push(auditorium);
                     }
 
                     //compare with first
-                    let cur: ScheduleObjModel = uniq_placement_elements[i].clone().try_into().map_err(|e: String| anyhow::anyhow!(e.clone()))?;
-                    if fir.teacher_id == cur.teacher_id &&
-                        fir.second_teacher_id == cur.second_teacher_id
-                        && fir.third_teacher_id == cur.third_teacher_id {
+                    let cur: ScheduleObjModel = uniq_placement_elements[i]
+                        .clone()
+                        .try_into()
+                        .map_err(|e: String| anyhow::anyhow!(e.clone()))?;
+                    if fir.teacher_id == cur.teacher_id
+                        && fir.second_teacher_id == cur.second_teacher_id
+                        && fir.third_teacher_id == cur.third_teacher_id
+                    {
                         // ok, only auditorium is different
-                        info!("Auditorium is different, but everything else is the same, merging...");
-                    }
-                    else if fir.teacher_id.is_some() && fir.second_teacher_id.is_none() &&
-                        cur.teacher_id.is_some() && cur.second_teacher_id.is_none() {
+                        info!(
+                            "Auditorium is different, but everything else is the same, merging..."
+                        );
+                    } else if fir.teacher_id.is_some()
+                        && fir.second_teacher_id.is_none()
+                        && cur.teacher_id.is_some()
+                        && cur.second_teacher_id.is_none()
+                    {
                         // ok, we can merge it
                         info!("1+1 case");
                         if fir.teacher_id != cur.teacher_id {
                             info!("Two first_teachers case");
                             fir.second_teacher_id = cur.teacher_id;
-                            uniq_placement_elements[0].lesson.second_teacher = uniq_placement_elements[i].lesson.teacher.clone();
-                        }
-                        else {
+                            uniq_placement_elements[0].lesson.second_teacher =
+                                uniq_placement_elements[i].lesson.teacher.clone();
+                        } else {
                             info!("Two same first_teachers case");
                         }
-                    }
-                    else {
+                    } else {
                         // no teachers is ok
-                        if fir.teacher_id.is_none() && fir.second_teacher_id.is_none() &&
-                            cur.teacher_id.is_none() && cur.second_teacher_id.is_none() {
+                        if fir.teacher_id.is_none()
+                            && fir.second_teacher_id.is_none()
+                            && cur.teacher_id.is_none()
+                            && cur.second_teacher_id.is_none()
+                        {
                             info!("0+0 case");
-                        }
-                        else if fir.second_teacher_id.is_some() && fir.third_teacher_id.is_none() &&
-                            cur.teacher_id.is_some() && cur.second_teacher_id.is_none() {
+                        } else if fir.second_teacher_id.is_some()
+                            && fir.third_teacher_id.is_none()
+                            && cur.teacher_id.is_some()
+                            && cur.second_teacher_id.is_none()
+                        {
                             // ok, we can merge it
                             info!("2+1 case");
-                            if fir.second_teacher_id == cur.teacher_id ||
-                                fir.teacher_id == cur.teacher_id {
+                            if fir.second_teacher_id == cur.teacher_id
+                                || fir.teacher_id == cur.teacher_id
+                            {
                                 info!("Same, merge not needed");
-                            }
-                            else {
+                            } else {
                                 info!("Different, merge needed");
                                 fir.third_teacher_id = cur.teacher_id;
-                                uniq_placement_elements[0].lesson.third_teacher = uniq_placement_elements[i].lesson.teacher.clone();
+                                uniq_placement_elements[0].lesson.third_teacher =
+                                    uniq_placement_elements[i].lesson.teacher.clone();
                             }
-                        }
-                        else if fir.third_teacher_id.is_some() && fir.fourth_teacher_id.is_none() &&
-                            cur.teacher_id.is_some() && cur.second_teacher_id.is_none() {
+                        } else if fir.third_teacher_id.is_some()
+                            && fir.fourth_teacher_id.is_none()
+                            && cur.teacher_id.is_some()
+                            && cur.second_teacher_id.is_none()
+                        {
                             info!("3+1 case");
 
-                            if fir.third_teacher_id == cur.teacher_id ||
-                                fir.second_teacher_id == cur.teacher_id ||
-                                fir.teacher_id == cur.teacher_id {
+                            if fir.third_teacher_id == cur.teacher_id
+                                || fir.second_teacher_id == cur.teacher_id
+                                || fir.teacher_id == cur.teacher_id
+                            {
                                 info!("Same, merge not needed");
-                            }
-                            else {
+                            } else {
                                 info!("Different, merge needed");
                                 fir.fourth_teacher_id = cur.teacher_id;
-                                uniq_placement_elements[0].lesson.fourth_teacher = uniq_placement_elements[i].lesson.teacher.clone();
+                                uniq_placement_elements[0].lesson.fourth_teacher =
+                                    uniq_placement_elements[i].lesson.teacher.clone();
                             }
-                        }
-                        else {
+                        } else {
                             error!("Error, only auditorium can be different in unique subject and placement group! abotring...");
-                            return Err(anyhow::anyhow!("Error! only auditorium can be different in unique subject and placement group!"))
+                            return Err(anyhow::anyhow!("Error! only auditorium can be different in unique subject and placement group!"));
                         }
                     }
                 }
                 if auditoriums.len() == 0 {
-                    uniq_placement_elements[0].lesson.auditorium_reservation.auditorium_number = None;
+                    uniq_placement_elements[0]
+                        .lesson
+                        .auditorium_reservation
+                        .auditorium_number = None;
+                } else {
+                    uniq_placement_elements[0]
+                        .lesson
+                        .auditorium_reservation
+                        .auditorium_number = Some(auditoriums.join(", "));
                 }
-                else {
-                    uniq_placement_elements[0].lesson.auditorium_reservation.auditorium_number = Some(auditoriums.join(", "));
-                }
-                group_schedule_res.schedule_objects.push(uniq_placement_elements[0].clone());
-            }
-            else {
-                group_schedule_res.schedule_objects.push(uniq_placement_elements[0].clone());
+                group_schedule_res
+                    .schedule_objects
+                    .push(uniq_placement_elements[0].clone());
+            } else {
+                group_schedule_res
+                    .schedule_objects
+                    .push(uniq_placement_elements[0].clone());
             }
         }
 
@@ -449,7 +570,10 @@ fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleO
 }
 
 pub async fn get_groups_list() -> anyhow::Result<Vec<GroupOriginal>> {
-    let url = format!("{}dicts/groups?scheduleId=594&withFaculty=true&withSemesterSeasons=false&withFlows=false", BASE_URL_GENERAL);
+    let url = format!(
+        "{}dicts/groups?scheduleId=594&withFaculty=true&withSemesterSeasons=false&withFlows=false",
+        BASE_URL_GENERAL
+    );
     let response = reqwest::get(&url).await?;
     let body = response.text().await?;
 
@@ -462,16 +586,13 @@ fn parse_groups(data: String) -> anyhow::Result<Vec<GroupOriginal>> {
     Ok(input_data)
 }
 
-
-
-
 #[cfg(test)]
 mod tests {
     use crate::api::etu_api::{parse_groups, parse_schedule_objs_groups};
 
     #[test]
     fn parse_groups_wrong_format() -> anyhow::Result<()> {
-        let groups = String::from( "[{}]");
+        let groups = String::from("[{}]");
 
         if parse_groups(groups).is_err() {
             Ok(())

@@ -1,14 +1,14 @@
-use rocket::Route;
-use rocket::serde::json::Json;
-use rocket_db_pools::Connection;
-use serde_derive::{Deserialize, Serialize};
-use crate::{api, models};
 use crate::api::etu_attendance_api::GetCurrentUserResult;
-use crate::models::Db;
 use crate::models::groups::GroupModel;
 use crate::models::users::{SubjectsTitleFormatting, UserDataModel, UserDataOptionalModel};
+use crate::models::Db;
 use crate::routes::auth::AuthorizeInfo;
-use crate::routes::{ResponderWithSuccess};
+use crate::routes::ResponderWithSuccess;
+use crate::{api, models};
+use rocket::serde::json::Json;
+use rocket::Route;
+use rocket_db_pools::Connection;
+use serde_derive::{Deserialize, Serialize};
 
 #[derive(Serialize)]
 pub struct SetUserGroupSuccess {
@@ -22,7 +22,11 @@ struct SetGroupBody {
 }
 
 #[post("/user/set_group", data = "<body>")]
-async fn set_group(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Json<SetGroupBody>) -> SetUserGroupRes {
+async fn set_group(
+    mut db: Connection<Db>,
+    auth: Option<AuthorizeInfo>,
+    body: Json<SetGroupBody>,
+) -> SetUserGroupRes {
     if auth.is_none() {
         return SetUserGroupRes::forbidden("User is not authorized!");
     }
@@ -54,7 +58,11 @@ pub struct SetUserDataSuccess {
 type SetUserDataRes = ResponderWithSuccess<SetUserDataSuccess>;
 
 #[post("/user/set_data", data = "<body>")]
-async fn set_data(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Json<UserDataOptionalModel>) -> SetUserDataRes {
+async fn set_data(
+    mut db: Connection<Db>,
+    auth: Option<AuthorizeInfo>,
+    body: Json<UserDataOptionalModel>,
+) -> SetUserDataRes {
     if auth.is_none() {
         return SetUserDataRes::failed("User is not authorized!");
     }
@@ -70,9 +78,8 @@ pub struct OutputUserDataModel {
     pub group: Option<GroupModel>,
     pub subjects_title_formatting: SubjectsTitleFormatting,
     pub attendance_token: Option<String>,
-    pub leader_for_group: Option<i32>
+    pub leader_for_group: Option<i32>,
 }
-
 
 impl Into<OutputUserDataModel> for (UserDataModel, Option<GroupModel>) {
     fn into(self) -> OutputUserDataModel {
@@ -81,7 +88,7 @@ impl Into<OutputUserDataModel> for (UserDataModel, Option<GroupModel>) {
             group: self.0.group_id.map(|_| self.1.unwrap()),
             subjects_title_formatting: self.0.subjects_title_formatting,
             attendance_token: self.0.attendance_token,
-            leader_for_group: self.0.leader_for_group
+            leader_for_group: self.0.leader_for_group,
         }
     }
 }
@@ -137,15 +144,27 @@ pub struct SetAttendanceTokenBody {
     attendance_token: Option<String>,
 }
 
-static LAST_ATTENDANCE_FETCH_TIME: std::sync::atomic::AtomicI64 = std::sync::atomic::AtomicI64::new(0);
+static LAST_ATTENDANCE_FETCH_TIME: std::sync::atomic::AtomicI64 =
+    std::sync::atomic::AtomicI64::new(0);
 
 #[post("/user/set_attendance_token", data = "<body>")]
-pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Json<SetAttendanceTokenBody>) -> SetAttendanceTokenRes {
-    let timestamp = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs() as i64;
+pub async fn set_attendance_token(
+    mut db: Connection<Db>,
+    auth: Option<AuthorizeInfo>,
+    body: Json<SetAttendanceTokenBody>,
+) -> SetAttendanceTokenRes {
+    let timestamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs() as i64;
 
     if timestamp - LAST_ATTENDANCE_FETCH_TIME.load(std::sync::atomic::Ordering::Relaxed) < 3 {
         warn!("Too many requests to attendance api!");
-        return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "too_many_requests".to_string() });
+        return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess {
+            ok: false,
+            group_changed: false,
+            result_code: "too_many_requests".to_string(),
+        });
     }
     LAST_ATTENDANCE_FETCH_TIME.store(timestamp, std::sync::atomic::Ordering::Relaxed);
 
@@ -163,18 +182,36 @@ pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<Authorize
         let attendance_user_info = api::etu_attendance_api::get_current_user(token.clone()).await?;
         let (is_leader, group) = match attendance_user_info {
             GetCurrentUserResult::Ok(res) => {
-                debug!("User info for user_id {} request result: {:?}", auth.user_id, res);
+                debug!(
+                    "User info for user_id {} request result: {:?}",
+                    auth.user_id, res
+                );
                 if res.groups.len() == 0 {
-                        return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "no_groups".to_string() });
+                    return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess {
+                        ok: false,
+                        group_changed: false,
+                        result_code: "no_groups".to_string(),
+                    });
                 }
                 if res.groups.len() > 1 {
-                    return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "too_many_groups".to_string() });
+                    return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess {
+                        ok: false,
+                        group_changed: false,
+                        result_code: "too_many_groups".to_string(),
+                    });
                 }
-                (res.groups[0].user_group.role == "leader", res.groups[0].name.clone())
+                (
+                    res.groups[0].user_group.role == "leader",
+                    res.groups[0].name.clone(),
+                )
             }
             GetCurrentUserResult::WrongToken => {
                 warn!("Wrong token: {}", token);
-                return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "wrong_token".to_string() });
+                return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess {
+                    ok: false,
+                    group_changed: false,
+                    result_code: "wrong_token".to_string(),
+                });
             }
         };
 
@@ -187,30 +224,50 @@ pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<Authorize
 
             //confirm group leader role
             if is_leader {
-                info!("User {} is confirmed to be a leader for group {}", auth.user_id, new_user_group_id);
+                info!(
+                    "User {} is confirmed to be a leader for group {}",
+                    auth.user_id, new_user_group_id
+                );
                 // save privilege level to db
-                models::users::confirm_privilege_level(&mut db, new_user_group_id, auth.user_id).await?;
+                models::users::confirm_privilege_level(&mut db, new_user_group_id, auth.user_id)
+                    .await?;
             }
 
             // -1 in case when group is not set will not be equal to any valid group
-            let own_group = models::users::get_user_group(&mut db, auth.user_id).await?.map(|g| g.group_id).unwrap_or(-1);
+            let own_group = models::users::get_user_group(&mut db, auth.user_id)
+                .await?
+                .map(|g| g.group_id)
+                .unwrap_or(-1);
             if own_group != new_user_group_id {
                 group_changed = true;
 
                 models::users::set_user_group(&mut db, auth.user_id, new_user_group_id).await?;
             }
-        }
-        else {
+        } else {
             warn!("Group was {} not found!", group);
-            return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "group_not_found".to_string() });
+            return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess {
+                ok: false,
+                group_changed: false,
+                result_code: "group_not_found".to_string(),
+            });
         }
     }
 
-    models::users::set_attendance_token(&mut db, auth.user_id, body.attendance_token.clone()).await?;
-    SetAttendanceTokenRes::success(SetAttendanceTokenSuccess { ok: true, group_changed, result_code: "success".to_string() })
+    models::users::set_attendance_token(&mut db, auth.user_id, body.attendance_token.clone())
+        .await?;
+    SetAttendanceTokenRes::success(SetAttendanceTokenSuccess {
+        ok: true,
+        group_changed,
+        result_code: "success".to_string(),
+    })
 }
 
 pub fn get_routes() -> Vec<Route> {
-    routes![set_group, get_group, set_data, get_data,
-    set_attendance_token]
+    routes![
+        set_group,
+        get_group,
+        set_data,
+        get_data,
+        set_attendance_token
+    ]
 }

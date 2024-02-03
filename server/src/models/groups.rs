@@ -1,6 +1,6 @@
 use sqlx::PgConnection;
 
-use super::{DbResult};
+use super::DbResult;
 use serde_derive::Serialize;
 
 use sqlx::postgres::types::PgInterval;
@@ -35,7 +35,10 @@ pub struct GroupModel {
     pub latest_schedule_merge_timestamp: Option<PrimitiveDateTime>,
 }
 
-pub async fn get_oldest_group_id_list(con: &mut PgConnection, upper_limit: i64) -> DbResult<Vec<i32>> {
+pub async fn get_oldest_group_id_list(
+    con: &mut PgConnection,
+    upper_limit: i64,
+) -> DbResult<Vec<i32>> {
     let res = sqlx::query_scalar!(
         "SELECT group_id FROM groups
          ORDER BY
@@ -47,7 +50,8 @@ pub async fn get_oldest_group_id_list(con: &mut PgConnection, upper_limit: i64) 
          LIMIT $1",
         upper_limit
     )
-        .fetch_all(&mut *con).await?;
+    .fetch_all(&mut *con)
+    .await?;
 
     if res.len() == 0 {
         return Err(anyhow::anyhow!("No groups found!"));
@@ -55,8 +59,10 @@ pub async fn get_oldest_group_id_list(con: &mut PgConnection, upper_limit: i64) 
     Ok(res)
 }
 
-
-pub async fn get_not_merged_sched_group_id_list(con: &mut PgConnection, upper_limit: i64) -> DbResult<Vec<i32>> {
+pub async fn get_not_merged_sched_group_id_list(
+    con: &mut PgConnection,
+    upper_limit: i64,
+) -> DbResult<Vec<i32>> {
     let res = sqlx::query_scalar!(
         "SELECT group_id FROM groups
             WHERE latest_schedule_merge_timestamp IS NULL
@@ -65,7 +71,8 @@ pub async fn get_not_merged_sched_group_id_list(con: &mut PgConnection, upper_li
          LIMIT $1",
         upper_limit
     )
-        .fetch_all(&mut *con).await?;
+    .fetch_all(&mut *con)
+    .await?;
 
     if res.len() == 0 {
         return Err(anyhow::anyhow!("No groups found!"));
@@ -75,23 +82,28 @@ pub async fn get_not_merged_sched_group_id_list(con: &mut PgConnection, upper_li
 
 // Result: is group exists?
 // Option: if merge was ever made for this group?
-pub async fn get_time_since_last_group_merge(group_id: i32, con: &mut PgConnection) -> DbResult<Option<i32>> {
+pub async fn get_time_since_last_group_merge(
+    group_id: i32,
+    con: &mut PgConnection,
+) -> DbResult<Option<i32>> {
     // 1 option: if we have such group and it has latest_schedule_merge_timestamp
     //
     let res: Option<Option<PgInterval>> = sqlx::query_scalar!(
         "SELECT NOW() - latest_schedule_merge_timestamp FROM groups WHERE group_id = $1 \
         and latest_schedule_merge_timestamp IS NOT NULL",
-        group_id)
-        .fetch_optional(&mut *con).await?;
+        group_id
+    )
+    .fetch_optional(&mut *con)
+    .await?;
 
     //silly one
     let res = match res {
         Some(Some(res)) => Some(res),
-        _ => None
+        _ => None,
     };
 
     match res {
-        Some(res) => Ok(Some((res.microseconds/1000000) as i32)),
+        Some(res) => Ok(Some((res.microseconds / 1000000) as i32)),
         None => {
             //check if it is null
             let res: Option<i32> = sqlx::query_scalar!(
@@ -99,12 +111,8 @@ pub async fn get_time_since_last_group_merge(group_id: i32, con: &mut PgConnecti
                 .fetch_optional(&mut *con).await?;
 
             match res {
-                Some(_) => {
-                    Ok(None)
-                },
-                None => {
-                    Err(anyhow::anyhow!("Error: cannot find group!"))
-                }
+                Some(_) => Ok(None),
+                None => Err(anyhow::anyhow!("Error: cannot find group!")),
             }
         }
     }
@@ -112,16 +120,18 @@ pub async fn get_time_since_last_group_merge(group_id: i32, con: &mut PgConnecti
 
 pub async fn set_last_group_merge(group_id: i32, con: &mut PgConnection) -> DbResult<()> {
     sqlx::query!(
-        "UPDATE groups SET latest_schedule_merge_timestamp = NOW() WHERE group_id = $1", group_id)
-        .execute(&mut *con).await?;
+        "UPDATE groups SET latest_schedule_merge_timestamp = NOW() WHERE group_id = $1",
+        group_id
+    )
+    .execute(&mut *con)
+    .await?;
 
     Ok(())
 }
 pub async fn get_groups(con: &mut PgConnection) -> DbResult<Vec<GroupModel>> {
-    let res = sqlx::query_as!(GroupModel,
-        "SELECT * FROM groups"
-    )
-        .fetch_all(&mut *con).await?;
+    let res = sqlx::query_as!(GroupModel, "SELECT * FROM groups")
+        .fetch_all(&mut *con)
+        .await?;
 
     Ok(res)
 }
@@ -132,18 +142,23 @@ pub async fn get_group(con: &mut PgConnection, group_id: i32) -> DbResult<Option
         "SELECT * FROM groups WHERE group_id = $1",
         group_id
     )
-        .fetch_optional(&mut *con).await?;
+    .fetch_optional(&mut *con)
+    .await?;
 
     Ok(res)
 }
 
-pub async fn find_group_by_name(con: &mut PgConnection, group_name: &str) -> DbResult<Option<GroupModel>> {
+pub async fn find_group_by_name(
+    con: &mut PgConnection,
+    group_name: &str,
+) -> DbResult<Option<GroupModel>> {
     let res = sqlx::query_as!(
         GroupModel,
         "SELECT * FROM groups WHERE number = $1",
         group_name
     )
-        .fetch_optional(&mut *con).await?;
+    .fetch_optional(&mut *con)
+    .await?;
 
     Ok(res)
 }

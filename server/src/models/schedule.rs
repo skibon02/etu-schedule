@@ -1,15 +1,12 @@
-
-
 use rocket::time::PrimitiveDateTime;
 
-use sqlx::{PgConnection};
+use sqlx::PgConnection;
 
 use crate::models;
-use crate::models::{DbResult};
-
+use crate::models::DbResult;
 
 #[derive(sqlx::Type, Default, Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
-#[sqlx(type_name="week_day", rename_all="UPPERCASE")]
+#[sqlx(type_name = "week_day", rename_all = "UPPERCASE")]
 pub enum WeekDay {
     #[default]
     Mon,
@@ -18,7 +15,7 @@ pub enum WeekDay {
     Thu,
     Fri,
     Sat,
-    Sun
+    Sun,
 }
 
 impl WeekDay {
@@ -30,7 +27,7 @@ impl WeekDay {
             WeekDay::Thu => 3,
             WeekDay::Fri => 4,
             WeekDay::Sat => 5,
-            WeekDay::Sun => 6
+            WeekDay::Sun => 6,
         }
     }
     pub fn to_string(self) -> String {
@@ -49,11 +46,10 @@ impl TryFrom<String> for WeekDay {
             "FRI" => Ok(WeekDay::Fri),
             "SAT" => Ok(WeekDay::Sat),
             "SUN" => Ok(WeekDay::Sun),
-            _ => Err(())
+            _ => Err(()),
         }
     }
 }
-
 
 impl TryFrom<u32> for WeekDay {
     type Error = ();
@@ -66,7 +62,7 @@ impl TryFrom<u32> for WeekDay {
             4 => Ok(WeekDay::Fri),
             5 => Ok(WeekDay::Sat),
             6 => Ok(WeekDay::Sun),
-            _ => Err(())
+            _ => Err(()),
         }
     }
 }
@@ -95,7 +91,6 @@ pub struct ScheduleObjModel {
     pub time_link_id: i32,
     pub prev_time_link_id: Option<i32>,
 
-
     pub subject_id: i32,
     pub subject_gen_id: i32,
     pub teacher_id: Option<i32>,
@@ -114,7 +109,7 @@ pub struct ScheduleObjModel {
 
     pub gen_start: i32,
     pub gen_end: Option<i32>,
-    pub existence_diff: String
+    pub existence_diff: String,
 }
 
 impl ScheduleObjModel {
@@ -137,8 +132,10 @@ pub struct ScheduleGenerationModel {
     pub group_id: i32,
 }
 
-
-pub async fn get_current_schedule_for_group(con: &mut PgConnection, group_id: i32) -> DbResult<Vec<ScheduleObjModel>> {
+pub async fn get_current_schedule_for_group(
+    con: &mut PgConnection,
+    group_id: i32,
+) -> DbResult<Vec<ScheduleObjModel>> {
     let res = sqlx::query_as!(ScheduleObjModel,
         "SELECT week_day as \"week_day: WeekDay\", auditorium, created_timestamp, modified_timestamp,
             existence_diff, teacher_id, second_teacher_id, third_teacher_id, fourth_teacher_id,
@@ -152,7 +149,10 @@ pub async fn get_current_schedule_for_group(con: &mut PgConnection, group_id: i3
     Ok(res)
 }
 
-pub async fn get_current_schedule_link_ids(con: &mut PgConnection, group_id: i32) -> DbResult<Vec<i32>> {
+pub async fn get_current_schedule_link_ids(
+    con: &mut PgConnection,
+    group_id: i32,
+) -> DbResult<Vec<i32>> {
     let res = sqlx::query_scalar!(
         "SELECT schedule_objs.time_link_id FROM schedule_objs WHERE group_id = $1 and gen_end IS NULL",
         group_id
@@ -169,7 +169,11 @@ pub async fn get_current_schedule_link_ids(con: &mut PgConnection, group_id: i32
     Ok(res)
 }
 
-pub async fn get_current_schedule_for_group_with_subject(con: &mut PgConnection, group_id: i32, subject_id: i32) -> DbResult<Vec<ScheduleObjModel>> {
+pub async fn get_current_schedule_for_group_with_subject(
+    con: &mut PgConnection,
+    group_id: i32,
+    subject_id: i32,
+) -> DbResult<Vec<ScheduleObjModel>> {
     let res = sqlx::query_as!(ScheduleObjModel,
             r#"SELECT week_day as "week_day: WeekDay", auditorium, created_timestamp, modified_timestamp,
             existence_diff, teacher_id, second_teacher_id, third_teacher_id, fourth_teacher_id,
@@ -184,41 +188,56 @@ pub async fn get_current_schedule_for_group_with_subject(con: &mut PgConnection,
 
 pub enum TimeLinkValidResult {
     Success(bool),
-    ErrorUserMessage(String)
+    ErrorUserMessage(String),
 }
 
-pub async fn is_time_link_id_valid_for_user(con: &mut PgConnection, time_link_id: i32, user_id: i32) -> DbResult<TimeLinkValidResult> {
-
+pub async fn is_time_link_id_valid_for_user(
+    con: &mut PgConnection,
+    time_link_id: i32,
+    user_id: i32,
+) -> DbResult<TimeLinkValidResult> {
     // get user saved attendance schedule elements
     let group_id = models::users::get_user_group(con, user_id).await;
     if let Err(e) = group_id {
         error!("Failed to get user group: {:?}", e);
-        return Ok(TimeLinkValidResult::ErrorUserMessage("Failed to get user group!".to_string()));
+        return Ok(TimeLinkValidResult::ErrorUserMessage(
+            "Failed to get user group!".to_string(),
+        ));
     }
     let group_id = group_id.unwrap();
 
     if group_id.is_none() {
-        return Ok(TimeLinkValidResult::ErrorUserMessage("User has no group!".to_string()));
+        return Ok(TimeLinkValidResult::ErrorUserMessage(
+            "User has no group!".to_string(),
+        ));
     }
     let group_id = group_id.unwrap().group_id;
 
     is_time_link_id_valid_for_group(con, time_link_id, group_id).await
 }
 
-pub async fn is_time_link_id_valid_for_group(con: &mut PgConnection, time_link_id: i32, group_id: i32) -> DbResult<TimeLinkValidResult> {
-
+pub async fn is_time_link_id_valid_for_group(
+    con: &mut PgConnection,
+    time_link_id: i32,
+    group_id: i32,
+) -> DbResult<TimeLinkValidResult> {
     // get user group link_id elements
     let schedule_link_ids = models::schedule::get_current_schedule_link_ids(con, group_id).await;
 
     if let Err(e) = schedule_link_ids {
         error!("Failed to get user group schedule link ids: {:?}", e);
-        return Ok(TimeLinkValidResult::ErrorUserMessage("Failed to get user group schedule link ids!".to_string()));
+        return Ok(TimeLinkValidResult::ErrorUserMessage(
+            "Failed to get user group schedule link ids!".to_string(),
+        ));
     }
     let schedule_link_ids = schedule_link_ids.unwrap();
 
     if !schedule_link_ids.contains(&time_link_id) {
-        warn!("User group {} doesn't have time_link_id: {}", group_id, time_link_id);
-        return Ok(TimeLinkValidResult::Success(false))
+        warn!(
+            "User group {} doesn't have time_link_id: {}",
+            group_id, time_link_id
+        );
+        return Ok(TimeLinkValidResult::Success(false));
     }
 
     Ok(TimeLinkValidResult::Success(true))

@@ -1,10 +1,10 @@
-pub mod users;
+pub mod attendance;
 pub mod groups;
+pub mod notes;
 pub mod schedule;
 pub mod subjects;
 pub mod teachers;
-pub mod attendance;
-pub mod notes;
+pub mod users;
 
 use rocket_db_pools::{sqlx, Database};
 

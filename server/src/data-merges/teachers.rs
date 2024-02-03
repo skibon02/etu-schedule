@@ -1,31 +1,49 @@
-use std::collections::BTreeMap;
 use anyhow::Context;
+use std::collections::BTreeMap;
 
-use sqlx::{Connection, PgConnection};
 use crate::data_merges::MergeResult;
 use crate::models;
-use crate::models::teachers::{TeacherModel};
+use crate::models::teachers::TeacherModel;
+use sqlx::{Connection, PgConnection};
 
-async fn insert_teacher_work_departments(teacher_id: i32, work_departments: Vec<String>, con: &mut PgConnection) -> anyhow::Result<()> {
-    con.transaction(|trx| Box::pin(async move {
-        //delete old departments
-        sqlx::query!("DELETE from teachers_departments WHERE teacher_id = $1",
-                teacher_id)
-            .execute(&mut **trx).await.context("Deletion old teacher work_departments failed!")?;
+async fn insert_teacher_work_departments(
+    teacher_id: i32,
+    work_departments: Vec<String>,
+    con: &mut PgConnection,
+) -> anyhow::Result<()> {
+    con.transaction(|trx| {
+        Box::pin(async move {
+            //delete old departments
+            sqlx::query!(
+                "DELETE from teachers_departments WHERE teacher_id = $1",
+                teacher_id
+            )
+            .execute(&mut **trx)
+            .await
+            .context("Deletion old teacher work_departments failed!")?;
 
-
-        for department in work_departments {
-            sqlx::query!("INSERT INTO teachers_departments (department, teacher_id) VALUES ($1, $2)",
-        department, teacher_id)
+            for department in work_departments {
+                sqlx::query!(
+                    "INSERT INTO teachers_departments (department, teacher_id) VALUES ($1, $2)",
+                    department,
+                    teacher_id
+                )
                 .execute(&mut **trx)
                 .await?;
-        }
+            }
 
-        Ok(())
-    })).await
+            Ok(())
+        })
+    })
+    .await
 }
 
-async fn single_teacher_merge(teacher_id: i32, teacher: &TeacherModel, last_gen_id: i32, con: &mut PgConnection) -> anyhow::Result<MergeResult> {
+async fn single_teacher_merge(
+    teacher_id: i32,
+    teacher: &TeacherModel,
+    last_gen_id: i32,
+    con: &mut PgConnection,
+) -> anyhow::Result<MergeResult> {
     trace!("Merging single teacher {}", teacher_id);
     let teacher = teacher.clone();
 
@@ -119,14 +137,25 @@ async fn single_teacher_merge(teacher_id: i32, teacher: &TeacherModel, last_gen_
     })).await
 }
 
-pub async fn teachers_merge(teachers: BTreeMap<i32, (TeacherModel, Vec<String>)>, last_gen_id: i32, con: &mut PgConnection) -> anyhow::Result<()> {
-    info!("MERGE::TEACHERS Merging started! Last generation: {}", last_gen_id);
+pub async fn teachers_merge(
+    teachers: BTreeMap<i32, (TeacherModel, Vec<String>)>,
+    last_gen_id: i32,
+    con: &mut PgConnection,
+) -> anyhow::Result<()> {
+    info!(
+        "MERGE::TEACHERS Merging started! Last generation: {}",
+        last_gen_id
+    );
     let start = std::time::Instant::now();
 
     let mut changed_cnt = 0;
     let mut inserted_cnt = 0;
     for (teacher_id, (teacher, work_departments)) in teachers {
-        trace!("MERGE::TEACHERS Merging for teacher ({}): {}", teacher_id, teacher.initials);
+        trace!(
+            "MERGE::TEACHERS Merging for teacher ({}): {}",
+            teacher_id,
+            teacher.initials
+        );
         let res = single_teacher_merge(teacher_id, &teacher, last_gen_id, con).await?;
 
         // work departments are not tracked
@@ -144,11 +173,13 @@ pub async fn teachers_merge(teachers: BTreeMap<i32, (TeacherModel, Vec<String>)>
         info!("MERGE::TEACHERS Merging teachers finished with changes! New generation created with id {}", last_gen_id + 1);
         info!("MERGE::TEACHERS \tinserted: {}", inserted_cnt);
         info!("MERGE::TEACHERS \tchanged: {}", changed_cnt);
-    }
-    else {
+    } else {
         info!("MERGE::TEACHRS Merging teachers: \tno changes")
     }
-    info!("MERGE::TEACHERS Merging teachers finished in {:?}!", start.elapsed());
+    info!(
+        "MERGE::TEACHERS Merging teachers finished in {:?}!",
+        start.elapsed()
+    );
     info!("");
 
     Ok(())
