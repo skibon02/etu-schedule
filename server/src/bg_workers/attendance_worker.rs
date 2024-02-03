@@ -64,7 +64,7 @@ pub async fn attendance_worker_task(
     loop {
         select!(
             _ = tokio::time::sleep(tokio::time::Duration::from_secs(60)) => {
-                info!("ATTENDANCE_WORKER_TASK: 60 secs passed, starting attendance worker routine...");
+                debug!("ATTENDANCE_WORKER_TASK: 60 secs passed, starting attendance worker routine...");
                 let time = api::etu_attendance_api::get_time().await;
                 let Ok(time) = time else {
                     error!("Failed to get time from etu attendance! Unknown response: {:#?}", time);
@@ -84,7 +84,7 @@ pub async fn attendance_worker_task(
                     continue;
                 };
 
-                info!("Ready for attendance check! Current time: {:#?}", local_time);
+                debug!("Ready for attendance check! Current time: {:#?}", local_time);
                 debug!("day_of_week: {:#?}", day_of_week);
                 debug!("week_parity: {:#?}", week_parity);
                 debug!("week_num: {:#?}", week_num);
