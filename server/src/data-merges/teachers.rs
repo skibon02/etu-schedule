@@ -37,7 +37,7 @@ async fn single_teacher_merge(teacher_id: i32, teacher: &TeacherModel, last_gen_
             trace!("Found existing teacher");
 
             let mut diff = false;
-            if teacher.initials != teacher.initials ||
+            if row.initials != teacher.initials ||
                 row.name != teacher.name ||
                 row.surname != teacher.surname ||
                 row.midname != teacher.midname ||
