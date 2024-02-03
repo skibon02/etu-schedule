@@ -3,6 +3,7 @@ use rocket::time::PrimitiveDateTime;
 use sqlx::PgConnection;
 
 use crate::models;
+use crate::models::subjects::SubjectModel;
 use crate::models::DbResult;
 
 #[derive(sqlx::Type, Default, Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
@@ -103,6 +104,7 @@ pub struct ScheduleObjModel {
     pub created_timestamp: PrimitiveDateTime,
     pub modified_timestamp: PrimitiveDateTime,
 
+    /// Time is lesson number, 0 - 8:00, 7 - max
     pub time: i32,
     pub week_day: WeekDay,
     pub week_parity: String,
@@ -118,8 +120,8 @@ impl ScheduleObjModel {
         if self.week_parity == "2" {
             res += 7;
         }
-        res *= 14;
-        res += self.time % 1000;
+        res *= 8; // 8 lessons per day
+        res += self.time;
 
         res
     }
@@ -132,7 +134,25 @@ pub struct ScheduleGenerationModel {
     pub group_id: i32,
 }
 
-pub async fn get_current_schedule_for_group(
+pub async fn get_active_subjects_for_group(
+    con: &mut PgConnection,
+    group_id: i32,
+) -> DbResult<Vec<SubjectModel>> {
+    let res = sqlx::query_as!(
+        SubjectModel,
+        "SELECT DISTINCT subjects.* FROM subjects join schedule_objs on \
+            subjects.subject_id = schedule_objs.subject_id and subjects.gen_start <= schedule_objs.subject_gen_id \
+            and (subjects.gen_end IS NULL or subjects.gen_end > schedule_objs.subject_gen_id) \
+            WHERE schedule_objs.group_id = $1 and schedule_objs.gen_end is NULL",
+        group_id
+    )
+    .fetch_all(&mut *con)
+    .await?;
+
+    Ok(res.into_iter().collect())
+}
+
+pub async fn get_active_schedule_for_group(
     con: &mut PgConnection,
     group_id: i32,
 ) -> DbResult<Vec<ScheduleObjModel>> {
@@ -149,7 +169,7 @@ pub async fn get_current_schedule_for_group(
     Ok(res)
 }
 
-pub async fn get_current_schedule_link_ids(
+pub async fn get_active_schedule_link_ids(
     con: &mut PgConnection,
     group_id: i32,
 ) -> DbResult<Vec<i32>> {
@@ -169,7 +189,7 @@ pub async fn get_current_schedule_link_ids(
     Ok(res)
 }
 
-pub async fn get_current_schedule_for_group_with_subject(
+pub async fn get_active_schedule_for_group_with_subject(
     con: &mut PgConnection,
     group_id: i32,
     subject_id: i32,
@@ -222,7 +242,7 @@ pub async fn is_time_link_id_valid_for_group(
     group_id: i32,
 ) -> DbResult<TimeLinkValidResult> {
     // get user group link_id elements
-    let schedule_link_ids = models::schedule::get_current_schedule_link_ids(con, group_id).await;
+    let schedule_link_ids = models::schedule::get_active_schedule_link_ids(con, group_id).await;
 
     if let Err(e) = schedule_link_ids {
         error!("Failed to get user group schedule link ids: {:?}", e);

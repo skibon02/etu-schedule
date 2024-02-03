@@ -407,11 +407,11 @@ fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleO
         for (_, uniq_placement_elements) in unique_subject_positions.iter_mut() {
             if uniq_placement_elements.len() > 1 {
                 //merge
-                warn!(
+                info!(
                     "During parse sched objs for group id {}...",
                     group_schedule.group_id
                 );
-                warn!("Found more than one schedule object for subject at single time placement");
+                info!("Found more than one schedule object for subject at single time placement");
                 info!(
                     "\tsubject_id: {}",
                     uniq_placement_elements[0].lesson.subject.id
@@ -543,7 +543,7 @@ fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleO
                         }
                     }
                 }
-                if auditoriums.len() == 0 {
+                if auditoriums.is_empty() {
                     uniq_placement_elements[0]
                         .lesson
                         .auditorium_reservation

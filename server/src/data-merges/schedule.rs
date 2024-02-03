@@ -1,7 +1,7 @@
 use crate::data_merges::MergeResult;
 use crate::models;
 use crate::models::schedule::{
-    get_current_schedule_for_group_with_subject, ScheduleObjModel, WeekDay,
+    get_active_schedule_for_group_with_subject, ScheduleObjModel, WeekDay,
 };
 use anyhow::Context;
 use sqlx::PgConnection;
@@ -72,7 +72,7 @@ async fn single_schedule_obj_group_merge(
     }
 
     let mut existing_sched_objs =
-        get_current_schedule_for_group_with_subject(con, group_id, subject_id).await?;
+        get_active_schedule_for_group_with_subject(con, group_id, subject_id).await?;
 
     trace!("group_id: {}, subject_id: {}", group_id, subject_id);
     trace!(
@@ -234,7 +234,7 @@ async fn single_schedule_obj_group_merge(
         }
         if !found {
             // invalidate old sched_obj (update gen_id)
-            trace!(
+            info!(
                 "Invalidating old schedule object: {}",
                 existing_sched_obj.last_known_orig_sched_obj_id
             );
@@ -252,6 +252,8 @@ async fn single_schedule_obj_group_merge(
             .execute(&mut *con)
             .await
             .context("Failed to invalidate old schedule object")?;
+
+            res.push(MergeResult::Removed);
         }
     }
 
@@ -263,8 +265,6 @@ pub async fn schedule_objs_merge(
     schedule_objs: &Vec<ScheduleObjModel>,
     con: &mut PgConnection,
 ) -> anyhow::Result<()> {
-    // group by subject_id
-
     let group_name = models::groups::get_group(con, group_id)
         .await?
         .map(|r| r.number);
@@ -287,6 +287,7 @@ pub async fn schedule_objs_merge(
             .or_default()
             .push(sched_obj.clone());
     }
+    let new_subject_ids: Vec<i32> = subj_id_to_sched_objs.keys().cloned().collect();
 
     let last_gen_id = get_last_gen_id(con, group_id).await?;
     info!("MERGE::SCHEDULE_OBJ_GROUP Last generation: {}", last_gen_id);
@@ -294,9 +295,11 @@ pub async fn schedule_objs_merge(
     let mut modified = false;
     let mut total_inserted_cnt = 0;
     let mut total_changed_cnt = 0;
+    let mut total_removed_cnt = 0;
     for (subj_id, subj_sched_objs) in subj_id_to_sched_objs {
         let mut inserted_cnt = 0;
         let mut changed_cnt = 0;
+        let mut removed_cnt = 0;
 
         trace!(
             "MERGE::SCHEDULE_OBJ_GROUP Merging schedule objects for subject id {} started!",
@@ -312,6 +315,9 @@ pub async fn schedule_objs_merge(
             if r == MergeResult::Updated {
                 changed_cnt += 1;
             }
+            if r == MergeResult::Removed {
+                removed_cnt += 1;
+            }
             if r != MergeResult::NotModified {
                 modified = true;
             }
@@ -319,14 +325,16 @@ pub async fn schedule_objs_merge(
 
         total_inserted_cnt += inserted_cnt;
         total_changed_cnt += changed_cnt;
+        total_removed_cnt += removed_cnt;
 
-        if inserted_cnt > 0 || changed_cnt > 0 {
+        if inserted_cnt > 0 || changed_cnt > 0 || removed_cnt > 0 {
             info!(
                 "MERGE::SCHEDULE_OBJ_GROUP Schedule objects modified! Grouped by subject_id = {}",
                 subj_id
             );
             info!("\tinserted: {}", inserted_cnt);
             info!("\tchanged: {}", changed_cnt);
+            info!("\tremoved: {}", removed_cnt);
 
             info!(
                 "MERGE::SCHEDULE_OBJ_GROUP Using generation id {}",
@@ -335,12 +343,44 @@ pub async fn schedule_objs_merge(
         }
     }
 
-    models::groups::set_last_group_merge(group_id, con).await?;
+    // phase 2. invalidate removed subjects
+    let active_subjects = models::schedule::get_active_subjects_for_group(con, group_id)
+        .await
+        .context("Failed to fetch existing schedule objects")?;
+    for active_subject in active_subjects {
+        if !new_subject_ids.contains(&active_subject.subject_id) {
+            info!(
+                "MERGE::SCHEDULE_OBJ_GROUP Invalidating removed subject: {}",
+                active_subject.subject_id
+            );
+            let new_gen_id = last_gen_id + 1;
+            create_new_gen(con, new_gen_id, group_id).await?;
+
+            sqlx::query!(
+                "UPDATE schedule_objs SET \
+            gen_end = $1 \
+            WHERE group_id = $2 AND subject_id = $3 AND gen_end IS NULL",
+                new_gen_id,
+                group_id,
+                active_subject.subject_id
+            )
+            .execute(&mut *con)
+            .await
+            .context("Failed to invalidate removed subject")?;
+            modified = true;
+
+            total_removed_cnt += 1;
+        }
+    }
+
+    // finalize
+    models::groups::set_last_group_schedule_merge(group_id, con).await?;
 
     if modified {
         info!("MERGE::SCHEDULE_OBJ_GROUP Merge schedule objects for group finished with changes! New generation created with id {}", last_gen_id + 1);
         info!("\tinserted: {}", total_inserted_cnt);
         info!("\tchanged: {}", total_changed_cnt);
+        info!("\tremoved: {}", total_removed_cnt);
     } else {
         info!("MERGE::SCHEDULE_OBJ_GROUP Merge schedule objects: \tno changes!")
     }

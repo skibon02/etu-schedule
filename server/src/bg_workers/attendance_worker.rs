@@ -11,7 +11,7 @@ use crate::{api, models};
 use tokio::sync::watch::Receiver;
 
 fn time_to_lesson_time_num(time: NaiveTime) -> Option<i32> {
-    let mut lesson_time_ranges = vec![
+    let mut lesson_time_ranges = [
         NaiveTime::from_hms_opt(8, 0, 0).unwrap()..NaiveTime::from_hms_opt(9, 30, 0).unwrap(),
         NaiveTime::from_hms_opt(9, 50, 0).unwrap()..NaiveTime::from_hms_opt(11, 20, 0).unwrap(),
         NaiveTime::from_hms_opt(11, 40, 0).unwrap()..NaiveTime::from_hms_opt(13, 10, 0).unwrap(),
@@ -45,16 +45,17 @@ pub async fn attendance_worker_task(
     // let check_in_test = api::etu_attendance_api::check_in(token.to_string(), 32).await;
     // info!("check_in_test: {:#?}", check_in_test);
 
+    // TODO: get semester start from etu
     let semester_start = chrono_tz::Europe::Moscow
-        .with_ymd_and_hms(2023, 9, 1, 0, 0, 0)
+        .with_ymd_and_hms(2024, 2, 5, 0, 0, 0)
         .unwrap();
     let day_of_week = semester_start.weekday().num_days_from_monday() as u64;
     let semester_start_week = semester_start
         .checked_sub_days(chrono::Days::new(day_of_week))
         .unwrap();
 
-    warn!("Semester start: {:#?}", semester_start);
-    warn!("Semester start week: {:#?}", semester_start_week);
+    info!("Semester start: {:#?}", semester_start);
+    info!("Semester start week: {:#?}", semester_start_week);
 
     // Set of processed check_ins:
     // user_id, time_link_id, week_num

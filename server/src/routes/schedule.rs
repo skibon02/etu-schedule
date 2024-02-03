@@ -190,7 +190,7 @@ async fn get_group_schedule_objects(
     match last_merge_time {
         Some(time) => {
             let sched_objects =
-                models::schedule::get_current_schedule_for_group(con.deref_mut(), group_id).await?;
+                models::schedule::get_active_schedule_for_group(con.deref_mut(), group_id).await?;
             let subjects =
                 models::subjects::get_subjects_for_group(con.deref_mut(), group_id).await?;
             let subjects_map: BTreeMap<i32, SubjectModel> = subjects

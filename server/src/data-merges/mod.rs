@@ -8,4 +8,5 @@ pub enum MergeResult {
     NotModified,
     Updated,
     Inserted,
+    Removed,
 }

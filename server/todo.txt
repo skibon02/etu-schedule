@@ -6,8 +6,10 @@ update modified_timestamp for db objects (for update requests)
 
 
 TODAY:
-get rid of unwraps in merge logic
-
 get rid of SPAMMERS +
 
-remove old schedule objects
+remove old schedule objects +
+
+get rid of unwraps in merge logic
+
+fix semester start date

@@ -214,7 +214,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
         .level(LevelFilter::Error)
         .chain(fern::log_file("output_error.log")?);
 
-    let _combined_log = Dispatch::new()
+    Dispatch::new()
         .chain(console_log)
         .chain(debug_file_log)
         .chain(info_file_log)

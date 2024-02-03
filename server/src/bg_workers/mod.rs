@@ -87,6 +87,6 @@ async fn process_schedule_merge(group_id_vec: Vec<i32>, con: &mut PgConnection) 
     info!(
         "BGTASK: Merge for {} groups finished in {:?}",
         group_id_vec.len(),
-        (Instant::now() - start)
+        Instant::now() - start
     );
 }

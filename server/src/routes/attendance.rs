@@ -38,7 +38,7 @@ pub async fn get_user_attendance_schedule(
 
     // get user group link_id elements
     let schedule_link_ids =
-        models::schedule::get_current_schedule_link_ids(&mut db, group_id).await?;
+        models::schedule::get_active_schedule_link_ids(&mut db, group_id).await?;
 
     let mut res = BTreeMap::new();
     for link_id in schedule_link_ids {
@@ -88,7 +88,7 @@ pub async fn set_user_attendance_schedule(
 
     // get user group link_id elements
     let schedule_link_ids =
-        models::schedule::get_current_schedule_link_ids(&mut db, group_id).await?;
+        models::schedule::get_active_schedule_link_ids(&mut db, group_id).await?;
 
     if !schedule_link_ids.contains(&data.schedule_obj_time_link_id) {
         return SetUserAttendanceScheduleRes::failed("Schedule object not found!");
@@ -138,7 +138,7 @@ pub async fn set_user_attendance_schedule_all(
 
     // get user group link_id elements
     let schedule_link_ids =
-        models::schedule::get_current_schedule_link_ids(&mut db, group_id).await?;
+        models::schedule::get_active_schedule_link_ids(&mut db, group_id).await?;
     models::attendance::set_attendance_schedule_all(
         &mut db,
         auth.user_id,
@@ -181,7 +181,7 @@ pub async fn get_user_attendance_schedule_diffs(
 
     // get user group link_id elements
     let schedule_link_ids =
-        models::schedule::get_current_schedule_link_ids(&mut db, group_id).await?;
+        models::schedule::get_active_schedule_link_ids(&mut db, group_id).await?;
 
     let mut res = BTreeMap::new();
     for link_id in schedule_link_ids {
@@ -236,7 +236,7 @@ pub async fn set_user_attendance_schedule_diffs(
 
     // get user group link_id elements
     let schedule_link_ids =
-        models::schedule::get_current_schedule_link_ids(&mut db, group_id).await?;
+        models::schedule::get_active_schedule_link_ids(&mut db, group_id).await?;
     if !schedule_link_ids.contains(&data.schedule_obj_time_link_id) {
         return SetUserAttendanceDiffsScheduleRes::failed("Schedule object not found!");
     }

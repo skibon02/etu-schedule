@@ -8,25 +8,25 @@ use sqlx::{Connection, PgConnection};
 
 async fn single_subject_merge(
     subject_id: i32,
-    subject: &SubjectModel,
+    input_subject: &SubjectModel,
     last_gen_id: i32,
     con: &mut PgConnection,
 ) -> anyhow::Result<MergeResult> {
     trace!("Merging single subject {}", subject_id);
-    let subject = subject.clone();
+    let subject = input_subject.clone();
 
     let res = con.transaction(|trx| Box::pin(async move {
-        let row : Option<SubjectModel> = models::subjects::get_cur_gen_subject_by_id(subject_id, &mut *trx).await?;
+        let existing_subject: Option<SubjectModel> = models::subjects::get_cur_gen_subject_by_id(subject_id, &mut *trx).await?;
 
-        if let Some(row) = row {
+        if let Some(existing_subject) = existing_subject {
             // merge
             trace!("Found existing subject");
 
             let mut diff = false;
-            if row.title != subject.title ||
-                row.short_title != subject.short_title ||
-                row.subject_type != subject.subject_type ||
-                row.control_type != subject.control_type {
+            if existing_subject.title != subject.title ||
+                existing_subject.short_title != subject.short_title ||
+                existing_subject.subject_type != subject.subject_type ||
+                existing_subject.control_type != subject.control_type {
                 diff = true;
             }
 
@@ -58,9 +58,9 @@ async fn single_subject_merge(
             else {
                 trace!("No difference in subject, skipping...");
                 // btw update untracked information
-                if row.semester != subject.semester ||
-                    row.alien_id != subject.alien_id ||
-                    row.department_id != subject.department_id {
+                if existing_subject.semester != subject.semester ||
+                    existing_subject.alien_id != subject.alien_id ||
+                    existing_subject.department_id != subject.department_id {
                     trace!("Updating untracked information in subject...");
 
                     sqlx::query!("UPDATE subjects SET semester = $1, alien_id = $2, department_id = $3 WHERE subject_id = $4",

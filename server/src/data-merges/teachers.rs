@@ -116,7 +116,6 @@ async fn single_teacher_merge(
             let new_gen_id = last_gen_id + 1;
             models::teachers::create_new_gen(&mut *trx, new_gen_id).await?;
 
-
             sqlx::query!("INSERT INTO teachers (teacher_id, \
         initials, name, surname, midname, birthday, email, group_id,\
         is_worker, is_department_head, is_department_dispatcher,

@@ -11,7 +11,7 @@ use crate::models::groups::get_not_merged_sched_group_id_list;
 const GROUPS_MERGE_INTERVAL: u64 = 60 * 5;
 
 pub async fn periodic_schedule_merge_task(
-    mut con: &mut PoolConnection<Postgres>,
+    con: &mut PoolConnection<Postgres>,
     mut shutdown_watcher: Receiver<bool>,
 ) {
     info!("PERIODIC_MERGE_TASK: Phase 1. Initial merge for all groups.");
@@ -33,11 +33,11 @@ pub async fn periodic_schedule_merge_task(
 
     info!("PERIODIC_MERGE_TASK: starting merge routine...");
     loop {
-        let group_id_range = models::groups::get_oldest_group_id_list(&mut con, 30)
+        let group_id_range = models::groups::get_oldest_group_id_list(con, 30)
             .await
             .unwrap();
 
-        process_schedule_merge(group_id_range, &mut con).await;
+        process_schedule_merge(group_id_range, con).await;
 
         select!(
             _ = tokio::time::sleep(tokio::time::Duration::from_secs(GROUPS_MERGE_INTERVAL)) => {}

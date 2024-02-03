@@ -86,7 +86,7 @@ pub async fn get_time_since_last_group_merge(
     group_id: i32,
     con: &mut PgConnection,
 ) -> DbResult<Option<i32>> {
-    // 1 option: if we have such group and it has latest_schedule_merge_timestamp
+    // 1 option: if we have such group, and it has latest_schedule_merge_timestamp
     //
     let res: Option<Option<PgInterval>> = sqlx::query_scalar!(
         "SELECT NOW() - latest_schedule_merge_timestamp FROM groups WHERE group_id = $1 \
@@ -118,7 +118,7 @@ pub async fn get_time_since_last_group_merge(
     }
 }
 
-pub async fn set_last_group_merge(group_id: i32, con: &mut PgConnection) -> DbResult<()> {
+pub async fn set_last_group_schedule_merge(group_id: i32, con: &mut PgConnection) -> DbResult<()> {
     sqlx::query!(
         "UPDATE groups SET latest_schedule_merge_timestamp = NOW() WHERE group_id = $1",
         group_id
