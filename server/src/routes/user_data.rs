@@ -8,7 +8,7 @@ use crate::models::Db;
 use crate::models::groups::GroupModel;
 use crate::models::users::{SubjectsTitleFormatting, UserDataModel, UserDataOptionalModel};
 use crate::routes::auth::AuthorizeInfo;
-use crate::routes::{GenericResponder, ResponderWithSuccess, ResponseErrorMessage};
+use crate::routes::{ResponderWithSuccess};
 
 #[derive(Serialize)]
 pub struct SetUserGroupSuccess {
@@ -170,7 +170,7 @@ pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<Authorize
                 if res.groups.len() > 1 {
                     return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "too_many_groups".to_string() });
                 }
-                (res.groups[0].UserGroup.role == "leader", res.groups[0].name.clone())
+                (res.groups[0].user_group.role == "leader", res.groups[0].name.clone())
             }
             GetCurrentUserResult::WrongToken => {
                 warn!("Wrong token: {}", token);

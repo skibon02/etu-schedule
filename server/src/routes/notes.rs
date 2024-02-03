@@ -86,7 +86,7 @@ pub async fn get_user_notes(mut db: Connection<Db>, auth: Option<AuthorizeInfo>)
     if group_id.is_none() {
         return GetRes::failed("User has no group!");
     }
-    let group_id = group_id.unwrap().group_id;
+    let _group_id = group_id.unwrap().group_id;
 
     // get user notes
     let res = models::notes::get_user_notes(&mut db, auth.user_id).await?;

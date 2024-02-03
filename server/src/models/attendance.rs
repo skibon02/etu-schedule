@@ -1,6 +1,6 @@
 use std::collections::btree_map::Entry::Vacant;
 use std::collections::BTreeMap;
-use sqlx::{Acquire, Connection, PgConnection};
+use sqlx::{Connection, PgConnection};
 use crate::models;
 use crate::models::DbResult;
 use crate::models::schedule::WeekDay;
@@ -190,7 +190,7 @@ pub async fn get_current_pending_attendance_marks(con: &mut PgConnection, week: 
     for user in users {
         let user_schedule = get_active_attendance_objs_at_time(con, user, week, week_parity.clone(), week_day, time).await?;
         let user_data = models::users::get_user_data(con, user).await?;
-        for (time_link_id, subject_id) in &user_schedule {
+        for (_, subject_id) in &user_schedule {
             if let Vacant(e) = subjects.entry(*subject_id) {
                 let subject = models::subjects::get_cur_gen_subject_by_id(*subject_id, con).await?.unwrap();
                 e.insert(subject);

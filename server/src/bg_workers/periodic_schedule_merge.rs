@@ -1,13 +1,13 @@
-use std::sync::Arc;
-use std::time::Instant;
+
+
 use sqlx::pool::PoolConnection;
 use sqlx::Postgres;
 use tokio::select;
 use tokio::sync::watch::Receiver;
 use crate::api::etu_api;
-use crate::bg_workers::{ETU_REQUEST_INTERVAL, process_schedule_merge};
+use crate::bg_workers::{process_schedule_merge};
 use crate::{data_merges, models};
-use crate::models::Db;
+
 use crate::models::groups::get_not_merged_sched_group_id_list;
 
 const GROUPS_MERGE_INTERVAL: u64 = 60*5;

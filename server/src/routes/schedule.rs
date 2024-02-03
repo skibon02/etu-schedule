@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 use std::ops::DerefMut;
 
-use rocket::{serde::json::Json, Route};
+use rocket::{Route};
 use rocket_db_pools::Connection;
 
 use crate::{models::groups::GroupModel, models};
@@ -10,7 +10,7 @@ use crate::models::Db;
 use crate::models::schedule::{ScheduleObjModel};
 use crate::models::subjects::SubjectModel;
 use crate::models::teachers::TeacherModel;
-use crate::routes::{ResponderWithSuccess, ResponseErrorMessage};
+use crate::routes::{ResponderWithSuccess};
 
 
 #[derive(serde::Serialize)]

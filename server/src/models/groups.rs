@@ -1,8 +1,8 @@
-use sqlx::{Acquire, Row, Postgres, PgConnection};
+use sqlx::PgConnection;
 
-use super::{Db, DbResult};
+use super::{DbResult};
 use serde_derive::Serialize;
-use sqlx::pool::PoolConnection;
+
 use sqlx::postgres::types::PgInterval;
 use time::PrimitiveDateTime;
 

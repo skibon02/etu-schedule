@@ -42,7 +42,7 @@ async fn process_schedule_merge(group_id_vec: Vec<i32>, con: &mut PgConnection) 
         let mut departments: Vec<DepartmentModel> = Vec::new();
         let mut teachers: BTreeMap<i32, (TeacherModel, Vec<String>)> = BTreeMap::new();
 
-        for sched_obj_orig in sched_objs.scheduleObjects {
+        for sched_obj_orig in sched_objs.schedule_objects {
             sched_objs_models.push(sched_obj_orig.clone().try_into().unwrap());
             subjects.entry(sched_obj_orig.lesson.subject.id).or_default().push(sched_obj_orig.lesson.subject.clone().into());
             departments.push(sched_obj_orig.lesson.subject.department.into());
@@ -51,15 +51,15 @@ async fn process_schedule_merge(group_id_vec: Vec<i32>, con: &mut PgConnection) 
                 let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
                 teachers.insert(teacher_model.0.teacher_id, teacher_model);
             }
-            if let Some(teacher) = sched_obj_orig.lesson.secondTeacher {
+            if let Some(teacher) = sched_obj_orig.lesson.second_teacher {
                 let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
                 teachers.insert(teacher_model.0.teacher_id, teacher_model);
             }
-            if let Some(teacher) = sched_obj_orig.lesson.thirdTeacher {
+            if let Some(teacher) = sched_obj_orig.lesson.third_teacher {
                 let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
                 teachers.insert(teacher_model.0.teacher_id, teacher_model);
             }
-            if let Some(teacher) = sched_obj_orig.lesson.fourthTeacher {
+            if let Some(teacher) = sched_obj_orig.lesson.fourth_teacher {
                 let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
                 teachers.insert(teacher_model.0.teacher_id, teacher_model);
             }

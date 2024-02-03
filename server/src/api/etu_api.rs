@@ -10,7 +10,6 @@ use itertools::Itertools;
 use rocket::time::PrimitiveDateTime;
 
 const BASE_URL_SCHEDULE: &str = "https://digital.etu.ru/api/schedule/";
-const BASE_URL_ATTENDANCE: &str = "https://digital.etu.ru/api/attendance/";
 const BASE_URL_GENERAL: &str = "https://digital.etu.ru/api/general/";
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
@@ -28,11 +27,13 @@ impl FacultyOriginal {
     }
 }
 
+
 #[derive(Deserialize, Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SubjectDepartmentOriginal {
     pub id: i32,
     pub title: String,
-    pub longTitle: Option<String>,
+    pub long_title: Option<String>,
     #[serde(rename = "type")]
     pub _type: String,
 }
@@ -42,7 +43,7 @@ impl Into<DepartmentModel> for SubjectDepartmentOriginal {
         DepartmentModel {
             department_id: self.id,
             title: self.title,
-            long_title: self.longTitle,
+            long_title: self.long_title,
             department_type: self._type,
             faculty_id: None,
         }
@@ -50,10 +51,11 @@ impl Into<DepartmentModel> for SubjectDepartmentOriginal {
 }
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DepartmentOriginal {
     pub id: i32,
     pub title: String,
-    pub longTitle: Option<String>,
+    pub long_title: Option<String>,
     #[serde(rename = "type")]
     pub _type: String,
     pub faculty: FacultyOriginal
@@ -64,7 +66,7 @@ impl DepartmentOriginal {
         DepartmentModel {
             department_id: self.id,
             title: self.title.clone(),
-            long_title: self.longTitle.clone(),
+            long_title: self.long_title.clone(),
             department_type: self._type.clone(),
             faculty_id: Some(self.faculty.id),
         }
@@ -74,16 +76,17 @@ impl DepartmentOriginal {
 
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct GroupOriginal {
-    pub fullNumber: String,
+    pub full_number: String,
     pub id: i32,
     pub number: String,
-    pub studyingType: String,
-    pub educationLevel: String,
-    pub departmentId: i32,
-    pub specialtyId: i32,
-    pub startYear: i32,
-    pub endYear: i32,
+    pub studying_type: String,
+    pub education_level: String,
+    pub department_id: i32,
+    pub specialty_id: i32,
+    pub start_year: i32,
+    pub end_year: i32,
     pub department: DepartmentOriginal
 }
 
@@ -92,12 +95,12 @@ impl GroupOriginal {
         GroupModel {
             group_id: self.id,
             number: self.number.clone(),
-            studying_type: self.studyingType.clone(),
-            education_level: self.educationLevel.clone(),
-            start_year: self.startYear,
-            end_year: self.endYear,
-            department_id: self.departmentId,
-            specialty_id: self.specialtyId,
+            studying_type: self.studying_type.clone(),
+            education_level: self.education_level.clone(),
+            start_year: self.start_year,
+            end_year: self.end_year,
+            department_id: self.department_id,
+            specialty_id: self.specialty_id,
 
             // missing info:
             latest_schedule_merge_timestamp: None,
@@ -106,33 +109,36 @@ impl GroupOriginal {
 }
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ReservationTimeOriginal {
     id: i32,
-    startTime: i32,
-    endTime: i32,
+    start_time: i32,
+    end_time: i32,
     week: String,
-    weekDay: String,
+    week_day: String,
 }
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AuditoriumReservationOriginal {
     id: u32,
-    auditoriumNumber: Option<String>,
+    auditorium_number: Option<String>,
     description: String,
     #[serde(rename = "type")]
     _type: String,
-    reservationTime: ReservationTimeOriginal,
-    updatedAt: Option<String>,
+    reservation_time: ReservationTimeOriginal,
+    updated_at: Option<String>,
 }
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SubjectOriginal {
     pub id: i32,
-    pub alienId: i32,
+    pub alien_id: i32,
     pub title: String,
-    pub shortTitle: String,
-    pub subjectType: String,
-    pub controlType: Option<String>,
+    pub short_title: String,
+    pub subject_type: String,
+    pub control_type: Option<String>,
     pub department: SubjectDepartmentOriginal,
     pub semester: i32,
 }
@@ -142,10 +148,10 @@ impl Into<SubjectModel> for SubjectOriginal {
         SubjectModel {
             subject_id: self.id,
             title: self.title,
-            short_title: self.shortTitle,
-            alien_id: self.alienId,
-            subject_type: self.subjectType,
-            control_type: self.controlType,
+            short_title: self.short_title,
+            alien_id: self.alien_id,
+            subject_type: self.subject_type,
+            control_type: self.control_type,
             department_id: self.department.id,
             semester: self.semester,
 
@@ -162,6 +168,7 @@ impl Into<SubjectModel> for SubjectOriginal {
 }
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct TeacherOriginal {
     id: i32,
 
@@ -172,13 +179,13 @@ pub struct TeacherOriginal {
 
     birthday: String,
     email: Option<String>,
-    groupId: Option<i32>,
+    group_id: Option<i32>,
 
     rank: Option<String>,
     position: Option<String>,
     degree: Option<String>,
     roles: Vec<String>,
-    workDepartments: Option<Vec<String>>,
+    work_departments: Option<Vec<String>>,
 }
 
 impl Into<(TeacherModel, Vec<String>)> for TeacherOriginal {
@@ -197,7 +204,7 @@ impl Into<(TeacherModel, Vec<String>)> for TeacherOriginal {
             midname: self.midname,
             birthday: fixed_birthday,
             email: self.email,
-            group_id: self.groupId,
+            group_id: self.group_id,
             is_worker,
             is_department_head,
             is_department_dispatcher,
@@ -215,23 +222,24 @@ impl Into<(TeacherModel, Vec<String>)> for TeacherOriginal {
             created_timestamp: PrimitiveDateTime::MIN,
             modified_timestamp: PrimitiveDateTime::MIN,
         };
-        let work_departments = self.workDepartments.unwrap_or_default();
+        let work_departments = self.work_departments.unwrap_or_default();
 
         (teacher, work_departments)
     }
 }
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct LessonOriginal {
     pub id: i32,
-    pub auditoriumReservation: AuditoriumReservationOriginal,
+    pub auditorium_reservation: AuditoriumReservationOriginal,
     pub subject: SubjectOriginal,
     pub teacher: Option<TeacherOriginal>,
-    pub secondTeacher: Option<TeacherOriginal>,
+    pub second_teacher: Option<TeacherOriginal>,
     // not included in original response
-    pub thirdTeacher: Option<TeacherOriginal>,
+    pub third_teacher: Option<TeacherOriginal>,
     // not included in original response
-    pub fourthTeacher: Option<TeacherOriginal>,
+    pub fourth_teacher: Option<TeacherOriginal>,
 }
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
@@ -247,13 +255,13 @@ impl TryInto<ScheduleObjModel> for ScheduleObjectOriginal {
             last_known_orig_sched_obj_id: self.id,
             subject_id: self.lesson.subject.id,
             teacher_id: self.lesson.teacher.as_ref().map(|t| t.id),
-            second_teacher_id: self.lesson.secondTeacher.as_ref().map(|t| t.id),
-            third_teacher_id: self.lesson.thirdTeacher.as_ref().map(|t| t.id),
-            fourth_teacher_id: self.lesson.fourthTeacher.as_ref().map(|t| t.id),
-            auditorium: self.lesson.auditoriumReservation.auditoriumNumber.clone(),
-            time: self.lesson.auditoriumReservation.reservationTime.startTime,
-            week_day: WeekDay::try_from(self.lesson.auditoriumReservation.reservationTime.weekDay.clone()).map_err(|_| "Cannot parse week day!".to_string())?,
-            week_parity: self.lesson.auditoriumReservation.reservationTime.week.clone(),
+            second_teacher_id: self.lesson.second_teacher.as_ref().map(|t| t.id),
+            third_teacher_id: self.lesson.third_teacher.as_ref().map(|t| t.id),
+            fourth_teacher_id: self.lesson.fourth_teacher.as_ref().map(|t| t.id),
+            auditorium: self.lesson.auditorium_reservation.auditorium_number.clone(),
+            time: self.lesson.auditorium_reservation.reservation_time.start_time,
+            week_day: WeekDay::try_from(self.lesson.auditorium_reservation.reservation_time.week_day.clone()).map_err(|_| "Cannot parse week day!".to_string())?,
+            week_parity: self.lesson.auditorium_reservation.reservation_time.week.clone(),
 
             // unrelated info
             subject_gen_id: Default::default(),
@@ -274,8 +282,9 @@ impl TryInto<ScheduleObjModel> for ScheduleObjectOriginal {
 
 
 #[derive(Deserialize, Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct GroupScheduleOriginal {
-    pub scheduleObjects: Vec<ScheduleObjectOriginal>,
+    pub schedule_objects: Vec<ScheduleObjectOriginal>,
     #[serde(rename = "id")]
     pub group_id: i32
 }
@@ -317,37 +326,37 @@ fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleO
     // 1) by group
     for group_schedule in sched_objs.iter() {
         trace!("Parsing group {}", group_schedule.group_id);
-        let mut group_schedule_res = GroupScheduleOriginal {scheduleObjects: Vec::new(), group_id: group_schedule.group_id};
+        let mut group_schedule_res = GroupScheduleOriginal { schedule_objects: Vec::new(), group_id: group_schedule.group_id};
 
         // 2) by subject and placement
         let mut unique_subject_positions = BTreeMap::<(i32, WeekDay, String, i32), Vec<ScheduleObjectOriginal>>::new();
-        for schedule_obj in &group_schedule.scheduleObjects {
+        for schedule_obj in &group_schedule.schedule_objects {
             // 3) subdivide start/end time
-            for time in (schedule_obj.lesson.auditoriumReservation.reservationTime.startTime%10)..(schedule_obj.lesson.auditoriumReservation.reservationTime.endTime%10+1) {
+            for time in (schedule_obj.lesson.auditorium_reservation.reservation_time.start_time%10)..(schedule_obj.lesson.auditorium_reservation.reservation_time.end_time %10+1) {
                 let mut sched_obj_clone = schedule_obj.clone();
-                sched_obj_clone.lesson.auditoriumReservation.reservationTime.startTime = time;
-                sched_obj_clone.lesson.auditoriumReservation.reservationTime.endTime = time;
+                sched_obj_clone.lesson.auditorium_reservation.reservation_time.start_time = time;
+                sched_obj_clone.lesson.auditorium_reservation.reservation_time.end_time = time;
 
                 unique_subject_positions.entry((schedule_obj.lesson.subject.id,
-                                                 WeekDay::try_from(schedule_obj.lesson.auditoriumReservation.reservationTime.weekDay.clone()).unwrap(),
-                                                 schedule_obj.lesson.auditoriumReservation.reservationTime.week.clone(),
-                                                 time)).or_default().push(sched_obj_clone);
+                                                WeekDay::try_from(schedule_obj.lesson.auditorium_reservation.reservation_time.week_day.clone()).unwrap(),
+                                                schedule_obj.lesson.auditorium_reservation.reservation_time.week.clone(),
+                                                time)).or_default().push(sched_obj_clone);
             }
         }
 
         //check uniqueness
-        for (_, mut uniq_placement_elements) in unique_subject_positions.iter_mut() {
+        for (_, uniq_placement_elements) in unique_subject_positions.iter_mut() {
             if uniq_placement_elements.len() > 1 {
                 //merge
                 warn!("During parse sched objs for group id {}...", group_schedule.group_id);
                 warn!("Found more than one schedule object for subject at single time placement");
                 info!("\tsubject_id: {}", uniq_placement_elements[0].lesson.subject.id);
-                info!("\tweek_parity: {}", uniq_placement_elements[0].lesson.auditoriumReservation.reservationTime.week);
-                info!("\tweek_day: {}", uniq_placement_elements[0].lesson.auditoriumReservation.reservationTime.weekDay);
-                info!("\ttime: {}", uniq_placement_elements[0].lesson.auditoriumReservation.reservationTime.startTime);
+                info!("\tweek_parity: {}", uniq_placement_elements[0].lesson.auditorium_reservation.reservation_time.week);
+                info!("\tweek_day: {}", uniq_placement_elements[0].lesson.auditorium_reservation.reservation_time.week_day);
+                info!("\ttime: {}", uniq_placement_elements[0].lesson.auditorium_reservation.reservation_time.start_time);
 
                 let mut auditoriums = Vec::new();
-                if let Some(auditorium) = uniq_placement_elements[0].lesson.auditoriumReservation.auditoriumNumber.clone() {
+                if let Some(auditorium) = uniq_placement_elements[0].lesson.auditorium_reservation.auditorium_number.clone() {
                     auditoriums.push(auditorium);
                 }
 
@@ -355,7 +364,7 @@ fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleO
                 // ensure everything is the same except auditorium
                 for i in 1..uniq_placement_elements.len() {
 
-                    if let Some(auditorium) = uniq_placement_elements[i].lesson.auditoriumReservation.auditoriumNumber.clone() {
+                    if let Some(auditorium) = uniq_placement_elements[i].lesson.auditorium_reservation.auditorium_number.clone() {
                         auditoriums.push(auditorium);
                     }
 
@@ -367,76 +376,70 @@ fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleO
                         // ok, only auditorium is different
                         info!("Auditorium is different, but everything else is the same, merging...");
                     }
+                    else if fir.teacher_id.is_some() && fir.second_teacher_id.is_none() &&
+                        cur.teacher_id.is_some() && cur.second_teacher_id.is_none() {
+                        // ok, we can merge it
+                        info!("1+1 case");
+                        if fir.teacher_id != cur.teacher_id {
+                            info!("Two first_teachers case");
+                            fir.second_teacher_id = cur.teacher_id;
+                            uniq_placement_elements[0].lesson.second_teacher = uniq_placement_elements[i].lesson.teacher.clone();
+                        }
+                        else {
+                            info!("Two same first_teachers case");
+                        }
+                    }
                     else {
-                        if fir.teacher_id.is_some() && fir.second_teacher_id.is_none() &&
+                        // no teachers is ok
+                        if fir.teacher_id.is_none() && fir.second_teacher_id.is_none() &&
+                            cur.teacher_id.is_none() && cur.second_teacher_id.is_none() {
+                            info!("0+0 case");
+                        }
+                        else if fir.second_teacher_id.is_some() && fir.third_teacher_id.is_none() &&
                             cur.teacher_id.is_some() && cur.second_teacher_id.is_none() {
                             // ok, we can merge it
-                            info!("1+1 case");
-                            if fir.teacher_id != cur.teacher_id {
-                                info!("Two first_teachers case");
-                                fir.second_teacher_id = cur.teacher_id;
-                                uniq_placement_elements[0].lesson.secondTeacher = uniq_placement_elements[i].lesson.teacher.clone();
+                            info!("2+1 case");
+                            if fir.second_teacher_id == cur.teacher_id ||
+                                fir.teacher_id == cur.teacher_id {
+                                info!("Same, merge not needed");
                             }
                             else {
-                                info!("Two same first_teachers case");
+                                info!("Different, merge needed");
+                                fir.third_teacher_id = cur.teacher_id;
+                                uniq_placement_elements[0].lesson.third_teacher = uniq_placement_elements[i].lesson.teacher.clone();
+                            }
+                        }
+                        else if fir.third_teacher_id.is_some() && fir.fourth_teacher_id.is_none() &&
+                            cur.teacher_id.is_some() && cur.second_teacher_id.is_none() {
+                            info!("3+1 case");
+
+                            if fir.third_teacher_id == cur.teacher_id ||
+                                fir.second_teacher_id == cur.teacher_id ||
+                                fir.teacher_id == cur.teacher_id {
+                                info!("Same, merge not needed");
+                            }
+                            else {
+                                info!("Different, merge needed");
+                                fir.fourth_teacher_id = cur.teacher_id;
+                                uniq_placement_elements[0].lesson.fourth_teacher = uniq_placement_elements[i].lesson.teacher.clone();
                             }
                         }
                         else {
-                            // no teachers is ok
-                            if fir.teacher_id.is_none() && fir.second_teacher_id.is_none() &&
-                                cur.teacher_id.is_none() && cur.second_teacher_id.is_none() {
-                                info!("0+0 case");
-                            }
-                            else {
-                                if fir.second_teacher_id.is_some() && fir.third_teacher_id.is_none() &&
-                                    cur.teacher_id.is_some() && cur.second_teacher_id.is_none() {
-                                    // ok, we can merge it
-                                    info!("2+1 case");
-                                    if fir.second_teacher_id == cur.teacher_id ||
-                                        fir.teacher_id == cur.teacher_id {
-                                        info!("Same, merge not needed");
-                                    }
-                                    else {
-                                        info!("Different, merge needed");
-                                        fir.third_teacher_id = cur.teacher_id;
-                                        uniq_placement_elements[0].lesson.thirdTeacher = uniq_placement_elements[i].lesson.teacher.clone();
-                                    }
-                                }
-                                else {
-                                    if fir.third_teacher_id.is_some() && fir.fourth_teacher_id.is_none() &&
-                                        cur.teacher_id.is_some() && cur.second_teacher_id.is_none() {
-                                        info!("3+1 case");
-
-                                        if fir.third_teacher_id == cur.teacher_id ||
-                                            fir.second_teacher_id == cur.teacher_id ||
-                                            fir.teacher_id == cur.teacher_id {
-                                            info!("Same, merge not needed");
-                                        }
-                                        else {
-                                            info!("Different, merge needed");
-                                            fir.fourth_teacher_id = cur.teacher_id;
-                                            uniq_placement_elements[0].lesson.fourthTeacher = uniq_placement_elements[i].lesson.teacher.clone();
-                                        }
-                                    }
-                                    else {
-                                        error!("Error, only auditorium can be different in unique subject and placement group! abotring...");
-                                        return Err(anyhow::anyhow!("Error! only auditorium can be different in unique subject and placement group!"))
-                                    }
-                                }
-                            }
+                            error!("Error, only auditorium can be different in unique subject and placement group! abotring...");
+                            return Err(anyhow::anyhow!("Error! only auditorium can be different in unique subject and placement group!"))
                         }
                     }
                 }
                 if auditoriums.len() == 0 {
-                    uniq_placement_elements[0].lesson.auditoriumReservation.auditoriumNumber = None;
+                    uniq_placement_elements[0].lesson.auditorium_reservation.auditorium_number = None;
                 }
                 else {
-                    uniq_placement_elements[0].lesson.auditoriumReservation.auditoriumNumber = Some(auditoriums.join(", "));
+                    uniq_placement_elements[0].lesson.auditorium_reservation.auditorium_number = Some(auditoriums.join(", "));
                 }
-                group_schedule_res.scheduleObjects.push(uniq_placement_elements[0].clone());
+                group_schedule_res.schedule_objects.push(uniq_placement_elements[0].clone());
             }
             else {
-                group_schedule_res.scheduleObjects.push(uniq_placement_elements[0].clone());
+                group_schedule_res.schedule_objects.push(uniq_placement_elements[0].clone());
             }
         }
 

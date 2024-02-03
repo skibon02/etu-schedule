@@ -4,4 +4,10 @@ detect bg task failure
 
 update modified_timestamp for db objects (for update requests)
 
+
+TODAY:
 get rid of unwraps in merge logic
+
+get rid of SPAMMERS +
+
+remove old schedule objects

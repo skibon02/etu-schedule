@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Context};
-use sqlx::{Acquire, PgConnection, Postgres};
-use sqlx::pool::PoolConnection;
-use crate::api::etu_api::{DepartmentOriginal, FacultyOriginal, GroupOriginal};
+use sqlx::{PgConnection};
+
+use crate::api::etu_api::{GroupOriginal};
 use crate::data_merges::MergeResult;
 
 use crate::models::groups::{DepartmentModel, FacultyModel, GroupModel};

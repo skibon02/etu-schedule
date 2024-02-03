@@ -5,7 +5,7 @@ export default function NoMatchRoute() {
       <br />
       Попробуйте открыть эту:
       <br /> 
-      <a className="no-match-link" href="https://77.246.107.64/">https://77.246.107.64/</a>
+      <a className="no-match-link" href="https://etu-schedule.ru/">etu-schedule</a>
     </div>
   )
 }

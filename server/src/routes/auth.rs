@@ -15,7 +15,7 @@ use crate::api::vk_api;
 
 #[post("/auth/deauth")]
 fn deauth(cookie: &CookieJar) -> Status {
-    cookie.remove_private(Cookie::named("token"));
+    cookie.remove_private(Cookie::build("token"));
     Status::Ok
 }
 
@@ -61,7 +61,7 @@ impl<'r> FromRequest<'r> for AuthorizeInfo {
     type Error = ();
     async fn from_request(req: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
         let db = req.guard::<&Db>().await;
-        let Outcome::Success(mut db) = db else {
+        let Outcome::Success(db) = db else {
             error!("Failed to get db: {:?}", db);
             return Outcome::Forward(Status::InternalServerError);
         };
@@ -136,6 +136,7 @@ async fn auth_data_fallback() -> Json<Value> {
     }))
 }
 
+#[allow(dead_code)]
 #[derive(Deserialize, Debug)]
 struct UserVkData {
     id: u32,
@@ -145,7 +146,9 @@ struct UserVkData {
     phone: String,
 }
 
+#[allow(dead_code)]
 #[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 struct AuthRedirectParams {
     auth: u32,
     #[serde(rename = "type")]
@@ -155,7 +158,6 @@ struct AuthRedirectParams {
     ttl: u32,
     uuid: String,
     hash: String,
-    #[serde(rename = "loadExternalUsers")]
     load_external_users: Option<bool>,
 }
 

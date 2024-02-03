@@ -1,10 +1,10 @@
 use std::collections::BTreeMap;
 use anyhow::Context;
-use sqlx::pool::PoolConnection;
-use sqlx::{Acquire, Connection, PgConnection, Postgres};
+
+use sqlx::{Connection, PgConnection};
 use crate::data_merges::MergeResult;
 use crate::models;
-use crate::models::teachers::{get_teachers_cur_gen, TeacherModel};
+use crate::models::teachers::{TeacherModel};
 
 async fn insert_teacher_work_departments(teacher_id: i32, work_departments: Vec<String>, con: &mut PgConnection) -> anyhow::Result<()> {
     con.transaction(|trx| Box::pin(async move {

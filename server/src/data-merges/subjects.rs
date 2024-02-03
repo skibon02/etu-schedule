@@ -1,10 +1,10 @@
 use std::collections::BTreeMap;
 use anyhow::Context;
-use sqlx::pool::PoolConnection;
-use sqlx::{Acquire, Connection, PgConnection, Postgres};
+
+use sqlx::{Connection, PgConnection};
 use crate::data_merges::MergeResult;
 use crate::models;
-use crate::models::subjects::{get_subjects_cur_gen, SubjectModel};
+use crate::models::subjects::{SubjectModel};
 
 async fn single_subject_merge(subject_id: i32, subject: &SubjectModel, last_gen_id: i32, con: &mut PgConnection) -> anyhow::Result<MergeResult> {
     trace!("Merging single subject {}", subject_id);

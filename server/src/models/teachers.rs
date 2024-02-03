@@ -1,6 +1,6 @@
 use anyhow::Context;
 use rocket::time::PrimitiveDateTime;
-use sqlx::{Row, PgConnection};
+use sqlx::PgConnection;
 use crate::models::DbResult;
 
 #[derive(sqlx::FromRow, Debug, Clone, PartialEq)]

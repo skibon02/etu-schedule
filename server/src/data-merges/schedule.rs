@@ -123,7 +123,7 @@ async fn single_schedule_obj_group_merge(group_id: i32, input_schedule_objs: &Ve
                         || existing_sched_obj.teacher_gen_id.map(|id| id != latest_teachers_gen).unwrap_or(false) {
                         debug!("Updating untracked information for schedule object");
 
-                        let new_teacher_gen_id = existing_sched_obj.teacher_id.map(|id| latest_teachers_gen);
+                        let new_teacher_gen_id = existing_sched_obj.teacher_gen_id.map(|_| latest_teachers_gen);
                         sqlx::query!("UPDATE schedule_objs SET \
                             last_known_orig_sched_obj_id = $1, \
                             subject_gen_id = $2, \
@@ -215,11 +215,10 @@ pub async fn schedule_objs_merge(group_id: i32, schedule_objs: &Vec<ScheduleObjM
     let last_gen_id = get_last_gen_id(con, group_id).await?;
     info!("MERGE::SCHEDULE_OBJ_GROUP Last generation: {}", last_gen_id);
 
-    let mut any_modified = false;
+    let mut modified = false;
     let mut total_inserted_cnt = 0;
     let mut total_changed_cnt = 0;
     for (subj_id, subj_sched_objs) in subj_id_to_sched_objs {
-        let mut modified = false;
         let mut inserted_cnt = 0;
         let mut changed_cnt = 0;
 
@@ -251,7 +250,7 @@ pub async fn schedule_objs_merge(group_id: i32, schedule_objs: &Vec<ScheduleObjM
 
     models::groups::set_last_group_merge(group_id, con).await?;
 
-    if any_modified {
+    if modified {
         info!("MERGE::SCHEDULE_OBJ_GROUP Merge schedule objects for group finished with changes! New generation created with id {}", last_gen_id + 1);
         info!("\tinserted: {}", total_inserted_cnt);
         info!("\tchanged: {}", total_changed_cnt);

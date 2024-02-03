@@ -1,14 +1,14 @@
 use std::sync::atomic::AtomicUsize;
-use std::sync::{Arc, OnceLock};
+use std::sync::{OnceLock};
 use std::time::Instant;
 use sqlx::pool::PoolConnection;
 use sqlx::Postgres;
 use tokio::select;
-use tokio::sync::Notify;
+
 use tokio::sync::watch::Receiver;
 use crate::{models};
 use crate::bg_workers::{ETU_REQUEST_INTERVAL, process_schedule_merge};
-use crate::models::Db;
+
 
 const SINGLE_GROUP_INTERVAL: i32 = 30;
 const FORCE_REQ_CHANNEL_SIZE: usize = 50;

@@ -2,8 +2,8 @@ use anyhow::{anyhow, Context};
 use rocket::time::PrimitiveDateTime;
 use rocket_db_pools::Connection;
 use serde_derive::{Deserialize, Serialize};
-use sqlx::{Acquire, Row, Postgres, PgConnection};
-use sqlx::pool::PoolConnection;
+use sqlx::{Acquire, PgConnection};
+
 use thiserror::Error;
 use crate::models::groups::GroupModel;
 

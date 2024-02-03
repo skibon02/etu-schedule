@@ -8,7 +8,7 @@ pub mod bg_workers;
 #[macro_use]
 extern crate rocket;
 
-use rocket::data::FromData;
+
 use rocket::fairing::{AdHoc, Fairing, Info, Kind};
 use rocket::outcome::Outcome;
 use rocket::request::FromRequest;
@@ -101,8 +101,16 @@ impl<'r> FromRequest<'r> for DocumentRequest {
     }
 }
 
+static FRONTEND_ROUTES: &[&str] = &["schedule", "planning", "profile"];
+
 #[get("/<path..>", rank=5)]
-async fn frontend_page(path: PathBuf, document: DocumentRequest) -> Option<NamedFile> {
+async fn frontend_page(path: PathBuf, _document: DocumentRequest) -> Option<NamedFile> {
+    info!("> frontend_page: {:?}", path);
+    // whitelist
+    if !FRONTEND_ROUTES.contains(&path.to_str().unwrap()) {
+        return None;
+    }
+
     let mut path = PathBuf::from("../client/build");
     path.push("index.html");
     NamedFile::open(path).await.ok()
@@ -133,7 +141,7 @@ pub fn bg_worker(shutdown_notifier: watch::Receiver<bool>) -> AdHoc {
 use chrono::Local;
 use colored::*;
 use fern::{Dispatch, FormatCallback};
-use lazy_static::lazy_static;
+
 use log::{LevelFilter, Record};
 use rand::Rng;
 use rocket::response::Responder;
@@ -204,7 +212,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
         .level(LevelFilter::Error)
         .chain(fern::log_file("output_error.log")?);
 
-    let combined_log = Dispatch::new()
+    let _combined_log = Dispatch::new()
         .chain(console_log)
         .chain(debug_file_log)
         .chain(info_file_log)
@@ -218,9 +226,13 @@ fn setup_logger() -> Result<(), fern::InitError> {
 use std::panic;
 use std::fs::File;
 use std::sync::Mutex;
+use base64::Engine;
+use base64::prelude::BASE64_STANDARD;
+use rocket::serde::json::json;
 
 lazy_static::lazy_static! {
     static ref PANIC_LOG_FILE: Mutex<File> = Mutex::new(File::create("panics.log").unwrap());
+    static ref IP_LOG_FILE: Mutex<File> = Mutex::new(File::create("ip.log").unwrap());
 }
 
 fn setup_panic_logger() {
@@ -321,7 +333,7 @@ pub fn run() -> Rocket<Build> {
 
             let mut rng = rand::thread_rng();
             let key: [u8; 32] = rng.gen();
-            base64::encode(&key);
+            let key = BASE64_STANDARD.encode(&key);
 
             fs::write("secret_key.txt", &key).unwrap();
             figment = figment.merge(("secret_key", key));
@@ -349,7 +361,8 @@ pub fn run() -> Rocket<Build> {
 
     rocket = rocket
         .mount("/api", routes)
-        .mount("/", routes![frontend_page]);
+        .mount("/", routes![frontend_page])
+        .register("/", catchers![not_found, default_catcher]);
 
     if with_client {
         rocket
@@ -357,6 +370,32 @@ pub fn run() -> Rocket<Build> {
     } else {
         rocket
     }
+}
+#[catch(404)]
+fn not_found(req: &Request<'_>) -> serde_json::Value {
+    if let Some(ip) = req.remote() {
+        info!("Route not found from client with IP: {}, route: {}", ip, req.uri());
+        let mut file = IP_LOG_FILE.lock().unwrap();
+        writeln!(file, "{}: Route not found from client with IP: {}, route: {}", Local::now().format("%Y-%m-%d %H:%M:%S").to_string(), ip, req.uri()).unwrap();
+    }
+
+    json! ({
+        "error": format!("Route not found: {}", req.uri())
+    })
+}
+
+
+#[catch(default)]
+fn default_catcher(status: Status, req: &Request<'_>) -> serde_json::Value {
+    if let Some(ip) = req.remote() {
+        error!("Error from client with IP: {}", ip);
+        let mut file = IP_LOG_FILE.lock().unwrap();
+        writeln!(file, "{}: Error from client with IP: {}", Local::now().format("%Y-%m-%d %H:%M:%S").to_string(), ip).unwrap();
+    }
+
+    json! ({
+        "error": format!("Unknown error: {}", status)
+    })
 }
 
 #[options("/<_path..>")]

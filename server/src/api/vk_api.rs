@@ -2,10 +2,10 @@ use reqwest::Response;
 use rocket::serde::json::Json;
 use serde_json::Value;
 use std::{
-    fs,
     sync::{Arc, OnceLock},
 };
 
+#[allow(dead_code)]
 static VK_APP_ID: &str = "7918120";
 pub static VK_SERVICE_TOKEN: OnceLock<Arc<str>> = OnceLock::new();
 

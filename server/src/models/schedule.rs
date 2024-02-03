@@ -1,12 +1,12 @@
-use anyhow::Context;
-use rocket::serde::json::Json;
+
+
 use rocket::time::PrimitiveDateTime;
-use rocket_db_pools::Connection;
-use sqlx::{Acquire, PgConnection, Postgres};
-use sqlx::pool::PoolConnection;
+
+use sqlx::{PgConnection};
+
 use crate::models;
-use crate::models::{Db, DbResult};
-use crate::routes::ResponseErrorMessage;
+use crate::models::{DbResult};
+
 
 #[derive(sqlx::Type, Default, Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 #[sqlx(type_name="week_day", rename_all="UPPERCASE")]

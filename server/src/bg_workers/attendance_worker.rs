@@ -1,16 +1,16 @@
 use std::collections::BTreeSet;
-use std::sync::Arc;
-use anyhow::Context;
-use chrono::{Datelike, NaiveTime, Timelike, TimeZone};
-use chrono_tz::Tz;
-use sqlx::{Connection, Postgres};
+
+
+use chrono::{Datelike, NaiveTime, TimeZone};
+
+use sqlx::{Postgres};
 use sqlx::pool::PoolConnection;
 use tokio::select;
-use tokio::sync::Notify;
+
 use tokio::sync::watch::Receiver;
 use crate::{api, models};
 use crate::api::etu_attendance_api::{CheckInResult, GetScheduleResult};
-use crate::models::Db;
+
 
 fn time_to_lesson_time_num(time: NaiveTime) -> Option<i32> {
     let mut lesson_time_ranges = vec![
@@ -20,7 +20,7 @@ fn time_to_lesson_time_num(time: NaiveTime) -> Option<i32> {
         NaiveTime::from_hms_opt(13, 40, 0).unwrap()..NaiveTime::from_hms_opt(15, 10, 0).unwrap(),
         NaiveTime::from_hms_opt(15, 30, 0).unwrap()..NaiveTime::from_hms_opt(17, 0, 0).unwrap(),
         NaiveTime::from_hms_opt(17, 20, 0).unwrap()..NaiveTime::from_hms_opt(18, 50, 0).unwrap(),
-        NaiveTime::from_hms_opt(19, 05, 0).unwrap()..NaiveTime::from_hms_opt(20, 35, 0).unwrap(),
+        NaiveTime::from_hms_opt(19, 5, 0).unwrap()..NaiveTime::from_hms_opt(20, 35, 0).unwrap(),
         NaiveTime::from_hms_opt(20, 50, 0).unwrap()..NaiveTime::from_hms_opt(22, 20, 0).unwrap(),
     ];
 
@@ -34,7 +34,7 @@ fn time_to_lesson_time_num(time: NaiveTime) -> Option<i32> {
     lesson_time_num
 }
 
-pub async fn attendance_worker_task(mut con: &mut PoolConnection<Postgres>, mut shutdown_watcher: Receiver<bool>) {
+pub async fn attendance_worker_task(con: &mut PoolConnection<Postgres>, mut shutdown_watcher: Receiver<bool>) {
 
     //test attendance
 
@@ -53,8 +53,8 @@ pub async fn attendance_worker_task(mut con: &mut PoolConnection<Postgres>, mut 
     warn!("Semester start: {:#?}", semester_start);
     warn!("Semester start week: {:#?}", semester_start_week);
 
-    /// Set of processed check_ins:
-    /// user_id, time_link_id, week_num
+    // Set of processed check_ins:
+    // user_id, time_link_id, week_num
     let mut processed_check_ins = BTreeSet::<(i32, i32, i32)>::new();
 
     loop {
@@ -115,8 +115,8 @@ pub async fn attendance_worker_task(mut con: &mut PoolConnection<Postgres>, mut 
                     };
 
                     let current_subjects: Vec<_> = schedule.iter().filter(|x| {
-                        x.checkInStart.parse::<chrono::DateTime<chrono::Utc>>().unwrap() <= local_time_utc &&
-                        x.checkInDeadline.parse::<chrono::DateTime<chrono::Utc>>().unwrap() >= local_time_utc
+                        x.check_in_start.parse::<chrono::DateTime<chrono::Utc>>().unwrap() <= local_time_utc &&
+                        x.check_in_deadline.parse::<chrono::DateTime<chrono::Utc>>().unwrap() >= local_time_utc
                     }).collect();
                     debug!("current_subjects: {:#?}", current_subjects);
 
@@ -140,8 +140,8 @@ pub async fn attendance_worker_task(mut con: &mut PoolConnection<Postgres>, mut 
 
                         let mut found_id = None;
                         for current_subject in &current_subjects {
-                            if current_subject.lesson.title == subject_title && current_subject.lesson.subjectType == subject_type
-                            && current_subject.lesson.shortTitle == short_title {
+                            if current_subject.lesson.title == subject_title && current_subject.lesson.subject_type == subject_type
+                            && current_subject.lesson.short_title == short_title {
                                 found_id = Some(current_subject.id);
                                 break;
                             }
