@@ -2,6 +2,7 @@ use std::collections::btree_map::Entry::Vacant;
 use std::collections::BTreeMap;
 use sqlx::{Acquire, Connection, PgConnection};
 use crate::models;
+use crate::models::DbResult;
 use crate::models::schedule::WeekDay;
 use crate::models::subjects::SubjectModel;
 use crate::models::users::UserDataModel;
@@ -12,7 +13,7 @@ pub struct UserAttendanceScheduleModel {
     pub schedule_obj_time_link_id: i32,
     pub enable_auto_attendance: bool,
 }
-pub async fn get_attendance_schedule(con: &mut PgConnection, user_id: i32) -> anyhow::Result<BTreeMap<i32, bool>> {
+pub async fn get_attendance_schedule(con: &mut PgConnection, user_id: i32) -> DbResult<BTreeMap<i32, bool>> {
     let res = sqlx::query_as!(
         UserAttendanceScheduleModel,
         "SELECT user_attendance_schedule.* FROM user_attendance_schedule join schedule_objs \
@@ -30,7 +31,7 @@ pub async fn get_attendance_schedule(con: &mut PgConnection, user_id: i32) -> an
 
 
 pub async fn set_attendance_schedule(con: &mut PgConnection, user_id: i32,
-                                     schedule_obj_time_link_id: i32, enable_auto_attendance: bool) -> anyhow::Result<()> {
+                                     schedule_obj_time_link_id: i32, enable_auto_attendance: bool) -> DbResult<()> {
 
     con.transaction(|tr| Box::pin(async move {
         //check old value
@@ -61,7 +62,7 @@ pub async fn set_attendance_schedule(con: &mut PgConnection, user_id: i32,
 }
 
 pub async fn set_attendance_schedule_all(con: &mut PgConnection, user_id: i32,
-                                         schedule_obj_time_link_ids: Vec<i32>, enable_auto_attendance: bool) -> anyhow::Result<()> {
+                                         schedule_obj_time_link_ids: Vec<i32>, enable_auto_attendance: bool) -> DbResult<()> {
 
     con.transaction(|tr| Box::pin(async move {
         for schedule_obj_time_link_id in schedule_obj_time_link_ids {
@@ -90,7 +91,7 @@ pub struct UserAttendanceScheduleDiffsModel {
     pub enable_auto_attendance: bool,
 }
 
-pub async fn get_attendance_schedule_diffs(con: &mut PgConnection, user_id: i32) -> anyhow::Result<BTreeMap<i32, Vec<(bool, i32)>>> {
+pub async fn get_attendance_schedule_diffs(con: &mut PgConnection, user_id: i32) -> DbResult<BTreeMap<i32, Vec<(bool, i32)>>> {
     let res = sqlx::query_as!(UserAttendanceScheduleDiffsModel,
         "SELECT user_attendance_schedule_diffs.* FROM user_attendance_schedule_diffs join schedule_objs \
         on user_attendance_schedule_diffs.schedule_obj_time_link_id = schedule_objs.time_link_id \
@@ -109,7 +110,7 @@ pub async fn get_attendance_schedule_diffs(con: &mut PgConnection, user_id: i32)
 }
 
 pub async fn set_attendance_schedule_diff(con: &mut PgConnection, user_id: i32,
-                                           schedule_obj_time_link_id: i32, enable_auto_attendance: bool, week_num: i32) -> anyhow::Result<()> {
+                                           schedule_obj_time_link_id: i32, enable_auto_attendance: bool, week_num: i32) -> DbResult<()> {
     // get current value for attendance schedule
     let current_value: Option<bool> = sqlx::query_scalar!("SELECT enable_auto_attendance \
     FROM user_attendance_schedule WHERE user_id = $1 AND schedule_obj_time_link_id = $2",
@@ -140,7 +141,7 @@ pub async fn set_attendance_schedule_diff(con: &mut PgConnection, user_id: i32,
 
 /// Panicking!
 /// Panic if user doesn't have attendance token set
-pub async fn get_active_attendance_objs_at_time(con: &mut PgConnection, user_id: i32, week: i64, week_parity: String, week_day: WeekDay, time: i32) -> anyhow::Result<Vec<(i32, i32)>> {
+pub async fn get_active_attendance_objs_at_time(con: &mut PgConnection, user_id: i32, week: i64, week_parity: String, week_day: WeekDay, time: i32) -> DbResult<Vec<(i32, i32)>> {
     let user_group = models::users::get_user_group(con, user_id).await?.unwrap().group_id;
     let res = sqlx::query!("SELECT schedule_objs.time_link_id, schedule_objs.subject_id FROM schedule_objs \
     WHERE schedule_objs.group_id = $5 AND schedule_objs.time = $4 AND week_day = $3 AND week_parity = $6 AND \
@@ -167,7 +168,7 @@ pub struct UserAttendanceScheduleInfo {
 }
 
 /// Requires external transaction!
-pub async fn get_current_pending_attendance_marks(con: &mut PgConnection, week: i64, week_day: WeekDay, time: i32) -> anyhow::Result<(Vec<UserAttendanceScheduleInfo>, BTreeMap<i32, SubjectModel>)> {
+pub async fn get_current_pending_attendance_marks(con: &mut PgConnection, week: i64, week_day: WeekDay, time: i32) -> DbResult<(Vec<UserAttendanceScheduleInfo>, BTreeMap<i32, SubjectModel>)> {
     let week_parity =
     if week % 2 == 0 {
         "1".to_string()

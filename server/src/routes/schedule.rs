@@ -10,7 +10,7 @@ use crate::models::Db;
 use crate::models::schedule::{ScheduleObjModel};
 use crate::models::subjects::SubjectModel;
 use crate::models::teachers::TeacherModel;
-use crate::routes::ResponseErrorMessage;
+use crate::routes::{ResponderWithSuccess, ResponseErrorMessage};
 
 
 #[derive(serde::Serialize)]
@@ -150,90 +150,78 @@ pub struct OutputGroupScheduleModel {
     actual_time: Option<i32>,
 }
 
-#[derive(Responder)]
-enum GetGroupScheduleObjectsResponse {
-    #[response(status = 200, content_type = "json")]
-    Success(Json<OutputGroupScheduleModel>),
-    #[response(status = 400, content_type = "json")]
-    Failed(Json<ResponseErrorMessage>)
-}
+type GetGroupScheduleObjectsRes = ResponderWithSuccess<OutputGroupScheduleModel>;
 
 #[get("/scheduleObjs/group/<group_id>")]
-async fn get_group_schedule_objects(group_id: i32, mut con: Connection<Db>) -> GetGroupScheduleObjectsResponse {
-    let last_merge_time = models::groups::get_time_since_last_group_merge(group_id, con.deref_mut()).await;
+async fn get_group_schedule_objects(group_id: i32, mut con: Connection<Db>) -> GetGroupScheduleObjectsRes {
+    let last_merge_time = models::groups::get_time_since_last_group_merge(group_id, con.deref_mut()).await?;
+
     match last_merge_time {
-        Ok(last_merge_time) => {
-            match last_merge_time {
-                Some(time) => {
-                    let sched_objects = models::schedule::get_current_schedule_for_group(con.deref_mut(), group_id).await.unwrap();
-                    let subjects = models::subjects::get_subjects_for_group(con.deref_mut(), group_id).await.unwrap();
-                    let subjects_map: BTreeMap<i32, SubjectModel> = subjects.into_iter().map(|row| (row.subject_id, row.clone())).collect();
+        Some(time) => {
+            let sched_objects = models::schedule::get_current_schedule_for_group(con.deref_mut(), group_id).await?;
+            let subjects = models::subjects::get_subjects_for_group(con.deref_mut(), group_id).await?;
+            let subjects_map: BTreeMap<i32, SubjectModel> = subjects.into_iter().map(|row| (row.subject_id, row.clone())).collect();
 
-                    let teachers = models::teachers::get_teachers_for_group(con.deref_mut(), group_id).await.unwrap();
-                    let mut teachers_map: BTreeMap<i32, (TeacherModel, Vec<String>)> = BTreeMap::new();
-                    for teacher in teachers {
-                        let teacher_departments = models::teachers::get_teacher_departments(teacher.teacher_id, &mut *con).await.unwrap();
-                        teachers_map.insert(teacher.teacher_id, (teacher, teacher_departments));
-                    }
+            let teachers = models::teachers::get_teachers_for_group(con.deref_mut(), group_id).await?;
+            let mut teachers_map: BTreeMap<i32, (TeacherModel, Vec<String>)> = BTreeMap::new();
+            for teacher in teachers {
+                let teacher_departments = models::teachers::get_teacher_departments(teacher.teacher_id, &mut *con).await?;
+                teachers_map.insert(teacher.teacher_id, (teacher, teacher_departments));
+            }
 
-                    if let Some(channel) = MERGE_REQUEST_CHANNEL.get(){
-                        //check if it is full
-                        if channel.try_send(group_id).is_err() {
-                            warn!("Channel is full, skipping merge request for group {}", group_id);
-                        }
-                        else {
-                            MERGE_REQUEST_CNT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-                        }
-                    }
-
-                    let output_objs: Vec<OutputScheduleObjectModel> = sched_objects.into_iter().map(|s| (s, &subjects_map, &teachers_map).try_into().unwrap()).collect();
-                    let output = OutputGroupScheduleModel {
-                        sched_objs: output_objs,
-                        is_ready: true,
-                        actual_time: Some(time)
-                    };
-
-                    GetGroupScheduleObjectsResponse::Success(Json(output))
-                },
-                None => {
-                    warn!("Group {} is not yet ready!", group_id);
-                    if let Some(channel) = MERGE_REQUEST_CHANNEL.get(){
-                        //check if it is full
-                        if channel.try_send(group_id).is_err() {
-                            warn!("Channel is full, skipping merge request for group {}", group_id);
-                        }
-                        else {
-                            MERGE_REQUEST_CNT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-                        }
-                    }
-
-                    let output = OutputGroupScheduleModel {
-                        sched_objs: Vec::new(),
-                        is_ready: false,
-                        actual_time: None
-                    };
-
-                    GetGroupScheduleObjectsResponse::Success(Json(output))
+            if let Some(channel) = MERGE_REQUEST_CHANNEL.get(){
+                //check if it is full
+                if channel.try_send(group_id).is_err() {
+                    warn!("Channel is full, skipping merge request for group {}", group_id);
+                }
+                else {
+                    MERGE_REQUEST_CNT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                 }
             }
+
+            let output_objs: Vec<OutputScheduleObjectModel> = sched_objects.into_iter().map(|s| (s, &subjects_map, &teachers_map).try_into().unwrap()).collect();
+            let output = OutputGroupScheduleModel {
+                sched_objs: output_objs,
+                is_ready: true,
+                actual_time: Some(time)
+            };
+
+            GetGroupScheduleObjectsRes::success(output)
         },
-        Err(e) => {
-            let res = ResponseErrorMessage::new(format!("Group id wasn't found!"));
-            error!("Failed to get group schedule objects: {:?}", e);
-            GetGroupScheduleObjectsResponse::Failed(Json(res))
+        None => {
+            warn!("Group {} is not yet ready!", group_id);
+            if let Some(channel) = MERGE_REQUEST_CHANNEL.get(){
+                //check if it is full
+                if channel.try_send(group_id).is_err() {
+                    warn!("Channel is full, skipping merge request for group {}", group_id);
+                }
+                else {
+                    MERGE_REQUEST_CNT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                }
+            }
+
+            let output = OutputGroupScheduleModel {
+                sched_objs: Vec::new(),
+                is_ready: false,
+                actual_time: None
+            };
+
+            GetGroupScheduleObjectsRes::success(output)
         }
     }
 
 }
 
+type GetGroupsRes = ResponderWithSuccess<BTreeMap<i32, GroupModel>>;
+
 #[get("/groups")]
-async fn get_groups(mut con: Connection<Db>) -> Json<BTreeMap<i32, GroupModel>> {
-    let groups = models::groups::get_groups(con.deref_mut()).await.unwrap();
+async fn get_groups(mut con: Connection<Db>) -> GetGroupsRes {
+    let groups = models::groups::get_groups(con.deref_mut()).await?;
     let mut out_groups = BTreeMap::new();
     for g in groups.into_iter() {
         out_groups.insert(g.group_id, g);
     }
-    Json(out_groups)
+    GetGroupsRes::success(out_groups)
 }
 
 pub fn get_routes() -> Vec<Route> {

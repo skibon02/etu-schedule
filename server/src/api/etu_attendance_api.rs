@@ -4,6 +4,7 @@ use anyhow::Context;
 use reqwest::Response;
 use rocket::serde::json::Json;
 use serde_json::Value;
+use crate::models::DbResult;
 
 #[derive(serde::Deserialize, Debug)]
 pub struct TimeResponse {
@@ -14,7 +15,7 @@ pub struct TimeResponse {
 fn route(query: &str) -> String {
     format!("https://digital.etu.ru/attendance/api/{}", query)
 }
-pub async fn get_time() -> anyhow::Result<TimeResponse> {
+pub async fn get_time() -> DbResult<TimeResponse> {
     let response: Response = reqwest::Client::new()
         .get(route("settings/time"))
         .send()
@@ -62,16 +63,9 @@ pub struct LessonInstanceResponse {
 pub enum GetScheduleResult {
     Ok(Vec<LessonInstanceResponse>),
     WrongToken,
-    Error(anyhow::Error),
 }
 
-impl<T: Debug> FromResidual<Result<T, anyhow::Error>> for GetScheduleResult {
-    fn from_residual(residual: Result<T, anyhow::Error>) -> Self {
-        GetScheduleResult::Error(residual.unwrap_err())
-    }
-}
-
-pub async fn get_cur_schedule(token: String) -> GetScheduleResult {
+pub async fn get_cur_schedule(token: String) -> DbResult<GetScheduleResult> {
     let response: Response = reqwest::Client::new()
         .get(route("schedule/check-in"))
         .header("Cookie", format!("connect.digital-attendance={}", token))
@@ -82,13 +76,13 @@ pub async fn get_cur_schedule(token: String) -> GetScheduleResult {
 
     if response.status().is_success() {
         let result: Vec<LessonInstanceResponse> = response.json().await.context("Cannot parse get_cur_schedule result with success code as LessonInstanceResponse json!")?;
-        GetScheduleResult::Ok(result)
+        Ok(GetScheduleResult::Ok(result))
     }
     else {
         warn!("Cannot get schedule: status code: {:?}", response.status().as_str());
 
         if response.status().as_u16() == 401 {
-            return GetScheduleResult::WrongToken;
+            return Ok(GetScheduleResult::WrongToken);
         }
 
         let result: Value = response.json().await.context("Cannot parse get_cur_schedule response as json")?;
@@ -117,16 +111,9 @@ pub enum CheckInResult {
     TooEarly,
     TooLate,
     WrongToken,
-    Error(anyhow::Error),
 }
 
-impl<T: Debug> FromResidual<Result<T, anyhow::Error>> for CheckInResult {
-    fn from_residual(residual: Result<T, anyhow::Error>) -> Self {
-        CheckInResult::Error(residual.unwrap_err())
-    }
-}
-
-pub async fn check_in(token: String, lesson_instance_id: i32) -> CheckInResult {
+pub async fn check_in(token: String, lesson_instance_id: i32) -> DbResult<CheckInResult> {
     let response = reqwest::Client::new()
         .post(route(&format!("schedule/check-in/{}", lesson_instance_id)))
         .header("Cookie", format!("connect.digital-attendance={}", token))
@@ -137,23 +124,23 @@ pub async fn check_in(token: String, lesson_instance_id: i32) -> CheckInResult {
     if response.status().is_success() {
         let result: AttendanceCheckInResponse = response.json().await.context("Cannot parse check_in result with success code as json!")?;
         if result.ok {
-            CheckInResult::Ok
+            Ok(CheckInResult::Ok)
         } else {
-            CheckInResult::Error(anyhow::anyhow!("Cannot make check-in: ok is not true!"))
+            Err(anyhow::anyhow!("Cannot make check-in: ok is not true!"))
         }
     } else {
         warn!("Cannot make check-in: status code: {:?}", response.status().as_str());
 
         if err_code == 401 {
-            return CheckInResult::WrongToken;
+            return Ok(CheckInResult::WrongToken);
         }
 
         let result: Value = response.json().await.context("Cannot parse check_in response as json")?;
         if let Ok(result) = serde_json::from_value::<AttendanceCheckInResponseError>(result.clone()) {
             match result.message.as_str() {
-                "Время для отметки истекло" => CheckInResult::TooLate,
-                "Время для отметки ещё не наступило" => CheckInResult::TooEarly,
-                "Не найдено" => CheckInResult::Error(anyhow::anyhow!("Cannot make check-in: lesson instance was not found!")),
+                "Время для отметки истекло" => Ok(CheckInResult::TooLate),
+                "Время для отметки ещё не наступило" => Ok(CheckInResult::TooEarly),
+                "Не найдено" => Err(anyhow::anyhow!("Cannot make check-in: lesson instance was not found!")),
                 _ => unimplemented!("Cannot parse error: {:?}", result)
             }
         } else {
@@ -207,15 +194,8 @@ pub struct CurrentUserResponse {
 pub enum GetCurrentUserResult {
     Ok(UserResponse),
     WrongToken,
-    Error(anyhow::Error),
 }
-
-impl<T: Debug> FromResidual<Result<T, anyhow::Error>> for GetCurrentUserResult {
-    fn from_residual(residual: Result<T, anyhow::Error>) -> Self {
-        GetCurrentUserResult::Error(residual.unwrap_err())
-    }
-}
-pub async fn get_current_user(token: String) -> GetCurrentUserResult {
+pub async fn get_current_user(token: String) -> DbResult<GetCurrentUserResult> {
     let response: Response = reqwest::Client::new()
         .get(route("auth/current-user"))
         .header("Cookie", format!("connect.digital-attendance={}", token))
@@ -226,9 +206,9 @@ pub async fn get_current_user(token: String) -> GetCurrentUserResult {
 
     let result: CurrentUserResponse = response.json().await.context("Cannot parse get_current_user result with success code as json!")?;
     if let Some(result) = result.user {
-        GetCurrentUserResult::Ok(result)
+        Ok(GetCurrentUserResult::Ok(result))
     }
     else {
-        return GetCurrentUserResult::WrongToken;
+        Ok(GetCurrentUserResult::WrongToken)
     }
 }

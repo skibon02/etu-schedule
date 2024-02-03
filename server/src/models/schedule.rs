@@ -5,7 +5,7 @@ use rocket_db_pools::Connection;
 use sqlx::{Acquire, PgConnection, Postgres};
 use sqlx::pool::PoolConnection;
 use crate::models;
-use crate::models::Db;
+use crate::models::{Db, DbResult};
 use crate::routes::ResponseErrorMessage;
 
 #[derive(sqlx::Type, Default, Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
@@ -138,7 +138,7 @@ pub struct ScheduleGenerationModel {
 }
 
 
-pub async fn get_current_schedule_for_group(con: &mut PgConnection, group_id: i32) -> anyhow::Result<Vec<ScheduleObjModel>> {
+pub async fn get_current_schedule_for_group(con: &mut PgConnection, group_id: i32) -> DbResult<Vec<ScheduleObjModel>> {
     let res = sqlx::query_as!(ScheduleObjModel,
         "SELECT week_day as \"week_day: WeekDay\", auditorium, created_timestamp, modified_timestamp,
             existence_diff, teacher_id, second_teacher_id, third_teacher_id, fourth_teacher_id,
@@ -152,7 +152,7 @@ pub async fn get_current_schedule_for_group(con: &mut PgConnection, group_id: i3
     Ok(res)
 }
 
-pub async fn get_current_schedule_link_ids(con: &mut PgConnection, group_id: i32) -> anyhow::Result<Vec<i32>> {
+pub async fn get_current_schedule_link_ids(con: &mut PgConnection, group_id: i32) -> DbResult<Vec<i32>> {
     let res = sqlx::query_scalar!(
         "SELECT schedule_objs.time_link_id FROM schedule_objs WHERE group_id = $1 and gen_end IS NULL",
         group_id
@@ -169,7 +169,7 @@ pub async fn get_current_schedule_link_ids(con: &mut PgConnection, group_id: i32
     Ok(res)
 }
 
-pub async fn get_current_schedule_for_group_with_subject(con: &mut PgConnection, group_id: i32, subject_id: i32) -> anyhow::Result<Vec<ScheduleObjModel>> {
+pub async fn get_current_schedule_for_group_with_subject(con: &mut PgConnection, group_id: i32, subject_id: i32) -> DbResult<Vec<ScheduleObjModel>> {
     let res = sqlx::query_as!(ScheduleObjModel,
             r#"SELECT week_day as "week_day: WeekDay", auditorium, created_timestamp, modified_timestamp,
             existence_diff, teacher_id, second_teacher_id, third_teacher_id, fourth_teacher_id,
@@ -187,7 +187,7 @@ pub enum TimeLinkValidResult {
     ErrorUserMessage(String)
 }
 
-pub async fn is_time_link_id_valid_for_user(con: &mut PgConnection, time_link_id: i32, user_id: i32) -> anyhow::Result<TimeLinkValidResult> {
+pub async fn is_time_link_id_valid_for_user(con: &mut PgConnection, time_link_id: i32, user_id: i32) -> DbResult<TimeLinkValidResult> {
 
     // get user saved attendance schedule elements
     let group_id = models::users::get_user_group(con, user_id).await;
@@ -205,7 +205,7 @@ pub async fn is_time_link_id_valid_for_user(con: &mut PgConnection, time_link_id
     is_time_link_id_valid_for_group(con, time_link_id, group_id).await
 }
 
-pub async fn is_time_link_id_valid_for_group(con: &mut PgConnection, time_link_id: i32, group_id: i32) -> anyhow::Result<TimeLinkValidResult> {
+pub async fn is_time_link_id_valid_for_group(con: &mut PgConnection, time_link_id: i32, group_id: i32) -> DbResult<TimeLinkValidResult> {
 
     // get user group link_id elements
     let schedule_link_ids = models::schedule::get_current_schedule_link_ids(con, group_id).await;

@@ -1,6 +1,7 @@
 use anyhow::Context;
 use rocket::time::PrimitiveDateTime;
 use sqlx::{Acquire, PgConnection, Postgres, Transaction};
+use crate::models::DbResult;
 
 #[derive(sqlx::FromRow, Debug, Clone, PartialEq)]
 pub struct SubjectModel {
@@ -27,7 +28,7 @@ pub struct SubjectModel {
     pub modified_timestamp: PrimitiveDateTime,
 }
 
-pub async fn get_subjects_cur_gen(con: &mut PgConnection) -> anyhow::Result<i32> {
+pub async fn get_subjects_cur_gen(con: &mut PgConnection) -> DbResult<i32> {
     let res: Option<i32> = sqlx::query_scalar!(
         "SELECT MAX(gen_id) as max FROM subjects_generation"
     )
@@ -36,7 +37,7 @@ pub async fn get_subjects_cur_gen(con: &mut PgConnection) -> anyhow::Result<i32>
     Ok(res.unwrap_or(0))
 }
 
-pub async fn create_new_gen(transaction: &mut PgConnection, gen_id: i32) -> anyhow::Result<()> {
+pub async fn create_new_gen(transaction: &mut PgConnection, gen_id: i32) -> DbResult<()> {
     // info!("Creating new subjects generation {}", gen_id);
     sqlx::query!("INSERT INTO subjects_generation (gen_id, creation_time) VALUES ($1, NOW())\
          ON CONFLICT DO NOTHING",
@@ -47,7 +48,7 @@ pub async fn create_new_gen(transaction: &mut PgConnection, gen_id: i32) -> anyh
     Ok(())
 }
 
-pub async fn get_subjects_for_group(con: &mut PgConnection, group_id: i32) -> anyhow::Result<Vec<SubjectModel>>  {
+pub async fn get_subjects_for_group(con: &mut PgConnection, group_id: i32) -> DbResult<Vec<SubjectModel>>  {
     let res = sqlx::query_as!(
         SubjectModel,
         "SELECT subjects.* FROM subjects join schedule_objs on \
@@ -61,7 +62,7 @@ pub async fn get_subjects_for_group(con: &mut PgConnection, group_id: i32) -> an
     Ok(res)
 }
 
-pub async fn get_cur_gen_subject_by_id(subject_id: i32, con: &mut PgConnection) -> anyhow::Result<Option<SubjectModel>> {
+pub async fn get_cur_gen_subject_by_id(subject_id: i32, con: &mut PgConnection) -> DbResult<Option<SubjectModel>> {
     let res = sqlx::query_as!(
             SubjectModel,
             "SELECT * FROM subjects WHERE subject_id = $1 AND gen_end IS NULL",

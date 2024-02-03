@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 use sqlx::PgConnection;
 use time::PrimitiveDateTime;
+use crate::models::DbResult;
 
 
 #[derive(Debug)]
@@ -31,7 +32,7 @@ pub struct GroupNote {
 // User notes
 
 pub async fn create_update_user_note(con: &mut PgConnection, user_id: i32,
-                                     schedule_obj_time_link_id: i32, text: String, week_num: i32) -> anyhow::Result<()> {
+                                     schedule_obj_time_link_id: i32, text: String, week_num: i32) -> DbResult<()> {
     //insert entry
     debug!("Inserting note for user {} with schedule_obj_time_link_id {} and week_num {} with value {}", user_id, schedule_obj_time_link_id, week_num, text);
     sqlx::query!("INSERT INTO user_notes (user_id, schedule_obj_time_link_id, text, week_num, modified_timestamp) \
@@ -44,7 +45,7 @@ pub async fn create_update_user_note(con: &mut PgConnection, user_id: i32,
     Ok(())
 }
 
-pub async fn get_user_notes(con: &mut PgConnection, user_id: i32) -> anyhow::Result<BTreeMap<i32, Vec<(String, i32)>>> {
+pub async fn get_user_notes(con: &mut PgConnection, user_id: i32) -> DbResult<BTreeMap<i32, Vec<(String, i32)>>> {
     // get user notes
     let res: Vec<UserNote> = sqlx::query_as!(UserNote,
         "SELECT user_notes.* FROM user_notes join schedule_objs \
@@ -61,7 +62,7 @@ pub async fn get_user_notes(con: &mut PgConnection, user_id: i32) -> anyhow::Res
     Ok(map)
 }
 
-pub async fn is_user_note_exists(con: &mut PgConnection, user_id: i32, schedule_obj_time_link_id: i32, week_num: i32) -> anyhow::Result<bool> {
+pub async fn is_user_note_exists(con: &mut PgConnection, user_id: i32, schedule_obj_time_link_id: i32, week_num: i32) -> DbResult<bool> {
     let res = sqlx::query_scalar!(
         "SELECT 1 FROM user_notes WHERE user_id = $1 AND schedule_obj_time_link_id = $2 AND week_num = $3",
         user_id, schedule_obj_time_link_id, week_num
@@ -70,7 +71,7 @@ pub async fn is_user_note_exists(con: &mut PgConnection, user_id: i32, schedule_
     Ok(res.is_some())
 }
 
-pub async fn delete_user_note(con: &mut PgConnection, user_id: i32, schedule_obj_time_link_id: i32, week_num: i32) -> anyhow::Result<()> {
+pub async fn delete_user_note(con: &mut PgConnection, user_id: i32, schedule_obj_time_link_id: i32, week_num: i32) -> DbResult<()> {
     sqlx::query!(
         "DELETE FROM user_notes WHERE user_id = $1 AND schedule_obj_time_link_id = $2 AND week_num = $3",
         user_id, schedule_obj_time_link_id, week_num
@@ -83,7 +84,7 @@ pub async fn delete_user_note(con: &mut PgConnection, user_id: i32, schedule_obj
 // Group notes
 
 pub async fn create_update_group_note(con: &mut PgConnection, group_id: i32,
-                                     schedule_obj_time_link_id: i32, text: String, week_num: i32) -> anyhow::Result<()> {
+                                     schedule_obj_time_link_id: i32, text: String, week_num: i32) -> DbResult<()> {
     //insert entry
     debug!("Inserting note for group {} with schedule_obj_time_link_id {} and week_num {} with value {}", group_id, schedule_obj_time_link_id, week_num, text);
     sqlx::query!("INSERT INTO group_notes (group_id, schedule_obj_time_link_id, text, week_num, modified_timestamp) \
@@ -96,7 +97,7 @@ pub async fn create_update_group_note(con: &mut PgConnection, group_id: i32,
     Ok(())
 }
 
-pub async fn get_group_notes(con: &mut PgConnection, group_id: i32) -> anyhow::Result<BTreeMap<i32, Vec<(String, i32)>>> {
+pub async fn get_group_notes(con: &mut PgConnection, group_id: i32) -> DbResult<BTreeMap<i32, Vec<(String, i32)>>> {
     // get user notes
     let res: Vec<GroupNote> = sqlx::query_as!(GroupNote,
         "SELECT group_notes.* FROM group_notes join schedule_objs \
@@ -113,7 +114,7 @@ pub async fn get_group_notes(con: &mut PgConnection, group_id: i32) -> anyhow::R
     Ok(map)
 }
 
-pub async fn is_group_note_exists(con: &mut PgConnection, group_id: i32, schedule_obj_time_link_id: i32, week_num: i32) -> anyhow::Result<bool> {
+pub async fn is_group_note_exists(con: &mut PgConnection, group_id: i32, schedule_obj_time_link_id: i32, week_num: i32) -> DbResult<bool> {
     let res = sqlx::query_scalar!(
         "SELECT 1 FROM group_notes WHERE group_id = $1 AND schedule_obj_time_link_id = $2 AND week_num = $3",
         group_id, schedule_obj_time_link_id, week_num
@@ -122,7 +123,7 @@ pub async fn is_group_note_exists(con: &mut PgConnection, group_id: i32, schedul
     Ok(res.is_some())
 }
 
-pub async fn delete_group_note(con: &mut PgConnection, group_id: i32, schedule_obj_time_link_id: i32, week_num: i32) -> anyhow::Result<()> {
+pub async fn delete_group_note(con: &mut PgConnection, group_id: i32, schedule_obj_time_link_id: i32, week_num: i32) -> DbResult<()> {
     sqlx::query!(
         "DELETE FROM group_notes WHERE group_id = $1 AND schedule_obj_time_link_id = $2 AND week_num = $3",
         group_id, schedule_obj_time_link_id, week_num

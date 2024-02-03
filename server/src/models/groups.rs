@@ -1,6 +1,6 @@
 use sqlx::{Acquire, Row, Postgres, PgConnection};
 
-use super::Db;
+use super::{Db, DbResult};
 use serde_derive::Serialize;
 use sqlx::pool::PoolConnection;
 use sqlx::postgres::types::PgInterval;
@@ -35,7 +35,7 @@ pub struct GroupModel {
     pub latest_schedule_merge_timestamp: Option<PrimitiveDateTime>,
 }
 
-pub async fn get_oldest_group_id_list(con: &mut PgConnection, upper_limit: i64) -> anyhow::Result<Vec<i32>> {
+pub async fn get_oldest_group_id_list(con: &mut PgConnection, upper_limit: i64) -> DbResult<Vec<i32>> {
     let res = sqlx::query_scalar!(
         "SELECT group_id FROM groups
          ORDER BY
@@ -56,7 +56,7 @@ pub async fn get_oldest_group_id_list(con: &mut PgConnection, upper_limit: i64) 
 }
 
 
-pub async fn get_not_merged_sched_group_id_list(con: &mut PgConnection, upper_limit: i64) -> anyhow::Result<Vec<i32>> {
+pub async fn get_not_merged_sched_group_id_list(con: &mut PgConnection, upper_limit: i64) -> DbResult<Vec<i32>> {
     let res = sqlx::query_scalar!(
         "SELECT group_id FROM groups
             WHERE latest_schedule_merge_timestamp IS NULL
@@ -75,7 +75,7 @@ pub async fn get_not_merged_sched_group_id_list(con: &mut PgConnection, upper_li
 
 // Result: is group exists?
 // Option: if merge was ever made for this group?
-pub async fn get_time_since_last_group_merge(group_id: i32, con: &mut PgConnection) -> anyhow::Result<Option<i32>> {
+pub async fn get_time_since_last_group_merge(group_id: i32, con: &mut PgConnection) -> DbResult<Option<i32>> {
     // 1 option: if we have such group and it has latest_schedule_merge_timestamp
     //
     let res: Option<Option<PgInterval>> = sqlx::query_scalar!(
@@ -110,14 +110,14 @@ pub async fn get_time_since_last_group_merge(group_id: i32, con: &mut PgConnecti
     }
 }
 
-pub async fn set_last_group_merge(group_id: i32, con: &mut PgConnection) -> anyhow::Result<()> {
+pub async fn set_last_group_merge(group_id: i32, con: &mut PgConnection) -> DbResult<()> {
     sqlx::query!(
         "UPDATE groups SET latest_schedule_merge_timestamp = NOW() WHERE group_id = $1", group_id)
         .execute(&mut *con).await?;
 
     Ok(())
 }
-pub async fn get_groups(con: &mut PgConnection) -> anyhow::Result<Vec<GroupModel>> {
+pub async fn get_groups(con: &mut PgConnection) -> DbResult<Vec<GroupModel>> {
     let res = sqlx::query_as!(GroupModel,
         "SELECT * FROM groups"
     )
@@ -126,7 +126,7 @@ pub async fn get_groups(con: &mut PgConnection) -> anyhow::Result<Vec<GroupModel
     Ok(res)
 }
 
-pub async fn get_group(con: &mut PgConnection, group_id: i32) -> anyhow::Result<Option<GroupModel>> {
+pub async fn get_group(con: &mut PgConnection, group_id: i32) -> DbResult<Option<GroupModel>> {
     let res = sqlx::query_as!(
         GroupModel,
         "SELECT * FROM groups WHERE group_id = $1",
@@ -137,7 +137,7 @@ pub async fn get_group(con: &mut PgConnection, group_id: i32) -> anyhow::Result<
     Ok(res)
 }
 
-pub async fn find_group_by_name(con: &mut PgConnection, group_name: &str) -> anyhow::Result<Option<GroupModel>> {
+pub async fn find_group_by_name(con: &mut PgConnection, group_name: &str) -> DbResult<Option<GroupModel>> {
     let res = sqlx::query_as!(
         GroupModel,
         "SELECT * FROM groups WHERE number = $1",

@@ -1,6 +1,8 @@
+use std::ops::FromResidual;
 use rocket::Route;
 use rocket::serde::json::Json;
 use serde_derive::Serialize;
+use crate::models::DbResult;
 
 pub mod auth;
 pub mod schedule;
@@ -17,8 +19,35 @@ pub enum GenericResponder<Success, Failure>
     Failed(Json<Failure>),
     #[response(status = 403, content_type = "json")]
     Forbidden(Json<Failure>),
+    #[response(status = 500, content_type = "json")]
+    InternalError(Json<Failure>),
 }
 pub type ResponderWithSuccess<T> = GenericResponder<T, ResponseErrorMessage>;
+
+impl<T: serde::Serialize> ResponderWithSuccess<T> {
+    pub fn success(data: T) -> Self {
+        GenericResponder::Success(Json(data))
+    }
+    pub fn failed(message: &str) -> Self {
+        GenericResponder::Failed(Json(ResponseErrorMessage::new(message.to_string())))
+    }
+
+    pub fn forbidden(message: &str) -> Self {
+        GenericResponder::Forbidden(Json(ResponseErrorMessage::new(message.to_string())))
+    }
+
+    pub fn internal_error(message: &str) -> Self {
+        GenericResponder::InternalError(Json(ResponseErrorMessage::new(message.to_string())))
+    }
+}
+
+/// database error is internal error: do not expose it to the client
+impl<T: serde::Serialize, R: std::fmt::Debug> FromResidual<DbResult<R>> for ResponderWithSuccess<T> {
+    fn from_residual(residual: DbResult<R>) -> Self {
+        error!("Failed to execute database operation: {:?}", residual);
+        ResponderWithSuccess::internal_error("не скажу")
+    }
+}
 
 #[derive(Serialize)]
 pub struct ResponseErrorMessage {

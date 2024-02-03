@@ -12,7 +12,6 @@ use serde_json::{Value, json};
 
 use crate::{FRONTEND_PORT, FrontendPort, models::{users::{self, UserInfo}, Db}};
 use crate::api::vk_api;
-use crate::routes::ResponseErrorMessage;
 
 #[post("/auth/deauth")]
 fn deauth(cookie: &CookieJar) -> Status {
@@ -34,8 +33,8 @@ impl<'r> FromRequest<'r> for UserInfo {
                     Ok(user_info) => request::Outcome::Success(user_info),
                     Err(e) => {
                         error!("Failed to get user info: {:?}", e);
-                        req.cookies().remove_private(Cookie::named("token"));
-                        req.cookies().remove_private(Cookie::named("token2"));
+                        req.cookies().remove_private(Cookie::build("token"));
+                        req.cookies().remove_private(Cookie::build("token2"));
                         request::Outcome::Forward(Status::Forbidden)
                     }
                 }

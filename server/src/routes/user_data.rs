@@ -8,20 +8,13 @@ use crate::models::Db;
 use crate::models::groups::GroupModel;
 use crate::models::users::{SubjectsTitleFormatting, UserDataModel, UserDataOptionalModel};
 use crate::routes::auth::AuthorizeInfo;
-use crate::routes::ResponseErrorMessage;
+use crate::routes::{GenericResponder, ResponderWithSuccess, ResponseErrorMessage};
 
 #[derive(Serialize)]
 pub struct SetUserGroupSuccess {
     ok: bool,
 }
-
-#[derive(Responder)]
-pub enum SetUserGroupResult {
-    #[response(status = 200, content_type = "json")]
-    Success(Json<SetUserGroupSuccess>),
-    #[response(status = 400, content_type = "json")]
-    Failed(Json<ResponseErrorMessage>)
-}
+type SetUserGroupRes = ResponderWithSuccess<SetUserGroupSuccess>;
 
 #[derive(Deserialize)]
 struct SetGroupBody {
@@ -29,13 +22,9 @@ struct SetGroupBody {
 }
 
 #[post("/user/set_group", data = "<body>")]
-async fn set_group(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Option<Json<SetGroupBody>>) -> SetUserGroupResult {
-    if body.is_none() {
-        return SetUserGroupResult::Failed(Json(ResponseErrorMessage::new("Invalid body!".to_string())));
-    }
-    let body = body.unwrap();
+async fn set_group(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Json<SetGroupBody>) -> SetUserGroupRes {
     if auth.is_none() {
-        return SetUserGroupResult::Failed(Json(ResponseErrorMessage::new("User is not authorized!".to_string())));
+        return SetUserGroupRes::forbidden("User is not authorized!");
     }
     let auth = auth.unwrap();
 
@@ -48,12 +37,12 @@ async fn set_group(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Op
         error!("Failed to set user group: {:?}", e);
 
         if let Some(e) = e.downcast_ref::<models::users::SetUserGroupError>() {
-            SetUserGroupResult::Failed(Json(ResponseErrorMessage::new(e.to_string())))
+            SetUserGroupRes::failed(&e.to_string())
         } else {
-            SetUserGroupResult::Failed(Json(ResponseErrorMessage::new("не скажу".to_string())))
+            SetUserGroupRes::internal_error("не скажу")
         }
     } else {
-        SetUserGroupResult::Success(Json(SetUserGroupSuccess { ok: true }))
+        SetUserGroupRes::success(SetUserGroupSuccess { ok: true })
     }
 }
 
@@ -62,34 +51,18 @@ pub struct SetUserDataSuccess {
     ok: bool,
 }
 
-#[derive(Responder)]
-pub enum SetUserDataResult {
-    #[response(status = 200, content_type = "json")]
-    Success(Json<SetUserDataSuccess>),
-    #[response(status = 400, content_type = "json")]
-    Failed(Json<ResponseErrorMessage>)
-}
+type SetUserDataRes = ResponderWithSuccess<SetUserDataSuccess>;
 
 #[post("/user/set_data", data = "<body>")]
-async fn set_data(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Option<Json<UserDataOptionalModel>>) -> SetUserDataResult {
-    if body.is_none() {
-        return SetUserDataResult::Failed(Json(ResponseErrorMessage::new("Invalid body!".to_string())));
-    }
-    let body = body.unwrap();
+async fn set_data(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Json<UserDataOptionalModel>) -> SetUserDataRes {
     if auth.is_none() {
-        return SetUserDataResult::Failed(Json(ResponseErrorMessage::new("User is not authorized!".to_string())));
+        return SetUserDataRes::failed("User is not authorized!");
     }
     let auth = auth.unwrap();
 
-    let res = models::users::set_user_data(&mut db, auth.user_id, body.into_inner()).await;
+    models::users::set_user_data(&mut db, auth.user_id, body.into_inner()).await?;
 
-    if let Err(e) = res {
-        error!("Failed to set user data: {:?}", e);
-
-        SetUserDataResult::Failed(Json(ResponseErrorMessage::new("не скажу".to_string())))
-    } else {
-        SetUserDataResult::Success(Json(SetUserDataSuccess { ok: true }))
-    }
+    SetUserDataRes::success(SetUserDataSuccess { ok: true })
 }
 #[derive(Serialize)]
 pub struct OutputUserDataModel {
@@ -113,43 +86,22 @@ impl Into<OutputUserDataModel> for (UserDataModel, Option<GroupModel>) {
     }
 }
 
-#[derive(Responder)]
-pub enum GetUserDataResult {
-    #[response(status = 200, content_type = "json")]
-    Success(Json<OutputUserDataModel>),
-    #[response(status = 400, content_type = "json")]
-    Failed(Json<ResponseErrorMessage>)
-}
+type GetUserDataRes = ResponderWithSuccess<OutputUserDataModel>;
 
 #[get("/user/get_data")]
-async fn get_data(mut db: Connection<Db>, auth: Option<AuthorizeInfo>) -> GetUserDataResult {
+async fn get_data(mut db: Connection<Db>, auth: Option<AuthorizeInfo>) -> GetUserDataRes {
     if auth.is_none() {
-        return GetUserDataResult::Failed(Json(ResponseErrorMessage::new("User is not authorized!".to_string())));
+        return GetUserDataRes::forbidden("User is not authorized!");
     }
     let auth = auth.unwrap();
 
-    let res = models::users::get_user_data(&mut db, auth.user_id).await;
+    let res = models::users::get_user_data(&mut db, auth.user_id).await?;
 
-    match res {
-        Err(e) => {
-            error!("Failed to get user data: {:?}", e);
-
-            GetUserDataResult::Failed(Json(ResponseErrorMessage::new("не скажу".to_string())))
-        }
-        Ok(res) => {
-            if let Some(group_id) = res.group_id {
-                let group = models::groups::get_group(&mut db, group_id).await;
-                match group {
-                    Ok(group) => GetUserDataResult::Success(Json((res, Some(group.unwrap())).into())),
-                    Err(e) => {
-                        error!("Failed to get user group: {:?}", e);
-                        GetUserDataResult::Failed(Json(ResponseErrorMessage::new("не скажу".to_string())))
-                    }
-                }
-            } else {
-                GetUserDataResult::Success(Json((res, None).into()))
-            }
-        }
+    if let Some(group_id) = res.group_id {
+        let group = models::groups::get_group(&mut db, group_id).await?;
+        GetUserDataRes::success((res, Some(group.unwrap())).into())
+    } else {
+        GetUserDataRes::success((res, None).into())
     }
 }
 
@@ -157,29 +109,18 @@ async fn get_data(mut db: Connection<Db>, auth: Option<AuthorizeInfo>) -> GetUse
 pub struct GetUserGroupSuccess {
     current_group: Option<GroupModel>,
 }
-#[derive(Responder)]
-pub enum GetUserGroupResult {
-    #[response(status = 200, content_type = "json")]
-    Success(Json<GetUserGroupSuccess>),
-    #[response(status = 400, content_type = "json")]
-    Failed(Json<ResponseErrorMessage>),
-}
+
+type GetUserGroupRes = ResponderWithSuccess<GetUserGroupSuccess>;
+
 #[get("/user/get_group")]
-async fn get_group(mut db: Connection<Db>, auth: Option<AuthorizeInfo>) -> GetUserGroupResult {
+async fn get_group(mut db: Connection<Db>, auth: Option<AuthorizeInfo>) -> GetUserGroupRes {
     if auth.is_none() {
-        return GetUserGroupResult::Failed(Json(ResponseErrorMessage::new("User is not authorized!".to_string())));
+        return GetUserGroupRes::forbidden("User is not authorized!");
     }
     let auth = auth.unwrap();
 
-    let res = models::users::get_user_group(&mut db, auth.user_id).await;
-
-    match res {
-        Ok(_) => GetUserGroupResult::Success(Json(GetUserGroupSuccess { current_group: res.unwrap() })),
-        Err(e) => {
-            error!("Failed to get user group: {:?}", e);
-            GetUserGroupResult::Failed(Json(ResponseErrorMessage::new("не скажу".to_string())))
-        }
-    }
+    let res = models::users::get_user_group(&mut db, auth.user_id).await?;
+    GetUserGroupRes::success(GetUserGroupSuccess { current_group: res })
 }
 
 #[derive(Serialize)]
@@ -188,13 +129,8 @@ pub struct SetAttendanceTokenSuccess {
     group_changed: bool,
     result_code: String,
 }
-#[derive(Responder)]
-pub enum SetAttendanceTokenResult {
-    #[response(status = 200, content_type = "json")]
-    Success(Json<SetAttendanceTokenSuccess>),
-    #[response(status = 400, content_type = "json")]
-    Failed(Json<ResponseErrorMessage>)
-}
+
+type SetAttendanceTokenRes = ResponderWithSuccess<SetAttendanceTokenSuccess>;
 
 #[derive(Deserialize)]
 pub struct SetAttendanceTokenBody {
@@ -204,21 +140,17 @@ pub struct SetAttendanceTokenBody {
 static LAST_ATTENDANCE_FETCH_TIME: std::sync::atomic::AtomicI64 = std::sync::atomic::AtomicI64::new(0);
 
 #[post("/user/set_attendance_token", data = "<body>")]
-pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Option<Json<SetAttendanceTokenBody>>) -> SetAttendanceTokenResult {
+pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<AuthorizeInfo>, body: Json<SetAttendanceTokenBody>) -> SetAttendanceTokenRes {
     let timestamp = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs() as i64;
 
     if timestamp - LAST_ATTENDANCE_FETCH_TIME.load(std::sync::atomic::Ordering::Relaxed) < 3 {
         warn!("Too many requests to attendance api!");
-        return SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "too_many_requests".to_string() }));
+        return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "too_many_requests".to_string() });
     }
     LAST_ATTENDANCE_FETCH_TIME.store(timestamp, std::sync::atomic::Ordering::Relaxed);
 
-    if body.is_none() {
-        return SetAttendanceTokenResult::Failed(Json(ResponseErrorMessage::new("Invalid body!".to_string())));
-    }
-    let body = body.unwrap();
     if auth.is_none() {
-        return SetAttendanceTokenResult::Failed(Json(ResponseErrorMessage::new("User is not authorized!".to_string())));
+        return SetAttendanceTokenRes::forbidden("User is not authorized!");
     }
     let auth = auth.unwrap();
 
@@ -228,31 +160,27 @@ pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<Authorize
         // check if token is valid
 
         info!("Acquiring information about user token...");
-        let attendance_user_info = api::etu_attendance_api::get_current_user(token.clone()).await;
+        let attendance_user_info = api::etu_attendance_api::get_current_user(token.clone()).await?;
         let (is_leader, group) = match attendance_user_info {
             GetCurrentUserResult::Ok(res) => {
                 debug!("User info for user_id {} request result: {:?}", auth.user_id, res);
                 if res.groups.len() == 0 {
-                        return SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "no_groups".to_string() }));
+                        return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "no_groups".to_string() });
                 }
                 if res.groups.len() > 1 {
-                    return SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "too_many_groups".to_string() }));
+                    return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "too_many_groups".to_string() });
                 }
                 (res.groups[0].UserGroup.role == "leader", res.groups[0].name.clone())
             }
             GetCurrentUserResult::WrongToken => {
                 warn!("Wrong token: {}", token);
-                return SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "wrong_token".to_string() }));
-            }
-            GetCurrentUserResult::Error(e) => {
-                error!("Failed to get user info: {:?}", e);
-                return SetAttendanceTokenResult::Failed(Json(ResponseErrorMessage::new("не скажу".to_string())));
+                return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "wrong_token".to_string() });
             }
         };
 
         //search if such group exists
         info!("searching for group match: {}...", group);
-        let new_user_group = models::groups::find_group_by_name(&mut db, &group).await.unwrap();
+        let new_user_group = models::groups::find_group_by_name(&mut db, &group).await?;
         if let Some(new_user_group) = new_user_group {
             info!("group found: id {}", new_user_group.group_id);
             let new_user_group_id = new_user_group.group_id;
@@ -261,34 +189,26 @@ pub async fn set_attendance_token(mut db: Connection<Db>, auth: Option<Authorize
             if is_leader {
                 info!("User {} is confirmed to be a leader for group {}", auth.user_id, new_user_group_id);
                 // save privilege level to db
-                models::users::confirm_privilege_level(&mut db, new_user_group_id, auth.user_id).await.unwrap();
+                models::users::confirm_privilege_level(&mut db, new_user_group_id, auth.user_id).await?;
             }
 
             // -1 in case when group is not set will not be equal to any valid group
-            let own_group = models::users::get_user_group(&mut db, auth.user_id).await.unwrap().map(|g| g.group_id).unwrap_or(-1);
+            let own_group = models::users::get_user_group(&mut db, auth.user_id).await?.map(|g| g.group_id).unwrap_or(-1);
             if own_group != new_user_group_id {
                 group_changed = true;
 
-                models::users::set_user_group(&mut db, auth.user_id, new_user_group_id).await.unwrap();
+                models::users::set_user_group(&mut db, auth.user_id, new_user_group_id).await?;
             }
         }
         else {
             warn!("Group was {} not found!", group);
-            return SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "group_not_found".to_string() }));
+            return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess{ ok: false, group_changed: false, result_code: "group_not_found".to_string() });
         }
     }
 
-    let res = models::users::set_attendance_token(&mut db, auth.user_id, body.attendance_token.clone()).await;
-
-    match res {
-        Ok(()) => SetAttendanceTokenResult::Success(Json(SetAttendanceTokenSuccess { ok: true, group_changed, result_code: "success".to_string() })),
-        Err(e) => {
-            error!("Failed to set attendance token: {:?}", e);
-            SetAttendanceTokenResult::Failed(Json(ResponseErrorMessage::new("не скажу".to_string())))
-        }
-    }
+    models::users::set_attendance_token(&mut db, auth.user_id, body.attendance_token.clone()).await?;
+    SetAttendanceTokenRes::success(SetAttendanceTokenSuccess { ok: true, group_changed, result_code: "success".to_string() })
 }
-
 
 pub fn get_routes() -> Vec<Route> {
     routes![set_group, get_group, set_data, get_data,

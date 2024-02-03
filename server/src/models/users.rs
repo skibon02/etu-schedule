@@ -7,7 +7,7 @@ use sqlx::pool::PoolConnection;
 use thiserror::Error;
 use crate::models::groups::GroupModel;
 
-use super::Db;
+use super::{Db, DbResult};
 
 #[derive(Debug)]
 #[derive(sqlx::FromRow)]
@@ -24,7 +24,7 @@ pub struct UserInfo {
     pub last_vk_fetch_timestamp: PrimitiveDateTime
 }
 
-pub async fn create_user(mut con: Connection<Db>, user_info: UserInfo) -> anyhow::Result<()> {
+pub async fn create_user(mut con: Connection<Db>, user_info: UserInfo) -> DbResult<()> {
     let mut transaction = con.begin().await?;
     debug!("Creating user: {:?}", user_info);
     sqlx::query!(
@@ -51,7 +51,7 @@ pub async fn create_user(mut con: Connection<Db>, user_info: UserInfo) -> anyhow
     Ok(())
 }
 
-pub async fn get_user_info(con: &mut PgConnection, id: i32) -> anyhow::Result<UserInfo> {
+pub async fn get_user_info(con: &mut PgConnection, id: i32) -> DbResult<UserInfo> {
     let res: Option<UserInfo> = sqlx::query_as!(UserInfo,
         "SELECT * FROM users WHERE vk_id = $1",
         id
@@ -65,7 +65,7 @@ pub async fn get_user_info(con: &mut PgConnection, id: i32) -> anyhow::Result<Us
     }
 }
 
-pub async fn user_exists(con: &mut PgConnection, id: i32) -> anyhow::Result<bool> {
+pub async fn user_exists(con: &mut PgConnection, id: i32) -> DbResult<bool> {
     let res = sqlx::query_scalar!(
         "SELECT vk_id FROM users WHERE vk_id = $1",
         id
@@ -75,7 +75,7 @@ pub async fn user_exists(con: &mut PgConnection, id: i32) -> anyhow::Result<bool
     Ok(res.is_some())
 }
 
-pub async fn get_user_group(con: &mut PgConnection, user_id: i32) -> anyhow::Result<Option<GroupModel>> {
+pub async fn get_user_group(con: &mut PgConnection, user_id: i32) -> DbResult<Option<GroupModel>> {
     let res = sqlx::query_as!(GroupModel,
         "SELECT groups.* from groups join user_data on groups.group_id = user_data.group_id AND user_data.user_id = $1",
         user_id)
@@ -92,7 +92,7 @@ pub enum SetUserGroupError {
 }
 
 /// Do not check if user exists!
-pub async fn set_user_group(con: &mut PgConnection, user_id: i32, group_id: i32) -> anyhow::Result<()> {
+pub async fn set_user_group(con: &mut PgConnection, user_id: i32, group_id: i32) -> DbResult<()> {
     let group_exists: Option<i32> = sqlx::query_scalar!("select group_id from groups where group_id = $1",
         group_id)
         .fetch_optional(&mut *con).await.context("Failed to check if group exists")?;
@@ -149,7 +149,7 @@ pub struct UserDataModel {
 }
 
 
-pub async fn set_user_data(con: &mut PgConnection, user_id: i32,  data: UserDataOptionalModel) -> anyhow::Result<()> {
+pub async fn set_user_data(con: &mut PgConnection, user_id: i32,  data: UserDataOptionalModel) -> DbResult<()> {
     if let Some(subjects_title_formatting) = data.subjects_title_formatting {
         debug!("Setting new user data: {:?}", subjects_title_formatting);
         sqlx::query!("UPDATE user_data SET subjects_title_formatting=$1 WHERE user_id = $2",
@@ -159,7 +159,7 @@ pub async fn set_user_data(con: &mut PgConnection, user_id: i32,  data: UserData
     Ok(())
 }
 
-pub async fn get_user_data(con: &mut PgConnection, user_id: i32) -> anyhow::Result<UserDataModel> {
+pub async fn get_user_data(con: &mut PgConnection, user_id: i32) -> DbResult<UserDataModel> {
     let res = sqlx::query_as!(UserDataModel,
         "SELECT subjects_title_formatting as \"subjects_title_formatting: SubjectsTitleFormatting\",\
          user_id, group_id, last_known_schedule_generation, attendance_token, leader_for_group FROM user_data WHERE user_id = $1",
@@ -170,14 +170,14 @@ pub async fn get_user_data(con: &mut PgConnection, user_id: i32) -> anyhow::Resu
     Ok(res)
 }
 
-pub async fn reset_user_group(con: &mut PgConnection, user_id: i32) -> anyhow::Result<()> {
+pub async fn reset_user_group(con: &mut PgConnection, user_id: i32) -> DbResult<()> {
     sqlx::query!("UPDATE user_data SET group_id=NULL WHERE user_id = $1", user_id)
         .execute(&mut *con).await.context("Failed to clear previous user group")?;
 
     Ok(())
 }
 
-pub async fn set_attendance_token(con: &mut PgConnection, user_id: i32, attendance_token: Option<String>) -> anyhow::Result<()> {
+pub async fn set_attendance_token(con: &mut PgConnection, user_id: i32, attendance_token: Option<String>) -> DbResult<()> {
     sqlx::query!("UPDATE user_data SET attendance_token=$1 WHERE user_id = $2",
     attendance_token, user_id)
         .execute(&mut *con).await.context("Failed to set new user attendance token")?;
@@ -185,14 +185,14 @@ pub async fn set_attendance_token(con: &mut PgConnection, user_id: i32, attendan
     Ok(())
 }
 
-pub async fn invalidate_attendance_token(con: &mut PgConnection, user_id: i32) -> anyhow::Result<()> {
+pub async fn invalidate_attendance_token(con: &mut PgConnection, user_id: i32) -> DbResult<()> {
     sqlx::query!("UPDATE user_data SET attendance_token=NULL WHERE user_id = $1",
         user_id)
         .execute(&mut *con).await.context("Failed to clear previous user attendance token")?;
 
     Ok(())
 }
-pub async fn confirm_privilege_level(con: &mut PgConnection, user_id: i32, group_id: i32) -> anyhow::Result<()> {
+pub async fn confirm_privilege_level(con: &mut PgConnection, user_id: i32, group_id: i32) -> DbResult<()> {
     sqlx::query!("UPDATE user_data SET leader_for_group=$1 WHERE user_id = $2",
         group_id, user_id)
         .execute(&mut *con).await.context("Failed to clear previous user attendance token")?;
@@ -200,7 +200,7 @@ pub async fn confirm_privilege_level(con: &mut PgConnection, user_id: i32, group
     Ok(())
 }
 
-pub async fn check_privilege_level(con: &mut PgConnection, user_id: i32, group_id: i32) -> anyhow::Result<bool> {
+pub async fn check_privilege_level(con: &mut PgConnection, user_id: i32, group_id: i32) -> DbResult<bool> {
     let res = sqlx::query_scalar!("SELECT leader_for_group FROM user_data WHERE user_id = $1",
         user_id)
         .fetch_optional(&mut *con).await.context("Failed to check privilege level")?;

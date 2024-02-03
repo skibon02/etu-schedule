@@ -101,7 +101,7 @@ pub async fn attendance_worker_task(mut con: &mut PoolConnection<Postgres>, mut 
                     tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
 
                     //make request
-                    let schedule = api::etu_attendance_api::get_cur_schedule(token.clone()).await;
+                    let schedule = api::etu_attendance_api::get_cur_schedule(token.clone()).await.unwrap();
                     if let GetScheduleResult::WrongToken = schedule {
                         warn!("Wrong token for user_id: {:?} (group_id: {:?})! Invalidating user token...",
                             user_schedule.user_data.user_id, user_schedule.user_data.group_id);
@@ -149,7 +149,7 @@ pub async fn attendance_worker_task(mut con: &mut PoolConnection<Postgres>, mut 
                         if let Some(id) = found_id {
                             info!("Found subject from attendance system: {:#?}", id);
                             info!("Processing check_in...");
-                            let check_in_res = api::etu_attendance_api::check_in(token.clone(), id).await;
+                            let check_in_res = api::etu_attendance_api::check_in(token.clone(), id).await.unwrap();
                             match check_in_res {
                                 CheckInResult::Ok => {
                                     info!("Check in success!");
