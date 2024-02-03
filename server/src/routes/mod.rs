@@ -1,4 +1,5 @@
 use rocket::Route;
+use rocket::serde::json::Json;
 use serde_derive::Serialize;
 
 pub mod auth;
@@ -7,6 +8,17 @@ mod user_data;
 mod attendance;
 mod notes;
 
+#[derive(Responder)]
+pub enum GenericResponder<Success, Failure>
+    where Success: serde::Serialize, Failure: serde::Serialize {
+    #[response(status = 200, content_type = "json")]
+    Success(Json<Success>),
+    #[response(status = 400, content_type = "json")]
+    Failed(Json<Failure>),
+    #[response(status = 403, content_type = "json")]
+    Forbidden(Json<Failure>),
+}
+pub type ResponderWithSuccess<T> = GenericResponder<T, ResponseErrorMessage>;
 
 #[derive(Serialize)]
 pub struct ResponseErrorMessage {

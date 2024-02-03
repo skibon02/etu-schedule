@@ -202,6 +202,11 @@ pub async fn is_time_link_id_valid_for_user(con: &mut PgConnection, time_link_id
     }
     let group_id = group_id.unwrap().group_id;
 
+    is_time_link_id_valid_for_group(con, time_link_id, group_id).await
+}
+
+pub async fn is_time_link_id_valid_for_group(con: &mut PgConnection, time_link_id: i32, group_id: i32) -> anyhow::Result<TimeLinkValidResult> {
+
     // get user group link_id elements
     let schedule_link_ids = models::schedule::get_current_schedule_link_ids(con, group_id).await;
 
@@ -212,6 +217,7 @@ pub async fn is_time_link_id_valid_for_user(con: &mut PgConnection, time_link_id
     let schedule_link_ids = schedule_link_ids.unwrap();
 
     if !schedule_link_ids.contains(&time_link_id) {
+        warn!("User group {} doesn't have time_link_id: {}", group_id, time_link_id);
         return Ok(TimeLinkValidResult::Success(false))
     }
 
