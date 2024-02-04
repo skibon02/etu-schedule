@@ -68,7 +68,7 @@ pub async fn get_subjects_for_group(
     Ok(res)
 }
 
-pub async fn get_cur_gen_subject_by_id(
+pub async fn get_active_subject_by_id(
     subject_id: i32,
     con: &mut PgConnection,
 ) -> DbResult<Option<SubjectModel>> {

@@ -16,7 +16,7 @@ async fn single_subject_merge(
     let subject = input_subject.clone();
 
     let res = con.transaction(|trx| Box::pin(async move {
-        let existing_subject: Option<SubjectModel> = models::subjects::get_cur_gen_subject_by_id(subject_id, &mut *trx).await?;
+        let existing_subject: Option<SubjectModel> = models::subjects::get_active_subject_by_id(subject_id, &mut *trx).await?;
 
         if let Some(existing_subject) = existing_subject {
             // merge

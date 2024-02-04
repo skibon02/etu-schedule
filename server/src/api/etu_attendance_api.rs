@@ -18,7 +18,7 @@ fn route(query: &str) -> String {
 pub async fn get_time() -> anyhow::Result<TimeResponse> {
     let response: Response = reqwest::Client::new()
         .get(route("settings/time"))
-        .timeout(Duration::from_secs(1))
+        .timeout(Duration::from_secs(2))
         .send()
         .await?;
 
@@ -73,7 +73,7 @@ pub async fn get_cur_schedule(token: String) -> anyhow::Result<GetScheduleResult
     let response: Response = reqwest::Client::new()
         .get(route("schedule/check-in"))
         .header("Cookie", format!("connect.digital-attendance={}", token))
-        .timeout(Duration::from_secs(1))
+        .timeout(Duration::from_secs(2))
         .send()
         .await
         .context("Cannot make fetch to schedule from etu attendance")?;
@@ -129,7 +129,7 @@ pub async fn check_in(token: String, lesson_instance_id: i32) -> anyhow::Result<
     let response = reqwest::Client::new()
         .post(route(&format!("schedule/check-in/{}", lesson_instance_id)))
         .header("Cookie", format!("connect.digital-attendance={}", token))
-        .timeout(Duration::from_secs(1))
+        .timeout(Duration::from_secs(2))
         .send()
         .await
         .context("Failed to perform check_in request to schedule api!")?;
@@ -230,7 +230,7 @@ pub async fn get_current_user(token: String) -> anyhow::Result<GetCurrentUserRes
     let response: Response = reqwest::Client::new()
         .get(route("auth/current-user"))
         .header("Cookie", format!("connect.digital-attendance={}", token))
-        .timeout(Duration::from_secs(1))
+        .timeout(Duration::from_secs(2))
         .send()
         .await
         .context("Cannot make fetch to current user from etu attendance")?;
@@ -262,7 +262,7 @@ pub struct SemesterInfo {
 pub async fn get_semester_info() -> anyhow::Result<SemesterInfo> {
     let response: Response = reqwest::Client::new()
         .get(route("schedule/semester"))
-        .timeout(Duration::from_secs(1))
+        .timeout(Duration::from_secs(2))
         .send()
         .await?;
 

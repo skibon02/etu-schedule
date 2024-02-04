@@ -1,13 +1,15 @@
 use anyhow::bail;
 use std::collections::BTreeSet;
 
-use chrono::{Datelike, NaiveTime, TimeZone};
+use chrono::{DateTime, Datelike, NaiveTime};
+use chrono_tz::Tz;
 
 use sqlx::pool::PoolConnection;
 use sqlx::Postgres;
 use tokio::select;
 
 use crate::api::etu_attendance_api::{CheckInResult, GetScheduleResult};
+use crate::bg_workers::FailureDetector;
 use crate::{api, models};
 use tokio::sync::watch::Receiver;
 
@@ -46,43 +48,65 @@ pub async fn attendance_worker_task(
     // let check_in_test = api::etu_attendance_api::check_in(token.to_string(), 32).await;
     // info!("check_in_test: {:#?}", check_in_test);
 
-    // TODO: get semester start from etu
-    let semester_start = chrono_tz::Europe::Moscow
-        .with_ymd_and_hms(2024, 2, 5, 0, 0, 0)
-        .unwrap();
+    let etu_semester_start = api::etu_attendance_api::get_semester_info()
+        .await
+        .unwrap()
+        .start_date;
+    let semester_start: DateTime<Tz> = DateTime::parse_from_rfc3339(&etu_semester_start)
+        .unwrap()
+        .with_timezone(&chrono_tz::Europe::Moscow);
+
+    info!(
+        "ATTENDANCE_WORKER_TASK: Semester start from etu: {:#?}",
+        etu_semester_start
+    );
+
     let day_of_week = semester_start.weekday().num_days_from_monday() as u64;
     let semester_start_week = semester_start
         .checked_sub_days(chrono::Days::new(day_of_week))
         .unwrap();
 
-    info!("Semester start: {:#?}", semester_start);
-    info!("Semester start week: {:#?}", semester_start_week);
+    info!(
+        "ATTENDANCE_WORKER_TASK: Semester start: {:#?}",
+        semester_start
+    );
+    info!(
+        "ATTENDANCE_WORKER_TASK: Semester start week: {:#?}",
+        semester_start_week
+    );
 
     // Set of processed check_ins:
     // user_id, time_link_id, week_num
     let mut processed_check_ins = BTreeSet::<(i32, i32, i32)>::new();
 
-    let mut fail_counter = 0;
+    let mut fail_detector = FailureDetector::new(10, 30);
     loop {
         select!(
             _ = tokio::time::sleep(tokio::time::Duration::from_secs(60)) => {
                 if let Err(e) = attendance_set_marks(semester_start_week, &mut *con, &mut processed_check_ins).await {
-                    warn!("attendance_set_marks failed: {:#?}", e);
-                    fail_counter += 1;
-                    if fail_counter > 5 {
-                        warn!("attendance_set_marks failed 5 times in a row! Exiting task...");
+                    warn!("ATTENDANCE_WORKER_TASK: attendance_set_marks failed: {:#?}", e);
+                    if fail_detector.failure() {
+                        warn!("ATTENDANCE_WORKER_TASK: attendance_set_marks failed too many times. Exiting task...");
                         return;
                     }
                 }
+                else {
+                    fail_detector.success();
+                }
             }
             _ = shutdown_watcher.changed() => {
-                warn!("ATTENDANCE_WORKER_TASK: Shutdown notification recieved! exiting task...");
+                warn!("ATTENDANCE_WORKER_TASK: Shutdown notification recieved! exiting task attendance_worker_task...");
                 return;
             }
         );
     }
 }
 
+/// Attendance set marks algorithm:
+/// 1. Get exact current lessons for users with attendance enabled and token valid for CURRENT time (does nothing between lessons)
+/// 2. Get current schedule from ETU attendance system for each user
+/// 3. Check if there is a lesson in current schedule that matches the lesson from our system
+/// 4. If there is a match, check in for this lesson
 pub async fn attendance_set_marks(
     semester_start_week: chrono::DateTime<chrono_tz::Tz>,
     con: &mut PoolConnection<Postgres>,
@@ -91,28 +115,27 @@ pub async fn attendance_set_marks(
     trace!("ATTENDANCE_WORKER_TASK: 60 secs passed, starting attendance worker routine...");
     let time = api::etu_attendance_api::get_time().await?;
 
-    let local_time_utc = time.time.parse::<chrono::DateTime<chrono::Utc>>().unwrap();
+    let local_time = DateTime::parse_from_rfc3339(&time.time)
+        .unwrap()
+        .with_timezone(&chrono_tz::Europe::Moscow);
 
-    let local_time = local_time_utc.with_timezone(&chrono_tz::Europe::Moscow);
     let day_of_week = local_time.weekday().num_days_from_monday() as u64;
     let day_of_week = models::schedule::WeekDay::try_from(day_of_week as u32).unwrap();
-    let week_parity = time.week;
     let week_num = (local_time - semester_start_week).num_weeks();
     let lesson_time_num = time_to_lesson_time_num(local_time.time());
     let Some(lesson_time_num) = lesson_time_num else {
         debug!("No lesson at this time! Skipping...");
-        bail!("No lesson at this time! Skipping...");
+        return Ok(());
     };
 
     debug!(
         "Ready for attendance check! Current time: {:#?}",
         local_time
     );
-    debug!("day_of_week: {:#?}", day_of_week);
-    debug!("week_parity: {:#?}", week_parity);
-    debug!("week_num: {:#?}", week_num);
+    // debug!("day_of_week: {:#?}", day_of_week);
+    // debug!("week_num: {:#?}", week_num);
     debug!("lesson_time_num: {:#?}", lesson_time_num);
-    debug!("Time: {:#?}", local_time.time());
+    // debug!("Time: {:#?}", local_time.time());
 
     let (user_schedule_info, subjects) = models::attendance::get_current_pending_attendance_marks(
         &mut *con,
@@ -123,17 +146,17 @@ pub async fn attendance_set_marks(
     .await?;
     trace!("objs: {:#?}", user_schedule_info);
     'users: for user_schedule in user_schedule_info {
-        let Some(token) = user_schedule.user_data.clone().attendance_token else {
-            error!("User {} has no attendance token!", user_schedule.user_id);
-            bail!("No attendance token");
-        };
-
         //wait 5s
         tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
 
+        let Some(token) = user_schedule.user_data.clone().attendance_token else {
+            error!("User {} has no attendance token!", user_schedule.user_id);
+            continue;
+        };
+
         //make request
-        let schedule = api::etu_attendance_api::get_cur_schedule(token.clone()).await?;
-        if let GetScheduleResult::WrongToken = schedule {
+        let etu_schedule = api::etu_attendance_api::get_cur_schedule(token.clone()).await?;
+        if let GetScheduleResult::WrongToken = etu_schedule {
             warn!(
                 "Wrong token for user_id: {:?} (group_id: {:?})! Invalidating user token...",
                 user_schedule.user_data.user_id, user_schedule.user_data.group_id
@@ -141,28 +164,45 @@ pub async fn attendance_set_marks(
             models::users::invalidate_attendance_token(&mut *con, user_schedule.user_id).await?;
             continue;
         }
-        let GetScheduleResult::Ok(schedule) = schedule else {
+        let GetScheduleResult::Ok(etu_schedule) = etu_schedule else {
             error!(
                 "Failed to get schedule for user_id: {:?} (group_id: {:?})! Unknown response: {:?}",
-                user_schedule.user_data.user_id, user_schedule.user_data.group_id, schedule
+                user_schedule.user_data.user_id, user_schedule.user_data.group_id, etu_schedule
             );
             continue;
         };
 
-        let current_subjects: Vec<_> = schedule
+        // early exit if checks are already processed
+        let mut need_to_check_in = false;
+        for (time_link_id, _) in &user_schedule.attend_lessons {
+            if !processed_check_ins.contains(&(
+                user_schedule.user_id,
+                *time_link_id,
+                week_num as i32,
+            )) {
+                need_to_check_in = true;
+                break;
+            }
+        }
+
+        if !need_to_check_in {
+            continue;
+        }
+
+        // otherwise, get etu_schedule to associate with saved local schedule and to get ids for check_in
+        let current_subjects_etu: Vec<_> = etu_schedule
             .iter()
             .filter(|x| {
-                x.check_in_start
-                    .parse::<chrono::DateTime<chrono::Utc>>()
+                DateTime::parse_from_rfc3339(&x.check_in_start)
                     .unwrap()
-                    <= local_time_utc
-                    && x.check_in_deadline
-                        .parse::<chrono::DateTime<chrono::Utc>>()
+                    .with_timezone(&chrono_tz::Europe::Moscow)
+                    <= local_time
+                    && DateTime::parse_from_rfc3339(&x.check_in_deadline)
                         .unwrap()
-                        >= local_time_utc
+                        .with_timezone(&chrono_tz::Europe::Moscow)
+                        >= local_time
             })
             .collect();
-        debug!("current_subjects: {:#?}", current_subjects);
 
         info!(
             "User_id: {:?} (group_id: {:?}), user_schedule.attend_lessons: {:#?}",
@@ -172,14 +212,14 @@ pub async fn attendance_set_marks(
                 .attend_lessons
                 .iter()
                 .map(|(_, subject_id)| {
-                    let subject = subjects.get(&subject_id).unwrap();
+                    let subject = subjects.get(subject_id).unwrap();
                     subject.title.clone()
                 })
                 .collect::<Vec<_>>()
         );
 
-        //iterate over lessons
-        'lessons: for (time_link_id, subject_id) in user_schedule.attend_lessons {
+        //iterate over lessons. Most probably we will have single lesson here
+        '_lessons: for (time_link_id, subject_id) in user_schedule.attend_lessons {
             let subject_title = subjects[&subject_id].title.clone();
             let subject_type = subjects[&subject_id].subject_type.clone();
             let short_title = subjects[&subject_id].short_title.clone();
@@ -191,9 +231,8 @@ pub async fn attendance_set_marks(
             }
 
             info!("finding match for subject_title: {:#?}...", subject_title);
-
             let mut found_id = None;
-            for current_subject in &current_subjects {
+            for current_subject in &current_subjects_etu {
                 if current_subject.lesson.title == subject_title
                     && current_subject.lesson.subject_type == subject_type
                     && current_subject.lesson.short_title == short_title

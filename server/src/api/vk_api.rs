@@ -20,7 +20,7 @@ pub async fn users_get(access_token: &str, fields: &str) -> Option<Json<Value>> 
             ("access_token", access_token),
             ("v", "5.131"),
         ])
-        .timeout(Duration::from_secs(3))
+        .timeout(Duration::from_secs(2))
         .send()
         .await
         .ok()?;

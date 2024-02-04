@@ -243,7 +243,7 @@ pub async fn get_current_pending_attendance_marks(
         let user_data = models::users::get_user_data(con, user).await?;
         for (_, subject_id) in &user_schedule {
             if let Vacant(e) = subjects.entry(*subject_id) {
-                let subject = models::subjects::get_cur_gen_subject_by_id(*subject_id, con)
+                let subject = models::subjects::get_active_subject_by_id(*subject_id, con)
                     .await?
                     .unwrap();
                 e.insert(subject);
