@@ -272,7 +272,7 @@ async fn get_groups(mut con: Connection<Db>) -> GetGroupsRes {
 }
 
 #[get("/semester")]
-async fn semester_info(_auth: AuthorizeInfo) -> ResponderWithSuccess<SemesterInfo> {
+async fn semester_info() -> ResponderWithSuccess<SemesterInfo> {
     let semester_info = api::etu_attendance_api::get_semester_info().await?;
     ResponderWithSuccess::success(semester_info)
 }
