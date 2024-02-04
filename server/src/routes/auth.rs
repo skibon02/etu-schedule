@@ -155,7 +155,7 @@ struct UserVkData {
     first_name: String,
     last_name: String,
     avatar: String,
-    phone: String,
+    phone: Option<String>,
 }
 
 #[allow(dead_code)]
