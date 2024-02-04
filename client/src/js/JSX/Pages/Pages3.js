@@ -9,11 +9,11 @@ import Fish from './Fish';
 import NoVkData from './NoVkData';
 
 export default function Pages() {
-  const { vkData, fish } = usePages();
+  const { vkData, fish, maxWeekNumber } = usePages();
 
   if (fish) {
     return <Fish />
-  } else if (!vkData) {
+  } else if (!vkData || !maxWeekNumber) {
     return <NoVkData />
   } else if (!vkData.is_authorized) {
     return <Profile />

@@ -14,7 +14,7 @@ export default function Header() {
   const dispatch = useDispatch();
 
   const { active } = useSelector(s => s.active);
-  const { date, weekNumber } = useSelector(s => s.date);
+  const { date, weekNumber, maxWeekNumber } = useSelector(s => s.date);
   const { groupSchedule } = useSelector(s => s.groupSchedule);
 
   return (
@@ -48,7 +48,7 @@ export default function Header() {
       <div className="header__week-buttons">
         <ScheduleButton 
           text={'К предыдущей неделе'} 
-          handleClick={() => handlePrevWeek(dispatch, new Date(date), weekNumber)} 
+          handleClick={() => {handlePrevWeek(dispatch, new Date(date), weekNumber)}} 
         />
         <ScheduleButton 
           text={'К текущей неделе'} 
@@ -56,7 +56,7 @@ export default function Header() {
         />
         <ScheduleButton 
           text={'К следующей неделе'} 
-          handleClick={() => handleNextWeek(dispatch, new Date(date), weekNumber)} 
+          handleClick={() => handleNextWeek(dispatch, new Date(date), weekNumber, maxWeekNumber)} 
         />
       </div>}
     </div>

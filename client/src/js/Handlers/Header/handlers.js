@@ -1,8 +1,8 @@
 import { setDate } from "../../ReduxStates/Slices/dateSLice";
 const weekTime = 24 * 60 * 60 * 1000 * 7;
 
-function handleNextWeek(dispatch, date, weekNumber) {
-  if (weekNumber < 17) {
+function handleNextWeek(dispatch, date, weekNumber, maxWeekNumber) {
+  if (weekNumber < maxWeekNumber) {
     dispatch(
       setDate( (new Date(date.getTime() + weekTime)).toISOString() )
     )

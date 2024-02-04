@@ -7,6 +7,7 @@ import { routingFx } from '../../FxFetches/Pages/routingFx';
 import { userDataGETFetch } from '../../ReduxStates/Slices/userDataSlice';
 import { groupScheduleFx } from '../../FxFetches/Pages/groupScheduleFx';
 import { setActiveByLocationFx } from '../../FxFetches/Pages/setActiveByLocationFx';
+import { semesterStartFetch } from '../../ReduxStates/Slices/dateSLice';
 
 export function usePages() {
   const dispatch = useDispatch();
@@ -15,12 +16,14 @@ export function usePages() {
   const online = useOnlineStatus();
 
   const { groupId, groupNILoading } = useSelector(s => s.groupNI);
+  const { maxWeekNumber } = useSelector(s => s.date);
   const { vkData } = useSelector(s => s.vkData);
 
   const [fish, setFish] = useState(false);
 
   useEffect(() => {
     dispatch(vkDataFetch());
+    semesterStartFetch(dispatch);
     const handleFish = () => setFish(true);
     window.addEventListener('fish', handleFish);
     return () => window.removeEventListener('fish', handleFish);
@@ -43,6 +46,6 @@ export function usePages() {
     setActiveByLocationFx(dispatch, location)
   }, [dispatch, location]);
 
-  return { vkData, fish };
+  return { vkData, fish, maxWeekNumber };
 }
 

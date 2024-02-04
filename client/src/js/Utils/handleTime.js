@@ -107,18 +107,11 @@ function makeCalendarTime(date, days) {
   return `${days[date.getDay()]} ${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`
 }
 
-function getWeekNumber(date) {
+function getWeekNumber(start, date) {
   const today = new Date(date);
-  const year = today.getFullYear();
-  let startSeptember = new Date(year, 8, 1); // 1 сентября текущего года
+  const startDate = new Date(start);
 
-  // Находим понедельник той недели, которая включает 1 сентября
-  let dayOfWeek = startSeptember.getDay();
-  if (dayOfWeek !== 1) {
-    startSeptember.setDate(startSeptember.getDate() - (dayOfWeek - 1) % 7);
-  }
-
-  const daysDiff = Math.floor((today - startSeptember) / (24 * 60 * 60 * 1000));
+  const daysDiff = Math.floor((today - startDate) / (24 * 60 * 60 * 1000));
   const weeksDiff = Math.floor(daysDiff / 7);
 
   return weeksDiff;
