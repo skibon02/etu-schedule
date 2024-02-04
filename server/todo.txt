@@ -1,8 +1,6 @@
 user attendance schedule periodic cleanup
 
-detect bg task failure
-
-update modified_timestamp for db objects (for update requests)
+update modified_timestamp for db objects
 
 Add timeout for etu reqwest!
 globally rework timeouts for reqwests
@@ -15,6 +13,6 @@ get rid of SPAMMERS +
 
 remove old schedule objects +
 
-get rid of unwraps in merge logic
+get rid of unwraps in merge logic +
 
 fix semester start date +

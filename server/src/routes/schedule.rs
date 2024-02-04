@@ -4,13 +4,15 @@ use std::ops::DerefMut;
 use rocket::Route;
 use rocket_db_pools::Connection;
 
+use crate::api::etu_attendance_api::SemesterInfo;
 use crate::bg_workers::{MERGE_REQUEST_CHANNEL, MERGE_REQUEST_CNT};
 use crate::models::schedule::ScheduleObjModel;
 use crate::models::subjects::SubjectModel;
 use crate::models::teachers::TeacherModel;
 use crate::models::Db;
+use crate::routes::auth::AuthorizeInfo;
 use crate::routes::ResponderWithSuccess;
-use crate::{models, models::groups::GroupModel};
+use crate::{api, models, models::groups::GroupModel};
 
 #[derive(serde::Serialize)]
 pub struct OutputAuditoriumReservationModel {
@@ -269,6 +271,12 @@ async fn get_groups(mut con: Connection<Db>) -> GetGroupsRes {
     GetGroupsRes::success(out_groups)
 }
 
+#[get("/semester")]
+async fn semester_info(_auth: AuthorizeInfo) -> ResponderWithSuccess<SemesterInfo> {
+    let semester_info = api::etu_attendance_api::get_semester_info().await?;
+    ResponderWithSuccess::success(semester_info)
+}
+
 pub fn get_routes() -> Vec<Route> {
-    routes![get_group_schedule_objects, get_groups]
+    routes![get_group_schedule_objects, get_groups, semester_info]
 }

@@ -5,7 +5,7 @@ use std::sync::OnceLock;
 use std::time::Instant;
 use tokio::select;
 
-use crate::bg_workers::{process_schedule_merge, ETU_REQUEST_INTERVAL};
+use crate::bg_workers::{process_schedule_merge, FailureDetector, ETU_REQUEST_INTERVAL};
 use crate::models;
 use tokio::sync::watch::Receiver;
 
@@ -26,7 +26,8 @@ pub async fn priority_schedule_merge_task(
     // for balancing forced requests
     let mut last_etu_request =
         Instant::now() - tokio::time::Duration::from_secs(ETU_REQUEST_INTERVAL);
-    let mut fail_counter = 0;
+
+    let mut fail_detector = FailureDetector::new(10, 30);
     loop {
         select!(
             Some(request) = rx.recv() => {
@@ -68,11 +69,14 @@ pub async fn priority_schedule_merge_task(
 
                 if let Err(e) = process_schedule_merge(vec![request], &mut con).await {
                     warn!("PRIORITY_MERGE_TASK: Error while merging group {}: {:?}", request, e);
-                    fail_counter += 1;
-                    if fail_counter > 5 {
-                        error!("PRIORITY_MERGE_TASK: Too many fails, interrupting task...");
+
+                    if fail_detector.failure() {
+                        warn!("PRIORITY_MERGE_TASK: Too many failures, exiting task...");
                         return;
                     }
+                }
+                else {
+                    fail_detector.success();
                 }
             }
             _ = shutdown_watcher.changed() => {

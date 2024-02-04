@@ -247,3 +247,25 @@ pub async fn get_current_user(token: String) -> anyhow::Result<GetCurrentUserRes
         Ok(GetCurrentUserResult::WrongToken)
     }
 }
+
+#[derive(serde::Deserialize, Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SemesterInfo {
+    pub id: i32,
+    pub season: String,
+    pub year: i32,
+    pub start_date: String,
+    pub end_date: String,
+    pub current_date: String,
+}
+
+pub async fn get_semester_info() -> anyhow::Result<SemesterInfo> {
+    let response: Response = reqwest::Client::new()
+        .get(route("schedule/semester"))
+        .timeout(Duration::from_secs(1))
+        .send()
+        .await?;
+
+    let result: SemesterInfo = response.json().await?;
+    Ok(result)
+}

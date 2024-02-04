@@ -1,5 +1,5 @@
 use crate::api::etu_api;
-use crate::bg_workers::process_schedule_merge;
+use crate::bg_workers::{process_schedule_merge, FailureDetector};
 use crate::{data_merges, models};
 use sqlx::pool::PoolConnection;
 use sqlx::Postgres;
@@ -15,7 +15,7 @@ pub async fn periodic_schedule_merge_task(
     mut shutdown_watcher: Receiver<bool>,
 ) {
     info!("PERIODIC_MERGE_TASK: Phase 0. Groups merge.");
-    let mut fail_counter = 0;
+    let mut fail_detector = FailureDetector::new(10, 30);
     loop {
         let new_groups = etu_api::get_groups_list().await;
         match new_groups {
@@ -29,17 +29,15 @@ pub async fn periodic_schedule_merge_task(
             }
             Err(e) => {
                 warn!("PERIODIC_MERGE_TASK: Failed to get groups list: {}", e);
-                fail_counter += 1;
-                if fail_counter > 5 {
-                    warn!(
-                        "PERIODIC_MERGE_TASK: Failed to get groups list 5 times. Exiting task..."
-                    );
+                if fail_detector.failure() {
+                    warn!("PERIODIC_MERGE_TASK: Too many failures. Exiting task...");
                     return;
                 }
             }
         }
         tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
     }
+    fail_detector.reset();
     info!("PERIODIC_MERGE_TASK: Groups merge finished.");
 
     info!("PERIODIC_MERGE_TASK: Phase 1. Initial merge for all groups.");
@@ -54,17 +52,19 @@ pub async fn periodic_schedule_merge_task(
                 "PERIODIC_MERGE_TASK: Failed to merge groups: {}. Skipping",
                 e
             );
-            fail_counter += 1;
-            if fail_counter > 5 {
-                warn!("PERIODIC_MERGE_TASK: Failed to merge groups 5 times. Exiting task...");
+            if fail_detector.failure() {
+                warn!("PERIODIC_MERGE_TASK: Too many failures. Exiting task...");
                 return;
             }
+        } else {
+            fail_detector.success();
         }
         if shutdown_watcher.has_changed().unwrap() {
             warn!("PERIODIC_MERGE_TASK: Shutdown notification recieved! exiting task...");
             return;
         }
     }
+    fail_detector.reset();
     info!("PERIODIC_MERGE_TASK: Initial merge for all groups finished.");
 
     info!("PERIODIC_MERGE_TASK: Phase 2. Starting merge routine...");
@@ -83,11 +83,12 @@ pub async fn periodic_schedule_merge_task(
                 "PERIODIC_MERGE_TASK: Failed to merge groups: {}. Skipping",
                 e
             );
-            fail_counter += 1;
-            if fail_counter > 5 {
+            if fail_detector.failure() {
                 warn!("PERIODIC_MERGE_TASK: Failed to merge groups 5 times. Exiting task...");
                 return;
             }
+        } else {
+            fail_detector.success();
         }
 
         select!(

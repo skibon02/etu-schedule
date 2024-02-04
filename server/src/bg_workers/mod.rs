@@ -73,16 +73,14 @@ async fn process_schedule_merge(
             }
         }
         for department in departments {
-            data_merges::groups::department_single_merge(department, None, &mut *con)
-                .await?;
+            data_merges::groups::department_single_merge(department, None, &mut *con).await?;
         }
 
         data_merges::subjects::subjects_merge(&subjects, last_subjects_generation, &mut *con)
             .await?;
         data_merges::teachers::teachers_merge(teachers, last_teachers_generation, &mut *con)
             .await?;
-        data_merges::schedule::schedule_objs_merge(group_id, &sched_objs_models, &mut *con)
-            .await?;
+        data_merges::schedule::schedule_objs_merge(group_id, &sched_objs_models, &mut *con).await?;
     }
     info!(
         "BGTASK: Merge for {} groups finished in {:?}",
@@ -91,4 +89,69 @@ async fn process_schedule_merge(
     );
 
     Ok(())
+}
+
+struct FailureDetector {
+    failures_cnt: u32,
+    success_cnt: u32,
+    failures_in_a_row: u32,
+    success_in_a_row: u32,
+
+    prev_failure: bool,
+    prev_success: bool,
+
+    failures_seq_limit: u32,
+    failures_overall_max: u32,
+}
+
+impl FailureDetector {
+    pub fn new(failures_seq_limit: u32, failures_overall_max: u32) -> Self {
+        Self {
+            failures_cnt: 0,
+            success_cnt: 0,
+            failures_in_a_row: 0,
+            success_in_a_row: 0,
+
+            prev_failure: false,
+            prev_success: false,
+
+            failures_seq_limit,
+            failures_overall_max,
+        }
+    }
+
+    /// returns true if failure limit reached
+    pub fn failure(&mut self) -> bool {
+        self.failures_cnt += 1;
+        self.failures_in_a_row += 1;
+        self.success_in_a_row = 0;
+        self.prev_failure = true;
+        self.prev_success = false;
+
+        if self.failures_in_a_row > self.failures_seq_limit {
+            self.failures_in_a_row = 0;
+            return true;
+        }
+        if self.failures_cnt > self.failures_overall_max {
+            return true;
+        }
+        false
+    }
+
+    pub fn success(&mut self) {
+        self.success_cnt += 1;
+        self.success_in_a_row += 1;
+        self.failures_in_a_row = 0;
+        self.prev_failure = false;
+        self.prev_success = true;
+    }
+
+    pub fn reset(&mut self) {
+        self.failures_cnt = 0;
+        self.success_cnt = 0;
+        self.failures_in_a_row = 0;
+        self.success_in_a_row = 0;
+        self.prev_failure = false;
+        self.prev_success = false;
+    }
 }
