@@ -7,6 +7,9 @@ update modified_timestamp for db objects (for update requests)
 Add timeout for etu reqwest!
 globally rework timeouts for reqwests
 
+attendance checkout feedback:
+check validity for attendance check system
+
 TODAY:
 get rid of SPAMMERS +
 

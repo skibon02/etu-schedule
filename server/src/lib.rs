@@ -103,7 +103,7 @@ impl<'r> FromRequest<'r> for DocumentRequest {
     }
 }
 
-static FRONTEND_ROUTES: &[&str] = &["schedule", "planning", "profile"];
+static FRONTEND_ROUTES: &[&str] = &["schedule", "planning", "profile", "api/auth/redirect"];
 
 #[get("/<path..>", rank = 5)]
 async fn frontend_page(path: PathBuf, _document: DocumentRequest) -> Option<NamedFile> {

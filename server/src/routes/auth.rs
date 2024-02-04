@@ -268,7 +268,9 @@ async fn process_auth(
     token: &str,
     uuid: &str,
 ) -> Result<(), AuthorizeError> {
-    let access_token = vk_api::exchange_access_token(token, uuid).await;
+    let access_token = vk_api::exchange_access_token(token, uuid)
+        .await
+        .ok_or(AuthorizeError::FailedVkRequest)?;
 
     let user_info = vk_api::users_get(&access_token, "photo_200,sex,bdate")
         .await
