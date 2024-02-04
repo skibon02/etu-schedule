@@ -24,6 +24,7 @@ use rocket::fs::{FileServer, NamedFile};
 
 #[path = "data-merges/mod.rs"]
 pub mod data_merges;
+pub mod diagnostics;
 
 const LOGGING_LEVEL: LevelFilter = LevelFilter::Info;
 
@@ -228,13 +229,13 @@ fn setup_logger() -> Result<(), fern::InitError> {
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
 use rocket::serde::json::json;
-use std::fs::File;
+use std::fs::{File, OpenOptions};
 use std::panic;
 use std::sync::Mutex;
 
 lazy_static::lazy_static! {
-    static ref PANIC_LOG_FILE: Mutex<File> = Mutex::new(File::create("panics.log").unwrap());
-    static ref IP_LOG_FILE: Mutex<File> = Mutex::new(File::create("ip.log").unwrap());
+    static ref PANIC_LOG_FILE: Mutex<File> = Mutex::new(OpenOptions::new().append(true).create(true).open("panic.log").unwrap());
+    static ref IP_LOG_FILE: Mutex<File> = Mutex::new(OpenOptions::new().append(true).create(true).open("ip.log").unwrap());
 }
 
 fn setup_panic_logger() {
