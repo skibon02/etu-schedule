@@ -193,6 +193,7 @@ pub struct GroupResponse {
     pub is_fake: bool,
     pub study_level: String,
     pub study_form: String,
+    #[serde(rename = "UserGroup")]
     pub user_group: UserGroupResponse,
 }
 
