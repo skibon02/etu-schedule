@@ -170,7 +170,17 @@ fn strip_colors(message: String) -> String {
     re.replace_all(&message, "").to_string()
 }
 
+fn logger_folder_name() -> String {
+    let cur_date = Local::now().format("%Y-%m-%d").to_string();
+    format!("logs/{}", cur_date).to_string()
+}
+
 fn setup_logger() -> Result<(), fern::InitError> {
+    let folder_name = logger_folder_name();
+    if fs::create_dir_all(&folder_name).is_err() {
+        warn!("Failed to create log folder: {}", folder_name);
+    }
+
     let console_log = Dispatch::new()
         .format(|out, message, record| {
             out.finish(format_args!(
@@ -198,22 +208,38 @@ fn setup_logger() -> Result<(), fern::InitError> {
     let debug_file_log = fern::Dispatch::new()
         .format(file_formatter)
         .level(LevelFilter::Debug)
-        .chain(fern::log_file("output_debug.log")?);
+        .chain(fern::log_file(folder_name.clone() + "/output_debug.log")?);
 
     let info_file_log = fern::Dispatch::new()
         .format(file_formatter)
         .level(LevelFilter::Info)
-        .chain(fern::log_file("output_info.log")?);
+        .chain(fern::log_file(folder_name.clone() + "/output_info.log")?);
 
     let warn_file_log = fern::Dispatch::new()
         .format(file_formatter)
         .level(LevelFilter::Warn)
-        .chain(fern::log_file("output_warn.log")?);
+        .chain(fern::log_file(folder_name.clone() + "/output_warn.log")?);
 
     let error_file_log = fern::Dispatch::new()
         .format(file_formatter)
         .level(LevelFilter::Error)
-        .chain(fern::log_file("output_error.log")?);
+        .chain(fern::log_file(folder_name + "/output_error.log")?);
+
+    let notify_callback = |out: FormatCallback, message: &Arguments, record: &Record| {
+        let message = format!(
+            "[{} {}] {}",
+            Local::now().format("%Y-%m-%d %H:%M:%S").to_string(),
+            &record.level(),
+            &strip_colors(message.to_string())
+        );
+        diagnostics::notify_important_event(diagnostics::EventType::ErrorMessage, &message);
+        out.finish(format_args!("{}", message))
+    };
+    let null_filename = if cfg!(windows) { "nul" } else { "/dev/null" };
+    let error_log_notifier = fern::Dispatch::new()
+        .format(notify_callback)
+        .level(LevelFilter::Error)
+        .chain(fern::log_file(null_filename)?);
 
     Dispatch::new()
         .chain(console_log)
@@ -221,6 +247,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
         .chain(info_file_log)
         .chain(warn_file_log)
         .chain(error_file_log)
+        .chain(error_log_notifier)
         .apply()?;
 
     Ok(())
@@ -233,9 +260,21 @@ use std::fs::{File, OpenOptions};
 use std::panic;
 use std::sync::Mutex;
 
+pub fn create_folder_and_open_file(folder: String, file: String) -> File {
+    if fs::create_dir_all(&folder).is_err() {
+        warn!("Failed to create log folder: {}", folder);
+    }
+
+    OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open(format!("{}/{}", folder, file))
+        .unwrap()
+}
+
 lazy_static::lazy_static! {
-    static ref PANIC_LOG_FILE: Mutex<File> = Mutex::new(OpenOptions::new().append(true).create(true).open("panic.log").unwrap());
-    static ref IP_LOG_FILE: Mutex<File> = Mutex::new(OpenOptions::new().append(true).create(true).open("ip.log").unwrap());
+    static ref PANIC_LOG_FILE: Mutex<File> = Mutex::new(create_folder_and_open_file(logger_folder_name(), "panics.log".to_string()));
+    static ref IP_LOG_FILE: Mutex<File> = Mutex::new(create_folder_and_open_file(logger_folder_name(), "ip.log".to_string()));
 }
 
 fn setup_panic_logger() {
@@ -263,8 +302,7 @@ fn setup_panic_logger() {
         let mut file = PANIC_LOG_FILE.lock().unwrap();
         writeln!(file, "{}", panic_message).unwrap();
 
-        // Additionally, you might want to print the panic message to stderr
-        eprintln!("{}", panic_message);
+        diagnostics::notify_important_event(diagnostics::EventType::PanicMessage, &panic_message);
     }));
 }
 

@@ -7,3 +7,8 @@ globally rework timeouts for reqwests
 
 attendance checkout feedback:
 check validity for attendance check system
+
+
+Create error/panic notifiers +
+
+log to separate directory, categorize by launch date +

@@ -112,7 +112,7 @@ pub async fn attendance_set_marks(
     con: &mut PoolConnection<Postgres>,
     processed_check_ins: &mut BTreeSet<(i32, i32, i32)>,
 ) -> anyhow::Result<()> {
-    trace!("ATTENDANCE_WORKER_TASK: 60 secs passed, starting attendance worker routine...");
+    debug!("ATTENDANCE_WORKER_TASK: 60 secs passed, starting attendance worker routine...");
     let time = api::etu_attendance_api::get_time().await?;
 
     let local_time = DateTime::parse_from_rfc3339(&time.time)
