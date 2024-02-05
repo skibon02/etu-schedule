@@ -7,12 +7,3 @@ globally rework timeouts for reqwests
 
 attendance checkout feedback:
 check validity for attendance check system
-
-TODAY:
-get rid of SPAMMERS +
-
-remove old schedule objects +
-
-get rid of unwraps in merge logic +
-
-fix semester start date +

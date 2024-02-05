@@ -309,7 +309,7 @@ pub async fn get_schedule_objs_group(group: u32) -> anyhow::Result<Option<GroupS
     );
     let response = reqwest::Client::new()
         .get(&url)
-        .timeout(Duration::from_secs(3))
+        .timeout(Duration::from_secs(5))
         .send()
         .await?;
     let body = response.text().await?;
@@ -328,7 +328,7 @@ pub async fn get_schedule_objs_groups(
     );
     let response = reqwest::Client::new()
         .get(&url)
-        .timeout(Duration::from_secs(3))
+        .timeout(Duration::from_secs(5))
         .send()
         .await?;
     let body = response.text().await?;
@@ -585,7 +585,7 @@ pub async fn get_groups_list() -> anyhow::Result<Vec<GroupOriginal>> {
     );
     let response = reqwest::Client::new()
         .get(&url)
-        .timeout(Duration::from_secs(3))
+        .timeout(Duration::from_secs(5))
         .send()
         .await?;
     let body = response.text().await?;

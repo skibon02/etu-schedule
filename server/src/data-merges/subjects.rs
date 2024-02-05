@@ -113,11 +113,11 @@ pub async fn subjects_merge(
     for (&subj_id, subjects) in subjects {
         for s in subjects.iter().skip(1) {
             if *s != subjects[0] {
-                error!(
+                anyhow::bail!(
                     "Subjects with same ID are not the same! first: {:?}, second: {:?}",
-                    subjects[0], s
-                );
-                anyhow::bail!("Cannot merge subjects! Subjects with same ID are not the same!")
+                    subjects[0],
+                    s
+                )
             }
         }
         let res = single_subject_merge(subj_id, &subjects[0], last_gen_id, con).await?;

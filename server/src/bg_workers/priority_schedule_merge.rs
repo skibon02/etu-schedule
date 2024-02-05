@@ -19,7 +19,6 @@ pub async fn priority_schedule_merge_task(
     mut con: &mut PoolConnection<Postgres>,
     mut shutdown_watcher: Receiver<bool>,
 ) {
-    // For demonstration, use a loop with a delay
     let (tx, mut rx) = tokio::sync::mpsc::channel(FORCE_REQ_CHANNEL_SIZE);
     MERGE_REQUEST_CHANNEL.set(tx).unwrap();
 
@@ -68,10 +67,10 @@ pub async fn priority_schedule_merge_task(
                 last_etu_request = Instant::now();
 
                 if let Err(e) = process_schedule_merge(vec![request], &mut con).await {
-                    warn!("PRIORITY_MERGE_TASK: Error while merging group {}: {:?}", request, e);
+                    error!("PRIORITY_MERGE_TASK: Error while merging group {}: {:?}", request, e);
 
                     if fail_detector.failure() {
-                        warn!("PRIORITY_MERGE_TASK: Too many failures, exiting task...");
+                        error!("PRIORITY_MERGE_TASK: Too many failures, exiting task...");
                         return;
                     }
                 }

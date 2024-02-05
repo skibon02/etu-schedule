@@ -10,7 +10,6 @@ use crate::models::schedule::ScheduleObjModel;
 use crate::models::subjects::SubjectModel;
 use crate::models::teachers::TeacherModel;
 use crate::models::Db;
-use crate::routes::auth::AuthorizeInfo;
 use crate::routes::ResponderWithSuccess;
 use crate::{api, models, models::groups::GroupModel};
 

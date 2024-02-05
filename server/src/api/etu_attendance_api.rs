@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use std::time::Duration;
 
-use anyhow::Context;
+use anyhow::{bail, Context};
 use reqwest::Response;
 
 use serde_json::Value;
@@ -41,7 +41,7 @@ pub struct TeacherResponse {
     pub id: i32,
     pub name: String,
     pub surname: String,
-    pub midname: String,
+    pub midname: Option<String>,
 }
 
 #[derive(serde::Deserialize, Debug)]
@@ -99,11 +99,9 @@ pub async fn get_cur_schedule(token: String) -> anyhow::Result<GetScheduleResult
             .context("Cannot parse get_cur_schedule response as json")?;
         if let Ok(result) = serde_json::from_value::<AttendanceCheckInResponseError>(result.clone())
         {
-            match result.message.as_str() {
-                _ => unimplemented!("Cannot parse error: {:?}", result),
-            }
+            bail!("Cannot parse error: {:?}", result.message.as_str());
         } else {
-            unimplemented!("Cannot parse error: {:?}", result)
+            bail!("Cannot parse error: {:?}", result)
         }
     }
 }
@@ -169,10 +167,10 @@ pub async fn check_in(token: String, lesson_instance_id: i32) -> anyhow::Result<
                 "Не найдено" => Err(anyhow::anyhow!(
                     "Cannot make check-in: lesson instance was not found!"
                 )),
-                _ => unimplemented!("Cannot parse error: {:?}", result),
+                _ => bail!("Cannot parse error: {:?}", result),
             }
         } else {
-            unimplemented!("Cannot parse error: {:?}", result)
+            bail!("Cannot parse error: {:?}", result)
         }
     }
 }

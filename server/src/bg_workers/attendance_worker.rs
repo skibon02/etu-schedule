@@ -84,9 +84,9 @@ pub async fn attendance_worker_task(
         select!(
             _ = tokio::time::sleep(tokio::time::Duration::from_secs(60)) => {
                 if let Err(e) = attendance_set_marks(semester_start_week, &mut *con, &mut processed_check_ins).await {
-                    warn!("ATTENDANCE_WORKER_TASK: attendance_set_marks failed: {:#?}", e);
+                    error!("ATTENDANCE_WORKER_TASK: attendance_set_marks failed: {:#?}", e);
                     if fail_detector.failure() {
-                        warn!("ATTENDANCE_WORKER_TASK: attendance_set_marks failed too many times. Exiting task...");
+                        error!("ATTENDANCE_WORKER_TASK: attendance_set_marks failed too many times. Exiting task...");
                         return;
                     }
                 }
@@ -150,7 +150,7 @@ pub async fn attendance_set_marks(
         tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
 
         let Some(token) = user_schedule.user_data.clone().attendance_token else {
-            error!("User {} has no attendance token!", user_schedule.user_id);
+            warn!("User {} has no attendance token!", user_schedule.user_id);
             continue;
         };
 
@@ -205,7 +205,7 @@ pub async fn attendance_set_marks(
             .collect();
 
         info!(
-            "User_id: {:?} (group_id: {:?}), user_schedule.attend_lessons: {:#?}",
+            "ATTENDANCE_WORKER_TASK: User_id: {:?} (group_id: {:?}), user_schedule.attend_lessons: {:#?}",
             user_schedule.user_data.user_id,
             user_schedule.user_data.group_id,
             user_schedule
@@ -230,7 +230,10 @@ pub async fn attendance_set_marks(
                 continue;
             }
 
-            info!("finding match for subject_title: {:#?}...", subject_title);
+            info!(
+                "ATTENDANCE_WORKER_TASK: finding match for subject_title: {:#?}...",
+                subject_title
+            );
             let mut found_id = None;
             for current_subject in &current_subjects_etu {
                 if current_subject.lesson.title == subject_title
@@ -242,8 +245,11 @@ pub async fn attendance_set_marks(
                 }
             }
             if let Some(id) = found_id {
-                info!("Found subject from attendance system: {:#?}", id);
-                info!("Processing check_in...");
+                info!(
+                    "ATTENDANCE_WORKER_TASK: Found subject from attendance system: {:#?}",
+                    id
+                );
+                info!("ATTENDANCE_WORKER_TASK: Processing check_in...");
                 let check_in_res = api::etu_attendance_api::check_in(token.clone(), id).await?;
                 match check_in_res {
                     CheckInResult::Ok => {
@@ -266,8 +272,7 @@ pub async fn attendance_set_marks(
                         continue 'users;
                     }
                     other => {
-                        warn!("Check in failed: Unknown response: {:#?}", other);
-                        bail!("Check in failed: Unknown response");
+                        bail!("Check in failed: Unknown response: {:#?}", other);
                     }
                 }
             } else {
