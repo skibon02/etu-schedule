@@ -151,6 +151,24 @@ pub async fn attendance_set_marks(
 
         debug!("Start processing user {}", user_schedule.user_id);
 
+        // early exit if checks are already processed
+        let mut need_to_check_in = false;
+        for (time_link_id, _) in &user_schedule.attend_lessons {
+            if !processed_check_ins.contains(&(
+                user_schedule.user_id,
+                *time_link_id,
+                week_num as i32,
+            )) {
+                need_to_check_in = true;
+                break;
+            }
+        }
+
+        if !need_to_check_in {
+            debug!("Early leaving! All marks are set");
+            continue;
+        }
+
         let Some(token) = user_schedule.user_data.clone().attendance_token else {
             warn!("User {} has no attendance token!", user_schedule.user_id);
             continue;
@@ -174,24 +192,6 @@ pub async fn attendance_set_marks(
             continue;
         };
         debug!("schedule received from ETU: {:?}", etu_schedule);
-
-        // early exit if checks are already processed
-        let mut need_to_check_in = false;
-        for (time_link_id, _) in &user_schedule.attend_lessons {
-            if !processed_check_ins.contains(&(
-                user_schedule.user_id,
-                *time_link_id,
-                week_num as i32,
-            )) {
-                need_to_check_in = true;
-                break;
-            }
-        }
-
-        if !need_to_check_in {
-            debug!("Early leaving! All marks are set");
-            continue;
-        }
 
         // otherwise, get etu_schedule to associate with saved local schedule and to get ids for check_in
         let current_subjects_etu: Vec<_> = etu_schedule
