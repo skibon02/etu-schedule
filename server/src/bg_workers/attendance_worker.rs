@@ -144,7 +144,7 @@ pub async fn attendance_set_marks(
         lesson_time_num,
     )
     .await?;
-    debug!("objs: {:#?}", user_schedule_info);
+    trace!("objs: {:#?}", user_schedule_info);
     'users: for user_schedule in user_schedule_info {
         //wait 5s
         tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
@@ -191,7 +191,7 @@ pub async fn attendance_set_marks(
             );
             continue;
         };
-        debug!("schedule received from ETU: {:?}", etu_schedule);
+        // debug!("schedule received from ETU: {:?}", etu_schedule);
 
         // otherwise, get etu_schedule to associate with saved local schedule and to get ids for check_in
         let current_subjects_etu: Vec<_> = etu_schedule

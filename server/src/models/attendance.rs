@@ -178,6 +178,8 @@ pub async fn get_active_attendance_objs_at_time(
         .await?
         .unwrap()
         .group_id;
+    // trace!("DEBUG: get_active_attendance_objs_at_time call!\n\tuser_id: {},\n\tweek: {}, \n\tweek_parity: {}, \n\tweek_day: {:?},\n\ttime: {}", user_id,
+    // week, week_parity, week_day, time);
     let res = sqlx::query!("SELECT schedule_objs.time_link_id, schedule_objs.subject_id FROM schedule_objs \
     WHERE schedule_objs.group_id = $5 AND schedule_objs.time = $4 AND week_day = $3 AND week_parity = $6 AND \
     schedule_objs.gen_end IS NULL AND \
