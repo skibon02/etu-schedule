@@ -144,10 +144,12 @@ pub async fn attendance_set_marks(
         lesson_time_num,
     )
     .await?;
-    trace!("objs: {:#?}", user_schedule_info);
+    debug!("objs: {:#?}", user_schedule_info);
     'users: for user_schedule in user_schedule_info {
         //wait 5s
         tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
+
+        debug!("Start processing user {}", user_schedule.user_id);
 
         let Some(token) = user_schedule.user_data.clone().attendance_token else {
             warn!("User {} has no attendance token!", user_schedule.user_id);
@@ -171,6 +173,7 @@ pub async fn attendance_set_marks(
             );
             continue;
         };
+        debug!("schedule received from ETU: {:?}", etu_schedule);
 
         // early exit if checks are already processed
         let mut need_to_check_in = false;
@@ -186,6 +189,7 @@ pub async fn attendance_set_marks(
         }
 
         if !need_to_check_in {
+            debug!("Early leaving! All marks are set");
             continue;
         }
 

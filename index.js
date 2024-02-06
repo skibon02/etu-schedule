@@ -1,9 +1,6 @@
 import express from "express"
-import { Database } from "bun:sqlite";
-const readline = require("readline")
-const path = require('path')
-
-const db = new Database("db.sqlite", {create: true});
+import readline from "readline"
+import path from "path"
 
 import attend_token from "./token.js"
 
@@ -346,18 +343,6 @@ async function get_group_schedule(group_id) {
     console.log(schedIDs);
 }
 
-async function init_db() {
-    let table_name = 'week_lessons';
-    let query = db.query(`SELECT count(name) as cnt FROM sqlite_master WHERE type='table' AND name='${table_name}';`);
-    if (query.get().cnt === 0) {
-        // db.query(`create table week_lessons (
-        //     id INT primary key,
-        //     day_of_week INT check (x >= 0 AND x < 7),
-        //
-        // )`).run()
-    }
-}
-
 async function list_lessons(date) {
     let opt_date = "";
 
@@ -461,7 +446,6 @@ async function ask() {
 }
 
 async function app() {
-    await init_db();
 
     api.listen(port, () => {
       console.log(`Listening on port ${port}...`);
