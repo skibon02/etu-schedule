@@ -107,7 +107,7 @@ function makeCalendarTime(date, days) {
   return `${days[date.getDay()]} ${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`
 }
 
-function getWeekNumber(start, date) {
+function getWeekNumber(start="2024-02-05T00:00:00.000Z", date) {
   const today = new Date(date);
   const startDate = new Date(start);
 
@@ -119,7 +119,7 @@ function getWeekNumber(start, date) {
 
 
 function isEvenWeek(date) {
-  const weeksDiff = getWeekNumber(date);
+  const weeksDiff = getWeekNumber(undefined, date);
 
   if (weeksDiff % 2 === 0) {
     return '1';
