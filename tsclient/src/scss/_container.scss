@@ -1,0 +1,115 @@
+@import "_nullstyle";
+// @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@100;300;700&family=Poppins:wght@100;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;500;700&family=Open+Sans:wght@300;700&family=Poppins:wght@100;400&display=swap');
+// font-family: 'Poppins', sans-serif;
+// font-family: 'Montserrat', sans-serif;
+
+body {
+  overflow-y: scroll;
+  font-family: 'Montserrat', sans-serif;
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 10px; 
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888; 
+  border-radius: 6px; 
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-track:hover {
+  background: #ddd; 
+  border-radius: 6px;
+}
+
+.a {
+  height: 0 !important;
+  display: inline-block;
+}
+
+.fish {
+  text-align: center;
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  height: 100vh;
+  user-select: none;
+  flex-direction: column;
+}
+
+.fish-image {
+  width: pxToEm(100px);
+}
+
+.no-match-link {
+   color: #0b2376;
+   text-decoration: underline;
+   &:active, :hover {
+    text-decoration: none;
+   }
+}
+ 
+.container {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.2em;
+  position: relative;
+  min-height: 100vh;
+}
+
+.under-header-box {
+  height: pxToEm(55px);
+}
+
+.under-header-box-mobile {
+  height: pxToEm(0px);
+}
+
+.under-planning-thead-box {
+  height: pxToEm(50px);
+}
+
+.under-planning-thead-box-mobile {
+  height: pxToEm(0px);
+}
+
+@media screen and (max-width: 700px) {
+  .container {
+    font-size: 14px;
+  }
+}
+
+
+@media screen and (max-width: 500px) {
+  .container {
+    font-size: 12px;
+  }
+  .under-header-box {
+    height: pxToEm(0px);
+  }
+  .under-header-box-mobile {
+    height: pxToEm(100px);
+  }
+  .under-planning-thead-box {
+    height: 0;
+  }
+  .under-planning-thead-box-mobile {
+    height: pxToEm(35px);
+  }
+}
+
+
+
