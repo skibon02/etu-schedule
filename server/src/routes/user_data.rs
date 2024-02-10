@@ -11,9 +11,7 @@ use rocket_db_pools::Connection;
 use serde_derive::{Deserialize, Serialize};
 
 #[derive(Serialize)]
-pub struct SetUserGroupSuccess {
-    ok: bool,
-}
+pub struct SetUserGroupSuccess;
 type SetUserGroupRes = ResponderWithSuccess<SetUserGroupSuccess>;
 
 #[derive(Deserialize)]
@@ -28,7 +26,7 @@ async fn set_group(
     body: Json<SetGroupBody>,
 ) -> SetUserGroupRes {
     if auth.is_none() {
-        return SetUserGroupRes::forbidden("User is not authorized!");
+        return SetUserGroupRes::forbidden(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
@@ -41,19 +39,17 @@ async fn set_group(
         error!("Failed to set user group: {:?}", e);
 
         if let Some(e) = e.downcast_ref::<models::users::SetUserGroupError>() {
-            SetUserGroupRes::failed(&e.to_string())
+            SetUserGroupRes::failed(Some(&e.to_string()))
         } else {
-            SetUserGroupRes::internal_error("не скажу")
+            SetUserGroupRes::internal_error(None)
         }
     } else {
-        SetUserGroupRes::success(SetUserGroupSuccess { ok: true })
+        SetUserGroupRes::success(SetUserGroupSuccess)
     }
 }
 
 #[derive(Serialize)]
-pub struct SetUserDataSuccess {
-    ok: bool,
-}
+pub struct SetUserDataSuccess;
 
 type SetUserDataRes = ResponderWithSuccess<SetUserDataSuccess>;
 
@@ -64,13 +60,13 @@ async fn set_data(
     body: Json<UserDataOptionalModel>,
 ) -> SetUserDataRes {
     if auth.is_none() {
-        return SetUserDataRes::failed("User is not authorized!");
+        return SetUserDataRes::failed(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
     models::users::set_user_data(&mut db, auth.user_id, body.into_inner()).await?;
 
-    SetUserDataRes::success(SetUserDataSuccess { ok: true })
+    SetUserDataRes::success(SetUserDataSuccess)
 }
 #[derive(Serialize)]
 pub struct OutputUserDataModel {
@@ -98,7 +94,7 @@ type GetUserDataRes = ResponderWithSuccess<OutputUserDataModel>;
 #[get("/user/get_data")]
 async fn get_data(mut db: Connection<Db>, auth: Option<AuthorizeInfo>) -> GetUserDataRes {
     if auth.is_none() {
-        return GetUserDataRes::forbidden("User is not authorized!");
+        return GetUserDataRes::forbidden(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
@@ -122,7 +118,7 @@ type GetUserGroupRes = ResponderWithSuccess<GetUserGroupSuccess>;
 #[get("/user/get_group")]
 async fn get_group(mut db: Connection<Db>, auth: Option<AuthorizeInfo>) -> GetUserGroupRes {
     if auth.is_none() {
-        return GetUserGroupRes::forbidden("User is not authorized!");
+        return GetUserGroupRes::forbidden(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
@@ -169,7 +165,7 @@ pub async fn set_attendance_token(
     LAST_ATTENDANCE_FETCH_TIME.store(timestamp, std::sync::atomic::Ordering::Relaxed);
 
     if auth.is_none() {
-        return SetAttendanceTokenRes::forbidden("User is not authorized!");
+        return SetAttendanceTokenRes::forbidden(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
@@ -186,7 +182,7 @@ pub async fn set_attendance_token(
                     "User info for user_id {} request result: {:?}",
                     auth.user_id, res
                 );
-                if res.groups.len() == 0 {
+                if res.groups.is_empty() {
                     return SetAttendanceTokenRes::success(SetAttendanceTokenSuccess {
                         ok: false,
                         group_changed: false,

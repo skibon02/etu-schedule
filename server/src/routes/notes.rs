@@ -18,7 +18,6 @@ pub struct CreateUserNoteRequest {
 
 #[derive(Serialize)]
 pub struct CreateUserNoteResultSuccess {
-    ok: bool,
     action: String,
 }
 
@@ -31,14 +30,14 @@ pub async fn create_update_user_note(
     data: Json<CreateUserNoteRequest>,
 ) -> CreateRes {
     if auth.is_none() {
-        return CreateRes::forbidden("User is not authorized!");
+        return CreateRes::forbidden(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
     // check valid week number
     // TODO: use etu api to get semester start and end dates
     if data.week_num > 52 {
-        return CreateRes::failed("week_num is too big!");
+        return CreateRes::failed(Some("week_num is too big!"));
     }
 
     // check valid time link id
@@ -51,11 +50,11 @@ pub async fn create_update_user_note(
     match res {
         models::schedule::TimeLinkValidResult::Success(r) => {
             if !r {
-                return CreateRes::failed("schedule_obj_time_link_id is not valid for user!");
+                return CreateRes::failed(Some("schedule_obj_time_link_id is not valid for user!"));
             }
         }
         models::schedule::TimeLinkValidResult::ErrorUserMessage(msg) => {
-            return CreateRes::failed(&msg);
+            return CreateRes::failed(Some(&msg));
         }
     }
 
@@ -79,7 +78,6 @@ pub async fn create_update_user_note(
 
     let action = if note_exists { "updated" } else { "created" };
     CreateRes::success(CreateUserNoteResultSuccess {
-        ok: true,
         action: action.to_string(),
     })
 }
@@ -100,14 +98,14 @@ type GetRes = ResponderWithSuccess<UserNotesObj>;
 #[get("/notes/user")]
 pub async fn get_user_notes(mut db: Connection<Db>, auth: Option<AuthorizeInfo>) -> GetRes {
     if auth.is_none() {
-        return GetRes::forbidden("User is not authorized!");
+        return GetRes::forbidden(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
     // get user saved attendance schedule elements
     let group_id = models::users::get_user_group(&mut db, auth.user_id).await?;
     if group_id.is_none() {
-        return GetRes::failed("User has no group!");
+        return GetRes::failed(Some("User has no group!"));
     }
     let _group_id = group_id.unwrap().group_id;
 
@@ -138,9 +136,7 @@ pub struct DeleteUserNoteRequest {
 }
 
 #[derive(Serialize)]
-pub struct DeleteUserNoteResultSuccess {
-    ok: bool,
-}
+pub struct DeleteUserNoteResultSuccess;
 
 type DeleteRes = ResponderWithSuccess<DeleteUserNoteResultSuccess>;
 
@@ -151,7 +147,7 @@ pub async fn delete_user_note(
     data: Json<DeleteUserNoteRequest>,
 ) -> DeleteRes {
     if auth.is_none() {
-        return DeleteRes::forbidden("User is not authorized!");
+        return DeleteRes::forbidden(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
@@ -165,11 +161,11 @@ pub async fn delete_user_note(
     match res {
         models::schedule::TimeLinkValidResult::Success(r) => {
             if !r {
-                return DeleteRes::failed("schedule_obj_time_link_id is not valid for user!");
+                return DeleteRes::failed(Some("schedule_obj_time_link_id is not valid for user!"));
             }
         }
         models::schedule::TimeLinkValidResult::ErrorUserMessage(msg) => {
-            return DeleteRes::failed(&msg);
+            return DeleteRes::failed(Some(&msg));
         }
     }
     let note_exists = models::notes::is_user_note_exists(
@@ -180,7 +176,7 @@ pub async fn delete_user_note(
     )
     .await?;
     if !note_exists {
-        return DeleteRes::failed("Note not found!");
+        return DeleteRes::failed(Some("Note not found!"));
     }
     models::notes::delete_user_note(
         &mut db,
@@ -190,7 +186,7 @@ pub async fn delete_user_note(
     )
     .await?;
 
-    DeleteRes::success(DeleteUserNoteResultSuccess { ok: true })
+    DeleteRes::success(DeleteUserNoteResultSuccess)
 }
 
 #[derive(Deserialize)]
@@ -202,7 +198,6 @@ pub struct CreateGroupNoteRequest {
 
 #[derive(Serialize)]
 pub struct CreateGroupNoteResultSuccess {
-    ok: bool,
     action: String,
 }
 type CreateGroupRes = ResponderWithSuccess<CreateGroupNoteResultSuccess>;
@@ -214,19 +209,19 @@ pub async fn create_update_group_note(
     data: Json<CreateGroupNoteRequest>,
 ) -> CreateGroupRes {
     if auth.is_none() {
-        return CreateGroupRes::forbidden("User is not authorized!");
+        return CreateGroupRes::forbidden(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
     // check valid week number
     // TODO: use etu api to get semester start and end dates
     if data.week_num > 52 {
-        return CreateGroupRes::failed("week_num is too big!");
+        return CreateGroupRes::failed(Some("week_num is too big!"));
     }
 
     let group_id = models::users::get_user_group(&mut db, auth.user_id).await?;
     if group_id.is_none() {
-        return CreateGroupRes::failed("User has no group!");
+        return CreateGroupRes::failed(Some("User has no group!"));
     }
     let group_id = group_id.unwrap().group_id;
 
@@ -234,7 +229,7 @@ pub async fn create_update_group_note(
     let res = models::users::check_privilege_level(&mut db, auth.user_id, group_id).await?;
     if !res {
         warn!("User has no permission to create group note!");
-        return CreateGroupRes::forbidden("User has no permission to create group note!");
+        return CreateGroupRes::forbidden(Some("User has no permission to create group note!"));
     }
 
     // check valid time link id
@@ -247,11 +242,13 @@ pub async fn create_update_group_note(
     match res {
         models::schedule::TimeLinkValidResult::Success(r) => {
             if !r {
-                return CreateGroupRes::failed("schedule_obj_time_link_id is not valid for group!");
+                return CreateGroupRes::failed(Some(
+                    "schedule_obj_time_link_id is not valid for group!",
+                ));
             }
         }
         models::schedule::TimeLinkValidResult::ErrorUserMessage(msg) => {
-            return CreateGroupRes::failed(&msg);
+            return CreateGroupRes::failed(Some(&msg));
         }
     }
 
@@ -276,7 +273,6 @@ pub async fn create_update_group_note(
     let action = if note_exists { "updated" } else { "created" };
 
     CreateGroupRes::success(CreateGroupNoteResultSuccess {
-        ok: true,
         action: action.to_string(),
     })
 }
@@ -297,13 +293,13 @@ type GetGroupRes = ResponderWithSuccess<GroupNotesObj>;
 #[get("/notes/group")]
 pub async fn get_group_notes(mut db: Connection<Db>, auth: Option<AuthorizeInfo>) -> GetGroupRes {
     if auth.is_none() {
-        return GetGroupRes::forbidden("User is not authorized!");
+        return GetGroupRes::forbidden(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
     let group_id = models::users::get_user_group(&mut db, auth.user_id).await?;
     if group_id.is_none() {
-        return GetGroupRes::failed("User has no group!");
+        return GetGroupRes::failed(Some("User has no group!"));
     }
     let group_id = group_id.unwrap().group_id;
 
@@ -334,9 +330,7 @@ pub struct DeleteGroupNoteRequest {
 }
 
 #[derive(Serialize)]
-pub struct DeleteGroupNoteResultSuccess {
-    ok: bool,
-}
+pub struct DeleteGroupNoteResultSuccess;
 type DeleteGroupRes = ResponderWithSuccess<DeleteGroupNoteResultSuccess>;
 
 #[delete("/notes/group", data = "<data>")]
@@ -346,13 +340,13 @@ pub async fn delete_group_note(
     data: Json<DeleteGroupNoteRequest>,
 ) -> DeleteGroupRes {
     if auth.is_none() {
-        return DeleteGroupRes::forbidden("User is not authorized!");
+        return DeleteGroupRes::forbidden(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
     let group_id = models::users::get_user_group(&mut db, auth.user_id).await?;
     if group_id.is_none() {
-        return DeleteGroupRes::failed("User has no group!");
+        return DeleteGroupRes::failed(Some("User has no group!"));
     }
     let group_id = group_id.unwrap().group_id;
 
@@ -360,7 +354,7 @@ pub async fn delete_group_note(
     let res = models::users::check_privilege_level(&mut db, auth.user_id, group_id).await?;
     if !res {
         warn!("User has no permission to delete group note!");
-        return DeleteGroupRes::forbidden("User has no permission to delete group note!");
+        return DeleteGroupRes::forbidden(Some("User has no permission to delete group note!"));
     }
 
     let note_exists = models::notes::is_group_note_exists(
@@ -371,7 +365,7 @@ pub async fn delete_group_note(
     )
     .await?;
     if !note_exists {
-        return DeleteGroupRes::failed("Note not found!");
+        return DeleteGroupRes::failed(Some("Note not found!"));
     }
 
     models::notes::delete_group_note(
@@ -382,7 +376,7 @@ pub async fn delete_group_note(
     )
     .await?;
 
-    DeleteGroupRes::success(DeleteGroupNoteResultSuccess { ok: true })
+    DeleteGroupRes::success(DeleteGroupNoteResultSuccess)
 }
 
 pub fn get_routes() -> Vec<Route> {

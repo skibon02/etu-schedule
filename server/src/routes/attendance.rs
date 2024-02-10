@@ -22,7 +22,7 @@ pub async fn get_user_attendance_schedule(
     auth: Option<AuthorizeInfo>,
 ) -> GetUserAttendanceScheduleRes {
     if auth.is_none() {
-        return GetUserAttendanceScheduleRes::forbidden("User is not authorized!");
+        return GetUserAttendanceScheduleRes::forbidden(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
@@ -32,7 +32,7 @@ pub async fn get_user_attendance_schedule(
 
     let group_id = models::users::get_user_group(&mut db, auth.user_id).await?;
     if group_id.is_none() {
-        return GetUserAttendanceScheduleRes::failed("User has no group!");
+        return GetUserAttendanceScheduleRes::failed(Some("User has no group!"));
     }
     let group_id = group_id.unwrap().group_id;
 
@@ -57,9 +57,7 @@ pub async fn get_user_attendance_schedule(
 }
 
 #[derive(Serialize)]
-pub struct SetUserAttendanceScheduleResultSuccess {
-    ok: bool,
-}
+pub struct SetUserAttendanceScheduleResultSuccess;
 type SetUserAttendanceScheduleRes = ResponderWithSuccess<SetUserAttendanceScheduleResultSuccess>;
 
 #[derive(Deserialize)]
@@ -75,14 +73,14 @@ pub async fn set_user_attendance_schedule(
     data: Json<SetUserAttendanceScheduleRequest>,
 ) -> SetUserAttendanceScheduleRes {
     if auth.is_none() {
-        return SetUserAttendanceScheduleRes::forbidden("User is not authorized!");
+        return SetUserAttendanceScheduleRes::forbidden(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
     // get user saved attendance schedule elements
     let group_id = models::users::get_user_group(&mut db, auth.user_id).await?;
     if group_id.is_none() {
-        return SetUserAttendanceScheduleRes::failed("User has no group!");
+        return SetUserAttendanceScheduleRes::failed(Some("User has no group!"));
     }
     let group_id = group_id.unwrap().group_id;
 
@@ -91,7 +89,7 @@ pub async fn set_user_attendance_schedule(
         models::schedule::get_active_schedule_link_ids(&mut db, group_id).await?;
 
     if !schedule_link_ids.contains(&data.schedule_obj_time_link_id) {
-        return SetUserAttendanceScheduleRes::failed("Schedule object not found!");
+        return SetUserAttendanceScheduleRes::failed(Some("Schedule object not found!"));
     }
 
     models::attendance::set_attendance_schedule(
@@ -102,13 +100,11 @@ pub async fn set_user_attendance_schedule(
     )
     .await?;
 
-    SetUserAttendanceScheduleRes::success(SetUserAttendanceScheduleResultSuccess { ok: true })
+    SetUserAttendanceScheduleRes::success(SetUserAttendanceScheduleResultSuccess)
 }
 
 #[derive(Serialize)]
-pub struct SetUserAttendanceScheduleAllResultSuccess {
-    ok: bool,
-}
+pub struct SetUserAttendanceScheduleAllResultSuccess;
 
 type SetUserAttendanceScheduleAllRes =
     ResponderWithSuccess<SetUserAttendanceScheduleAllResultSuccess>;
@@ -125,14 +121,14 @@ pub async fn set_user_attendance_schedule_all(
     data: Json<SetUserAttendanceScheduleAllRequest>,
 ) -> SetUserAttendanceScheduleAllRes {
     if auth.is_none() {
-        return SetUserAttendanceScheduleAllRes::forbidden("User is not authorized!");
+        return SetUserAttendanceScheduleAllRes::forbidden(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
     // get user saved attendance schedule elements
     let group_id = models::users::get_user_group(&mut db, auth.user_id).await?;
     if group_id.is_none() {
-        return SetUserAttendanceScheduleAllRes::failed("User has no group!");
+        return SetUserAttendanceScheduleAllRes::failed(Some("User has no group!"));
     }
     let group_id = group_id.unwrap().group_id;
 
@@ -147,7 +143,7 @@ pub async fn set_user_attendance_schedule_all(
     )
     .await?;
 
-    SetUserAttendanceScheduleAllRes::success(SetUserAttendanceScheduleAllResultSuccess { ok: true })
+    SetUserAttendanceScheduleAllRes::success(SetUserAttendanceScheduleAllResultSuccess)
 }
 
 #[derive(Serialize)]
@@ -165,7 +161,7 @@ pub async fn get_user_attendance_schedule_diffs(
     auth: Option<AuthorizeInfo>,
 ) -> GetUserAttendanceScheduleDiffRes {
     if auth.is_none() {
-        return GetUserAttendanceScheduleDiffRes::forbidden("User is not authorized!");
+        return GetUserAttendanceScheduleDiffRes::forbidden(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
@@ -175,7 +171,7 @@ pub async fn get_user_attendance_schedule_diffs(
 
     let group_id = models::users::get_user_group(&mut db, auth.user_id).await?;
     if group_id.is_none() {
-        return GetUserAttendanceScheduleDiffRes::failed("User has no group!");
+        return GetUserAttendanceScheduleDiffRes::failed(Some("User has no group!"));
     }
     let group_id = group_id.unwrap().group_id;
 
@@ -219,18 +215,18 @@ pub async fn set_user_attendance_schedule_diffs(
     data: Json<SetUserAttendanceDiffsScheduleRequest>,
 ) -> SetUserAttendanceDiffsScheduleRes {
     if auth.is_none() {
-        return SetUserAttendanceDiffsScheduleRes::forbidden("User is not authorized!");
+        return SetUserAttendanceDiffsScheduleRes::forbidden(Some("User is not authorized!"));
     }
     let auth = auth.unwrap();
 
     if data.week_num > 52 {
-        return SetUserAttendanceDiffsScheduleRes::failed("Week number is too big!");
+        return SetUserAttendanceDiffsScheduleRes::failed(Some("Week number is too big!"));
     }
 
     // get user saved attendance schedule elements
     let group_id = models::users::get_user_group(&mut db, auth.user_id).await?;
     if group_id.is_none() {
-        return SetUserAttendanceDiffsScheduleRes::failed("User has no group!");
+        return SetUserAttendanceDiffsScheduleRes::failed(Some("User has no group!"));
     }
     let group_id = group_id.unwrap().group_id;
 
@@ -238,7 +234,7 @@ pub async fn set_user_attendance_schedule_diffs(
     let schedule_link_ids =
         models::schedule::get_active_schedule_link_ids(&mut db, group_id).await?;
     if !schedule_link_ids.contains(&data.schedule_obj_time_link_id) {
-        return SetUserAttendanceDiffsScheduleRes::failed("Schedule object not found!");
+        return SetUserAttendanceDiffsScheduleRes::failed(Some("Schedule object not found!"));
     }
 
     models::attendance::set_attendance_schedule_diff(
@@ -250,9 +246,7 @@ pub async fn set_user_attendance_schedule_diffs(
     )
     .await?;
 
-    SetUserAttendanceDiffsScheduleRes::Success(Json(SetUserAttendanceScheduleResultSuccess {
-        ok: true,
-    }))
+    SetUserAttendanceDiffsScheduleRes::Success(Json(SetUserAttendanceScheduleResultSuccess))
 }
 
 pub fn get_routes() -> Vec<Route> {

@@ -31,16 +31,22 @@ impl<T: serde::Serialize> ResponderWithSuccess<T> {
     pub fn success(data: T) -> Self {
         GenericResponder::Success(Json(data))
     }
-    pub fn failed(message: &str) -> Self {
-        GenericResponder::Failed(Json(ResponseErrorMessage::new(message.to_string())))
+    pub fn failed(message: Option<&str>) -> Self {
+        GenericResponder::Failed(Json(ResponseErrorMessage::new(
+            message.map(|m| m.to_string()),
+        )))
     }
 
-    pub fn forbidden(message: &str) -> Self {
-        GenericResponder::Forbidden(Json(ResponseErrorMessage::new(message.to_string())))
+    pub fn forbidden(message: Option<&str>) -> Self {
+        GenericResponder::Forbidden(Json(ResponseErrorMessage::new(
+            message.map(|m| m.to_string()),
+        )))
     }
 
-    pub fn internal_error(message: &str) -> Self {
-        GenericResponder::InternalError(Json(ResponseErrorMessage::new(message.to_string())))
+    pub fn internal_error(message: Option<&str>) -> Self {
+        GenericResponder::InternalError(Json(ResponseErrorMessage::new(
+            message.map(|m| m.to_string()),
+        )))
     }
 }
 
@@ -50,18 +56,20 @@ impl<T: serde::Serialize, R: std::fmt::Debug> FromResidual<DbResult<R>>
 {
     fn from_residual(residual: DbResult<R>) -> Self {
         error!("Failed to execute database operation: {:?}", residual);
-        ResponderWithSuccess::internal_error("не скажу")
+        ResponderWithSuccess::internal_error(None)
     }
 }
 
 #[derive(Serialize)]
 pub struct ResponseErrorMessage {
-    message: String,
+    user_message: Option<String>,
 }
 
 impl ResponseErrorMessage {
-    pub fn new(message: String) -> Self {
-        ResponseErrorMessage { message }
+    pub fn new(message: Option<String>) -> Self {
+        ResponseErrorMessage {
+            user_message: message,
+        }
     }
 }
 

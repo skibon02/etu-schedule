@@ -54,10 +54,10 @@ pub struct OutputTeacherModel {
     is_worker: bool,
 }
 
-impl Into<OutputTeacherModel> for (TeacherModel, Vec<String>) {
-    fn into(self) -> OutputTeacherModel {
-        let teacher = self.0;
-        let work_departments = self.1;
+impl From<(TeacherModel, Vec<String>)> for OutputTeacherModel {
+    fn from(v: (TeacherModel, Vec<String>)) -> OutputTeacherModel {
+        let teacher = v.0;
+        let work_departments = v.1;
 
         OutputTeacherModel {
             id: teacher.teacher_id,
@@ -107,14 +107,14 @@ impl TryInto<OutputScheduleObjectModel>
         let subject = self
             .1
             .get(&sched_model.subject_id)
-            .map_or(Err("Subject not found!".to_string()), |r| Ok(r))?;
+            .ok_or("Subject not found!".to_string())?;
 
         let first_teacher = match sched_model.teacher_id {
             Some(id) => Some(
                 self.2
                     .get(&id)
                     .cloned()
-                    .map_or(Err(format!("Teacher {} not found!", id)), |r| Ok(r))?,
+                    .ok_or(format!("Teacher {} not found!", id))?,
             ),
             None => None,
         };
@@ -123,7 +123,7 @@ impl TryInto<OutputScheduleObjectModel>
                 self.2
                     .get(&id)
                     .cloned()
-                    .map_or(Err(format!("Teacher {} not found!", id)), |r| Ok(r))?,
+                    .ok_or(format!("Teacher {} not found!", id))?,
             ),
             None => None,
         };
@@ -132,7 +132,7 @@ impl TryInto<OutputScheduleObjectModel>
                 self.2
                     .get(&id)
                     .cloned()
-                    .map_or(Err(format!("Teacher {} not found!", id)), |r| Ok(r))?,
+                    .ok_or(format!("Teacher {} not found!", id))?,
             ),
             None => None,
         };
@@ -141,7 +141,7 @@ impl TryInto<OutputScheduleObjectModel>
                 self.2
                     .get(&id)
                     .cloned()
-                    .map_or(Err(format!("Teacher {} not found!", id)), |r| Ok(r))?,
+                    .ok_or(format!("Teacher {} not found!", id))?,
             ),
             None => None,
         };
