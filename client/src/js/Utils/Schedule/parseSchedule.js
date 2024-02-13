@@ -91,9 +91,8 @@ function parseWeek(scheduleObjects, weekParity) {
 */
 function parseDays(week, dayOfWeek, date, currentDayOfWeek) {
   if (week.some((scheduleObject) => 
-    scheduleObject.auditorium_reservation.week_day === dayOfWeek)) 
-  {
-     return week.
+    scheduleObject.auditorium_reservation.week_day === dayOfWeek)) {
+    return week.
     filter((scheduleObject) => 
     scheduleObject.auditorium_reservation.week_day === dayOfWeek).
     map((day) => ({
