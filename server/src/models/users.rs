@@ -252,11 +252,19 @@ pub async fn confirm_privilege_level(
     Ok(())
 }
 
+#[derive(Serialize, Debug, Copy, Clone, PartialOrd, PartialEq)]
+#[repr(i32)]
+pub enum PrivilegeLevel {
+    User = 0,
+    Leader,
+    Admin,
+}
+
 pub async fn check_privilege_level(
     con: &mut PgConnection,
     user_id: i32,
     group_id: i32,
-) -> DbResult<bool> {
+) -> DbResult<PrivilegeLevel> {
     let res = sqlx::query_scalar!(
         "SELECT leader_for_group FROM user_data WHERE user_id = $1",
         user_id
@@ -266,7 +274,13 @@ pub async fn check_privilege_level(
     .context("Failed to check privilege level")?;
 
     match res {
-        Some(leader_for_group) => Ok(leader_for_group == Some(group_id)),
-        None => Ok(false),
+        Some(leader_for_group) => {
+            if leader_for_group == Some(group_id) {
+                Ok(PrivilegeLevel::Leader)
+            } else {
+                Ok(PrivilegeLevel::User)
+            }
+        }
+        None => Ok(PrivilegeLevel::User),
     }
 }

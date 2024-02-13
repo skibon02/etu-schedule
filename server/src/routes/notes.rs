@@ -136,7 +136,7 @@ pub struct DeleteUserNoteRequest {
 }
 
 #[derive(Serialize)]
-pub struct DeleteUserNoteResultSuccess;
+pub struct DeleteUserNoteResultSuccess {}
 
 type DeleteRes = ResponderWithSuccess<DeleteUserNoteResultSuccess>;
 
@@ -186,7 +186,7 @@ pub async fn delete_user_note(
     )
     .await?;
 
-    DeleteRes::success(DeleteUserNoteResultSuccess)
+    DeleteRes::success(DeleteUserNoteResultSuccess {})
 }
 
 #[derive(Deserialize)]
@@ -227,7 +227,7 @@ pub async fn create_update_group_note(
 
     //check permission
     let res = models::users::check_privilege_level(&mut db, auth.user_id, group_id).await?;
-    if !res {
+    if res < models::users::PrivilegeLevel::Leader {
         warn!("User has no permission to create group note!");
         return CreateGroupRes::forbidden(Some("User has no permission to create group note!"));
     }
@@ -330,7 +330,7 @@ pub struct DeleteGroupNoteRequest {
 }
 
 #[derive(Serialize)]
-pub struct DeleteGroupNoteResultSuccess;
+pub struct DeleteGroupNoteResultSuccess {}
 type DeleteGroupRes = ResponderWithSuccess<DeleteGroupNoteResultSuccess>;
 
 #[delete("/notes/group", data = "<data>")]
@@ -352,11 +352,30 @@ pub async fn delete_group_note(
 
     //check permission
     let res = models::users::check_privilege_level(&mut db, auth.user_id, group_id).await?;
-    if !res {
+    if res < models::users::PrivilegeLevel::Leader {
         warn!("User has no permission to delete group note!");
         return DeleteGroupRes::forbidden(Some("User has no permission to delete group note!"));
     }
 
+    // check valid time link id
+    let res = models::schedule::is_time_link_id_valid_for_group(
+        &mut db,
+        data.schedule_obj_time_link_id,
+        group_id,
+    )
+    .await?;
+    match res {
+        models::schedule::TimeLinkValidResult::Success(r) => {
+            if !r {
+                return DeleteGroupRes::failed(Some(
+                    "schedule_obj_time_link_id is not valid for group!",
+                ));
+            }
+        }
+        models::schedule::TimeLinkValidResult::ErrorUserMessage(msg) => {
+            return DeleteGroupRes::failed(Some(&msg));
+        }
+    }
     let note_exists = models::notes::is_group_note_exists(
         &mut db,
         group_id,
@@ -376,7 +395,7 @@ pub async fn delete_group_note(
     )
     .await?;
 
-    DeleteGroupRes::success(DeleteGroupNoteResultSuccess)
+    DeleteGroupRes::success(DeleteGroupNoteResultSuccess {})
 }
 
 pub fn get_routes() -> Vec<Route> {

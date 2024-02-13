@@ -57,7 +57,7 @@ pub async fn get_user_attendance_schedule(
 }
 
 #[derive(Serialize)]
-pub struct SetUserAttendanceScheduleResultSuccess;
+pub struct SetUserAttendanceScheduleResultSuccess {}
 type SetUserAttendanceScheduleRes = ResponderWithSuccess<SetUserAttendanceScheduleResultSuccess>;
 
 #[derive(Deserialize)]
@@ -100,11 +100,11 @@ pub async fn set_user_attendance_schedule(
     )
     .await?;
 
-    SetUserAttendanceScheduleRes::success(SetUserAttendanceScheduleResultSuccess)
+    SetUserAttendanceScheduleRes::success(SetUserAttendanceScheduleResultSuccess {})
 }
 
 #[derive(Serialize)]
-pub struct SetUserAttendanceScheduleAllResultSuccess;
+pub struct SetUserAttendanceScheduleAllResultSuccess {}
 
 type SetUserAttendanceScheduleAllRes =
     ResponderWithSuccess<SetUserAttendanceScheduleAllResultSuccess>;
@@ -143,7 +143,7 @@ pub async fn set_user_attendance_schedule_all(
     )
     .await?;
 
-    SetUserAttendanceScheduleAllRes::success(SetUserAttendanceScheduleAllResultSuccess)
+    SetUserAttendanceScheduleAllRes::success(SetUserAttendanceScheduleAllResultSuccess {})
 }
 
 #[derive(Serialize)]
@@ -246,7 +246,7 @@ pub async fn set_user_attendance_schedule_diffs(
     )
     .await?;
 
-    SetUserAttendanceDiffsScheduleRes::Success(Json(SetUserAttendanceScheduleResultSuccess))
+    SetUserAttendanceDiffsScheduleRes::Success(Json(SetUserAttendanceScheduleResultSuccess {}))
 }
 
 pub fn get_routes() -> Vec<Route> {

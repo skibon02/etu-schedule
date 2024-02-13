@@ -1,6 +1,8 @@
 use crate::api::etu_attendance_api::GetCurrentUserResult;
 use crate::models::groups::GroupModel;
-use crate::models::users::{SubjectsTitleFormatting, UserDataModel, UserDataOptionalModel};
+use crate::models::users::{
+    PrivilegeLevel, SubjectsTitleFormatting, UserDataModel, UserDataOptionalModel,
+};
 use crate::models::Db;
 use crate::routes::auth::AuthorizeInfo;
 use crate::routes::ResponderWithSuccess;
@@ -11,7 +13,7 @@ use rocket_db_pools::Connection;
 use serde_derive::{Deserialize, Serialize};
 
 #[derive(Serialize)]
-pub struct SetUserGroupSuccess;
+pub struct SetUserGroupSuccess {}
 type SetUserGroupRes = ResponderWithSuccess<SetUserGroupSuccess>;
 
 #[derive(Deserialize)]
@@ -44,12 +46,12 @@ async fn set_group(
             SetUserGroupRes::internal_error(None)
         }
     } else {
-        SetUserGroupRes::success(SetUserGroupSuccess)
+        SetUserGroupRes::success(SetUserGroupSuccess {})
     }
 }
 
 #[derive(Serialize)]
-pub struct SetUserDataSuccess;
+pub struct SetUserDataSuccess {}
 
 type SetUserDataRes = ResponderWithSuccess<SetUserDataSuccess>;
 
@@ -66,7 +68,7 @@ async fn set_data(
 
     models::users::set_user_data(&mut db, auth.user_id, body.into_inner()).await?;
 
-    SetUserDataRes::success(SetUserDataSuccess)
+    SetUserDataRes::success(SetUserDataSuccess {})
 }
 #[derive(Serialize)]
 pub struct OutputUserDataModel {
@@ -129,8 +131,10 @@ async fn get_group(mut db: Connection<Db>, auth: Option<AuthorizeInfo>) -> GetUs
 #[derive(Serialize)]
 pub struct SetAttendanceTokenSuccess {
     ok: bool,
-    group_changed: bool,
     result_code: String,
+    group_changed: bool,
+    new_group_id: Option<i32>,
+    new_group_name: Option<String>,
 }
 
 type SetAttendanceTokenRes = ResponderWithSuccess<SetAttendanceTokenSuccess>;
@@ -160,6 +164,8 @@ pub async fn set_attendance_token(
             ok: false,
             group_changed: false,
             result_code: "too_many_requests".to_string(),
+            new_group_id: None,
+            new_group_name: None,
         });
     }
     LAST_ATTENDANCE_FETCH_TIME.store(timestamp, std::sync::atomic::Ordering::Relaxed);
@@ -171,6 +177,8 @@ pub async fn set_attendance_token(
 
     //check if token is valid
     let mut group_changed = false;
+    let mut new_group_id = None;
+    let mut new_group_name = None;
     if let Some(token) = &body.attendance_token {
         // check if token is valid
 
@@ -187,6 +195,8 @@ pub async fn set_attendance_token(
                         ok: false,
                         group_changed: false,
                         result_code: "no_groups".to_string(),
+                        new_group_id: None,
+                        new_group_name: None,
                     });
                 }
                 if res.groups.len() > 1 {
@@ -194,6 +204,8 @@ pub async fn set_attendance_token(
                         ok: false,
                         group_changed: false,
                         result_code: "too_many_groups".to_string(),
+                        new_group_id: None,
+                        new_group_name: None,
                     });
                 }
                 (
@@ -207,6 +219,8 @@ pub async fn set_attendance_token(
                     ok: false,
                     group_changed: false,
                     result_code: "wrong_token".to_string(),
+                    new_group_id: None,
+                    new_group_name: None,
                 });
             }
         };
@@ -236,6 +250,8 @@ pub async fn set_attendance_token(
                 .unwrap_or(-1);
             if own_group != new_user_group_id {
                 group_changed = true;
+                new_group_id = Some(new_user_group_id);
+                new_group_name = Some(group.clone());
 
                 models::users::set_user_group(&mut db, auth.user_id, new_user_group_id).await?;
             }
@@ -245,6 +261,8 @@ pub async fn set_attendance_token(
                 ok: false,
                 group_changed: false,
                 result_code: "group_not_found".to_string(),
+                new_group_id: None,
+                new_group_name: None,
             });
         }
     }
@@ -255,6 +273,39 @@ pub async fn set_attendance_token(
         ok: true,
         group_changed,
         result_code: "success".to_string(),
+        new_group_id,
+        new_group_name,
+    })
+}
+
+#[derive(Serialize)]
+pub struct GetAccessRightsResult {
+    pub privilege_level: PrivilegeLevel,
+    pub privilege_level_num: i32,
+}
+
+type GetAccessRightsRes = ResponderWithSuccess<GetAccessRightsResult>;
+
+#[get("/user/get_privilege_level")]
+async fn get_privilege_level(
+    mut db: Connection<Db>,
+    auth: Option<AuthorizeInfo>,
+) -> GetAccessRightsRes {
+    if auth.is_none() {
+        return GetAccessRightsRes::forbidden(Some("User is not authorized!"));
+    }
+    let auth = auth.unwrap();
+
+    let group_id = models::users::get_user_group(&mut db, auth.user_id).await?;
+    if group_id.is_none() {
+        GetAccessRightsRes::failed(Some("User has no group!"));
+    }
+    let group_id = group_id.unwrap().group_id;
+
+    let res = models::users::check_privilege_level(&mut db, auth.user_id, group_id).await?;
+    GetAccessRightsRes::success(GetAccessRightsResult {
+        privilege_level: res,
+        privilege_level_num: res as i32,
     })
 }
 
@@ -264,6 +315,7 @@ pub fn get_routes() -> Vec<Route> {
         get_group,
         set_data,
         get_data,
-        set_attendance_token
+        set_attendance_token,
+        get_privelege_level
     ]
 }
