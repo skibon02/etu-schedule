@@ -112,7 +112,7 @@ class GroupDateServiceClass implements IGroupDateService {
       const r = await myfetch('/api/attendance/schedule_diffs/update', {
         body: JSON.stringify({
           schedule_obj_time_link_id: time_link_id,
-          week_num: +weekNumber,
+          week_num: weekNumber,
           enable_auto_attendance: flag,
         }),
         credentials: "include",
@@ -132,10 +132,11 @@ class GroupDateServiceClass implements IGroupDateService {
   }
 
   async schedulePlanningSETOneFetch(time_link_id: number, flag: boolean) {
+    this.groupStore.schedulePlanning![time_link_id].auto_attendance_enabled = flag;
     try {
       const r = await myfetch(`/api/attendance/schedule/update`, {
         body: JSON.stringify({
-          schedule_obj_time_link_id: +time_link_id, 
+          schedule_obj_time_link_id: time_link_id, 
           enable_auto_attendance: flag
         }),
         method: "POST",
@@ -145,6 +146,8 @@ class GroupDateServiceClass implements IGroupDateService {
       if (r.status === 200) {
         const d = await r.json();
         console.log('successful fetch on set one schedule planning:', d);
+
+        this.groupStore.scheduleDiffsGETFetch();
       } else {
         throw new Error(`${r.status}`);
       }
@@ -155,6 +158,9 @@ class GroupDateServiceClass implements IGroupDateService {
   }
 
   async schedulePlanningSETAllFetch(flag: boolean) {
+    Object.keys(this.groupStore.schedulePlanning!).forEach(key => {
+      this.groupStore.schedulePlanning![Number(key)].auto_attendance_enabled = flag;
+    });
     try {
       const r = await myfetch('/api/attendance/schedule/update_all', {
         method: "POST",
@@ -167,6 +173,8 @@ class GroupDateServiceClass implements IGroupDateService {
       if (r.status === 200) {
         const d = await r.json();
         console.log('successful fetch on set all schedule planning:', d);
+
+        this.groupStore.scheduleDiffsGETFetch();
       } else {
         throw new Error(`${r.status}`);
       }
