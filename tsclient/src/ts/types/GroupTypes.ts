@@ -67,10 +67,13 @@ export interface IGroupClass {
   parsedSchedule1: parsedSchedule | null,
   parsedSchedule2: parsedSchedule | null,
   groupScheduleStatus:  'idle' | 'pending' | 'done',
+  groupList: Igroup[] | null,
+  groupListStatus:  'idle' | 'pending' | 'done',
   schedulePlanning: IscheduleDiff | null,
   scheduleDiffs: IscheduleDiffs | null,
   schedulePlanningGETFetch(): void,
   scheduleDiffsGETFetch(): void,
+  groupListGETFetch(): void,
 }
 
 export interface ITeacherInfo {

@@ -1,11 +1,12 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import { IuserData, IfullNameEnabled } from "../types/UserDataTypes"
+import { IuserData, IfullNameEnabled, IvkData } from "../types/UserDataTypes"
 import { makeFetch } from "../utils/makeFetch";
 
 export class UserDataClass implements IuserData {
   fullNameEnabled: IfullNameEnabled;
   userId: number | null;
   leaderForGroup: number | null;
+  vkData: IvkData | null;
 
   constructor() {
     makeAutoObservable(this);
@@ -13,6 +14,7 @@ export class UserDataClass implements IuserData {
     this.fullNameEnabledAuto = this.fullNameEnabledAuto.bind(this);
     this.fullNameEnabledShort = this.fullNameEnabledShort.bind(this);
     this.userDataSETFetch = this.userDataSETFetch.bind(this);
+    this.vkDataGETFetch = this.vkDataGETFetch.bind(this);
 
     this.fullNameEnabled = {
       value: 'auto',
@@ -20,6 +22,7 @@ export class UserDataClass implements IuserData {
     };
     this.userId = null;
     this.leaderForGroup = null;
+    this.vkData = null;
   }
 
   async userDataSETFetch() {
@@ -32,6 +35,17 @@ export class UserDataClass implements IuserData {
         })
       },
       () => {},
+      () => {}
+    )
+  }
+
+  async vkDataGETFetch() {
+    makeFetch(
+      '/api/auth/data',
+      {},
+      (d: IvkData) => {
+        this.vkData = d;
+      },
       () => {}
     )
   }

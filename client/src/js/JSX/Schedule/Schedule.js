@@ -10,9 +10,10 @@ export default function Schedule() {
   const { date } = useSelector(s => s.date);
   const { groupNumber, groupNILoading } = useSelector(s => s.groupNI);
   const { groupSchedule } = useSelector(s => s.groupSchedule);
+  const { planningData } = useSelector(s => s.planningData);
   const { active } = useSelector(s => s.active);
 
-  if (!groupSchedule) {
+  if (!groupSchedule || !planningData) {
     return (
       <NoSchedule groupNumber={groupNumber} groupNILoading={groupNILoading} />
     )
@@ -26,7 +27,7 @@ export default function Schedule() {
 
   const weekSchedule = makeSchedule(groupSchedule, new Date(date));
   
-  if (weekSchedule) {
+  if (weekSchedule.length > 0) {
     return (
       <CSSTransition in={active === 'schedule'} timeout={300} classNames={'modal-transition'} unmountOnExit>
       <div className="modal-transition">

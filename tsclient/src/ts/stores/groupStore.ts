@@ -1,5 +1,5 @@
-import { makeAutoObservable } from "mobx";
-import { IGroupClass, IGroupSchedule, IscheduleDiff, IscheduleDiffs, parsedSchedule } from "../types/GroupTypes";
+import { makeAutoObservable, runInAction } from "mobx";
+import { IGroupClass, IGroupSchedule, Igroup, IscheduleDiff, IscheduleDiffs, parsedSchedule } from "../types/GroupTypes";
 import { makeFetch } from "../utils/makeFetch";
 
 export class GroupClass implements IGroupClass {
@@ -12,12 +12,15 @@ export class GroupClass implements IGroupClass {
   groupScheduleStatus:  'idle' | 'pending' | 'done';
   schedulePlanning: IscheduleDiff | null;
   scheduleDiffs: IscheduleDiffs | null;
+  groupList: Igroup[] | null;
+  groupListStatus:  'idle' | 'pending' | 'done';
 
   constructor() {
     makeAutoObservable(this);
 
     this.scheduleDiffsGETFetch = this.scheduleDiffsGETFetch.bind(this);
     this.schedulePlanningGETFetch = this.schedulePlanningGETFetch.bind(this);
+    this.groupListGETFetch = this.groupListGETFetch.bind(this);
 
     this.groupNumber = null;
     this.groupId = null;
@@ -28,6 +31,8 @@ export class GroupClass implements IGroupClass {
     this.groupScheduleStatus = 'idle';
     this.schedulePlanning = null;
     this.scheduleDiffs = null;
+    this.groupList = null;
+    this.groupListStatus = 'idle';
   }
 
   async scheduleDiffsGETFetch() {
@@ -47,6 +52,25 @@ export class GroupClass implements IGroupClass {
       {},
       (d: IscheduleDiff) => {
         this.schedulePlanning = d;
+      },
+      () => {}
+    )
+  }
+
+  async groupListGETFetch() {
+    this.groupListStatus = 'pending';
+    makeFetch(
+      '/api/groups',
+      {},
+      (d: Igroup[]) => {
+        const groups: Igroup[] = [];
+        Object.values(d).forEach((group: Igroup) => {
+          groups.push(group)
+        });
+        runInAction(() => {
+          this.groupList = groups;
+          this.groupListStatus = 'done';
+        })
       },
       () => {}
     )

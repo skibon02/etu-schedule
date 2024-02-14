@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import { IDateClass, IResponseSemester } from "../types/DateTypes";
 import { makeFetch } from "../utils/makeFetch";
 
@@ -48,9 +48,11 @@ export class DateClass implements IDateClass {
   }
 
   setSemesterDate(semData: IResponseSemester): void {
-    this.semesterStart = semData.startDate;
-    this.semesterEnd = semData.endDate;
-    this.maxWeekNumber = this.getWeekNumber(this.semesterEnd);
+    runInAction(() => {
+      this.semesterStart = semData.startDate;
+      this.semesterEnd = semData.endDate;
+      this.maxWeekNumber = this.getWeekNumber(this.semesterEnd);
+    })
   }
 
   getWeekNumber (ISODate: string): number {
@@ -64,25 +66,31 @@ export class DateClass implements IDateClass {
   }
 
   curDate(): void {
-    this.date = new Date().toISOString();
-    this.weekNumber = this.getWeekNumber(this.date);
-    this.weekParity = this.weekNumber % 2 ? '2' : '1';
+    runInAction(() => {
+      this.date = new Date().toISOString();
+      this.weekNumber = this.getWeekNumber(this.date);
+      this.weekParity = this.weekNumber % 2 ? '2' : '1';
+    })
   }
 
   incDate(): void {
-    this.date = new Date(
-      new Date().getTime() + weekTime
-    ).toISOString();
-    this.weekNumber = this.weekNumber + 1;
-    this.weekParity = this.weekNumber % 2 ? '2' : '1';
+    runInAction(() => {
+      this.date = new Date(
+        new Date().getTime() + weekTime
+      ).toISOString();
+      this.weekNumber = this.weekNumber + 1;
+      this.weekParity = this.weekNumber % 2 ? '2' : '1';
+    })
   }
 
   decDate(): void {
-    this.date = new Date(
-      new Date().getTime() - weekTime
-    ).toISOString();
-    this.weekNumber = this.weekNumber - 1;
-    this.weekParity = this.weekNumber % 2 ? '2' : '1';
+    runInAction(() => {
+      this.date = new Date(
+        new Date().getTime() - weekTime
+      ).toISOString();
+      this.weekNumber = this.weekNumber - 1;
+      this.weekParity = this.weekNumber % 2 ? '2' : '1';
+    })
   }
 }
 
