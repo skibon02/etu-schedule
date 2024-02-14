@@ -316,6 +316,6 @@ pub fn get_routes() -> Vec<Route> {
         set_data,
         get_data,
         set_attendance_token,
-        get_privelege_level
+        get_privilege_level
     ]
 }
