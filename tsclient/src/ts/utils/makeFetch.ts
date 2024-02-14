@@ -1,6 +1,6 @@
 import myfetch from "./myfetch";
 
-export async function makeFetch(url: string, params: Object, onSuccess: Function, onFail: Function) {
+export async function makeFetch(url: string, params: RequestInit = {}, onSuccess: Function, onFail: Function) {
   try {
     const r = await myfetch(url, params);
     if (r.status === 200) {
