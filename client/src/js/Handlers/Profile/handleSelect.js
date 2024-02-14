@@ -5,7 +5,7 @@ import { setFullNameEnabled } from "../../ReduxStates/Slices/fullNameEnabledSlic
 
 function handleGroupSelect(dispatch, option) {
   dispatch(setGroupSchedule(null));
-  groupNISETFx(dispatch, option.value);
+  groupNISETFx(dispatch, option.value, option.label);
 }
 
 function handlefullNameEnabledSelect(dispatch, option) {

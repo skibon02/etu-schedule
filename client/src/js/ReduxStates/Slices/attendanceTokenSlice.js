@@ -11,7 +11,7 @@ async function attendanceTokenSETFetch(dispatch, token) {
     })
   });
   let d = await r.json();
-  if (d.ok && d.result_code === 'success') {
+  if (d.result_code === 'success') {
     dispatch(setAttendanceToken(token));
     groupNIGETFetch(dispatch);
   } else {

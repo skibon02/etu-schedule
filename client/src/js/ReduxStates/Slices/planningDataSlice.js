@@ -22,9 +22,7 @@ async function planningDataSETOneFetch(dispatch, time_link_id, flag) {
 
   console.log('result of changing planning Data\n', d);
 
-  if (d.ok) {
-    dispatch(scheduleDiffsGETFetch());
-  }
+  dispatch(scheduleDiffsGETFetch());
 }
 
 async function planningDataSETAllFetch(dispatch, flag) {
@@ -38,9 +36,7 @@ async function planningDataSETAllFetch(dispatch, flag) {
   let d = await r.json();
   console.log('result of updating all planning:', d);
 
-  if (d.ok) {
-    dispatch(scheduleDiffsGETFetch());
-  }
+  dispatch(scheduleDiffsGETFetch());
 }
 
 const planningDataSlice = createSlice({
