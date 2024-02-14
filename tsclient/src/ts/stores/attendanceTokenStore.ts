@@ -3,8 +3,8 @@ import { IAttendanceTokenClass } from "../types/AttendanceTokenTypes";
 
 export class AttendanceTokenClass implements IAttendanceTokenClass {
   attendanceToken: string | null;
-  groupChanged: boolean;
   isTokenValid: boolean;
+  tooManyRequests: boolean;
   loadingStatus: 'idle' | "pending" | "done";
 
   constructor() {
@@ -13,14 +13,13 @@ export class AttendanceTokenClass implements IAttendanceTokenClass {
     this.deleteToken = this.deleteToken.bind(this);
 
     this.attendanceToken = null;
-    this.groupChanged = false;
     this.isTokenValid = false;
+    this.tooManyRequests = false;
     this.loadingStatus = 'idle';
   }
 
   deleteToken(): void {
     this.attendanceToken = null;
-    this.groupChanged = false;
     this.isTokenValid = false;
     this.loadingStatus = 'done';
   }

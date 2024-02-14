@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import myfetch from "../utils/myfetch";
 import { IuserData, IfullNameEnabled } from "../types/UserDataTypes"
+import { makeFetch } from "../utils/makeFetch";
 
 export class UserDataClass implements IuserData {
   fullNameEnabled: IfullNameEnabled;
@@ -22,6 +22,20 @@ export class UserDataClass implements IuserData {
     this.leaderForGroup = null;
   }
 
+  async userDataSETFetch() {
+    makeFetch(
+      '/api/user/set_data',
+      {
+        method: "POST",
+        body: JSON.stringify({
+          subjects_title_formatting: this.fullNameEnabled,
+        })
+      },
+      () => {},
+      () => {}
+    )
+  }
+
   fullNameEnabledAuto(): void {
     runInAction(() => {
       this.fullNameEnabled.label = 'Авто';
@@ -34,27 +48,6 @@ export class UserDataClass implements IuserData {
       this.fullNameEnabled.label = 'Сокращённое';
       this.fullNameEnabled.value = 'short';
     })
-  }
-
-  async userDataSETFetch() {
-    try {
-      const r = await myfetch('/api/user/set_data', {
-        method: "POST",
-        credentials: "include", 
-        body: JSON.stringify({
-          subjects_title_formatting: this.fullNameEnabled,
-        }),
-      });
-      if (r.status === 200) {
-        const d = await r.json();
-        console.log('successfully fetched set_data:', d);
-      } else {
-        throw new Error(`${r.status}`);
-      }
-    } catch (error) {
-      const e = error as Error;
-      console.error('Error in set_data fetch:', e.message);
-    }
   }
 }
 

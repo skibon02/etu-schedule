@@ -1,6 +1,6 @@
 import { makeAutoObservable } from "mobx";
-import myfetch from "../utils/myfetch";
 import { IDateClass, IResponseSemester } from "../types/DateTypes";
+import { makeFetch } from "../utils/makeFetch";
 
 const weekTime = 7 * 24 * 60 * 60 * 1000;
 
@@ -11,6 +11,7 @@ export class DateClass implements IDateClass {
   weekParity: string;
   absoluteWeekParity: string;
   semesterStart: string | null;
+  semesterEnd: string | null;
   maxWeekNumber: number | null;
 
   constructor() {
@@ -29,30 +30,27 @@ export class DateClass implements IDateClass {
     this.weekParity = this.weekNumber % 2 ? '2' : '1';
     this.absoluteWeekParity = this.getWeekNumber((new Date()).toISOString()) % 2 ? '2' : '1';
     this.semesterStart = null;
+    this.semesterEnd = null;
     this.maxWeekNumber = null;
   }
 
   async semesterGetFetch() {
-    try {
-      const r = await myfetch('/api/semester');
-      if (r.status === 200) {
-        const d: IResponseSemester = await r.json();
-        console.log('Fetch on semester:', d);
+    makeFetch(
+      '/api/semester',
+      {},
+      (d: IResponseSemester) => {
         if (d.startDate) {
           this.setSemesterDate(d);
         }
-      } else {
-        throw new Error(`${r.status}`);
-      }
-    } catch (error) {
-      const e = error as Error;
-      console.error('Error fetching semester data:', e.message);
-    }
+      },
+      () => {}
+    )
   }
 
   setSemesterDate(semData: IResponseSemester): void {
     this.semesterStart = semData.startDate;
-    this.maxWeekNumber = this.getWeekNumber(this.semesterStart);
+    this.semesterEnd = semData.endDate;
+    this.maxWeekNumber = this.getWeekNumber(this.semesterEnd);
   }
 
   getWeekNumber (ISODate: string): number {

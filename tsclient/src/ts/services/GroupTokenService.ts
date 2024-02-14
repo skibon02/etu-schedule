@@ -1,9 +1,9 @@
 import { runInAction } from "mobx";
-import myfetch from "../utils/myfetch";
 import { attendanceTokenStore, AttendanceTokenClass } from "../stores/attendanceTokenStore";
 import { groupStore, GroupClass } from "../stores/groupStore";
 import { IResponseSetToken } from "../types/AttendanceTokenTypes";
 import { IGroupTokenClass } from "../types/GroupTokenServiceTypes";
+import { makeFetch } from "../utils/makeFetch";
 
 class GroupTokenClass implements IGroupTokenClass {
   private AttendanceTokenStore: AttendanceTokenClass;
@@ -16,36 +16,53 @@ class GroupTokenClass implements IGroupTokenClass {
     this.groupStore = groupStore; 
   }
 
-  async attendanceTokenSetFetch(token: string) {
-    try {
-      const r = await myfetch('/api/user/set_attendance_token', {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify({
-          attendance_token: token,
-        })
-      });
-      if (r.status === 200) {
-        const d: IResponseSetToken = await r.json();
-        console.log('Successfully fetched on set attendance token with token:', token);
-        console.log('Response:', d);
+  async attendanceTokenSetFetch(token: string) {const url = '/api/user/set_attendance_token';
+    const options = {
+      method: "POST",
+      body: JSON.stringify({
+        attendance_token: token,
+      })
+    };
+
+    const onSuccess = (url: string, options: Object, onSuccess: Function, onFail: Function, d: IResponseSetToken, retryAccepted: boolean) => {
+      if (d.result_code === 'success') {
         runInAction(() => {
-          if (d.result_code === 'success') {
-            this.AttendanceTokenStore.attendanceToken = token;
-            if (d.group_changed === true) {
-              // this.GroupStore.groupId = 
-            }
-          } else {
-            this.AttendanceTokenStore.isTokenValid = false;
+          this.AttendanceTokenStore.attendanceToken = token;
+          if (d.group_changed === true) {
+            this.groupStore.groupId = d.new_group_id;
+            this.groupStore.groupNumber = d.new_group_name;
           }
+          this.AttendanceTokenStore.loadingStatus = 'done';
+        })
+      } else if (d.result_code === 'too_many_requests' && retryAccepted) {
+        setTimeout(() => {makeFetch(url, options, onSuccess, onFail)}, 5000)
+      } else if (d.result_code === 'too_many_requests' && !retryAccepted) {
+        runInAction(() => {
+          this.AttendanceTokenStore.tooManyRequests = false;
+          this.AttendanceTokenStore.loadingStatus = 'done';
         })
       } else {
-        throw new Error(`${r.status}`);
+        runInAction(() => {
+          this.AttendanceTokenStore.isTokenValid = false;
+          this.AttendanceTokenStore.loadingStatus = 'done';
+        })
       }
-    } catch (error) {
-      const e = error as Error;
-      console.error('Error fetching set attendance token:', e.message);
     }
+
+    this.AttendanceTokenStore.loadingStatus = 'pending';
+    makeFetch(
+      url,
+      options,
+      (d: IResponseSetToken) => onSuccess(
+        url, 
+        options, 
+        (d: IResponseSetToken) => onSuccess(url, options, () => {}, () => {}, d, false), 
+        () => {}, 
+        d, 
+        true
+      ),
+      () => {}
+    )
   }
 }
 

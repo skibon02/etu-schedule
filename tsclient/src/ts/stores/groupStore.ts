@@ -1,6 +1,6 @@
 import { makeAutoObservable } from "mobx";
 import { IGroupClass, IGroupSchedule, IscheduleDiff, IscheduleDiffs, parsedSchedule } from "../types/GroupTypes";
-import myfetch from "../utils/myfetch";
+import { makeFetch } from "../utils/makeFetch";
 
 export class GroupClass implements IGroupClass {
   groupNumber: null | string;
@@ -31,37 +31,25 @@ export class GroupClass implements IGroupClass {
   }
 
   async scheduleDiffsGETFetch() {
-    try {
-      const r = await myfetch('/api/attendance/schedule_diffs');
-      if (r.status === 200) {
-        const d = await r.json();
-        console.log('successfully fetched on schedule diffs:', d);
-
+    makeFetch(
+      '/api/attendance/schedule_diffs',
+      {},
+      (d: IscheduleDiffs) => {
         this.scheduleDiffs = d;
-      } else {
-        throw new Error(`${r.status}`)
-      }
-    } catch (error) {
-      const e = error as Error;
-      console.error('Failed to fetch schedule diffs:', e.message);
-    }
+      },
+      () => {}
+    )
   }
 
   async schedulePlanningGETFetch() {
-    try {
-      const r = await myfetch(`/api/attendance/schedule`);
-      if (r.status === 200) {
-        const d = await r.json();
-        console.log('successfully fetched on schedule planning:', d);
-
+    makeFetch(
+      '/api/attendance/schedule',
+      {},
+      (d: IscheduleDiff) => {
         this.schedulePlanning = d;
-      } else {
-        throw new Error(`${r.status}`)
-      }
-    } catch (error) {
-      const e = error as Error;
-      console.error('Failed to fetch schedule planning:', e.message);
-    }
+      },
+      () => {}
+    )
   }
 }
 

@@ -2,9 +2,9 @@ import { runInAction } from "mobx";
 import { UserDataClass, userDataStore } from "../stores/userDataStore";
 import { GroupClass, groupStore } from "../stores/groupStore";
 import { AttendanceTokenClass, attendanceTokenStore } from "../stores/attendanceTokenStore";
-import myfetch from "../utils/myfetch";
 import { Igroup } from "../types/GroupTypes";
 import { IUserDataGroupTokenService, IuserDataGetFetchResponse } from "../types/UserDataGroupTokenTypes";
+import { makeFetch } from "../utils/makeFetch";
 
 class UserDataGroupTokenClass implements IUserDataGroupTokenService {
   private groupStore: GroupClass;
@@ -24,12 +24,10 @@ class UserDataGroupTokenClass implements IUserDataGroupTokenService {
   }
 
   async userDataGetFetch() {
-    try {
-      const r = await myfetch('/api/user/get_data');
-      if (r.status === 200) {
-        const d: IuserDataGetFetchResponse = await r.json();
-        console.log('successfully fetched on user/get_data:', d);
-
+    makeFetch(
+      '/api/user/get_data',
+      {},
+      (d: IuserDataGetFetchResponse) => {
         runInAction(() => {
           // group
           const group: Igroup | null = d.group;
@@ -56,13 +54,9 @@ class UserDataGroupTokenClass implements IUserDataGroupTokenService {
           // attendanceToken
           this.attendanceTokenStore.attendanceToken = d.attendance_token;
         })
-      } else {
-        throw new Error(`${r.status}`)
-      }
-    } catch (error) {
-      const e = error as Error;
-      console.error('Failed to fetch user/get_data:', e.message);
-    }
+      },
+      () => {}
+    )
   }
 }
 

@@ -14,6 +14,7 @@ export interface IDateClass {
   weekParity: string,
   absoluteWeekParity: string,
   semesterStart: string | null,
+  semesterEnd: string | null,
   maxWeekNumber: number | null,
   semesterGetFetch(): void,
   setSemesterDate(semData: IResponseSemester): void,
