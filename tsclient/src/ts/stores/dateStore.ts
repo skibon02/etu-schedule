@@ -1,8 +1,8 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import { IDateClass, IResponseSemester } from "../types/DateTypes";
+import { IDateClass, IResponseSemester } from "../types/stores/DateTypes";
 import { makeFetch } from "../utils/makeFetch";
 
-const weekTime = 7 * 24 * 60 * 60 * 1000;
+export const weekTime = 7 * 24 * 60 * 60 * 1000;
 
 export class DateClass implements IDateClass {
   date: string;
@@ -23,6 +23,7 @@ export class DateClass implements IDateClass {
     this.curDate = this.curDate.bind(this);
     this.decDate = this.decDate.bind(this);
     this.incDate = this.incDate.bind(this);
+    this.reset = this.reset.bind(this);
 
     this.date = (new Date()).toISOString();
     this.weekNumber = this.getWeekNumber(this.date);
@@ -90,6 +91,19 @@ export class DateClass implements IDateClass {
       ).toISOString();
       this.weekNumber = this.weekNumber - 1;
       this.weekParity = this.weekNumber % 2 ? '2' : '1';
+    })
+  }
+
+  reset(): void {
+    runInAction(() => {
+      this.date = (new Date()).toISOString();
+      this.weekNumber = this.getWeekNumber(this.date);
+      this.currentWeekNumber = this.getWeekNumber(this.date);
+      this.weekParity = this.weekNumber % 2 ? '2' : '1';
+      this.absoluteWeekParity = this.getWeekNumber((new Date()).toISOString()) % 2 ? '2' : '1';
+      this.semesterStart = null;
+      this.semesterEnd = null;
+      this.maxWeekNumber = null;
     })
   }
 }

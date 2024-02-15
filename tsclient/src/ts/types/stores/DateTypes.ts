@@ -22,5 +22,6 @@ export interface IDateClass {
   curDate(): void,
   incDate(): void,
   decDate(): void,
+  reset(): void,
 }
 

@@ -1,8 +1,8 @@
 import { runInAction } from "mobx";
 import { attendanceTokenStore, AttendanceTokenClass } from "../stores/attendanceTokenStore";
 import { groupStore, GroupClass } from "../stores/groupStore";
-import { IResponseSetToken } from "../types/AttendanceTokenTypes";
-import { IGroupTokenClass } from "../types/GroupTokenServiceTypes";
+import { IResponseSetToken } from "../types/stores/AttendanceTokenTypes";
+import { IGroupTokenClass } from "../types/services/GroupTokenServiceTypes";
 import { makeFetch } from "../utils/makeFetch";
 
 class GroupTokenClass implements IGroupTokenClass {
@@ -16,7 +16,8 @@ class GroupTokenClass implements IGroupTokenClass {
     this.groupStore = groupStore; 
   }
 
-  async attendanceTokenSetFetch(token: string) {const url = '/api/user/set_attendance_token';
+  async attendanceTokenSetFetch(token: string) {
+    const url = '/api/user/set_attendance_token';
     const options = {
       method: "POST",
       body: JSON.stringify({

@@ -1,4 +1,4 @@
-import { Igroup } from "./GroupTypes";
+import { Igroup } from "../stores/GroupTypes";
 
 export interface IUserDataGroupTokenService {
   userDataGetFetch(): void,

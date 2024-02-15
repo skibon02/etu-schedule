@@ -2,8 +2,8 @@ import { runInAction } from "mobx";
 import { UserDataClass, userDataStore } from "../stores/userDataStore";
 import { GroupClass, groupStore } from "../stores/groupStore";
 import { AttendanceTokenClass, attendanceTokenStore } from "../stores/attendanceTokenStore";
-import { Igroup } from "../types/GroupTypes";
-import { IUserDataGroupTokenService, IuserDataGetFetchResponse } from "../types/UserDataGroupTokenTypes";
+import { Igroup } from "../types/stores/GroupTypes";
+import { IUserDataGroupTokenService, IuserDataGetFetchResponse } from "../types/services/UserDataGroupTokenTypes";
 import { makeFetch } from "../utils/makeFetch";
 
 class UserDataGroupTokenClass implements IUserDataGroupTokenService {

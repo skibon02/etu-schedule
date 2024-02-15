@@ -13,7 +13,7 @@ export interface IvkData {
   user_id: number,
 }
 
-export interface IuserData {
+export interface IuserDataClass {
   fullNameEnabled: IfullNameEnabled,
   userId: number | null,
   vkData: null | IvkData,
@@ -22,5 +22,6 @@ export interface IuserData {
   fullNameEnabledShort(): void,
   userDataSETFetch(): void,
   vkDataGETFetch(): void,
+  reset(): void,
 }
 

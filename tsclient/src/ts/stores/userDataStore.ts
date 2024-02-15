@@ -1,8 +1,8 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import { IuserData, IfullNameEnabled, IvkData } from "../types/UserDataTypes"
+import { IuserDataClass, IfullNameEnabled, IvkData } from "../types/stores/UserDataTypes"
 import { makeFetch } from "../utils/makeFetch";
 
-export class UserDataClass implements IuserData {
+export class UserDataClass implements IuserDataClass {
   fullNameEnabled: IfullNameEnabled;
   userId: number | null;
   leaderForGroup: number | null;
@@ -15,6 +15,7 @@ export class UserDataClass implements IuserData {
     this.fullNameEnabledShort = this.fullNameEnabledShort.bind(this);
     this.userDataSETFetch = this.userDataSETFetch.bind(this);
     this.vkDataGETFetch = this.vkDataGETFetch.bind(this);
+    this.reset = this.reset.bind(this);
 
     this.fullNameEnabled = {
       value: 'auto',
@@ -61,6 +62,18 @@ export class UserDataClass implements IuserData {
     runInAction(() => {
       this.fullNameEnabled.label = 'Сокращённое';
       this.fullNameEnabled.value = 'short';
+    })
+  }
+
+  reset(): void {
+    runInAction(() => {
+      this.fullNameEnabled = {
+        value: 'auto',
+        label: 'Авто',
+      };
+      this.userId = null;
+      this.leaderForGroup = null;
+      this.vkData = null;
     })
   }
 }

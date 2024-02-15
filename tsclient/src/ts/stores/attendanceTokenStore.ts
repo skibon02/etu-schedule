@@ -1,5 +1,6 @@
-import { makeAutoObservable } from "mobx";
-import { IAttendanceTokenClass } from "../types/AttendanceTokenTypes";
+import { makeAutoObservable, runInAction } from "mobx";
+import { IAttendanceTokenClass } from "../types/stores/AttendanceTokenTypes";
+import { makeFetch } from "../utils/makeFetch";
 
 export class AttendanceTokenClass implements IAttendanceTokenClass {
   attendanceToken: string | null;
@@ -11,17 +12,42 @@ export class AttendanceTokenClass implements IAttendanceTokenClass {
     makeAutoObservable(this);
 
     this.deleteToken = this.deleteToken.bind(this);
+    this.reset = this.reset.bind(this);
 
     this.attendanceToken = null;
-    this.isTokenValid = false;
+    this.isTokenValid = true;
     this.tooManyRequests = false;
     this.loadingStatus = 'idle';
   }
 
   deleteToken(): void {
-    this.attendanceToken = null;
-    this.isTokenValid = false;
-    this.loadingStatus = 'done';
+    this.loadingStatus = 'pending';
+    makeFetch(
+      '/api/user/set_attendance_token', 
+      {
+        method: "POST",
+        body: JSON.stringify({
+          attendance_token: null,
+        })
+      }, 
+      () => {
+        runInAction(() => {
+          this.attendanceToken = null;
+          this.isTokenValid = true;
+          this.loadingStatus = 'done';
+        })
+      }, 
+      () => {}
+    )
+  }
+
+  reset(): void {
+    runInAction(() => {
+      this.attendanceToken = null;
+      this.isTokenValid = true;
+      this.tooManyRequests = false;
+      this.loadingStatus = 'idle';
+    })
   }
 }
 

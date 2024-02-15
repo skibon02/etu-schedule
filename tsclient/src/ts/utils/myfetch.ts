@@ -7,11 +7,11 @@ async function myfetch(path: string, param: RequestInit = {}): Promise<Response>
 
   if (navigator.onLine) {
     try {
-      const response = await fetch(path, param);
-      if (!response.ok) {
+      const r = await fetch(path, param);
+      if (!r.ok) {
         throw new Error('fish!');
       }
-      return response;
+      return r;
     } catch (error) {
       const e = error as Error;
       console.log('fish!');
@@ -20,7 +20,9 @@ async function myfetch(path: string, param: RequestInit = {}): Promise<Response>
       throw e; 
     }
   } else {
-    return new Response(null, { status: 503, statusText: 'Offline' });
+    const responseBody = JSON.stringify({ message: "Error message" });
+    const r = new Response(responseBody, { status: 400, statusText: 'Offline' });
+    return r;
   }
 }
 

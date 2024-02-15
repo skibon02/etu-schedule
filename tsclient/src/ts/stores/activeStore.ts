@@ -1,11 +1,15 @@
 import { makeAutoObservable } from "mobx";
-import { IActiveClass } from "../types/ActiveTypes";
+import { IActiveClass } from "../types/stores/ActiveTypes";
 
-class ActiveClass implements IActiveClass {
+export class ActiveClass implements IActiveClass {
   active: "profile" | "schedule" | "planning" = 'profile';
 
   constructor() {
     makeAutoObservable(this);
+
+    this.reset = this.reset.bind(this);
+
+    this.active = 'profile';
   }
 
   profile = (): void => {
@@ -19,10 +23,14 @@ class ActiveClass implements IActiveClass {
   planning = (): void => {
     this.active = 'planning';
   }
+
+  reset() {
+    this.active = 'profile';
+  }
 }
 
-const acitveStore = new ActiveClass();
+const activeStore = new ActiveClass();
 
 export  {
-  acitveStore,
+  activeStore,
 }

@@ -1,11 +1,11 @@
-import myfetch from "../utils/myfetch";
 import { groupStore, GroupClass } from "../stores/groupStore";
 import { dateStore, DateClass } from "../stores/dateStore";
-import { IGroupDateService } from "../types/GroupDateServiceTypes";
+import { IGroupDateService } from "../types/services/GroupDateServiceTypes";
 import { runInAction } from "mobx";
-import { IGroupSchedule, Igroup } from "../types/GroupTypes";
+import { IGroupSchedule, Igroup } from "../types/stores/GroupTypes";
 import { makeSchedule } from "../utils/parseSchedule";
 import { makeFetch } from "../utils/makeFetch";
+import { weekTime } from "../stores/dateStore";
 
 class GroupDateServiceClass implements IGroupDateService {
   private dateStore: DateClass;
@@ -30,11 +30,13 @@ class GroupDateServiceClass implements IGroupDateService {
         method: "POST",
       },
       () => {
-        console.log('id is:', groupId);
+        console.log('group id is:', groupId);
         runInAction(() => {
           this.groupStore.groupId = groupId;
           this.groupStore.groupNumber = groupNumber;
           this.groupScheduleGetFetch(groupId);
+          this.groupStore.scheduleDiffsGETFetch();
+          this.groupStore.schedulePlanningGETFetch();
           this.groupStore.groupNumberIdStatus = 'done';
         });
       },
@@ -53,6 +55,8 @@ class GroupDateServiceClass implements IGroupDateService {
             this.groupStore.groupId = d.current_group.group_id;
             this.groupStore.groupNumber = d.current_group.number;
             this.groupScheduleGetFetch(d.current_group.group_id);
+            this.groupStore.scheduleDiffsGETFetch();
+            this.groupStore.schedulePlanningGETFetch();
           }
           this.groupStore.groupNumberIdStatus = 'done';
         })
@@ -68,17 +72,16 @@ class GroupDateServiceClass implements IGroupDateService {
       {},
       (d: IGroupSchedule) => {
         runInAction(() => {
+          this.groupStore.groupSchedule = d;
           if (d.is_ready) {
-            this.groupStore.groupSchedule = d;
             if (this.dateStore.absoluteWeekParity === '1') {
               this.groupStore.parsedSchedule1 = makeSchedule(d, new Date());
-              this.groupStore.parsedSchedule2 = makeSchedule(d, new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7));
+              this.groupStore.parsedSchedule2 = makeSchedule(d, new Date(new Date().getTime() + weekTime));
             } else {
               this.groupStore.parsedSchedule2 = makeSchedule(d, new Date());
-              this.groupStore.parsedSchedule1 = makeSchedule(d, new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7));
+              this.groupStore.parsedSchedule1 = makeSchedule(d, new Date(new Date().getTime() + weekTime));
             }
           } else {
-            this.groupStore.groupSchedule = null;
             this.groupStore.parsedSchedule1 = null;
             this.groupStore.parsedSchedule2 = null;
           }
@@ -111,7 +114,7 @@ class GroupDateServiceClass implements IGroupDateService {
     }
 
     makeFetch(
-        '/api/attendance/schedule/update',
+      '/api/attendance/schedule/update',
       {
         body: JSON.stringify({
           schedule_obj_time_link_id: time_link_id, 

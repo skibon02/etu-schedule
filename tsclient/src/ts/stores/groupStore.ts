@@ -1,5 +1,5 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import { IGroupClass, IGroupSchedule, Igroup, IscheduleDiff, IscheduleDiffs, parsedSchedule } from "../types/GroupTypes";
+import { IGroupClass, IGroupSchedule, Igroup, IscheduleDiff, IscheduleDiffs, parsedSchedule } from "../types/stores/GroupTypes";
 import { makeFetch } from "../utils/makeFetch";
 
 export class GroupClass implements IGroupClass {
@@ -11,7 +11,9 @@ export class GroupClass implements IGroupClass {
   parsedSchedule2: parsedSchedule | null;
   groupScheduleStatus:  'idle' | 'pending' | 'done';
   schedulePlanning: IscheduleDiff | null;
+  schedulePlanningStatus:  'idle' | 'pending' | 'done';
   scheduleDiffs: IscheduleDiffs | null;
+  scheduleDiffsStatus:  'idle' | 'pending' | 'done';
   groupList: Igroup[] | null;
   groupListStatus:  'idle' | 'pending' | 'done';
 
@@ -21,37 +23,48 @@ export class GroupClass implements IGroupClass {
     this.scheduleDiffsGETFetch = this.scheduleDiffsGETFetch.bind(this);
     this.schedulePlanningGETFetch = this.schedulePlanningGETFetch.bind(this);
     this.groupListGETFetch = this.groupListGETFetch.bind(this);
+    this.reset = this.reset.bind(this);
 
     this.groupNumber = null;
     this.groupId = null;
     this.groupNumberIdStatus = 'idle';
-    this.groupSchedule = null
+    this.groupSchedule = null;
     this.parsedSchedule1 = null;
     this.parsedSchedule2 = null;
     this.groupScheduleStatus = 'idle';
     this.schedulePlanning = null;
+    this.schedulePlanningStatus = 'idle';
     this.scheduleDiffs = null;
+    this.scheduleDiffsStatus = 'idle';
     this.groupList = null;
     this.groupListStatus = 'idle';
   }
 
   async scheduleDiffsGETFetch() {
+    this.scheduleDiffsStatus = 'pending';
     makeFetch(
       '/api/attendance/schedule_diffs',
       {},
       (d: IscheduleDiffs) => {
-        this.scheduleDiffs = d;
+        runInAction(() => {
+          this.scheduleDiffs = d;
+          this.scheduleDiffsStatus = 'done';
+        })
       },
       () => {}
     )
   }
 
   async schedulePlanningGETFetch() {
+    this.schedulePlanningStatus = 'pending';
     makeFetch(
       '/api/attendance/schedule',
       {},
       (d: IscheduleDiff) => {
-        this.schedulePlanning = d;
+        runInAction(() => {
+          this.schedulePlanning = d;
+          this.schedulePlanningStatus = 'done';
+        })
       },
       () => {}
     )
@@ -74,6 +87,24 @@ export class GroupClass implements IGroupClass {
       },
       () => {}
     )
+  }
+
+  reset() {
+    runInAction(() => {
+      this.groupNumber = null;
+      this.groupId = null;
+      this.groupNumberIdStatus = 'idle';
+      this.groupSchedule = null;
+      this.parsedSchedule1 = null;
+      this.parsedSchedule2 = null;
+      this.groupScheduleStatus = 'idle';
+      this.schedulePlanning = null;
+      this.schedulePlanningStatus = 'idle';
+      this.scheduleDiffs = null;
+      this.scheduleDiffsStatus = 'idle';
+      this.groupList = null;
+      this.groupListStatus = 'idle';
+    })
   }
 }
 

@@ -3,5 +3,6 @@ export interface IActiveClass {
   profile(): void,
   schedule(): void,
   planning(): void,
+  reset(): void
 }
 
