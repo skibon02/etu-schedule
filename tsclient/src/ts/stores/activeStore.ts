@@ -7,20 +7,23 @@ export class ActiveClass implements IActiveClass {
   constructor() {
     makeAutoObservable(this);
 
+    this.profile = this.profile.bind(this);
+    this.schedule = this.schedule.bind(this);
+    this.planning = this.planning.bind(this);
     this.reset = this.reset.bind(this);
 
     this.active = 'profile';
   }
 
-  profile = (): void => {
+  profile(): void {
     this.active = 'profile';
   }
 
-  schedule = (): void => {
+  schedule(): void {
     this.active = 'schedule';
   }
 
-  planning = (): void => {
+  planning(): void {
     this.active = 'planning';
   }
 

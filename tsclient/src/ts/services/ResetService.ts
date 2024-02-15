@@ -3,7 +3,7 @@ import { UserDataClass, userDataStore } from "../stores/userDataStore";
 import { GroupClass, groupStore } from "../stores/groupStore";
 import { AttendanceTokenClass, attendanceTokenStore } from "../stores/attendanceTokenStore";
 import { DateClass, dateStore } from "../stores/dateStore";
-import { ActiveClass, acitveStore } from "../stores/activeStore";
+import { ActiveClass, activeStore } from "../stores/activeStore";
 import { makeFetch } from "../utils/makeFetch";
 import { IResetClass } from "../types/services/ResetServiceTypes";
 
@@ -58,7 +58,7 @@ const ResetService = new ResetClass(
   groupStore,
   attendanceTokenStore,
   dateStore,
-  acitveStore
+  activeStore
 );
 
 export {

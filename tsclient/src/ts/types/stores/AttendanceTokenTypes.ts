@@ -10,7 +10,7 @@ export interface IAttendanceTokenClass {
   isTokenValid: boolean,
   tooManyRequests: boolean;
   loadingStatus: 'idle' | 'pending' | 'done',
-  deleteToken(): void,
+  deleteTokenFetch(): void,
   reset(): void,
 }
 

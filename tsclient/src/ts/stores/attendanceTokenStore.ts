@@ -11,7 +11,7 @@ export class AttendanceTokenClass implements IAttendanceTokenClass {
   constructor() {
     makeAutoObservable(this);
 
-    this.deleteToken = this.deleteToken.bind(this);
+    this.deleteTokenFetch = this.deleteTokenFetch.bind(this);
     this.reset = this.reset.bind(this);
 
     this.attendanceToken = null;
@@ -20,7 +20,7 @@ export class AttendanceTokenClass implements IAttendanceTokenClass {
     this.loadingStatus = 'idle';
   }
 
-  deleteToken(): void {
+  deleteTokenFetch(): void {
     this.loadingStatus = 'pending';
     makeFetch(
       '/api/user/set_attendance_token', 
