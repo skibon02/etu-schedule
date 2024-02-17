@@ -40,7 +40,8 @@ class GroupDateServiceClass implements IGroupDateService {
           this.groupStore.groupNumberIdStatus = 'done';
         });
       },
-      () => {}
+      () => {},
+      'установить группу'
     )
   }
 
@@ -61,7 +62,8 @@ class GroupDateServiceClass implements IGroupDateService {
           this.groupStore.groupNumberIdStatus = 'done';
         })
       },
-      () => {}
+      () => {},
+      'загрузить данные о группе'
     )
   }
 
@@ -88,7 +90,8 @@ class GroupDateServiceClass implements IGroupDateService {
           this.groupStore.groupScheduleStatus = 'done';
         })
       },
-      () => {}
+      () => {},
+      'загрузить расписание группы'
     )
   }
 
@@ -104,7 +107,8 @@ class GroupDateServiceClass implements IGroupDateService {
         method: "POST",
       },
       () => {},
-      () => {}
+      () => {},
+      'отправить данные о посещаемости'
     )
   }
 
@@ -123,7 +127,8 @@ class GroupDateServiceClass implements IGroupDateService {
         method: "POST",
       }, 
       () => {this.groupStore.scheduleDiffsGETFetch()}, 
-      () => {}
+      () => {},
+      'отправить данные о посещаемости'
     );
   }
 
@@ -145,13 +150,14 @@ class GroupDateServiceClass implements IGroupDateService {
         method: "POST",
       },
       () => {this.groupStore.scheduleDiffsGETFetch()},
-      () => {}
+      () => {},
+      'отправить данные о посещаемости'
     );
   }
 }
 
-const groupDateService = new GroupDateServiceClass(dateStore, groupStore);
+const GroupDateService = new GroupDateServiceClass(dateStore, groupStore);
 
 export {
-  groupDateService,
+  GroupDateService,
 }

@@ -4,7 +4,6 @@ import { userDataSETFetch } from "../../ReduxStates/Slices/userDataSlice";
 import { setFullNameEnabled } from "../../ReduxStates/Slices/fullNameEnabledSlice";
 
 function handleGroupSelect(dispatch, option) {
-  dispatch(setGroupSchedule(null));
   groupNISETFx(dispatch, option.value, option.label);
 }
 

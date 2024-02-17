@@ -1,6 +1,6 @@
 import { backendHost } from './util';
 
-async function myfetch(path: string, param: RequestInit = {}): Promise<Response> {
+async function myfetch(path: string, param: RequestInit = {}, fishMessage: string): Promise<Response> {
   path = backendHost + path;
   console.log('dev fetch to ' + path);
   param.credentials = 'include';
@@ -15,7 +15,8 @@ async function myfetch(path: string, param: RequestInit = {}): Promise<Response>
     } catch (error) {
       const e = error as Error;
       console.log('fish!');
-      const event = new CustomEvent('fish', { detail: e.message });
+      const userDescription = `Кажется, на сервере произошла ошибка при попытке ${fishMessage}. Попробуйте перезагрузить страницу.`;
+      const event = new CustomEvent('fish', { detail: userDescription });
       window.dispatchEvent(event);
       throw e; 
     }

@@ -17,6 +17,10 @@ class GroupTokenClass implements IGroupTokenClass {
   }
 
   async attendanceTokenSetFetch(token: string) {
+    if (!token) {
+      return;
+    }
+    
     const url = '/api/user/set_attendance_token';
     const options = {
       method: "POST",
@@ -36,7 +40,7 @@ class GroupTokenClass implements IGroupTokenClass {
           this.AttendanceTokenStore.loadingStatus = 'done';
         })
       } else if (d.result_code === 'too_many_requests' && retryAccepted) {
-        setTimeout(() => {makeFetch(url, options, onSuccess, onFail)}, 5000)
+        setTimeout(() => {makeFetch(url, options, onSuccess, onFail, 'установить токен')}, 5000)
       } else if (d.result_code === 'too_many_requests' && !retryAccepted) {
         runInAction(() => {
           this.AttendanceTokenStore.tooManyRequests = false;
@@ -62,7 +66,8 @@ class GroupTokenClass implements IGroupTokenClass {
         d, 
         true
       ),
-      () => {}
+      () => {},
+      'установить токен'
     )
   }
 }

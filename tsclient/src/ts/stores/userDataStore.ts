@@ -36,7 +36,8 @@ export class UserDataClass implements IuserDataClass {
         })
       },
       () => {},
-      () => {}
+      () => {},
+      'изменить настройки пользователя'
     )
   }
 
@@ -47,7 +48,8 @@ export class UserDataClass implements IuserDataClass {
       (d: IvkData) => {
         this.vkData = d;
       },
-      () => {}
+      () => {},
+      'получения данных об авторизации'
     )
   }
 
@@ -55,13 +57,15 @@ export class UserDataClass implements IuserDataClass {
     runInAction(() => {
       this.fullNameEnabled.label = 'Авто';
       this.fullNameEnabled.value = 'auto';
+      this.userDataSETFetch();
     })
   }
 
   fullNameEnabledShort(): void {
     runInAction(() => {
       this.fullNameEnabled.label = 'Сокращённое';
-      this.fullNameEnabled.value = 'short';
+      this.fullNameEnabled.value = 'shorten';
+      this.userDataSETFetch();
     })
   }
 

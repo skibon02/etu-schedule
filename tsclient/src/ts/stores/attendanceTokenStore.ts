@@ -13,6 +13,7 @@ export class AttendanceTokenClass implements IAttendanceTokenClass {
 
     this.deleteTokenFetch = this.deleteTokenFetch.bind(this);
     this.reset = this.reset.bind(this);
+    this.nullToken = this.nullToken.bind(this);
 
     this.attendanceToken = null;
     this.isTokenValid = true;
@@ -31,14 +32,19 @@ export class AttendanceTokenClass implements IAttendanceTokenClass {
         })
       }, 
       () => {
-        runInAction(() => {
-          this.attendanceToken = null;
-          this.isTokenValid = true;
-          this.loadingStatus = 'done';
-        })
+        this.nullToken();
       }, 
-      () => {}
+      () => {},
+      'удалить токен'
     )
+  }
+
+  nullToken(): void {
+    runInAction(() => {
+      this.attendanceToken = null;
+      this.isTokenValid = true;
+      this.loadingStatus = 'done';
+    })
   }
 
   reset(): void {

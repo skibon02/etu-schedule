@@ -1,8 +1,8 @@
 import myfetch from "./myfetch";
 
-export async function makeFetch(url: string, params: RequestInit = {}, onSuccess: Function, onFail: Function) {
+export async function makeFetch(url: string, params: RequestInit = {}, onSuccess: Function, onFail: Function, fishMessage: string) {
   try {
-    const r = await myfetch(url, params);
+    const r = await myfetch(url, params, fishMessage);
     if (r.status === 200) {
       const d = await r.json();
       console.log(`successfully fetched on ${url}\nresponse:`, d);

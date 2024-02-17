@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { images, minies, origins } from "../../Utils/Profile/infoTokenDescriptionModal";
+import { images, minies, origins } from "../../utils/Profile/infoTokenDescriptionModal";
 
-export function useTokenDescriptionModal(showDescription, setShowDescription) {
+export function useTokenDescriptionModal(showDescription: boolean, setShowDescription: (value: boolean) => void) {
   const [currentImage, setCurrentImage] = useState(0);
   const [inCSST, setInCSST] = useState(true);
   const [showOrigin, setShowOrigin] = useState(false);
@@ -32,7 +32,7 @@ export function useTokenDescriptionModal(showDescription, setShowDescription) {
     }, 180);
   }
 
-  function current(i) {
+  function current(i: number) {
     return () => {
       setInCSST(false);
       setShowOrigin(false);
@@ -50,17 +50,17 @@ export function useTokenDescriptionModal(showDescription, setShowDescription) {
     current: current,
   }
 
-  useEffect(() => {
-    function preloadImages(urls) {
-      urls.forEach((url) => {
-        const img = new Image();
-        img.src = url;
-      });
-    }
-    preloadImages(images);
-    preloadImages(minies);
-    preloadImages(origins);
-  }, []);
+  // useEffect(() => {
+  //   function preloadImages(urls) {
+  //     urls.forEach((url) => {
+  //       const img = new Image();
+  //       img.src = url;
+  //     });
+  //   }
+  //   preloadImages(images);
+  //   preloadImages(minies);
+  //   preloadImages(origins);
+  // }, []);
 
   useEffect(() => {
     let scrollPosition = window.pageYOffset; 
@@ -70,7 +70,7 @@ export function useTokenDescriptionModal(showDescription, setShowDescription) {
       document.body.style.top = `-${scrollPosition}px`;
       document.body.style.width = '100%';
 
-      const handleKeyUp = (e) => {
+      const handleKeyUp = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
           close();
           return;

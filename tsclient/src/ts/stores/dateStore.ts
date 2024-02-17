@@ -44,7 +44,8 @@ export class DateClass implements IDateClass {
           this.setSemesterDate(d);
         }
       },
-      () => {}
+      () => {},
+      'загрузить данные о семестре'
     )
   }
 

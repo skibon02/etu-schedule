@@ -51,7 +51,8 @@ export class GroupClass implements IGroupClass {
           this.scheduleDiffsStatus = 'done';
         })
       },
-      () => {}
+      () => {},
+      ''
     )
   }
 
@@ -66,7 +67,8 @@ export class GroupClass implements IGroupClass {
           this.schedulePlanningStatus = 'done';
         })
       },
-      () => {}
+      () => {},
+      'загрузить данные о посещаемости'
     )
   }
 
@@ -85,7 +87,8 @@ export class GroupClass implements IGroupClass {
           this.groupListStatus = 'done';
         })
       },
-      () => {}
+      () => {},
+      'загрузить список групп'
     )
   }
 

@@ -1,5 +1,5 @@
 export interface IfullNameEnabled {
-  value: 'auto' | 'short',
+  value: 'auto' | 'shorten',
   label: 'Авто' | 'Сокращённое',
 }
 

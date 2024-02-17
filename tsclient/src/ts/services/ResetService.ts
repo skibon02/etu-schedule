@@ -38,7 +38,8 @@ class ResetClass implements IResetClass {
       () => {
         this.reset();
       },
-      () => {}
+      () => {},
+      'выйти из профиля'
     )
   }
 

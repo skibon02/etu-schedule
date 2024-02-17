@@ -45,7 +45,7 @@ class UserDataGroupTokenClass implements IUserDataGroupTokenService {
             };
           } else {
             this.userDataStore.fullNameEnabled = {
-              value: 'short',
+              value: 'shorten',
               label: 'Сокращённое',
             };
           }
@@ -55,7 +55,8 @@ class UserDataGroupTokenClass implements IUserDataGroupTokenService {
           this.attendanceTokenStore.attendanceToken = d.attendance_token;
         })
       },
-      () => {}
+      () => {},
+      'получить данные о профиле',
     )
   }
 }
