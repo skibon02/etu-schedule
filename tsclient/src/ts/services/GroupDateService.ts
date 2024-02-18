@@ -1,11 +1,10 @@
 import { groupStore, GroupClass } from "../stores/groupStore";
-import { dateStore, DateClass } from "../stores/dateStore";
+import { dateStore, DateClass, weekTime } from "../stores/dateStore";
 import { IGroupDateService } from "../types/services/GroupDateServiceTypes";
 import { runInAction } from "mobx";
 import { IGroupSchedule, Igroup } from "../types/stores/GroupTypes";
-import { makeSchedule } from "../utils/parseSchedule";
+import { makeSchedule } from "../utils/Schedule/parseSchedule";
 import { makeFetch } from "../utils/makeFetch";
-import { weekTime } from "../stores/dateStore";
 
 class GroupDateServiceClass implements IGroupDateService {
   private dateStore: DateClass;
@@ -95,13 +94,13 @@ class GroupDateServiceClass implements IGroupDateService {
     )
   }
 
-  async scheduleDiffsSETFetch(time_link_id: number, weekNumber: number, flag: boolean) {
+  async scheduleDiffsSETFetch(time_link_id: number, flag: boolean) {
     makeFetch(
       '/api/attendance/schedule_diffs/update',
       {
         body: JSON.stringify({
           schedule_obj_time_link_id: time_link_id,
-          week_num: weekNumber,
+          week_num: this.dateStore.weekNumber,
           enable_auto_attendance: flag,
         }),
         method: "POST",

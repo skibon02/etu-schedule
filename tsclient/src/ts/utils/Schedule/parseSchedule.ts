@@ -1,7 +1,7 @@
-import { dateStore } from "../stores/dateStore";
-import { IUsableSchedule, IScheduleObjectExtended, ITeacherInfo, ITeacher, IScheduleObject, IGroupSchedule } from "../types/stores/GroupTypes";
+import { dateStore } from "../../stores/dateStore";
+import { IUsableSchedule, IScheduleObjectExtended, ITeacherInfo, ITeacher, IScheduleObject, IGroupSchedule } from "../../types/stores/GroupTypes";
 
-const WEEK_DAYS: string[] = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+export const WEEK_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 export function makeUsableSchedule(scheduleObject: IScheduleObjectExtended, fullNameEnabledValue: string): IUsableSchedule {
   const date: string = scheduleObject.date;

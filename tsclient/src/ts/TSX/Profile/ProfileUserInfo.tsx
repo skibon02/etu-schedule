@@ -4,8 +4,9 @@ import VkButton from './VkButton';
 import DeAuthButton from './DeauthButton';
 import { userDataStore } from '../../stores/userDataStore';
 import { attendanceTokenStore } from '../../stores/attendanceTokenStore';
+import { observer } from 'mobx-react';
 
-export default function ProfileUserInfo() {
+function ProfileUserInfo() {
   
   const isAuthorized = userDataStore.vkData!.is_authorized;
 
@@ -49,3 +50,5 @@ export default function ProfileUserInfo() {
     </div>
   )
 }
+
+export default observer(ProfileUserInfo);

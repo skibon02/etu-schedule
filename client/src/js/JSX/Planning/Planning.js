@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { WeekHeader } from "../Schedule/WeekHeader";
 import { isEvenWeek } from "../../Utils/handleTime";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import NoSchedule from "../Schedule/NoSchedule";
 import PlanningHeader from "./PlanningHeader";
 import Week from "../Schedule/Week";

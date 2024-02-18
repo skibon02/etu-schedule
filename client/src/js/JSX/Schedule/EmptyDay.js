@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { makeCalendarTime } from "../../Utils/handleTime";
 import { DAYS } from "../../Utils/DAYS";
 
-export default function EmptyDay({weekSchedule}) {
+export default function EmptyDay({date}) {
   const {active} = useSelector(s => s.active);
 
   return (
@@ -10,9 +10,9 @@ export default function EmptyDay({weekSchedule}) {
     <div className="day">
       <div className="day__date">
         {active === 'planning' ? 
-        makeCalendarTime(weekSchedule, DAYS).slice(0, -5)
+        makeCalendarTime(date, DAYS).slice(0, -5)
         :
-        makeCalendarTime(weekSchedule, DAYS)
+        makeCalendarTime(date, DAYS)
         }
         <div className="day__schedule-string">
           0 пар

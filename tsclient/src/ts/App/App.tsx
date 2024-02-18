@@ -1,8 +1,9 @@
+import Router from "../TSX/Router/Router";
 
 function App() {
 
   return (
-    <div className=""></div>
+    <Router />
   )
 }
 

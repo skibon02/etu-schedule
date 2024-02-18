@@ -48,12 +48,12 @@ export function Subject({subjectData, orderNumber, planning_time_link_id_value, 
         </div>
       </div>
       {active === 'schedule' &&
-        <Attendance 
-          key={planning_time_link_id_value ? 1 : 0}
-          isDead={isDead}
-          time_link_id={time_link_id}
-          schedule_diffs_value={schedule_diffs_value}
-          planning_time_link_id_value={planning_time_link_id_value} />
+      <Attendance 
+        key={planning_time_link_id_value ? 1 : 0}
+        isDead={isDead}
+        time_link_id={time_link_id}
+        schedule_diffs_value={schedule_diffs_value}
+        planning_time_link_id_value={planning_time_link_id_value} />
       }
       {active === 'planning' && 
       <PlanningSwitch 

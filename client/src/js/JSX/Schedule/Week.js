@@ -23,5 +23,5 @@ export default function Week({weekSchedule}) {
         {week}
       </div>
     </CSSTransition>
-    )
+  )
 }

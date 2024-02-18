@@ -16,7 +16,7 @@ export interface IDateClass {
   semesterStart: string | null,
   semesterEnd: string | null,
   maxWeekNumber: number | null,
-  semesterGetFetch(): void,
+  semesterGETFetch(): void,
   setSemesterDate(semData: IResponseSemester): void,
   getWeekNumber(ISODate: string): number,
   curDate(): void,

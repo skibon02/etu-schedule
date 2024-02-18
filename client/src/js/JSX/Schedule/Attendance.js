@@ -1,7 +1,6 @@
 import { useAttendance } from '../../Hooks/Schedule/useAttendance';
-import * as handlers from '../../Handlers/Schedule/Subject/handlers'
-import { addToQueue } from '../../FxFetches/Schedule/processScheduleQueue';
-import { scheduleDiffsSETFetch } from '../../ReduxStates/Slices/scheduleDiffsSlice';
+// import { handleClockClick, handleMessageClick } from '../../Handlers/Schedule/Subject/handlers'
+// import { addToQueue } from '../../FxFetches/Schedule/processScheduleQueue';
 
 export default function Attendance({
   isDead, 
@@ -11,14 +10,10 @@ export default function Attendance({
 }) {
 
   const { 
-    weekNumber, 
-    toggleClock, setToggleClock, 
-    init, setInit, 
-    toggleMessage, setToggleMessage,
-    timerId, setTimerId,
-    needToShow, setNeedToSHow,
-    clockClassNameNormal, clockClassNamePulsing
-   } = useAttendance(schedule_diffs_value, planning_time_link_id_value);
+    toggleClock, toggleMessage, needToShow,
+    clockClassNameNormal, clockClassNamePulsing,
+    handleClockClick, handleMessageClick
+  } = useAttendance(schedule_diffs_value, planning_time_link_id_value, time_link_id, isDead);
 
   return (
     <>
@@ -26,20 +21,7 @@ export default function Attendance({
       <div className="attendance__container" >
         <div  
           className='attendance__pseudo-body' 
-          onClick={() => {
-            handlers.handleClockClick(
-              isDead,
-              timerId,
-              setToggleClock,
-              setToggleMessage,
-              toggleClock,
-              setTimerId,
-              setInit,
-              needToShow,
-              setNeedToSHow
-            );
-            // addToQueue([time_link_id, weekNumber, !init])}} >
-            scheduleDiffsSETFetch(time_link_id, weekNumber, !init)}} >
+          onClick={handleClockClick} >
           <div 
             className={
               isDead ? 
@@ -56,10 +38,7 @@ export default function Attendance({
         {!needToShow && toggleMessage &&
           <div 
             className="attendance__message message"
-            onClick={() => handlers.handleMessageClick(
-              isDead,
-              setToggleMessage
-            )} >
+            onClick={handleMessageClick} >
             Изменение актуально только для этой недели
           </div> 
         }

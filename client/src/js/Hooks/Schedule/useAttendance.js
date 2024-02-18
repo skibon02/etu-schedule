@@ -1,7 +1,8 @@
 import { useSelector } from 'react-redux'
 import { useState } from 'react';
+import { scheduleDiffsSETFetch } from '../../ReduxStates/Slices/scheduleDiffsSlice';
 
-export function useAttendance(schedule_diffs_value, planning_time_link_id_value) {
+export function useAttendance(schedule_diffs_value, planning_time_link_id_value, time_link_id, isDead) {
 
   const { weekNumber } = useSelector(s => s.date);
 
@@ -9,7 +10,7 @@ export function useAttendance(schedule_diffs_value, planning_time_link_id_value)
   const [init, setInit] = useState(schedule_diffs_value !== null ? schedule_diffs_value : planning_time_link_id_value);
   const [toggleMessage, setToggleMessage] = useState(false);
   const [timerId, setTimerId] = useState(0);
-  const [needToShow, setNeedToSHow] = useState(schedule_diffs_value === null);
+  const [needToShow, setNeedToShow] = useState(schedule_diffs_value === null);
   
   let clockClassNameNormal;
   let clockClassNamePulsing;
@@ -25,13 +26,34 @@ export function useAttendance(schedule_diffs_value, planning_time_link_id_value)
     clockClassNamePulsing = 'attendance__body attendance__body_red'
   }
 
+  
+  function handleClockClick() {
+    if (!isDead) {
+      clearTimeout(timerId);
+      setToggleClock(p => !p)
+      if (needToShow) {
+        setToggleMessage(true)
+        setTimerId(setTimeout(() => {
+          setToggleMessage(false)
+        }, 5000));
+      }
+      setNeedToShow(!needToShow);
+      setInit(p => !p);
+    }
+    scheduleDiffsSETFetch(time_link_id, weekNumber, !init)
+  }
+
+  function handleMessageClick() {
+    if (!isDead) {
+      setToggleMessage(false);
+    }
+  }
+
   return { 
-    weekNumber, 
-    toggleClock, setToggleClock, 
-    init, setInit, 
-    toggleMessage, setToggleMessage,
-    timerId, setTimerId,
-    needToShow, setNeedToSHow,
-    clockClassNameNormal, clockClassNamePulsing
+    toggleClock, 
+    toggleMessage,
+    needToShow,
+    clockClassNameNormal, clockClassNamePulsing,
+    handleClockClick, handleMessageClick
    }
 }

@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from "mobx";
+import { computed, makeAutoObservable, runInAction } from "mobx";
 import { IDateClass, IResponseSemester } from "../types/stores/DateTypes";
 import { makeFetch } from "../utils/makeFetch";
 
@@ -17,7 +17,7 @@ export class DateClass implements IDateClass {
   constructor() {
     makeAutoObservable(this);
 
-    this.semesterGetFetch = this.semesterGetFetch.bind(this);
+    this.semesterGETFetch = this.semesterGETFetch.bind(this);
     this.setSemesterDate = this.setSemesterDate.bind(this);
     this.getWeekNumber = this.getWeekNumber.bind(this);
     this.curDate = this.curDate.bind(this);
@@ -34,8 +34,8 @@ export class DateClass implements IDateClass {
     this.semesterEnd = null;
     this.maxWeekNumber = null;
   }
-
-  async semesterGetFetch() {
+  
+  async semesterGETFetch() {
     makeFetch(
       '/api/semester',
       {},
@@ -78,7 +78,7 @@ export class DateClass implements IDateClass {
   incDate(): void {
     runInAction(() => {
       this.date = new Date(
-        new Date().getTime() + weekTime
+        new Date(this.date).getTime() + weekTime
       ).toISOString();
       this.weekNumber = this.weekNumber + 1;
       this.weekParity = this.weekNumber % 2 ? '2' : '1';
@@ -88,7 +88,7 @@ export class DateClass implements IDateClass {
   decDate(): void {
     runInAction(() => {
       this.date = new Date(
-        new Date().getTime() - weekTime
+        new Date(this.date).getTime() - weekTime
       ).toISOString();
       this.weekNumber = this.weekNumber - 1;
       this.weekParity = this.weekNumber % 2 ? '2' : '1';

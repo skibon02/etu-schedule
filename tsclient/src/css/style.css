@@ -253,6 +253,14 @@ body {
   height: 0em;
 }
 
+.fish-message {
+  font-size: 1.3em;
+  position: absolute;
+  background-color: rgba(214, 0, 0, 0.9568627451);
+  color: #fff;
+  padding: 0.625em;
+}
+
 @media screen and (max-width: 700px) {
   .container {
     font-size: 14px;

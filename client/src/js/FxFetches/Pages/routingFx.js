@@ -1,4 +1,4 @@
- function routingFx(navigate, loc, vkData) {
+function routingFx(navigate, loc, vkData) {
   if (loc === '/' && vkData && vkData.is_authorized) {
     navigate('/schedule');
     return;

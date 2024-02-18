@@ -1,26 +1,16 @@
+import { useState } from 'react'
+import { observer } from 'mobx-react'
 import Select, { SingleValue } from 'react-select'
-import { lazy, useState } from 'react'
+import { GroupDateService } from '../../services/GroupDateService'
+import { GroupTokenService } from '../../services/GroupTokenService'
 import { userDataStore } from '../../stores/userDataStore'
 import { attendanceTokenStore } from '../../stores/attendanceTokenStore'
 import { groupStore } from '../../stores/groupStore'
-import { makeGroupListSelect } from "../../utils/Profile/makeGroupListSelect"
+import { groupFilterOptions, handleEnterUp, makeGroupListSelect } from '../../utils/Profile/utils'
+import { fullNameOptionType, groupOptionType } from '../../types/tsx/Profile/UserPreferencesTypes'
 import DeleteTokenModal from './DeleteTokenModal'
 import InvalidTokenModal from './InvalidTokenModal'
 import TokenDescriptionModal from './TokenDescriptionModal'
-import { observer } from 'mobx-react'
-import { GroupDateService } from '../../services/GroupDateService'
-import { GroupTokenService } from '../../services/GroupTokenService'
-
-type fullNameOptionType = { value: string; label: string; };
-type groupOptionType = { label: string; value: number | null; } | { label: string; value: string; };
-function groupFilterOptions(option: groupOptionType, value: string) {
-  return option.label.toLowerCase().indexOf(value.toLowerCase()) === 0
-}
-function handleEnterUp(inputV: string, e: React.KeyboardEvent<HTMLInputElement>) {
-  if (e.key === 'Enter') {
-    GroupTokenService.attendanceTokenSetFetch(inputV);
-  }
-}
 
 function FullNamePreference() {
 

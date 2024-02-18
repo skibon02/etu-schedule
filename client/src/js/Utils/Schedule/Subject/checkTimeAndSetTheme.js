@@ -5,4 +5,4 @@ export function checkTimeAndSetTheme(checkInDeadline) {
     isLate = true;
   } 
   return isLate;
-};
+}

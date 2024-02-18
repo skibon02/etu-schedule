@@ -10,7 +10,7 @@ export function makeWeek(weekSchedule) {
       )
     } else {
       week.push(
-        <EmptyDay key={i} weekSchedule={weekSchedule[i][1]} />
+        <EmptyDay key={i} date={weekSchedule[i][1]} />
       )
     }
   }

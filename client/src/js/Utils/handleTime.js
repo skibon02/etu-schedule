@@ -1,96 +1,30 @@
-// !!! @param date passing as new Date(date)
 function knowSubjectTime(i, date) {
   date.setSeconds(0);
   date.setMilliseconds(0);
 
-  let startTime = new Date(date);
-  let endTime = new Date(date);
-  let checkInDeadLine = new Date(date);
+  const timeIntervals = [
+    { start: [8, 0], end: [9, 30], checkIn: [9, 45] },
+    { start: [9, 50], end: [11, 20], checkIn: [11, 35] },
+    { start: [11, 40], end: [13, 10], checkIn: [13, 25] },
+    { start: [13, 40], end: [15, 10], checkIn: [15, 25] },
+    { start: [15, 30], end: [17, 0], checkIn: [17, 15] },
+    { start: [17, 20], end: [18, 50], checkIn: [19, 5] },
+    { start: [19, 5], end: [20, 35], checkIn: [20, 50] },
+    { start: [20, 50], end: [22, 20], checkIn: [22, 35] },
+  ];
+  
+  const interval = timeIntervals[i];
 
-  switch (i) {
-    case 0:
-      startTime.setHours(8);
-      startTime.setMinutes(0);
+  const startTime = new Date(date);
+  startTime.setHours(interval.start[0], interval.start[1]);
 
-      endTime.setHours(9);
-      endTime.setMinutes(30);
-      
-      checkInDeadLine.setHours(9);
-      checkInDeadLine.setMinutes(45);
-      break;
-    case 1:
-      startTime.setHours(9);
-      startTime.setMinutes(50);
+  const endTime = new Date(date);
+  endTime.setHours(interval.end[0], interval.end[1]);
 
-      endTime.setHours(11);
-      endTime.setMinutes(20);
-      
-      checkInDeadLine.setHours(11);
-      checkInDeadLine.setMinutes(35);
-      break;
-    case 2:
-      startTime.setHours(11);
-      startTime.setMinutes(40);
+  const checkInDeadLine = new Date(date);
+  checkInDeadLine.setHours(interval.checkIn[0], interval.checkIn[1]);
 
-      endTime.setHours(13);
-      endTime.setMinutes(10);
-      
-      checkInDeadLine.setHours(13);
-      checkInDeadLine.setMinutes(25);
-      break;
-    case 3:
-      startTime.setHours(13);
-      startTime.setMinutes(40);
-
-      endTime.setHours(15);
-      endTime.setMinutes(10);
-      
-      checkInDeadLine.setHours(15);
-      checkInDeadLine.setMinutes(25);
-      break;
-    case 4:
-      startTime.setHours(15);
-      startTime.setMinutes(30);
-
-      endTime.setHours(17);
-      endTime.setMinutes(0);
-      
-      checkInDeadLine.setHours(17);
-      checkInDeadLine.setMinutes(15);
-      break;
-    case 5:
-      startTime.setHours(17);
-      startTime.setMinutes(20);
-
-      endTime.setHours(18);
-      endTime.setMinutes(50);
-      
-      checkInDeadLine.setHours(19);
-      checkInDeadLine.setMinutes(5);
-      break;
-    case 6:
-      startTime.setHours(19);
-      startTime.setMinutes(5);
-
-      endTime.setHours(20);
-      endTime.setMinutes(35);
-      
-      checkInDeadLine.setHours(20);
-      checkInDeadLine.setMinutes(20);
-      break;
-    case 7:
-      startTime.setHours(20);
-      startTime.setMinutes(50);
-
-      endTime.setHours(22);
-      endTime.setMinutes(20);
-      
-      checkInDeadLine.setHours(22);
-      checkInDeadLine.setMinutes(35);
-      break;
-  }
-
-  return [startTime, endTime, checkInDeadLine]
+  return [startTime, endTime, checkInDeadLine];
 }
 
 function makeClockTime(date) {

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { CSSTransition } from "react-transition-group";
-import { IModalTemplateProps } from "../../types/tsx/Profile/ModalTemplateTypes";ModalTemplate
+import { IModalTemplateProps } from "../../types/tsx/Profile/ModalTemplateTypes";
 
 export default function ModalTemplate({
   showDecline = true,

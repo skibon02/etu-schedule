@@ -107,5 +107,4 @@ function VkButton() {
   );
 }
 
-export default VkButton;
-// export default observer(VkButton);
+export default observer(VkButton);

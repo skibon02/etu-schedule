@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from "mobx";
+import { computed, makeAutoObservable, runInAction } from "mobx";
 import { IuserDataClass, IfullNameEnabled, IvkData } from "../types/stores/UserDataTypes"
 import { makeFetch } from "../utils/makeFetch";
 
@@ -46,7 +46,9 @@ export class UserDataClass implements IuserDataClass {
       '/api/auth/data',
       {},
       (d: IvkData) => {
-        this.vkData = d;
+        runInAction(() => {
+          this.vkData = d;
+        })
       },
       () => {},
       'получения данных об авторизации'

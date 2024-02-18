@@ -86,6 +86,14 @@ body {
   height: pxToEm(0px);
 }
 
+.fish-message {
+  font-size: 1.3em;
+  position: absolute;
+  background-color: #d60000f4;
+  color: #fff;
+  padding: pxToEm(10px);
+}
+
 @media screen and (max-width: 700px) {
   .container {
     font-size: 14px;

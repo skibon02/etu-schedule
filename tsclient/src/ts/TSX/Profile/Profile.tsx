@@ -5,11 +5,12 @@ import { useEffect } from "react";
 import { groupStore } from "../../stores/groupStore";
 import ProfileUserInfo from "./ProfileUserInfo";
 import UserPreferences from "./UserPreferences";
+import { observer } from "mobx-react";
 
-export default function Profile() {
+function Profile() {
 
   useEffect(() => {
-    groupStore.groupListGETFetch();
+    if (userDataStore.vkData?.is_authorized) groupStore.groupListGETFetch();
   }, [userDataStore.vkData?.is_authorized]);
 
   return (
@@ -23,3 +24,5 @@ export default function Profile() {
     </>
   )
 }
+
+export default observer(Profile);
