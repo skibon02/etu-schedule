@@ -78,10 +78,10 @@ function VkButton() {
         },
         'авторизоваться'
       );
+      userDataStore.vkDataGETFetch();
     }
 
     authorize();
-    userDataStore.vkDataGETFetch();
   }, [authData]);
 
   return (
