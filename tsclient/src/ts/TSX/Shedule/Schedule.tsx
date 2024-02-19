@@ -10,7 +10,7 @@ import Week from "./Week";
 
 function Schedule() {
 
-  if (groupStore.groupNumberIdStatus !== 'done' || groupStore.groupScheduleStatus !== 'done' || groupStore.schedulePlanningStatus !== 'done' || groupStore.scheduleDiffsStatus !== 'done') {
+  if (groupStore.groupNumberIdStatus !== 'done' || groupStore.groupScheduleStatus !== 'done' || groupStore.schedulePlanningStatus !== 'done' && groupStore.schedulePlanning === null || groupStore.scheduleDiffsStatus !== 'done' && groupStore.scheduleDiffs === null) {
     return <NoSchedule description="loading" />
   } else if (groupStore.groupNumberIdStatus === 'done' && groupStore.groupId === null) {
     return <NoSchedule description="noGroupChosen" />

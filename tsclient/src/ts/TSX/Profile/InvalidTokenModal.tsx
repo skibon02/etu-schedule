@@ -12,7 +12,7 @@ export default function InvalidTokenModal({setInputV, inCSST}: InvalidTokenModal
     <ModalTemplate
       showDecline={false}
       titleText={'Похоже, что этот токен больше не подходит. Попробуйте ввести новый.'}
-      confirmText={'Отмена'}
+      confirmText={'Закрыть'}
       declineText=""
       handleConfirm={() => {
         setInputV('');

@@ -32,7 +32,7 @@ export class UserDataClass implements IuserDataClass {
       {
         method: "POST",
         body: JSON.stringify({
-          subjects_title_formatting: this.fullNameEnabled,
+          subjects_title_formatting: this.fullNameEnabled.value,
         })
       },
       () => {},

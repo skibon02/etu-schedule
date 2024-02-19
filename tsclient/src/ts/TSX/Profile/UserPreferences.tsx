@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react'
 import Select, { SingleValue } from 'react-select'
-import { GroupDateService } from '../../services/GroupDateService'
-import { GroupTokenService } from '../../services/GroupTokenService'
 import { userDataStore } from '../../stores/userDataStore'
 import { attendanceTokenStore } from '../../stores/attendanceTokenStore'
 import { groupStore } from '../../stores/groupStore'
@@ -11,6 +9,8 @@ import { fullNameOptionType, groupOptionType } from '../../types/tsx/Profile/Use
 import DeleteTokenModal from './DeleteTokenModal'
 import InvalidTokenModal from './InvalidTokenModal'
 import TokenDescriptionModal from './TokenDescriptionModal'
+import TooManyRequestsModal from './TooManyRequestsModal'
+import { GroupDateTokenService } from '../../services/GroupDateTokenService'
 
 function FullNamePreference() {
 
@@ -42,10 +42,10 @@ function GroupPreference() {
       </div>
       <div className={!attendanceTokenStore.attendanceToken ? "user-preference__value" : "user-preference__value user-preference__value_disabled"}>
         <Select 
-          key={groupStore.groupNumberIdStatus} // !!!
+          key={groupStore.groupId} // !!!
           noOptionsMessage={() => 'Похоже, что такой группы нет'}
           options={groupStore.groupList ? makeGroupListSelect(groupStore.groupList) : [{label: 'Загрузка...', value: 0}]}
-          onChange={(option: SingleValue<groupOptionType>) => {if (typeof option!.value === 'number') GroupDateService.groupIdSetFetch(option!.value, option!.label)}}
+          onChange={(option: SingleValue<groupOptionType>) => {if (typeof option!.value === 'number') GroupDateTokenService.groupIdSetFetch(option!.value, option!.label)}}
           defaultValue={groupStore.groupNumber ? {label: groupStore.groupNumber, value: groupStore.groupId} : groupStore.groupNumberIdStatus === 'pending' ? {label: 'Загрузка...', value: 'loading'} : {label: 'Группа не выбрана', value: null}}
           filterOption={groupFilterOptions} />
       </div>
@@ -64,6 +64,7 @@ function TokenPreference() {
     <InvalidTokenModal setInputV={setInputV} inCSST={!attendanceTokenStore.isTokenValid} />
     <DeleteTokenModal setShowModal={setShowDeleteTokenModal} inCSST={showDeleteTokenModal} />
     <TokenDescriptionModal setShowDescription={setShowDescription} showDescription={showDescription} />
+    <TooManyRequestsModal inCSST={attendanceTokenStore.tooManyRequests} />
     <div className="profile__user-preference user-preference">
       <div className="user-preference__title">
         Токен посещаемости:
@@ -83,10 +84,13 @@ function TokenPreference() {
             value={attendanceTokenStore.loadingStatus === 'pending' ? 'Загрузка...' : inputV} 
             onChange={(e) => setInputV(e.target.value)}
             onKeyUp={(e) => handleEnterUp(inputV, e)} />
-          {attendanceTokenStore.attendanceToken === null && attendanceTokenStore.loadingStatus !== 'pending' ?
+          {attendanceTokenStore.loadingStatus === 'pending' ?
+          <div className="loader-token"></div>
+          :
+          !attendanceTokenStore.attendanceToken ?
           <div 
             className="user-preference__button user-preference__confirm-button"
-            onClick={() => {GroupTokenService.attendanceTokenSetFetch(inputV)}}>
+            onClick={() => {GroupDateTokenService.attendanceTokenSetFetch(inputV)}}>
           </div>
           :
           <div 

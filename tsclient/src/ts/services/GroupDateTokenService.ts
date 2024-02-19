@@ -1,23 +1,29 @@
 import { groupStore, GroupClass } from "../stores/groupStore";
 import { dateStore, DateClass, weekTime } from "../stores/dateStore";
-import { IGroupDateService } from "../types/services/GroupDateServiceTypes";
-import { runInAction } from "mobx";
+import { IGroupDateTokenService } from "../types/services/GroupDateTokenServiceTypes";
+import { makeAutoObservable, runInAction } from "mobx";
 import { IGroupSchedule, Igroup } from "../types/stores/GroupTypes";
 import { makeSchedule } from "../utils/Schedule/parseSchedule";
 import { makeFetch } from "../utils/makeFetch";
+import { IResponseSetToken } from "../types/stores/AttendanceTokenTypes";
+import { AttendanceTokenClass, attendanceTokenStore } from "../stores/attendanceTokenStore";
 
-class GroupDateServiceClass implements IGroupDateService {
+class GroupDateTokenServiceClass implements IGroupDateTokenService {
   private dateStore: DateClass;
   private groupStore: GroupClass;
-
-  constructor(dateStore: DateClass, groupStore: GroupClass) {
+  private AttendanceTokenStore: AttendanceTokenClass;
+  
+  constructor(dateStore: DateClass, groupStore: GroupClass, attendanceTokenStore: AttendanceTokenClass) {
+    makeAutoObservable(this);
 
     this.groupIdSetFetch = this.groupIdSetFetch.bind(this);
     this.groupNumberIdGetFetch = this.groupNumberIdGetFetch.bind(this);
     this.groupScheduleGetFetch = this.groupScheduleGetFetch.bind(this);
+    this.attendanceTokenSetFetch = this.attendanceTokenSetFetch.bind(this);
 
     this.dateStore = dateStore; 
     this.groupStore = groupStore; 
+    this.AttendanceTokenStore = attendanceTokenStore;
   }
 
   async groupIdSetFetch(groupId: number, groupNumber: string) {
@@ -153,10 +159,68 @@ class GroupDateServiceClass implements IGroupDateService {
       'отправить данные о посещаемости'
     );
   }
+
+  async attendanceTokenSetFetch(token: string) {
+    if (!token) {
+      return;
+    }
+    
+    const url = '/api/user/set_attendance_token';
+    const options = {
+      method: "POST",
+      body: JSON.stringify({
+        attendance_token: token,
+      })
+    };
+
+    const onSuccess = (url: string, options: Object, onSuccess: Function, onFail: Function, d: IResponseSetToken, retryAccepted: boolean) => {
+      if (d.result_code === 'success') {
+        runInAction(() => {
+          this.AttendanceTokenStore.attendanceToken = token;
+          if (d.group_changed === true) {
+            this.groupStore.groupId = d.new_group_id;
+            this.groupStore.groupNumber = d.new_group_name;
+            this.groupScheduleGetFetch(d.new_group_id!);
+            this.groupStore.scheduleDiffsGETFetch();
+            this.groupStore.schedulePlanningGETFetch();
+          }
+          this.AttendanceTokenStore.loadingStatus = 'done';
+        })
+      } else if (d.result_code === 'too_many_requests' && retryAccepted) {
+        setTimeout(() => {makeFetch(url, options, onSuccess, onFail, 'установить токен')}, 5000);
+      } else if (d.result_code === 'too_many_requests' && !retryAccepted) {
+        runInAction(() => {
+          this.AttendanceTokenStore.tooManyRequests = true;
+          this.AttendanceTokenStore.loadingStatus = 'done';
+        })
+      } else {
+        runInAction(() => {
+          this.AttendanceTokenStore.isTokenValid = false;
+          this.AttendanceTokenStore.loadingStatus = 'done';
+        })
+      }
+    }
+
+    this.AttendanceTokenStore.loadingStatus = 'pending';
+    makeFetch(
+      url,
+      options,
+      (d: IResponseSetToken) => onSuccess(
+        url, 
+        options, 
+        (d: IResponseSetToken) => onSuccess(url, options, () => {}, () => {}, d, false), 
+        () => {}, 
+        d, 
+        true
+      ),
+      () => {},
+      'установить токен'
+    )
+  }
 }
 
-const GroupDateService = new GroupDateServiceClass(dateStore, groupStore);
+const GroupDateTokenService = new GroupDateTokenServiceClass(dateStore, groupStore, attendanceTokenStore);
 
 export {
-  GroupDateService,
+  GroupDateTokenService,
 }

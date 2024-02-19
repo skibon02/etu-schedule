@@ -43,7 +43,14 @@ export class AttendanceTokenClass implements IAttendanceTokenClass {
     runInAction(() => {
       this.attendanceToken = null;
       this.isTokenValid = true;
+      this.tooManyRequests = false;
       this.loadingStatus = 'done';
+    })
+  }
+
+  resetTooManyRequests(): void {
+    runInAction(() => {
+      this.tooManyRequests = false;
     })
   }
 

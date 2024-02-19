@@ -89,14 +89,49 @@ body {
 .fish-message {
   font-size: 1.3em;
   position: absolute;
-  background-color: #d60000f4;
+  top: pxToEm(80px);
+  left: 50%;
+  width: pxToEm(600px);
+  background-color: #d60000;
+  z-index: 999999999;
   color: #fff;
-  padding: pxToEm(10px);
+  padding: pxToEm(10px); 
+  opacity: 1;
+  transform: translateY(0) translateX(-50%);
+  transition: transform 0.15s ease, opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  border-radius: pxToEm(10px);
+  line-height: 1.2em;
+  box-shadow: 0 pxToEm(10px) pxToEm(10px) #0000007b;
+
+  &__info-mark {
+    margin-right: pxToEm(5px);
+    font-size: 1.7em;
+  }
+
+  &__message {
+  }
+
+  &__hidden {
+    opacity: 0;
+    transform: translateY(pxToEm(-200px)) translateX(-50%);
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .fish-message {
+    font-size: 1.1em;
+  }
 }
 
 @media screen and (max-width: 700px) {
   .container {
     font-size: 14px;
+  }
+  
+  .fish-message {
+    font-size: 0.85em;
   }
 }
 
@@ -116,6 +151,11 @@ body {
   }
   .under-planning-thead-box-mobile {
     height: pxToEm(35px);
+  }
+  
+  .fish-message {
+    width: 90%;
+    top: pxToEm(20px);
   }
 }
 

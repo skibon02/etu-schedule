@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { GroupDateService } from '../../services/GroupDateService';
+import { GroupDateTokenService } from '../../services/GroupDateTokenService';
 
 export function useAttendance(schedule_diffs_value: null | boolean, planning_time_link_id_value: boolean, time_link_id: number, isDead: boolean) {
 
@@ -23,7 +23,6 @@ export function useAttendance(schedule_diffs_value: null | boolean, planning_tim
     clockClassNamePulsing = 'attendance__body attendance__body_red'
   }
 
-  
   function handleClockClick() {
     if (!isDead) {
       clearTimeout(timerId);
@@ -37,7 +36,7 @@ export function useAttendance(schedule_diffs_value: null | boolean, planning_tim
       setNeedToShow(!needToShow);
       setInit(p => !p);
     }
-    GroupDateService.scheduleDiffsSETFetch(time_link_id, !init)
+    GroupDateTokenService.scheduleDiffsSETFetch(time_link_id, !init)
   }
 
   function handleMessageClick() {

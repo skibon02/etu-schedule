@@ -256,14 +256,54 @@ body {
 .fish-message {
   font-size: 1.3em;
   position: absolute;
-  background-color: rgba(214, 0, 0, 0.9568627451);
+  top: 5em;
+  left: 50%;
+  width: 37.5em;
+  background-color: #d60000;
+  z-index: 999999999;
   color: #fff;
   padding: 0.625em;
+  opacity: 1;
+  -webkit-transform: translateY(0) translateX(-50%);
+      -ms-transform: translateY(0) translateX(-50%);
+          transform: translateY(0) translateX(-50%);
+  -webkit-transition: opacity 0.3s ease, -webkit-transform 0.15s ease;
+  transition: opacity 0.3s ease, -webkit-transform 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.3s ease;
+  transition: transform 0.15s ease, opacity 0.3s ease, -webkit-transform 0.15s ease;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  border-radius: 0.625em;
+  line-height: 1.2em;
+  -webkit-box-shadow: 0 0.625em 0.625em rgba(0, 0, 0, 0.4823529412);
+          box-shadow: 0 0.625em 0.625em rgba(0, 0, 0, 0.4823529412);
+}
+.fish-message__info-mark {
+  margin-right: 0.3125em;
+  font-size: 1.7em;
+}
+.fish-message__hidden {
+  opacity: 0;
+  -webkit-transform: translateY(-12.5em) translateX(-50%);
+      -ms-transform: translateY(-12.5em) translateX(-50%);
+          transform: translateY(-12.5em) translateX(-50%);
 }
 
+@media screen and (max-width: 1000px) {
+  .fish-message {
+    font-size: 1.1em;
+  }
+}
 @media screen and (max-width: 700px) {
   .container {
     font-size: 14px;
+  }
+  .fish-message {
+    font-size: 0.85em;
   }
 }
 @media screen and (max-width: 500px) {
@@ -281,6 +321,10 @@ body {
   }
   .under-planning-thead-box-mobile {
     height: 2.1875em;
+  }
+  .fish-message {
+    width: 90%;
+    top: 1.25em;
   }
 }
 .header-active {
@@ -1526,6 +1570,18 @@ h1, h2, h3, h4, h5, h6 {
   height: 0.75em;
 }
 
+.loader-token {
+  margin-top: 0.3125em;
+  margin-right: 0.3125em;
+  width: 1.25em;
+  height: 1.25em;
+  border: 0.125em solid #0b2376;
+  border-top: 0.125em solid transparent;
+  border-radius: 50%;
+  -webkit-animation: spin 1s linear infinite;
+          animation: spin 1s linear infinite;
+}
+
 .are-you-sure {
   font-size: min(4vmin, 2.5rem);
   position: fixed;
@@ -1940,6 +1996,9 @@ h1, h2, h3, h4, h5, h6 {
     width: 1.0625em;
     height: 1.0625em;
   }
+  .loader-token {
+    font-size: 1.4em;
+  }
 }
 @media screen and (max-width: 500px) {
   .profile {
@@ -2024,6 +2083,9 @@ h1, h2, h3, h4, h5, h6 {
   }
   .carousel-current__image-description-text {
     font-size: 1em;
+  }
+  .loader-token {
+    font-size: 1.5em;
   }
 }
 * {

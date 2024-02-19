@@ -3,8 +3,8 @@ import { weekHeaderTime } from "../../utils/Schedule/utils";
 import { groupStore } from "../../stores/groupStore";
 import { dateStore } from "../../stores/dateStore";
 import { activeStore } from "../../stores/activeStore";
-import { GroupDateService } from "../../services/GroupDateService";
 import { observer } from "mobx-react";
+import { GroupDateTokenService } from "../../services/GroupDateTokenService";
 
 function WeekHeader({weekParity}: {weekParity: string | null}) {
 
@@ -35,11 +35,11 @@ function WeekHeader({weekParity}: {weekParity: string | null}) {
       </div>
       {activeStore.active === 'planning' &&
       <div className="planning-all-mark planning-all-mark__container">
-        <div onClick={() => GroupDateService.schedulePlanningSETAllFetch(false)} 
+        <div onClick={() => GroupDateTokenService.schedulePlanningSETAllFetch(false)} 
           className="planning-all-mark__button planning-all-mark__button_red">
           Не посещать все пары
         </div>
-        <div onClick={() => GroupDateService.schedulePlanningSETAllFetch(true)} 
+        <div onClick={() => GroupDateTokenService.schedulePlanningSETAllFetch(true)} 
           className="planning-all-mark__button planning-all-mark__button_green">
           Посещать все пары
         </div>

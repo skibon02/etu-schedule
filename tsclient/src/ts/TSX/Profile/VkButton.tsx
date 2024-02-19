@@ -16,8 +16,6 @@ Config.init({
 function VkButton() {
   const [authData, setAuthData] = useState<any | null>(null);
 
-  console.log('ВНИМАНИЕ', authData);
-
   useEffect(() => {
     const vkAuthRedirectURL = currentHost + '/api/auth/redirect';
 

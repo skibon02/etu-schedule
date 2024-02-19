@@ -1,5 +1,5 @@
 import ModalTemplate from "./ModalTemplate";
-import { ResetService } from "../../services/ResetService"
+import { DataFlowService } from "../../services/DataFlowService"
 
 interface DeauthModalProps {
   setShowModal: (value: boolean) => void;
@@ -14,7 +14,7 @@ export default function DeauthModal({setShowModal, showModal}: DeauthModalProps)
       confirmText={'Да'}
       declineText={'Отмена'}
       handleConfirm={() => {
-        ResetService.deauthFetch();
+        DataFlowService.deauthFetch();
         setShowModal(false);
       }}
       handleDecline={() => setShowModal(false)}

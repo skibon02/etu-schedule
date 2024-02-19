@@ -374,6 +374,17 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
   height: pxToEm(12px);
 }
 
+.loader-token {
+  margin-top: pxToEm(5px);
+  margin-right: pxToEm(5px);
+  width: pxToEm(20px);
+  height: pxToEm(20px);
+  border: pxToEm(2px) solid #0b2376; 
+  border-top: pxToEm(2px) solid transparent; 
+  border-radius: 50%; 
+  animation: spin 1s linear infinite; 
+}
+
 .are-you-sure {
   font-size: min(4vmin, 2.5rem) ;
   position: fixed;
@@ -734,6 +745,10 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
     width: pxToEm(17px);
     height: pxToEm(17px);
   }
+
+  .loader-token {
+    font-size: 1.4em;
+  }
 }
 
 @media screen and (max-width: 500px) {
@@ -841,5 +856,9 @@ $BG-INFO: linear-gradient(0deg, rgb(169, 200, 241) 30%, rgb(237, 255, 247) 100%)
     &__image-description-text {
       font-size: 1em;
     }
+  }
+
+  .loader-token {
+    font-size: 1.5em;
   }
 }

@@ -1,4 +1,4 @@
-import { runInAction } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import { UserDataClass, userDataStore } from "../stores/userDataStore";
 import { GroupClass, groupStore } from "../stores/groupStore";
 import { AttendanceTokenClass, attendanceTokenStore } from "../stores/attendanceTokenStore";
@@ -16,6 +16,8 @@ class UserDataGroupTokenClass implements IUserDataGroupTokenService {
     groupStore: GroupClass,
     userDataStore: UserDataClass
   ) {
+    makeAutoObservable(this);
+
     this.userDataGetFetch = this.userDataGetFetch.bind(this);
     
     this.groupStore = groupStore;

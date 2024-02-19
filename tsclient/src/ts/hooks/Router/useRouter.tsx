@@ -4,13 +4,12 @@ import { activeStore } from '../../stores/activeStore';
 import { userDataStore } from '../../stores/userDataStore';
 import { dateStore } from '../../stores/dateStore';
 import { UserDataGroupTokenService } from '../../services/UserDataGroupTokenService';
-import { GroupDateService } from '../../services/GroupDateService';
+import { handleFishEvent, initializeFishMessage } from '../../utils/Router/utils';
+import { GroupDateTokenService } from '../../services/GroupDateTokenService';
 
 export function useRouter() {
   const location = useLocation();
   const navigate = useNavigate();
-
-  const [renderStatus, setRenderStatus] = useState<'loading' | 'notAuth' | 'ready'>('loading');
 
   function setActiveByLocationFx() {
     let loc = location.pathname
@@ -47,43 +46,35 @@ export function useRouter() {
   }
 
   useEffect(() => {
-    userDataStore.vkDataGETFetch();
-    dateStore.semesterGETFetch();
-    const handleFish = (e: any) => {
-      const newElement = document.createElement('div');
-      newElement.className = 'fish-message';
-      newElement.innerHTML = e.detail;
-      document.body.appendChild(newElement);
+    if (userDataStore.vkData === null) {
+      userDataStore.vkDataGETFetch();
+      dateStore.semesterGETFetch();
     }
+    
+    const newElement = initializeFishMessage();
+    let timeoutId: null | NodeJS.Timeout = null;
+  
+    const handleFish = handleFishEvent(newElement, timeoutId);
+  
     window.addEventListener('fish', handleFish);
-    return () => window.removeEventListener('fish', handleFish);
-  }, []);
+  
+    return () => {
+      window.removeEventListener('fish', handleFish);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [userDataStore.vkData]);
 
   useEffect(() => {
     routingFx();
     if (userDataStore.vkData && userDataStore.vkData.is_authorized) {
       UserDataGroupTokenService.userDataGetFetch();
-      GroupDateService.groupNumberIdGetFetch();
+      GroupDateTokenService.groupNumberIdGetFetch();
     }
   }, [userDataStore.vkData]);
 
   useEffect(() => {
     setActiveByLocationFx()
   }, [location]);
-
-  // я не дебил, тут должно быть 2 loading, их не стоит объединять в 1 if
-  useEffect(() => {
-    if (dateStore.semesterStart === null) {
-      setRenderStatus('loading');
-    } else if (userDataStore.vkData === null) {
-      setRenderStatus('loading');
-    } else if (!userDataStore.vkData!.is_authorized) {
-      setRenderStatus('notAuth');
-    } else if (userDataStore.vkData !== null && dateStore.semesterStart !== null) {
-      setRenderStatus('ready');
-    }
-  }, [userDataStore.vkData, dateStore.semesterStart]);
-
-  return { renderStatus };
 }
-

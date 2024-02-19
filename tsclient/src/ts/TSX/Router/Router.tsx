@@ -7,13 +7,14 @@ import NoMatchingRoute from './NoMatchingRoute';
 import Schedule from '../Shedule/Schedule';
 import Loading from './Loading';
 import { observer } from 'mobx-react';
+import { DataFlowService } from '../../services/DataFlowService';
 
 function Router() {
-  const { renderStatus } = useRouter();
+  useRouter();
 
-  if (renderStatus === 'loading') {
+  if (DataFlowService.renderStatus === 'loading') {
     return <Loading />
-  } else if (renderStatus === 'notAuth') {
+  } else if (DataFlowService.renderStatus === 'notAuth') {
     return <Profile />
   } else {
     return (

@@ -13,6 +13,8 @@ export async function makeFetch(url: string, params: RequestInit = {}, onSuccess
     }
   } catch (error) {
     const e = error as Error;
-    console.error(`Failed to fetch on ${url}\nresponse status: ${e.message}`);
+    if (e.message !== 'Unexpected end of JSON input') {
+      console.error(`Failed to fetch on ${url}\nresponse status: ${e.message}`);
+    }
   }
 }

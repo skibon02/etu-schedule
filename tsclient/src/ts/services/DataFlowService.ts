@@ -1,18 +1,19 @@
-import { runInAction } from "mobx";
+import { autorun, makeAutoObservable, runInAction } from "mobx";
 import { UserDataClass, userDataStore } from "../stores/userDataStore";
 import { GroupClass, groupStore } from "../stores/groupStore";
 import { AttendanceTokenClass, attendanceTokenStore } from "../stores/attendanceTokenStore";
 import { DateClass, dateStore } from "../stores/dateStore";
 import { ActiveClass, activeStore } from "../stores/activeStore";
 import { makeFetch } from "../utils/makeFetch";
-import { IResetClass } from "../types/services/ResetServiceTypes";
+import { IDataFlowClass } from "../types/services/DataFlowServcieTypes";
 
-class ResetClass implements IResetClass {
+class DataFlowClass implements IDataFlowClass {
   private userDataStore: UserDataClass;
   private groupStore: GroupClass;
   private attendanceTokenStore: AttendanceTokenClass;
   private dateStore: DateClass;
   private activeStore: ActiveClass;
+  renderStatus: "loading" | "notAuth" | "ready";
 
   constructor(
     userDataStore: UserDataClass,
@@ -21,6 +22,8 @@ class ResetClass implements IResetClass {
     dateStore: DateClass,
     activeStore: ActiveClass
   ) {
+    makeAutoObservable(this);
+
     this.deauthFetch = this.deauthFetch.bind(this);
     this.reset = this.reset.bind(this);
 
@@ -29,18 +32,41 @@ class ResetClass implements IResetClass {
     this.attendanceTokenStore = attendanceTokenStore;
     this.dateStore = dateStore;
     this.activeStore = activeStore;
+    this.renderStatus = "loading";
+
+    autorun(() => {
+      if (this.dateStore.semesterStart === null) {
+        runInAction(() => {
+          this.renderStatus = "loading";
+        })
+      } else if (this.userDataStore.vkData === null) {
+        runInAction(() => {
+          this.renderStatus = "loading";
+        })
+      } else if (!this.userDataStore.vkData.is_authorized) {
+        runInAction(() => {
+          this.renderStatus = "notAuth";
+        })
+      } else if (this.userDataStore.vkData !== null && this.dateStore.semesterStart !== null) {
+        runInAction(() => {
+          this.renderStatus = "ready";
+        })
+      }
+    });
   }
 
   async deauthFetch() {
-    makeFetch(
+    await makeFetch(
       '/api/auth/deauth',
       { method: "POST" },
-      () => {
-        this.reset();
-      },
+      () => {},
       () => {},
       'выйти из профиля'
     )
+    runInAction(() => {
+      this.renderStatus = "loading";
+      this.reset();
+    })
   }
 
   reset(): void {
@@ -54,7 +80,7 @@ class ResetClass implements IResetClass {
   }
 }
 
-const ResetService = new ResetClass(
+const DataFlowService = new DataFlowClass(
   userDataStore,
   groupStore,
   attendanceTokenStore,
@@ -63,5 +89,5 @@ const ResetService = new ResetClass(
 );
 
 export {
-  ResetService
+  DataFlowService
 }

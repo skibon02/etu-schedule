@@ -1,4 +1,4 @@
-import { GroupTokenService } from "../../services/GroupTokenService";
+import { GroupDateTokenService } from "../../services/GroupDateTokenService";
 import { Igroup } from "../../types/stores/GroupTypes";
 import { groupOptionType } from "../../types/tsx/Profile/UserPreferencesTypes";
 
@@ -19,7 +19,7 @@ function groupFilterOptions(option: groupOptionType, value: string) {
 }
 function handleEnterUp(inputV: string, e: React.KeyboardEvent<HTMLInputElement>) {
   if (e.key === 'Enter') {
-    GroupTokenService.attendanceTokenSetFetch(inputV);
+    GroupDateTokenService.attendanceTokenSetFetch(inputV);
   }
 }
 
