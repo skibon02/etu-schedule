@@ -1,30 +1,26 @@
 import { useState, useEffect } from 'react';
 import { Config, Connect, ConnectEvents } from '@vkontakte/superappkit';
 import myfetch from '../../utils/myfetch';
-import { currentHost } from '../../utils/util';
+import { backendHost, currentHost } from '../../utils/util';
 import { userDataStore } from '../../stores/userDataStore';
 import { observer } from 'mobx-react';
 
-// Инициализация конфигурации VK
+if (window.location.pathname === '/api/auth/redirect') {
+  window.location.href = backendHost + '/api/auth/redirect' + window.location.search;
+}
+
 Config.init({
   appId: 51771477, // идентификатор приложения
 });
 
-const SERVER_HOST = currentHost;
-
 function VkButton() {
   const [authData, setAuthData] = useState<any | null>(null);
 
-  // Загрузка данных VK при монтировании компонента
-  useEffect(() => {
-    userDataStore.vkDataGETFetch();
-  }, []);
+  console.log('ВНИМАНИЕ', authData);
 
-  // Обработка данных авторизации VK
   useEffect(() => {
-    const vkAuthRedirectURL = SERVER_HOST + '/api/auth/redirect';
+    const vkAuthRedirectURL = currentHost + '/api/auth/redirect';
 
-    // Функция для обработки событий авторизации
     const handleAuth = (e: any) => {
       const type = e.type;
       if (!type) return;
@@ -45,7 +41,6 @@ function VkButton() {
       }
     };
 
-    // Создание кнопки OneTap VK
     const vkOneTapButton = Connect.buttonOneTapAuth({
       callback: handleAuth,
       options: {
@@ -58,26 +53,14 @@ function VkButton() {
     });
 
     const vkElementDiv = document.getElementById("vk");
+    const frame = vkOneTapButton!.getFrame() as Node;
+    vkElementDiv!.appendChild(frame);
 
-    if (vkElementDiv) {
-      const frame = vkOneTapButton!.getFrame();
-      if (frame) {
-        vkElementDiv.appendChild(frame);
-
-        return () => {
-          if (frame && vkElementDiv.contains(frame)) {
-            vkElementDiv.removeChild(frame);
-          }
-        };
-      } else {
-        console.error('Failed to get frame from vkOneTapButton.');
-      }
-    } else {
-      console.error('Element with ID "vk" was not found in the document.');
-    }
+    return () => {
+      vkElementDiv!.removeChild(frame);
+    };
   }, []);
 
-  // Обработка авторизационных данных
   useEffect(() => {
     async function authorize() {
       if (!authData) return;
@@ -100,6 +83,7 @@ function VkButton() {
     }
 
     authorize();
+    userDataStore.vkDataGETFetch();
   }, [authData]);
 
   return (

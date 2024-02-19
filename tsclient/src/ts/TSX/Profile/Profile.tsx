@@ -10,7 +10,7 @@ import { observer } from "mobx-react";
 function Profile() {
 
   useEffect(() => {
-    if (userDataStore.vkData?.is_authorized) groupStore.groupListGETFetch();
+    if (userDataStore.vkData?.is_authorized && groupStore.groupList === null) groupStore.groupListGETFetch();
   }, [userDataStore.vkData?.is_authorized]);
 
   return (

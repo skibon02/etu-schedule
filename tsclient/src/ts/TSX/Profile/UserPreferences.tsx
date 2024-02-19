@@ -40,7 +40,7 @@ function GroupPreference() {
       <div className="user-preference__title">
         Постоянная группа:
       </div>
-      <div className={attendanceTokenStore.attendanceToken ? "user-preference__value" : "user-preference__value user-preference__value_disabled"}>
+      <div className={!attendanceTokenStore.attendanceToken ? "user-preference__value" : "user-preference__value user-preference__value_disabled"}>
         <Select 
           key={groupStore.groupNumberIdStatus} // !!!
           noOptionsMessage={() => 'Похоже, что такой группы нет'}
@@ -76,14 +76,14 @@ function TokenPreference() {
       <div className="user-preference__value">
         <div className="user-preference__attendance-token-container">
           <input 
-            className={!attendanceTokenStore.attendanceToken && attendanceTokenStore.loadingStatus === 'done' ? "user-preference__input user-preference__input_notification" : "user-preference__input user-preference__input_disabled"}
+            className={!attendanceTokenStore.attendanceToken && attendanceTokenStore.loadingStatus !== 'pending' ? "user-preference__input user-preference__input_notification" : "user-preference__input user-preference__input_disabled"}
             type="text" 
             placeholder='Введите токен'
             disabled={!!attendanceTokenStore.attendanceToken || !attendanceTokenStore.isTokenValid}
             value={attendanceTokenStore.loadingStatus === 'pending' ? 'Загрузка...' : inputV} 
             onChange={(e) => setInputV(e.target.value)}
             onKeyUp={(e) => handleEnterUp(inputV, e)} />
-          {!attendanceTokenStore.attendanceToken && attendanceTokenStore.loadingStatus === 'done' ?
+          {attendanceTokenStore.attendanceToken === null && attendanceTokenStore.loadingStatus !== 'pending' ?
           <div 
             className="user-preference__button user-preference__confirm-button"
             onClick={() => {GroupTokenService.attendanceTokenSetFetch(inputV)}}>
