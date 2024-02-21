@@ -114,7 +114,7 @@ async fn frontend_page(path: PathBuf, _document: DocumentRequest) -> Option<Name
         return None;
     }
 
-    let mut path = PathBuf::from("../client/build");
+    let mut path = PathBuf::from("../tsclient/build");
     path.push("index.html");
     NamedFile::open(path).await.ok()
 }
@@ -416,7 +416,7 @@ pub fn run() -> Rocket<Build> {
         .register("/", catchers![not_found, default_catcher]);
 
     if with_client {
-        rocket.mount("/", FileServer::from("../client/build"))
+        rocket.mount("/", FileServer::from("../tsclient/build"))
     } else {
         rocket
     }
