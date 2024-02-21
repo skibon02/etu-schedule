@@ -256,6 +256,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
 use rocket::serde::json::json;
+use rocket::shield::{Hsts, Shield};
 use std::fs::{File, OpenOptions};
 use std::panic;
 use std::sync::Mutex;
@@ -393,8 +394,10 @@ pub fn run() -> Rocket<Build> {
 
     let with_client = args.contains(&"--with-client".to_string());
     info!("> with client: {}", with_client);
+    let shield = Shield::default().enable(Hsts::default());
     let mut rocket = rocket::custom(figment)
         .attach(Db::init())
+        .attach(shield)
         .attach(AdHoc::try_on_ignite("SQLx Migrations", run_migrations))
         .attach(bg_worker(rx))
         .attach(AdHoc::on_shutdown("Notify shutdown", |_rocket| {
