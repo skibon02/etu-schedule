@@ -73,9 +73,15 @@ export interface IGroupClass {
   schedulePlanningStatus:  'idle' | 'pending' | 'done';
   scheduleDiffs: IscheduleDiffs | null,
   scheduleDiffsStatus:  'idle' | 'pending' | 'done';
+  userNotes: IgetUserNotesResponse | null;
+  userNotesStatus: 'idle' | 'pending' | 'done',
+  groupNotes: IgetGroupNotesResponse | null;
+  groupNotesStatus: 'idle' | 'pending' | 'done',
   schedulePlanningGETFetch(): void,
   scheduleDiffsGETFetch(): void,
   groupListGETFetch(): void,
+  userNotesGETFetch(): void,
+  groupNotesGETFetch(): void,
   reset(): void,
 }
 
@@ -120,3 +126,24 @@ export interface IscheduleDiff {
 export interface IscheduleDiffs {
   [key: number]: IscheduleDiff
 }
+
+
+export interface IgetUserNotesResponse {
+  weeks: Record<number, IUserNotesWeek>; // week number: {weekId: number, userNotes: {time_link_id: note} }
+}
+
+export interface IUserNotesWeek {
+  week_id: number; // week number
+  user_notes: Record<number, string>; // time_link_id: note
+}
+
+export interface IgetGroupNotesResponse {
+  weeks: Record<number, IgroupNotesWeek>; // week number: {weekId: number, userNotes: {time_link_id: note} }
+}
+
+export interface IgroupNotesWeek {
+  week_id: number; // week number
+  group_notes: Record<number, string>; // time_link_id: note
+}
+
+

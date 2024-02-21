@@ -166,28 +166,28 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
-  border-radius: 6px;
+  width: 5px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #888;
-  border-radius: 6px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
-  border-radius: 6px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 6px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-track:hover {
   background: #ddd;
-  border-radius: 6px;
+  border-radius: 3px;
 }
 
 .a {
@@ -255,7 +255,7 @@ body {
 
 .fish-message {
   font-size: 1.3em;
-  position: absolute;
+  position: fixed;
   top: 5em;
   left: 50%;
   width: 37.5em;
@@ -798,6 +798,9 @@ body {
   font-weight: 700;
   margin-bottom: 0.3125em;
 }
+.lesson__teachers {
+  margin-bottom: 0.3125em;
+}
 .lesson__teacher {
   margin-bottom: 0.3125em;
 }
@@ -809,6 +812,135 @@ body {
   -ms-flex-negative: 0;
       flex-shrink: 0;
 }
+.lesson__notes {
+  font-size: 1em;
+  color: #ffffff;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 0.9375em;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+.lesson__note {
+  cursor: pointer;
+  border-radius: 0.3125em;
+  padding: 0.3125em 0.625em;
+  -webkit-transition: all 0.15s ease;
+  transition: all 0.15s ease;
+}
+.lesson__note:hover {
+  -webkit-box-shadow: 0 0 0.3125em rgba(0, 0, 0, 0.2901960784);
+          box-shadow: 0 0 0.3125em rgba(0, 0, 0, 0.2901960784);
+}
+.lesson__note-title {
+  max-width: 16.9375em;
+  height: 1.25em;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.lesson__note-icon {
+  width: 1.25em;
+  height: 1.25em;
+}
+.lesson__note-text {
+  margin-left: 0.3125em;
+}
+.lesson__user-note-icon {
+  background: url("../icons/edit-strong-green.svg") center/100% no-repeat;
+}
+.lesson__group-note-icon {
+  background: url("../icons/edit-strong-orange.svg") center/100% no-repeat;
+}
+.lesson__user-note {
+  background: #44d0ad;
+}
+.lesson__group-note {
+  background: #f69267;
+}
+.lesson__note-editor-description {
+  text-align: center;
+  font-size: 0.9em;
+}
+.lesson__note-editor {
+  margin-top: 0.3125em;
+  max-width: 16.9375em;
+  max-height: 11.25em;
+  overflow-y: auto;
+}
+.lesson__note-editor-buttons {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+}
+.lesson__note-editor-button {
+  width: 7.5em;
+  text-align: center;
+  -webkit-transition: all 0.15s easse;
+  transition: all 0.15s easse;
+  padding: 0.3125em 0.625em;
+  border-radius: 0.625em;
+}
+.lesson__note-editor-button:hover {
+  -webkit-box-shadow: 0 0 0.3125em rgba(0, 0, 0, 0.2901960784);
+          box-shadow: 0 0 0.3125em rgba(0, 0, 0, 0.2901960784);
+}
+.lesson__note-editor-button-confirm {
+  background: #49a495;
+}
+.lesson__note-editor-button-decline {
+  background: rgba(214, 0, 0, 0.9725490196);
+}
+
+.editor-transition-enter {
+  overflow: hidden;
+  max-width: 0;
+  max-height: 0;
+}
+
+.editor-transition-enter-active {
+  max-width: 16.9375em;
+  max-height: 11.25em;
+  -webkit-transition: all 0.15s ease;
+  transition: all 0.15s ease;
+}
+
+.editor-transition-exit {
+  max-width: 16.9375em;
+  max-height: 11.25em;
+}
+
+.editor-transition-exit-active {
+  overflow: hidden;
+  max-width: 0;
+  max-height: 0;
+  -webkit-transition: all 0.15s ease;
+  transition: all 0.15s ease;
+}
+
+.ql-toolbar.ql-snow {
+  border: none !important;
+  border-bottom: 1px solid rgb(65, 65, 65) !important;
+}
+
+.ql-container.ql-snow {
+  border: none !important;
+}
+
+.ql-editor {
+  font-size: 1.2em;
+}
+
 .lesson-type-room {
   font-size: 0.9em;
   display: -webkit-box;
@@ -989,6 +1121,9 @@ body {
   .lesson__time {
     width: 3.75em;
   }
+  .lesson__notes {
+    font-size: 0.9em;
+  }
   .no-schedule {
     font-size: 0.6em;
   }
@@ -1016,10 +1151,25 @@ body {
   .attendance__body_green:hover {
     background: #2DB694;
   }
+  .lesson__about {
+    max-height: 15.625em;
+    max-width: 13.75em;
+  }
+  .lesson__notes {
+    -webkit-transform: scale(0.8) translateX(-14%) translateY(-14%);
+        -ms-transform: scale(0.8) translateX(-14%) translateY(-14%);
+            transform: scale(0.8) translateX(-14%) translateY(-14%);
+  }
+  .lesson__note-editor-description {
+    font-size: 1.1em;
+  }
 }
 @media screen and (max-width: 350px) {
   .lesson__time {
     width: 3.125em;
+  }
+  .lesson__about {
+    max-width: 10.625em;
   }
   .no-schedule {
     font-size: 0.6em;

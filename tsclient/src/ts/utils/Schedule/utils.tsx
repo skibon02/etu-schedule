@@ -141,8 +141,20 @@ function weekHeaderTime(date: Date) {
   return [`${calendarDate}`, `${hours}:${minutes}:${seconds}`];
 }
 
+function truncateString(str: string, pos: number): string {
+  let result = extractTextFromHtml(str);
+  if (result.length > pos) {
+    return result.substring(0, pos - 3) + "...";
+  } else {
+    return result;
+  }
+}
 
-
+function extractTextFromHtml(htmlString: string) {
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = htmlString;
+  return tempDiv.textContent || tempDiv.innerText || "";
+}
 
 export {
   makeTeachers,
@@ -153,4 +165,5 @@ export {
   makeCalendarTime,
   scheduleString,
   weekHeaderTime,
+  truncateString,
 }

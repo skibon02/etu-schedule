@@ -10,29 +10,30 @@ body {
   scroll-behavior: smooth;
 }
 
+
 ::-webkit-scrollbar {
-  width: 10px; 
-  border-radius: 6px;
+  width: 5px; 
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #888; 
-  border-radius: 6px; 
+  border-radius: 3px; 
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555; 
-  border-radius: 6px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-track {
   background: #f1f1f1; 
-  border-radius: 6px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-track:hover {
   background: #ddd; 
-  border-radius: 6px;
+  border-radius: 3px;
 }
 
 .a {
@@ -88,7 +89,7 @@ body {
 
 .fish-message {
   font-size: 1.3em;
-  position: absolute;
+  position: fixed;
   top: pxToEm(80px);
   left: 50%;
   width: pxToEm(600px);

@@ -1,5 +1,5 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import { IGroupClass, IGroupSchedule, Igroup, IscheduleDiff, IscheduleDiffs, parsedSchedule } from "../types/stores/GroupTypes";
+import { IGroupClass, IGroupSchedule, IgetGroupNotesResponse, IgetUserNotesResponse, Igroup, IscheduleDiff, IscheduleDiffs, parsedSchedule } from "../types/stores/GroupTypes";
 import { makeFetch } from "../utils/makeFetch";
 
 export class GroupClass implements IGroupClass {
@@ -16,6 +16,10 @@ export class GroupClass implements IGroupClass {
   scheduleDiffsStatus:  'idle' | 'pending' | 'done';
   groupList: Igroup[] | null;
   groupListStatus:  'idle' | 'pending' | 'done';
+  userNotes: IgetUserNotesResponse | null;
+  userNotesStatus: 'idle' | 'pending' | 'done';
+  groupNotes: IgetGroupNotesResponse | null;
+  groupNotesStatus: 'idle' | 'pending' | 'done';
 
   constructor() {
     makeAutoObservable(this);
@@ -23,6 +27,8 @@ export class GroupClass implements IGroupClass {
     this.scheduleDiffsGETFetch = this.scheduleDiffsGETFetch.bind(this);
     this.schedulePlanningGETFetch = this.schedulePlanningGETFetch.bind(this);
     this.groupListGETFetch = this.groupListGETFetch.bind(this);
+    this.userNotesGETFetch = this.userNotesGETFetch.bind(this);
+    this.groupNotesGETFetch = this.groupNotesGETFetch.bind(this);
     this.reset = this.reset.bind(this);
 
     this.groupNumber = null;
@@ -38,6 +44,10 @@ export class GroupClass implements IGroupClass {
     this.scheduleDiffsStatus = 'idle';
     this.groupList = null;
     this.groupListStatus = 'idle';
+    this.userNotes = null;
+    this.userNotesStatus = 'idle';
+    this.groupNotes = null;
+    this.groupNotesStatus = 'idle';
   }
 
   async scheduleDiffsGETFetch() {
@@ -92,6 +102,42 @@ export class GroupClass implements IGroupClass {
     )
   }
 
+  async userNotesGETFetch() {
+    runInAction(() => {
+      this.userNotesStatus = 'pending';
+    })
+    makeFetch(
+      '/api/notes/user',
+      {},
+      (d: IgetUserNotesResponse) => {
+        runInAction(() => {
+          this.userNotes = d;
+          this.userNotesStatus = 'done';
+        })
+      },
+      () => {},
+      'получения заметок пользователя'
+    )
+  }
+
+  async groupNotesGETFetch() {
+    runInAction(() => {
+      this.groupNotesStatus = 'pending';
+    })
+    makeFetch(
+      '/api/notes/group',
+      {},
+      (d: IgetGroupNotesResponse) => {
+        runInAction(() => {
+          this.groupNotes = d;
+          this.groupNotesStatus = 'done';
+        })
+      },
+      () => {},
+      'получения заметок группы'
+    )
+  }
+
   reset() {
     runInAction(() => {
       this.groupNumber = null;
@@ -107,6 +153,10 @@ export class GroupClass implements IGroupClass {
       this.scheduleDiffsStatus = 'idle';
       this.groupList = null;
       this.groupListStatus = 'idle';
+      this.userNotes = null;
+      this.userNotesStatus = 'idle';
+      this.groupNotes = null;
+      this.groupNotesStatus = 'idle';
     })
   }
 }

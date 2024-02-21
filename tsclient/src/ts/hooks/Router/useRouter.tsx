@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { activeStore } from '../../stores/activeStore';
 import { userDataStore } from '../../stores/userDataStore';
@@ -6,10 +6,13 @@ import { dateStore } from '../../stores/dateStore';
 import { UserDataGroupTokenService } from '../../services/UserDataGroupTokenService';
 import { handleFishEvent, initializeFishMessage } from '../../utils/Router/utils';
 import { GroupDateTokenService } from '../../services/GroupDateTokenService';
+import { useOnlineStatus } from '../useOnlineStatus';
+import { DataFlowService } from '../../services/DataFlowService';
 
 export function useRouter() {
   const location = useLocation();
   const navigate = useNavigate();
+  const online = useOnlineStatus();
 
   function setActiveByLocationFx() {
     let loc = location.pathname
@@ -45,13 +48,7 @@ export function useRouter() {
     }
   }
 
-  useEffect(() => {
-    if (userDataStore.vkData === null) {
-      userDataStore.vkDataGETFetch();
-      dateStore.semesterGETFetch();
-    }
-    
-    const newElement = initializeFishMessage();
+  useEffect(() => {const newElement = initializeFishMessage();
     let timeoutId: null | NodeJS.Timeout = null;
   
     const handleFish = handleFishEvent(newElement, timeoutId);
@@ -64,15 +61,30 @@ export function useRouter() {
         clearTimeout(timeoutId);
       }
     };
-  }, [userDataStore.vkData]);
+  }, []);
 
   useEffect(() => {
+    if (userDataStore.vkData === null) {
+      userDataStore.vkDataGETFetch();
+      dateStore.semesterGETFetch();
+    }
     routingFx();
     if (userDataStore.vkData && userDataStore.vkData.is_authorized) {
       UserDataGroupTokenService.userDataGetFetch();
       GroupDateTokenService.groupNumberIdGetFetch();
     }
   }, [userDataStore.vkData]);
+
+  useEffect(() => {
+    if (online) {
+      UserDataGroupTokenService.userDataGetFetch();
+      GroupDateTokenService.groupNumberIdGetFetch();
+    } else {
+      const userDescription = `Похоже, что вы не в сети. Рекомендуем перезагрузить страницу.`;
+      const event = new CustomEvent('fish', { detail: userDescription });
+      window.dispatchEvent(event);
+    }
+  }, [online]);
 
   useEffect(() => {
     setActiveByLocationFx()

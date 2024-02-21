@@ -2,7 +2,7 @@ import { makeAutoObservable } from "mobx";
 import { IActiveClass } from "../types/stores/ActiveTypes";
 
 export class ActiveClass implements IActiveClass {
-  active: "profile" | "schedule" | "planning" = 'profile';
+  active: "profile" | "schedule" | "planning";
 
   constructor() {
     makeAutoObservable(this);
@@ -28,7 +28,7 @@ export class ActiveClass implements IActiveClass {
   }
 
   reset() {
-    this.active = 'profile';
+    // this.active = 'profile';
   }
 }
 

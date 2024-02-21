@@ -1,5 +1,5 @@
 import { computed, makeAutoObservable, runInAction } from "mobx";
-import { IuserDataClass, IfullNameEnabled, IvkData } from "../types/stores/UserDataTypes"
+import { IuserDataClass, IfullNameEnabled, IvkData, } from "../types/stores/UserDataTypes"
 import { makeFetch } from "../utils/makeFetch";
 
 export class UserDataClass implements IuserDataClass {
@@ -7,6 +7,7 @@ export class UserDataClass implements IuserDataClass {
   userId: number | null;
   leaderForGroup: number | null;
   vkData: IvkData | null;
+  activeSubjectId: number;
 
   constructor() {
     makeAutoObservable(this);
@@ -15,6 +16,7 @@ export class UserDataClass implements IuserDataClass {
     this.fullNameEnabledShort = this.fullNameEnabledShort.bind(this);
     this.userDataSETFetch = this.userDataSETFetch.bind(this);
     this.vkDataGETFetch = this.vkDataGETFetch.bind(this);
+    this.setActiveSubjectId = this.setActiveSubjectId.bind(this);
     this.reset = this.reset.bind(this);
 
     this.fullNameEnabled = {
@@ -24,6 +26,7 @@ export class UserDataClass implements IuserDataClass {
     this.userId = null;
     this.leaderForGroup = null;
     this.vkData = null;
+    this.activeSubjectId = 0;
   }
 
   async userDataSETFetch() {
@@ -55,6 +58,12 @@ export class UserDataClass implements IuserDataClass {
     )
   }
 
+  setActiveSubjectId(subjectId: number): void {
+    runInAction(() => {
+      this.activeSubjectId = subjectId;
+    })
+  }
+
   fullNameEnabledAuto(): void {
     runInAction(() => {
       this.fullNameEnabled.label = 'Авто';
@@ -80,6 +89,7 @@ export class UserDataClass implements IuserDataClass {
       this.userId = null;
       this.leaderForGroup = null;
       this.vkData = null;
+      this.activeSubjectId = 0;
     })
   }
 }

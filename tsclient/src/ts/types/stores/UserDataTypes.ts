@@ -18,10 +18,13 @@ export interface IuserDataClass {
   userId: number | null,
   vkData: null | IvkData,
   leaderForGroup: number | null,
+  activeSubjectId: number;
+  setActiveSubjectId: (subjectId: number) => void;
   fullNameEnabledAuto(): void,
   fullNameEnabledShort(): void,
   userDataSETFetch(): void,
   vkDataGETFetch(): void,
   reset(): void,
 }
+
 

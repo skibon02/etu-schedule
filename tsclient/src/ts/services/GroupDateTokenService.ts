@@ -20,6 +20,10 @@ class GroupDateTokenServiceClass implements IGroupDateTokenService {
     this.groupNumberIdGetFetch = this.groupNumberIdGetFetch.bind(this);
     this.groupScheduleGetFetch = this.groupScheduleGetFetch.bind(this);
     this.attendanceTokenSetFetch = this.attendanceTokenSetFetch.bind(this);
+    this.userNoteDELETEFetch = this.userNoteDELETEFetch.bind(this);
+    this.groupNoteDELETEFetch = this.groupNoteDELETEFetch.bind(this);
+    this.userNoteSETFetch = this.userNoteSETFetch.bind(this);
+    this.groupNoteSETFetch = this.groupNoteSETFetch.bind(this);
 
     this.dateStore = dateStore; 
     this.groupStore = groupStore; 
@@ -40,8 +44,10 @@ class GroupDateTokenServiceClass implements IGroupDateTokenService {
           this.groupStore.groupId = groupId;
           this.groupStore.groupNumber = groupNumber;
           this.groupScheduleGetFetch(groupId);
-          this.groupStore.scheduleDiffsGETFetch();
           this.groupStore.schedulePlanningGETFetch();
+          this.groupStore.scheduleDiffsGETFetch();
+          this.groupStore.userNotesGETFetch();
+          this.groupStore.groupNotesGETFetch();
           this.groupStore.groupNumberIdStatus = 'done';
         });
       },
@@ -61,8 +67,10 @@ class GroupDateTokenServiceClass implements IGroupDateTokenService {
             this.groupStore.groupId = d.current_group.group_id;
             this.groupStore.groupNumber = d.current_group.number;
             this.groupScheduleGetFetch(d.current_group.group_id);
-            this.groupStore.scheduleDiffsGETFetch();
             this.groupStore.schedulePlanningGETFetch();
+            this.groupStore.scheduleDiffsGETFetch();
+            this.groupStore.userNotesGETFetch();
+            this.groupStore.groupNotesGETFetch();
           }
           this.groupStore.groupNumberIdStatus = 'done';
         })
@@ -181,8 +189,10 @@ class GroupDateTokenServiceClass implements IGroupDateTokenService {
             this.groupStore.groupId = d.new_group_id;
             this.groupStore.groupNumber = d.new_group_name;
             this.groupScheduleGetFetch(d.new_group_id!);
-            this.groupStore.scheduleDiffsGETFetch();
             this.groupStore.schedulePlanningGETFetch();
+            this.groupStore.scheduleDiffsGETFetch();
+            this.groupStore.userNotesGETFetch();
+            this.groupStore.groupNotesGETFetch();
           }
           this.AttendanceTokenStore.loadingStatus = 'done';
         })
@@ -215,6 +225,102 @@ class GroupDateTokenServiceClass implements IGroupDateTokenService {
       ),
       () => {},
       'установить токен'
+    )
+  }
+
+  async userNoteDELETEFetch(time_link_id: number) {
+    runInAction(() => {
+      this.groupStore.userNotesStatus = 'pending';
+    })
+    await makeFetch(
+      '/api/notes/user',
+      {
+        body: JSON.stringify({
+          schedule_obj_time_link_id: time_link_id,
+          week_num: this.dateStore.weekNumber,
+        }),
+        method: "DELETE",
+      },
+      () => {
+        runInAction(() => {
+          this.groupStore.userNotesStatus = 'done';
+        })
+      },
+      () => {},
+      'удалить заметку'
+    )
+  }
+
+  async groupNoteDELETEFetch(time_link_id: number) {
+    runInAction(() => {
+      this.groupStore.groupNotesStatus = 'pending';
+    })
+    await makeFetch(
+      '/api/notes/group',
+      {
+        body: JSON.stringify({
+          schedule_obj_time_link_id: time_link_id,
+          week_num: this.dateStore.weekNumber,
+        }),
+        method: "DELETE",
+      },
+      () => {
+        runInAction(() => {
+          this.groupStore.groupNotesStatus = 'done';
+        })
+      },
+      () => {},
+      'удалить заметку'
+    )
+  }
+
+  async userNoteSETFetch(time_link_id: number, text: string) {
+    runInAction(() => {
+      this.groupStore.userNotesStatus = 'pending';
+    })
+    await makeFetch(
+      '/api/notes/user/create_update',
+      {
+        body: JSON.stringify({
+          schedule_obj_time_link_id: time_link_id,
+          week_num: this.dateStore.weekNumber,
+          text: text,
+        }),
+        method: "POST",
+      },
+      () => {
+        runInAction(() => {
+          this.groupStore.userNotesStatus = 'done';
+          this.groupStore.userNotesGETFetch();
+        })
+      },
+      () => {},
+      'сохранить заметку пользователя'
+    )
+  }
+
+  async groupNoteSETFetch(time_link_id: number, text: string) {
+    runInAction(() => {
+      this.groupStore.groupNotesStatus = 'pending';
+    })
+    await makeFetch(
+      '/api/notes/group/create_update',
+      {
+        body: JSON.stringify({
+          schedule_obj_time_link_id: time_link_id,
+          week_num: this.dateStore.weekNumber,
+          text: text,
+        }),
+        method: "POST",
+      },
+      () => {
+        runInAction(() => {
+          this.groupStore.groupNotesStatus = 'done';
+          this.groupStore.groupNotesGETFetch();
+        })
+      },
+      () => {},
+      'сохранить заметку группы'
     )
   }
 }

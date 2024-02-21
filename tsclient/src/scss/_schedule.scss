@@ -217,6 +217,7 @@
   }
 
   &__teachers {
+    margin-bottom: pxToEm(5px);
   }
 
   &__teacher {
@@ -234,6 +235,129 @@
 
   &__attendance {
   }
+
+  &__notes {
+    font-size: 1em;
+    color: #ffffff;
+    user-select: none;
+    display: flex;
+    gap: pxToEm(15px);
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  &__note {
+    cursor: pointer;
+    border-radius: pxToEm(5px);
+    padding: pxToEm(5px) pxToEm(10px);
+    transition: all 0.15s ease;
+
+    &:hover {
+      box-shadow: 0 0 pxToEm(5px, ) #0000004a;
+    }
+  }
+
+  &__note-title {
+    max-width: pxToEm(271px, );
+    height: pxToEm(20px, );
+    display: flex;
+  }
+
+  &__note-icon {
+    width: pxToEm(20px);
+    height: pxToEm(20px);
+  }
+
+  &__note-text {
+    margin-left: pxToEm(5px);
+  }
+
+  &__user-note-icon {
+    background: url('../icons/edit-strong-green.svg') center / 100% no-repeat;
+  }
+
+  &__group-note-icon {
+    background: url('../icons/edit-strong-orange.svg') center / 100% no-repeat;
+  }
+
+  &__user-note {
+    background: #44d0ad;
+    // color: #008967;
+  }
+
+  &__group-note {
+    background: #f69267;
+    // color: #c03a00;
+  }
+
+  &__note-editor-description {
+    text-align: center;
+    font-size: 0.9em;
+  }
+
+  &__note-editor {
+    margin-top: pxToEm(5px);
+    max-width: pxToEm(271px, );
+    max-height: pxToEm(180px, );
+    overflow-y: auto;
+  }
+
+  &__note-editor-buttons {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  &__note-editor-button {
+    width: pxToEm(120px, );
+    text-align: center;
+    transition: all .15s easse;
+    padding: pxToEm(5px, ) pxToEm(10px, );
+    border-radius: pxToEm(10px, );
+
+    &:hover {
+      box-shadow: 0 0 pxToEm(5px, ) #0000004a;
+    }
+  }
+
+  &__note-editor-button-confirm {
+    background: #49a495;
+  }
+
+  &__note-editor-button-decline {
+    background: #d60000f8;
+  }
+}
+
+.editor-transition-enter {
+  overflow: hidden;
+  max-width: 0;
+  max-height: 0;
+}
+.editor-transition-enter-active {
+  max-width: pxToEm(271px, );
+  max-height: pxToEm(180px, );
+  transition: all .15s ease;
+}
+.editor-transition-exit {
+  max-width: pxToEm(271px, );
+  max-height: pxToEm(180px, );
+}
+.editor-transition-exit-active {
+  overflow: hidden;
+  max-width: 0;
+  max-height: 0;
+  transition: all .15s ease;
+}
+
+.ql-toolbar.ql-snow{
+  border: none !important;
+  border-bottom: 1px solid rgb(65, 65, 65) !important;
+}
+.ql-container.ql-snow {
+  border: none !important;
+}
+.ql-editor {
+  font-size: 1.2em;
 }
 
 .lesson-type-room {
@@ -399,6 +523,10 @@
     &__time {
       width: pxToEm(60px, );
     }
+
+    &__notes {
+      font-size: 0.9em;
+    }
   }
   .no-schedule {
     font-size: 0.6em;
@@ -435,12 +563,30 @@
       }
     }
   }
+  .lesson {
+    &__about {
+      max-height: pxToEm(250px, );
+      max-width: pxToEm(220px, );
+    }
+
+    &__notes {
+      transform: scale(0.8) translateX(-14%) translateY(-14%);
+    }
+
+    &__note-editor-description {
+      font-size: 1.1em;
+    }
+  }
 }
 
 @media screen and (max-width: 350px) {
   .lesson {
     &__time {
       width: pxToEm(50px, );
+    }
+
+    &__about {
+      max-width: pxToEm(170px, );
     }
   }
 

@@ -92,7 +92,6 @@ function parseDays(week: IScheduleObject[], dayOfWeek: string, date: Date, curre
   }
 }
 
-
 function sortScheduleByLesson(scheduleObjectI: IScheduleObject, scheduleObjectJ: IScheduleObject): number {
   return (
     +scheduleObjectI.auditorium_reservation.time 
