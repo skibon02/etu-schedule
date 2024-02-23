@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 export function useOnlineStatus() {
   const [isOnline, setIsOnline] = useState(true);
+  console.log('online:', isOnline);
   useEffect(() => {
     function handleOnline() {
       setIsOnline(true);
@@ -11,7 +12,6 @@ export function useOnlineStatus() {
     }
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-    console.log('online:', isOnline);
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);

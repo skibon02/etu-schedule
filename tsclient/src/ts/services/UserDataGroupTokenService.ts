@@ -26,6 +26,10 @@ class UserDataGroupTokenClass implements IUserDataGroupTokenService {
   }
 
   async userDataGetFetch() {
+    runInAction(() => {
+      this.attendanceTokenStore.loadingStatus = 'pending';
+      this.groupStore.groupNumberIdStatus = 'pending';
+    })
     makeFetch(
       '/api/user/get_data',
       {},
@@ -55,6 +59,9 @@ class UserDataGroupTokenClass implements IUserDataGroupTokenService {
   
           // attendanceToken
           this.attendanceTokenStore.attendanceToken = d.attendance_token;
+
+          this.attendanceTokenStore.loadingStatus = 'done';
+          this.groupStore.groupNumberIdStatus = 'done';
         })
       },
       () => {},

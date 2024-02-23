@@ -67,7 +67,7 @@ function TextEditorTemplate({disabledEditor, inCSST, setActiveModal, text, setTe
     <CSSTransition in={inCSST} timeout={150} classNames={'editor-transition'} unmountOnExit>
       <div className="editor-transition">
         <div className="lesson__note-editor" >
-          <div className="lesson__note-editor-description">Заметки {desc === 'user' ? 'пользователя' : 'группы'}</div>
+          <div className="lesson__note-editor-description">Заметка {desc === 'user' ? 'пользователя' : 'группы'}</div>
           <QuillEditor disabledEditor={disabledEditor} text={text} setText={setText} bgColor={bgColor} />
           <div className="lesson__note-editor-buttons">
             {(desc === 'user' || desc === 'group' && !disabledEditor) &&

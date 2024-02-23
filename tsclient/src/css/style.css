@@ -886,8 +886,8 @@ body {
 .lesson__note-editor-button {
   width: 7.5em;
   text-align: center;
-  -webkit-transition: all 0.15s easse;
-  transition: all 0.15s easse;
+  -webkit-transition: all 0.15s ease;
+  transition: all 0.15s ease;
   padding: 0.3125em 0.625em;
   border-radius: 0.625em;
 }
@@ -1151,14 +1151,25 @@ body {
   .attendance__body_green:hover {
     background: #2DB694;
   }
-  .lesson__about {
-    max-height: 15.625em;
-    max-width: 13.75em;
+  .lesson .quill {
+    max-width: 15em;
   }
-  .lesson__notes {
-    -webkit-transform: scale(0.8) translateX(-14%) translateY(-14%);
-        -ms-transform: scale(0.8) translateX(-14%) translateY(-14%);
-            transform: scale(0.8) translateX(-14%) translateY(-14%);
+  .lesson .ql-editor {
+    font-size: 0.9em;
+  }
+  .lesson__note-title {
+    font-size: 1.2em;
+    overflow: hidden;
+  }
+  .lesson__note-editor-button {
+    font-size: 0.85em;
+    width: 7.5em;
+    padding: 0.3125em 0.625em;
+    border-radius: 0.625em;
+  }
+  .lesson__note-editor-button:hover {
+    -webkit-box-shadow: 0 0 0.3125em rgba(0, 0, 0, 0.2901960784);
+            box-shadow: 0 0 0.3125em rgba(0, 0, 0, 0.2901960784);
   }
   .lesson__note-editor-description {
     font-size: 1.1em;

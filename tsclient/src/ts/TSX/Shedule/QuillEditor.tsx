@@ -19,7 +19,7 @@ const QuillEditor = ({disabledEditor, text, setText, bgColor}: {disabledEditor: 
       ['bold', 'italic', 'underline'], // жирный, курсив, подчеркивание, зачеркивание
       [{'list': 'ordered'}], // списки
       // [{'list': 'ordered'}, {'list': 'bullet'}], // списки
-      [{'size': ['small', false, 'large']}], // размер шрифта
+      // [{'size': ['small', false, 'large']}], // размер шрифта
     ],
   };
 
@@ -28,8 +28,8 @@ const QuillEditor = ({disabledEditor, text, setText, bgColor}: {disabledEditor: 
       ref={quillRef}
       readOnly={disabledEditor}
       style={{
-        height: '100%', 
-        width: '100%',
+        // height: '100%', 
+        // width: '100%',
         borderRadius: '5px',
         backgroundColor: bgColor,
     }} value={text} onChange={setText} modules={modules} />

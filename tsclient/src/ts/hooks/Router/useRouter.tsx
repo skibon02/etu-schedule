@@ -7,6 +7,8 @@ import { UserDataGroupTokenService } from '../../services/UserDataGroupTokenServ
 import { handleFishEvent, initializeFishMessage } from '../../utils/Router/utils';
 import { GroupDateTokenService } from '../../services/GroupDateTokenService';
 import { useOnlineStatus } from '../useOnlineStatus';
+import { groupStore } from '../../stores/groupStore';
+import { attendanceTokenStore } from '../../stores/attendanceTokenStore';
 
 export function useRouter() {
   const location = useLocation();
@@ -75,10 +77,14 @@ export function useRouter() {
   }, [userDataStore.vkData]);
 
   useEffect(() => {
-    if (online) {
+    if (online && userDataStore.userId !== null && groupStore.scheduleDiffs !== null && groupStore.schedulePlanning !== null && groupStore.userNotes !== null && groupStore.groupNotes !== null && attendanceTokenStore.attendanceToken !== null) {
       UserDataGroupTokenService.userDataGetFetch();
-      GroupDateTokenService.groupNumberIdGetFetch();
-    } else {
+      // GroupDateTokenService.groupNumberIdGetFetch();
+      groupStore.userNotesGETFetch();
+      groupStore.groupNotesGETFetch();
+      groupStore.scheduleDiffsGETFetch();
+      groupStore.schedulePlanningGETFetch();
+    } else if (!online) {
       const userDescription = `Похоже, что вы не в сети. Рекомендуем перезагрузить страницу.`;
       const event = new CustomEvent('fish', { detail: userDescription });
       window.dispatchEvent(event);

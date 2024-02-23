@@ -153,7 +153,26 @@ function truncateString(str: string, pos: number): string {
 function extractTextFromHtml(htmlString: string) {
   const tempDiv = document.createElement("div");
   tempDiv.innerHTML = htmlString;
-  return tempDiv.textContent || tempDiv.innerText || "";
+  
+  function recursiveExtract(node: Node) {
+    let text = '';
+    
+    for (const child of node.childNodes) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        text += child.textContent;
+      } else if (child instanceof HTMLElement) {
+        if (['P', 'DIV', 'BR'].includes(child.tagName)) {
+          text += ' ' + recursiveExtract(child) + ' ';
+        } else {
+          text += recursiveExtract(child);
+        }
+      }
+    }
+
+    return text;
+  }
+
+  return recursiveExtract(tempDiv).trim();
 }
 
 export {

@@ -310,7 +310,7 @@
   &__note-editor-button {
     width: pxToEm(120px, );
     text-align: center;
-    transition: all .15s easse;
+    transition: all .15s ease;
     padding: pxToEm(5px, ) pxToEm(10px, );
     border-radius: pxToEm(10px, );
 
@@ -565,12 +565,35 @@
   }
   .lesson {
     &__about {
-      max-height: pxToEm(250px, );
-      max-width: pxToEm(220px, );
+      // max-height: pxToEm(250px, );
+    }
+
+    .quill {
+      max-width: pxToEm(240px, );
+    }
+
+    .ql-editor {
+      font-size: 0.9em;
+    }
+
+    &__note-title {
+      font-size: 1.2em;
+      overflow: hidden;
     }
 
     &__notes {
-      transform: scale(0.8) translateX(-14%) translateY(-14%);
+      // transform: scale(0.8) translateX(-14%) translateY(-14%);
+    }
+
+    &__note-editor-button {
+      font-size: 0.85em;
+      width: pxToEm(120px, );
+      padding: pxToEm(5px, ) pxToEm(10px, );
+      border-radius: pxToEm(10px, );
+  
+      &:hover {
+        box-shadow: 0 0 pxToEm(5px, ) #0000004a;
+      }
     }
 
     &__note-editor-description {
@@ -584,6 +607,10 @@
     &__time {
       width: pxToEm(50px, );
     }
+
+    // .quill {
+    //   width: pxToEm(170px, );
+    // }
 
     &__about {
       max-width: pxToEm(170px, );
