@@ -882,6 +882,7 @@ body {
   display: flex;
   -ms-flex-pack: distribute;
       justify-content: space-around;
+  gap: 0.3125em;
 }
 .lesson__note-editor-button {
   width: 7.5em;

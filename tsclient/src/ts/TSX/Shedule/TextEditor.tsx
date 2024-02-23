@@ -55,11 +55,11 @@ function TextEditorTemplate({disabledEditor, inCSST, setActiveModal, text, setTe
     }
 
     window.addEventListener('keyup', handleKeyUp);
-    window.addEventListener('click', handleClickOutside);
+    window.addEventListener('mousedown', handleClickOutside);
 
     return () => {
       window.removeEventListener('keyup', handleKeyUp);
-      window.removeEventListener('click', handleClickOutside);
+      window.removeEventListener('mousedown', handleClickOutside);
     }
   }, []);
 

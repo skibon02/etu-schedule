@@ -305,6 +305,7 @@
   &__note-editor-buttons {
     display: flex;
     justify-content: space-around;
+    gap: pxToEm(5px, );
   }
 
   &__note-editor-button {
