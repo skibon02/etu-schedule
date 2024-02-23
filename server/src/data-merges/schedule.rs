@@ -1,11 +1,11 @@
 use crate::data_merges::MergeResult;
 use crate::models;
 use crate::models::schedule::{
-    get_active_schedule_for_group_with_subject, ScheduleObjModel, WeekDay,
+    get_cur_schedule_for_group_with_subject, ScheduleObjModel, ScheduleObjModelNormalized, WeekDay,
 };
 use anyhow::Context;
 use sqlx::PgConnection;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 async fn get_new_link_id(con: &mut PgConnection) -> anyhow::Result<i32> {
     let res: Option<i32> =
@@ -43,7 +43,7 @@ async fn create_new_gen(con: &mut PgConnection, gen_id: i32, group_id: i32) -> a
 /// last gen id is used to reuse single new generation across merges
 async fn single_schedule_obj_group_merge(
     group_id: i32,
-    input_schedule_objs: &Vec<ScheduleObjModel>,
+    input_schedule_objs: &Vec<ScheduleObjModelNormalized>,
     subject_id: i32,
     last_gen_id: i32,
     con: &mut PgConnection,
@@ -54,11 +54,12 @@ async fn single_schedule_obj_group_merge(
     //check for unique position condition
     let mut unique_positions = BTreeMap::<(WeekDay, String, i32), i32>::new();
     for input_sched_obj in &input_schedule_objs {
+        let sched_obj = &input_sched_obj.schedule_object;
         *unique_positions
             .entry((
-                input_sched_obj.week_day,
-                input_sched_obj.week_parity.clone(),
-                input_sched_obj.time,
+                sched_obj.week_day,
+                sched_obj.week_parity.clone(),
+                sched_obj.time,
             ))
             .or_default() += 1;
     }
@@ -72,7 +73,7 @@ async fn single_schedule_obj_group_merge(
     }
 
     let mut existing_sched_objs =
-        get_active_schedule_for_group_with_subject(con, group_id, subject_id).await?;
+        get_cur_schedule_for_group_with_subject(con, group_id, subject_id).await?;
 
     trace!("group_id: {}, subject_id: {}", group_id, subject_id);
     trace!(
@@ -90,30 +91,49 @@ async fn single_schedule_obj_group_merge(
     let latest_teachers_gen = models::teachers::get_teachers_cur_gen(con).await?;
 
     //try to link by schedule_obj_id or get_lesson_pos
-    for input_sched_obj in &input_schedule_objs {
+    for ScheduleObjModelNormalized {
+        schedule_object: input_sched_obj,
+        teachers: input_sched_obj_teachers,
+    } in &input_schedule_objs
+    {
+        let input_schedule_obj_teachers: BTreeSet<_> = input_sched_obj_teachers.iter().collect();
+        let input_schedule_obj_auditoriums: BTreeSet<_> = input_sched_obj
+            .auditorium
+            .clone()
+            .map(|a| a.split(',').map(|s| s.trim().to_string()).collect())
+            .unwrap_or_default();
         trace!(
             "Searching link for input schedule object: {}",
             input_sched_obj.last_known_orig_sched_obj_id
         );
         let mut found = false;
-        for existing_sched_obj in &mut existing_sched_objs {
+        for ScheduleObjModelNormalized {
+            schedule_object: existing_sched_obj,
+            teachers: existing_sched_obj_teachers,
+        } in &mut existing_sched_objs
+        {
+            let existing_sched_obj_teachers: BTreeSet<_> =
+                existing_sched_obj_teachers.iter().collect();
+            let existing_sched_obj_auditoriums: BTreeSet<_> = existing_sched_obj
+                .auditorium
+                .clone()
+                .map(|a| a.split(',').map(|s| s.trim().to_string()).collect())
+                .unwrap_or_default();
             if input_sched_obj.get_lesson_pos() == existing_sched_obj.get_lesson_pos() {
                 found = true;
 
                 // process diff and update
                 let mut diff = false;
 
-                if input_sched_obj.teacher_id != existing_sched_obj.teacher_id
-                    || input_sched_obj.second_teacher_id != existing_sched_obj.second_teacher_id
-                    || input_sched_obj.third_teacher_id != existing_sched_obj.third_teacher_id
-                    || input_sched_obj.fourth_teacher_id != existing_sched_obj.fourth_teacher_id
-                    || input_sched_obj.auditorium != existing_sched_obj.auditorium
+                if input_schedule_obj_teachers != existing_sched_obj_teachers
+                    || input_schedule_obj_auditoriums != existing_sched_obj_auditoriums
                     || input_sched_obj.get_lesson_pos() != existing_sched_obj.get_lesson_pos()
                 {
                     diff = true;
                 }
 
                 if diff {
+                    // update
                     debug!("Detected diff in schedule object, updating...");
 
                     // invalidate old sched_obj (update gen_id)
@@ -133,18 +153,42 @@ async fn single_schedule_obj_group_merge(
                     .context("Failed to invalidate old schedule object")?;
 
                     // insert new object
-                    sqlx::query!("INSERT INTO schedule_objs \
+                    let schedule_obj_id: i32 = sqlx::query_scalar!(
+                        "INSERT INTO schedule_objs \
             (last_known_orig_sched_obj_id, group_id, time_link_id, subject_id, subject_gen_id,\
-            teacher_id, teacher_gen_id, second_teacher_id, third_teacher_id, fourth_teacher_id, auditorium,\
+            teacher_gen_id, auditorium,\
             time, week_day, week_parity, gen_start, existence_diff) \
             VALUES\
             ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, \
-            $11, $12, $13, $14, $15, $16)",
-                        input_sched_obj.last_known_orig_sched_obj_id, group_id, existing_sched_obj.time_link_id, subject_id, latest_subject_gen,
-                        input_sched_obj.teacher_id, latest_teachers_gen, input_sched_obj.second_teacher_id, input_sched_obj.third_teacher_id, input_sched_obj.fourth_teacher_id, input_sched_obj.auditorium.clone(),
-                        input_sched_obj.time, input_sched_obj.week_day as WeekDay, input_sched_obj.week_parity.clone(), new_gen_id, "changed")
+            $11, $12) RETURNING schedule_obj_id",
+                        input_sched_obj.last_known_orig_sched_obj_id,
+                        group_id,
+                        existing_sched_obj.time_link_id,
+                        subject_id,
+                        latest_subject_gen,
+                        latest_teachers_gen,
+                        input_sched_obj.auditorium.clone(),
+                        input_sched_obj.time,
+                        input_sched_obj.week_day as WeekDay,
+                        input_sched_obj.week_parity.clone(),
+                        new_gen_id,
+                        "changed"
+                    )
+                    .fetch_one(&mut *con)
+                    .await
+                    .context("Failed to insert new schedule object")?;
+
+                    // insert new teachers
+                    for teacher_id in input_sched_obj_teachers {
+                        sqlx::query!(
+                            "INSERT INTO schedule_objs_teachers (schedule_obj_id, teacher_id) VALUES ($1, $2)",
+                            schedule_obj_id,
+                            teacher_id
+                        )
                         .execute(&mut *con)
-                        .await.context("Failed to insert new schedule object")?;
+                        .await
+                        .context("Failed to insert new schedule object teachers")?;
+                    }
 
                     info!(
                         "Schedule object [CHANGED]: ({}): {} week {}:{}",
@@ -200,18 +244,30 @@ async fn single_schedule_obj_group_merge(
 
             create_new_gen(con, new_gen_id, group_id).await?;
 
-            sqlx::query!("INSERT INTO schedule_objs \
+            let schedule_obj_id: i32 = sqlx::query_scalar!(
+                "INSERT INTO schedule_objs \
             (last_known_orig_sched_obj_id, group_id, time_link_id, subject_id, subject_gen_id,\
-            teacher_id, teacher_gen_id, second_teacher_id, third_teacher_id, fourth_teacher_id, auditorium,\
+            teacher_gen_id, auditorium,\
             time, week_day, week_parity, gen_start, existence_diff) \
             VALUES\
             ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, \
-            $11, $12, $13, $14, $15, $16)",
-                input_sched_obj.last_known_orig_sched_obj_id, group_id, new_link_id, subject_id, latest_subject_gen,
-                input_sched_obj.teacher_id, latest_teachers_gen, input_sched_obj.second_teacher_id, input_sched_obj.third_teacher_id, input_sched_obj.fourth_teacher_id, input_sched_obj.auditorium.clone(),
-                input_sched_obj.time, input_sched_obj.week_day as WeekDay, input_sched_obj.week_parity.clone(), new_gen_id, "new")
-                .execute(&mut *con)
-                .await.context("Failed to insert new schedule object")?;
+            $11, $12) RETURNING schedule_obj_id",
+                input_sched_obj.last_known_orig_sched_obj_id,
+                group_id,
+                new_link_id,
+                subject_id,
+                latest_subject_gen,
+                latest_teachers_gen,
+                input_sched_obj.auditorium.clone(),
+                input_sched_obj.time,
+                input_sched_obj.week_day as WeekDay,
+                input_sched_obj.week_parity.clone(),
+                new_gen_id,
+                "new"
+            )
+            .fetch_one(&mut *con)
+            .await
+            .context("Failed to insert new schedule object")?;
             info!(
                 "Schedule object [INSERTED]: ({}): {} week {}:{}",
                 input_sched_obj.last_known_orig_sched_obj_id,
@@ -220,6 +276,18 @@ async fn single_schedule_obj_group_merge(
                 input_sched_obj.time
             );
 
+            // insert new teachers
+            for teacher_id in input_sched_obj_teachers {
+                sqlx::query!(
+                    "INSERT INTO schedule_objs_teachers (schedule_obj_id, teacher_id) VALUES ($1, $2)",
+                    schedule_obj_id,
+                    teacher_id
+                )
+                .execute(&mut *con)
+                .await
+                .context("Failed to insert new schedule object teachers")?;
+            }
+
             res.push(MergeResult::Inserted);
         }
     }
@@ -227,7 +295,9 @@ async fn single_schedule_obj_group_merge(
     for existing_sched_obj in existing_sched_objs {
         let mut found = false;
         for input_sched_obj in &mut input_schedule_objs {
-            if input_sched_obj.get_lesson_pos() == existing_sched_obj.get_lesson_pos() {
+            if input_sched_obj.schedule_object.get_lesson_pos()
+                == existing_sched_obj.schedule_object.get_lesson_pos()
+            {
                 found = true;
                 break;
             }
@@ -236,7 +306,9 @@ async fn single_schedule_obj_group_merge(
             // invalidate old sched_obj (update gen_id)
             info!(
                 "Invalidating old schedule object: {}",
-                existing_sched_obj.last_known_orig_sched_obj_id
+                existing_sched_obj
+                    .schedule_object
+                    .last_known_orig_sched_obj_id
             );
 
             let new_gen_id = last_gen_id + 1;
@@ -247,7 +319,7 @@ async fn single_schedule_obj_group_merge(
             gen_end = $1 \
             WHERE schedule_obj_id = $2 AND gen_end IS NULL",
                 new_gen_id,
-                existing_sched_obj.schedule_obj_id
+                existing_sched_obj.schedule_object.schedule_obj_id
             )
             .execute(&mut *con)
             .await
@@ -262,7 +334,7 @@ async fn single_schedule_obj_group_merge(
 
 pub async fn schedule_objs_merge(
     group_id: i32,
-    schedule_objs: &Vec<ScheduleObjModel>,
+    schedule_objs: &Vec<ScheduleObjModelNormalized>,
     con: &mut PgConnection,
 ) -> anyhow::Result<()> {
     let group_name = models::groups::get_group(con, group_id)
@@ -277,13 +349,13 @@ pub async fn schedule_objs_merge(
         group_id, group_name
     );
     let start = std::time::Instant::now();
-    let mut subj_id_to_sched_objs: std::collections::HashMap<i32, Vec<ScheduleObjModel>> =
+    let mut subj_id_to_sched_objs: std::collections::HashMap<i32, Vec<ScheduleObjModelNormalized>> =
         std::collections::HashMap::new();
 
     // group by subject id
     for sched_obj in schedule_objs {
         subj_id_to_sched_objs
-            .entry(sched_obj.subject_id)
+            .entry(sched_obj.schedule_object.subject_id)
             .or_default()
             .push(sched_obj.clone());
     }
@@ -344,7 +416,7 @@ pub async fn schedule_objs_merge(
     }
 
     // phase 2. invalidate removed subjects
-    let active_subjects = models::schedule::get_active_subjects_for_group(con, group_id)
+    let active_subjects = models::schedule::get_cur_subjects_for_group(con, group_id)
         .await
         .context("Failed to fetch existing schedule objects")?;
     for active_subject in active_subjects {

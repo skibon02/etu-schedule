@@ -49,7 +49,7 @@ pub async fn periodic_schedule_merge_task(
         );
         if let Err(e) = process_schedule_merge(groups, &mut *con).await {
             error!(
-                "PERIODIC_MERGE_TASK: Failed to merge groups: {}. Skipping",
+                "PERIODIC_MERGE_TASK: Failed to merge groups: {:?}. Skipping",
                 e
             );
             if fail_detector.failure() {
@@ -73,14 +73,14 @@ pub async fn periodic_schedule_merge_task(
     loop {
         let Ok(group_id_range) = models::groups::get_oldest_group_id_list(con, 30)
             .await
-            .map_err(|e| warn!("PERIODIC_MERGE_TASK: Failed to get group id list: {}", e))
+            .map_err(|e| warn!("PERIODIC_MERGE_TASK: Failed to get group id list: {:?}", e))
         else {
             continue;
         };
 
         if let Err(e) = process_schedule_merge(group_id_range, con).await {
             error!(
-                "PERIODIC_MERGE_TASK: Failed to merge groups: {}. Skipping",
+                "PERIODIC_MERGE_TASK: Failed to merge groups: {:?}. Skipping",
                 e
             );
             if fail_detector.failure() {

@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::ops::DerefMut;
 
 use rocket::Route;
@@ -6,7 +6,7 @@ use rocket_db_pools::Connection;
 
 use crate::api::etu_attendance_api::SemesterInfo;
 use crate::bg_workers::{MERGE_REQUEST_CHANNEL, MERGE_REQUEST_CNT};
-use crate::models::schedule::ScheduleObjModel;
+use crate::models::schedule::{ScheduleObjModel, ScheduleObjModelNormalized};
 use crate::models::subjects::SubjectModel;
 use crate::models::teachers::TeacherModel;
 use crate::models::Db;
@@ -86,65 +86,39 @@ impl From<(TeacherModel, Vec<String>)> for OutputTeacherModel {
 pub struct OutputScheduleObjectModel {
     auditorium_reservation: OutputAuditoriumReservationModel,
     subject: OutputSubjectModel,
-    teacher: Option<OutputTeacherModel>,
-    second_teacher: Option<OutputTeacherModel>,
-    third_teacher: Option<OutputTeacherModel>,
-    fourth_teacher: Option<OutputTeacherModel>,
+    teachers: Vec<OutputTeacherModel>,
     id: i32,
     time_link_id: i32,
 }
 
 impl TryInto<OutputScheduleObjectModel>
     for (
-        ScheduleObjModel,
+        ScheduleObjModelNormalized,
         &BTreeMap<i32, SubjectModel>,
         &BTreeMap<i32, (TeacherModel, Vec<String>)>,
     )
 {
     type Error = String;
     fn try_into(self) -> Result<OutputScheduleObjectModel, String> {
-        let sched_model = self.0;
+        let sched_model = self.0.schedule_object;
         let subject = self
             .1
             .get(&sched_model.subject_id)
             .ok_or("Subject not found!".to_string())?;
 
-        let first_teacher = match sched_model.teacher_id {
-            Some(id) => Some(
+        let teachers = self
+            .0
+            .teachers
+            .iter()
+            .filter_map(|id| {
                 self.2
-                    .get(&id)
+                    .get(id)
                     .cloned()
-                    .ok_or(format!("Teacher {} not found!", id))?,
-            ),
-            None => None,
-        };
-        let second_teacher = match sched_model.second_teacher_id {
-            Some(id) => Some(
-                self.2
-                    .get(&id)
-                    .cloned()
-                    .ok_or(format!("Teacher {} not found!", id))?,
-            ),
-            None => None,
-        };
-        let third_teacher = match sched_model.third_teacher_id {
-            Some(id) => Some(
-                self.2
-                    .get(&id)
-                    .cloned()
-                    .ok_or(format!("Teacher {} not found!", id))?,
-            ),
-            None => None,
-        };
-        let fourth_teacher = match sched_model.fourth_teacher_id {
-            Some(id) => Some(
-                self.2
-                    .get(&id)
-                    .cloned()
-                    .ok_or(format!("Teacher {} not found!", id))?,
-            ),
-            None => None,
-        };
+                    .map(|t| t.into())
+                    .ok_or(format!("Teacher {} not found!", id))
+                    .ok()
+            })
+            .collect();
 
         Ok(OutputScheduleObjectModel {
             auditorium_reservation: OutputAuditoriumReservationModel {
@@ -161,10 +135,7 @@ impl TryInto<OutputScheduleObjectModel>
                 control_type: subject.control_type.clone(),
                 department_id: subject.department_id,
             },
-            teacher: first_teacher.map(|t| t.into()),
-            second_teacher: second_teacher.map(|t| t.into()),
-            third_teacher: third_teacher.map(|t| t.into()),
-            fourth_teacher: fourth_teacher.map(|t| t.into()),
+            teachers,
             id: sched_model.schedule_obj_id,
             time_link_id: sched_model.time_link_id,
         })
@@ -191,7 +162,7 @@ async fn get_group_schedule_objects(
     match last_merge_time {
         Some(time) => {
             let sched_objects =
-                models::schedule::get_active_schedule_for_group(con.deref_mut(), group_id).await?;
+                models::schedule::get_cur_schedule_for_group(con.deref_mut(), group_id).await?;
             let subjects =
                 models::subjects::get_subjects_for_group(con.deref_mut(), group_id).await?;
             let subjects_map: BTreeMap<i32, SubjectModel> = subjects

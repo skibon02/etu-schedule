@@ -8,7 +8,8 @@ globally rework timeouts for reqwests
 attendance checkout feedback:
 check validity for attendance check system
 
+keep semester start/end cached info during runtime
 
-Create error/panic notifiers +
+full anyhow error trace with contexts
 
-log to separate directory, categorize by launch date +
+get rid of unnamed tuples

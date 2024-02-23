@@ -1,5 +1,7 @@
 pub mod periodic_schedule_merge;
+
 pub use periodic_schedule_merge::*;
+use std::collections::btree_map::Entry;
 pub mod priority_schedule_merge;
 pub use priority_schedule_merge::*;
 pub mod attendance_keep_alive;
@@ -15,7 +17,7 @@ use std::time::Instant;
 use crate::api::etu_api;
 use crate::data_merges;
 use crate::models::groups::DepartmentModel;
-use crate::models::schedule::ScheduleObjModel;
+use crate::models::schedule::{ScheduleObjModel, ScheduleObjModelNormalized};
 use crate::models::subjects::{get_subjects_cur_gen, SubjectModel};
 use crate::models::teachers::{get_teachers_cur_gen, TeacherModel};
 
@@ -42,7 +44,7 @@ async fn process_schedule_merge(
     //TODO: parallelize with rayon
     for (group_id, sched_objs) in sched_objs {
         info!("BGTASK: Starting merge for group id {}", group_id);
-        let mut sched_objs_models: Vec<ScheduleObjModel> = Vec::new();
+        let mut sched_objs_models: Vec<ScheduleObjModelNormalized> = Vec::new();
         let mut subjects: BTreeMap<i32, Vec<SubjectModel>> = BTreeMap::new();
         let mut departments: Vec<DepartmentModel> = Vec::new();
         let mut teachers: BTreeMap<i32, (TeacherModel, Vec<String>)> = BTreeMap::new();
@@ -55,21 +57,20 @@ async fn process_schedule_merge(
                 .push(sched_obj_orig.lesson.subject.clone().into());
             departments.push(sched_obj_orig.lesson.subject.department.into());
 
-            if let Some(teacher) = sched_obj_orig.lesson.teacher {
-                let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
-                teachers.insert(teacher_model.0.teacher_id, teacher_model);
-            }
-            if let Some(teacher) = sched_obj_orig.lesson.second_teacher {
-                let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
-                teachers.insert(teacher_model.0.teacher_id, teacher_model);
-            }
-            if let Some(teacher) = sched_obj_orig.lesson.third_teacher {
-                let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
-                teachers.insert(teacher_model.0.teacher_id, teacher_model);
-            }
-            if let Some(teacher) = sched_obj_orig.lesson.fourth_teacher {
-                let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
-                teachers.insert(teacher_model.0.teacher_id, teacher_model);
+            if let Some(combined_teachers) = sched_obj_orig.lesson.combined_teachers {
+                for teacher in combined_teachers {
+                    let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
+                    teachers.insert(teacher_model.0.teacher_id, teacher_model);
+                }
+            } else {
+                if let Some(teacher) = sched_obj_orig.lesson.teacher {
+                    let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
+                    teachers.insert(teacher_model.0.teacher_id, teacher_model);
+                }
+                if let Some(teacher) = sched_obj_orig.lesson.second_teacher {
+                    let teacher_model: (TeacherModel, Vec<String>) = teacher.into();
+                    teachers.insert(teacher_model.0.teacher_id, teacher_model);
+                }
             }
         }
         for department in departments {

@@ -1,9 +1,12 @@
 use rocket::time::PrimitiveDateTime;
+use std::collections::BTreeSet;
 
 use sqlx::PgConnection;
 
 use crate::models;
+use crate::models::groups::GroupModel;
 use crate::models::subjects::SubjectModel;
+use crate::models::teachers::TeacherModel;
 use crate::models::DbResult;
 
 #[derive(sqlx::Type, Default, Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
@@ -94,11 +97,7 @@ pub struct ScheduleObjModel {
 
     pub subject_id: i32,
     pub subject_gen_id: i32,
-    pub teacher_id: Option<i32>,
     pub teacher_gen_id: Option<i32>,
-    pub second_teacher_id: Option<i32>,
-    pub third_teacher_id: Option<i32>,
-    pub fourth_teacher_id: Option<i32>,
 
     pub auditorium: Option<String>,
     pub created_timestamp: PrimitiveDateTime,
@@ -112,6 +111,12 @@ pub struct ScheduleObjModel {
     pub gen_start: i32,
     pub gen_end: Option<i32>,
     pub existence_diff: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct ScheduleObjModelNormalized {
+    pub schedule_object: ScheduleObjModel,
+    pub teachers: Vec<i32>,
 }
 
 impl ScheduleObjModel {
@@ -134,7 +139,7 @@ pub struct ScheduleGenerationModel {
     pub group_id: i32,
 }
 
-pub async fn get_active_subjects_for_group(
+pub async fn get_cur_subjects_for_group(
     con: &mut PgConnection,
     group_id: i32,
 ) -> DbResult<Vec<SubjectModel>> {
@@ -152,13 +157,13 @@ pub async fn get_active_subjects_for_group(
     Ok(res.into_iter().collect())
 }
 
-pub async fn get_active_schedule_for_group(
+pub async fn get_cur_schedule_for_group(
     con: &mut PgConnection,
     group_id: i32,
-) -> DbResult<Vec<ScheduleObjModel>> {
+) -> DbResult<Vec<ScheduleObjModelNormalized>> {
     let res = sqlx::query_as!(ScheduleObjModel,
         "SELECT week_day as \"week_day: WeekDay\", auditorium, created_timestamp, modified_timestamp,
-            existence_diff, teacher_id, second_teacher_id, third_teacher_id, fourth_teacher_id,
+            existence_diff,
             teacher_gen_id, subject_id, subject_gen_id, gen_end, gen_start, schedule_obj_id,
             group_id, prev_time_link_id, time_link_id, last_known_orig_sched_obj_id,
             time, week_parity FROM schedule_objs WHERE group_id = $1 and gen_end IS NULL",
@@ -166,10 +171,34 @@ pub async fn get_active_schedule_for_group(
     )
         .fetch_all(&mut *con).await?;
 
+    let teachers = sqlx::query!(
+        r#"SELECT schedule_objs_teachers.* from schedule_objs_teachers JOIN schedule_objs
+        ON schedule_objs.schedule_obj_id = schedule_objs_teachers.schedule_obj_id
+        WHERE schedule_objs.group_id = $1 and schedule_objs.gen_end IS NULL"#,
+        group_id
+    )
+    .fetch_all(&mut *con)
+    .await?;
+
+    let res = res
+        .into_iter()
+        .map(|x| {
+            let teachers = teachers
+                .iter()
+                .filter(|t| t.schedule_obj_id == x.schedule_obj_id)
+                .map(|t| t.teacher_id)
+                .collect();
+            ScheduleObjModelNormalized {
+                schedule_object: x,
+                teachers,
+            }
+        })
+        .collect();
+
     Ok(res)
 }
 
-pub async fn get_active_schedule_link_ids(
+pub async fn get_cur_schedule_link_ids(
     con: &mut PgConnection,
     group_id: i32,
 ) -> DbResult<Vec<i32>> {
@@ -189,20 +218,45 @@ pub async fn get_active_schedule_link_ids(
     Ok(res)
 }
 
-pub async fn get_active_schedule_for_group_with_subject(
+pub async fn get_cur_schedule_for_group_with_subject(
     con: &mut PgConnection,
     group_id: i32,
     subject_id: i32,
-) -> DbResult<Vec<ScheduleObjModel>> {
+) -> DbResult<Vec<ScheduleObjModelNormalized>> {
     let res = sqlx::query_as!(ScheduleObjModel,
             r#"SELECT week_day as "week_day: WeekDay", auditorium, created_timestamp, modified_timestamp,
-            existence_diff, teacher_id, second_teacher_id, third_teacher_id, fourth_teacher_id,
-            teacher_gen_id, subject_id, subject_gen_id, gen_end, gen_start, schedule_obj_id,
-            group_id, prev_time_link_id, time_link_id, last_known_orig_sched_obj_id,
-            time, week_parity FROM schedule_objs WHERE group_id = $1 and gen_end IS NULL and subject_id = $2"#,
+            existence_diff, teacher_gen_id, subject_id, subject_gen_id,
+             gen_end, gen_start, schedule_obj_id, group_id, prev_time_link_id, 
+             time_link_id, last_known_orig_sched_obj_id, time, week_parity 
+             FROM schedule_objs WHERE group_id = $1 and gen_end IS NULL and subject_id = $2"#,
             group_id, subject_id)
         .fetch_all(&mut *con).await?;
 
+    let teachers = sqlx::query!(
+        r#"SELECT schedule_objs_teachers.* from schedule_objs_teachers JOIN schedule_objs
+        ON schedule_objs.schedule_obj_id = schedule_objs_teachers.schedule_obj_id
+        WHERE schedule_objs.group_id = $1 and schedule_objs.gen_end IS NULL
+        AND subject_id = $2"#,
+        group_id,
+        subject_id
+    )
+    .fetch_all(&mut *con)
+    .await?;
+
+    let res = res
+        .into_iter()
+        .map(|x| {
+            let teachers = teachers
+                .iter()
+                .filter(|t| t.schedule_obj_id == x.schedule_obj_id)
+                .map(|t| t.teacher_id)
+                .collect();
+            ScheduleObjModelNormalized {
+                schedule_object: x,
+                teachers,
+            }
+        })
+        .collect();
     Ok(res)
 }
 
@@ -242,7 +296,7 @@ pub async fn is_time_link_id_valid_for_group(
     group_id: i32,
 ) -> DbResult<TimeLinkValidResult> {
     // get user group link_id elements
-    let schedule_link_ids = models::schedule::get_active_schedule_link_ids(con, group_id).await;
+    let schedule_link_ids = models::schedule::get_cur_schedule_link_ids(con, group_id).await;
 
     if let Err(e) = schedule_link_ids {
         error!("Failed to get user group schedule link ids: {:?}", e);

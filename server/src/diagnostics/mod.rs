@@ -11,15 +11,19 @@ pub enum EventType {
 }
 
 lazy_static! {
-    static ref VK_DIAG_TOKEN: String = File::open("vk_notifier_token.txt")
-        .unwrap()
-        .bytes()
-        .map(|x| x.unwrap() as char)
-        .collect();
+    static ref VK_DIAG_TOKEN: Option<String> =
+        File::open("vk_notifier_token.txt").ok().map(|mut f| {
+            let mut s = String::new();
+            f.read_to_string(&mut s).unwrap();
+            s
+        });
 }
 
 pub static PEER_ID: u32 = 274525427;
 pub fn send_vk_message(source: EventType, msg: &str) {
+    let Some(vk_token) = VK_DIAG_TOKEN.clone() else {
+        return;
+    };
     let emoji = match source {
         EventType::ErrorMessage => "🔴",
         EventType::PanicMessage => "🔥🔥🔥",
@@ -37,7 +41,7 @@ pub fn send_vk_message(source: EventType, msg: &str) {
     thread::spawn(|| {
         let rt = tokio::runtime::Runtime::new().unwrap();
         rt.block_on(async {
-            api::vk_api::send_message(VK_DIAG_TOKEN.clone(), PEER_ID, msg).await;
+            api::vk_api::send_message(vk_token, PEER_ID, msg).await;
         });
     });
 }
