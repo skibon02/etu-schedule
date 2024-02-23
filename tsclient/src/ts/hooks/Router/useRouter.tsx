@@ -7,7 +7,6 @@ import { UserDataGroupTokenService } from '../../services/UserDataGroupTokenServ
 import { handleFishEvent, initializeFishMessage } from '../../utils/Router/utils';
 import { GroupDateTokenService } from '../../services/GroupDateTokenService';
 import { useOnlineStatus } from '../useOnlineStatus';
-import { DataFlowService } from '../../services/DataFlowService';
 
 export function useRouter() {
   const location = useLocation();
