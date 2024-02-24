@@ -6,6 +6,7 @@ import { ISubjectProps } from "../../types/tsx/Schedule/SubjectTypes";
 import { ObsGroupEditor, ObsUserEditor } from "./TextEditor";
 import Attendance from "./Attendance";
 import PlanningSwitch from "../Planning/PlanningSwitch";
+import { userDataStore } from "../../stores/userDataStore";
 
 function Subject({subjectData, orderNumber, planning_time_link_id_value, schedule_diffs_value}: ISubjectProps) {
   const { lessonStart, lessonEnd, lessonName, lessonType, teachers, time_link_id, roomName, isDead, 
@@ -48,6 +49,7 @@ function Subject({subjectData, orderNumber, planning_time_link_id_value, schedul
               </div>
               <ObsUserEditor time_link_id={subjectData.time_link_id} activeModal={activeModal} setActiveModal={setActiveModal} text={userText} setText={setUserText} />
             </div>
+            {userDataStore.leaderForGroup || truncateString(groupText, 12) !== '' &&
             <div className="lesson__group-note lesson__note" onClick={handleGroupNoteClick}>
               <div className="lesson__note-title" onClick={handleGroupNoteTitleClick}>
                 <div className="lesson__group-note-icon lesson__note-icon"></div>
@@ -55,6 +57,7 @@ function Subject({subjectData, orderNumber, planning_time_link_id_value, schedul
               </div>
               <ObsGroupEditor time_link_id={subjectData.time_link_id} activeModal={activeModal} setActiveModal={setActiveModal} text={groupText} setText={setGroupText} />
             </div>
+            }
           </div>
           }
         </div>

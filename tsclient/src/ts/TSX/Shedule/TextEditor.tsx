@@ -32,16 +32,16 @@ function TextEditorTemplate({disabledEditor, inCSST, setActiveModal, text, setTe
 
   useEffect(() => {
     textCacheRef.current = textCache;
-  }, [textCache]);
+    textRef.current = text;
+  }, [textCache, text]);
 
   useEffect(() => {
+    if (!inCSST) {
+      return;
+    }
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as Element;
-
-      if (target.classList.contains('lesson__note-editor-button-confirm')) {
-        handleConfirm(e, textRef.current);
-      }
-
+      
       if (!(target.closest('.lesson__user-note') || target.closest('.lesson__group-note')) || target.classList.contains('lesson__note-editor-button-decline')) {
         handleDecline(e, textCacheRef.current);
       }
@@ -61,7 +61,7 @@ function TextEditorTemplate({disabledEditor, inCSST, setActiveModal, text, setTe
       window.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('mousedown', handleClickOutside);
     }
-  }, []);
+  }, [inCSST]);
 
   return (
     <CSSTransition in={inCSST} timeout={150} classNames={'editor-transition'} unmountOnExit>

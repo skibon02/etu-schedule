@@ -10,11 +10,6 @@ export function makeUsableSchedule(scheduleObject: IScheduleObjectExtended, full
   const id = scheduleObject.id;
   const time_link_id = scheduleObject.time_link_id;
 
-  let firstTeacher = scheduleObject.teacher; 
-  let secondTeacher = scheduleObject.second_teacher;
-  let thirdTeacher = scheduleObject.third_teacher;
-  let fourthTeacher = scheduleObject.fourth_teacher;
-
   let title = subject.title;
   let shortTitle = subject.short_title;
   const subjectType = subject.subject_type;
@@ -27,12 +22,6 @@ export function makeUsableSchedule(scheduleObject: IScheduleObjectExtended, full
     title = shortTitle;
   }
 
-  let teachers: ITeacherInfo[] = [];
-  makeTeacher(firstTeacher, teachers);
-  makeTeacher(secondTeacher, teachers);
-  makeTeacher(thirdTeacher, teachers);
-  makeTeacher(fourthTeacher, teachers);
-
   const time = auditoriumReservation.time;
   const weekDay = auditoriumReservation.week_day;
 
@@ -40,6 +29,8 @@ export function makeUsableSchedule(scheduleObject: IScheduleObjectExtended, full
   if (auditoriumReservation !== null) {
     number = auditoriumReservation.auditorium_number;
   }
+
+  const teachers = scheduleObject.teachers;
 
   return {
     title,
@@ -52,17 +43,6 @@ export function makeUsableSchedule(scheduleObject: IScheduleObjectExtended, full
     id,
     time_link_id,
   };
-}
-
-function makeTeacher(teacher: ITeacher | undefined, teachers: ITeacherInfo[]): void {
-  if (teacher) {
-    teachers.push({
-      id: teacher.id, 
-      name: teacher.name, 
-      surname: teacher.surname, 
-      midname: teacher.midname
-    });
-  }
 }
 
 function parseWeek(scheduleObjects: IScheduleObject[], weekParity: string): IScheduleObject[] {

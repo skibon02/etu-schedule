@@ -35,8 +35,8 @@ export function useAttendance(schedule_diffs_value: null | boolean, planning_tim
       }
       setNeedToShow(!needToShow);
       setInit(p => !p);
+      GroupDateTokenService.scheduleDiffsSETFetch(time_link_id, !init)
     }
-    GroupDateTokenService.scheduleDiffsSETFetch(time_link_id, !init)
   }
 
   function handleMessageClick() {

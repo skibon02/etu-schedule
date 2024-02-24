@@ -39,10 +39,7 @@ export interface ITeacher {
 export interface IScheduleObject {
   auditorium_reservation: IAuditoriumReservation,
   subject: ISubject,
-  teacher?: ITeacher,
-  second_teacher?: ITeacher,
-  third_teacher?: ITeacher,
-  fourth_teacher?: ITeacher,
+  teachers: ITeacher[],
   id: number,
   time_link_id: number,
 }
