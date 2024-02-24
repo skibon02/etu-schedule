@@ -259,8 +259,9 @@
 
   &__note-title {
     max-width: pxToEm(271px, );
-    height: pxToEm(20px, );
+    height: pxToEm(25px, );
     display: flex;
+    border-bottom: .1px solid #ffffff;
   }
 
   &__note-icon {
@@ -580,6 +581,7 @@
     &__note-title {
       font-size: 1.2em;
       overflow: hidden;
+      max-width: pxToEm(220px, );
     }
 
     &__notes {

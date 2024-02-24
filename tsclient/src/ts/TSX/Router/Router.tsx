@@ -1,13 +1,13 @@
+import { observer } from 'mobx-react';
 import { Route, Routes } from 'react-router-dom';
 import { useRouter } from '../../hooks/Router/useRouter';
+import { DataFlowService } from '../../services/DataFlowService';
 import Header from "../Header/Header";
 import Planning from "../Planning/Planning";
 import Profile from "../Profile/Profile";
 import NoMatchingRoute from './NoMatchingRoute';
 import Schedule from '../Shedule/Schedule';
 import Loading from './Loading';
-import { observer } from 'mobx-react';
-import { DataFlowService } from '../../services/DataFlowService';
 
 function Router() {
   useRouter();

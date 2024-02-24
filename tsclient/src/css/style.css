@@ -842,10 +842,11 @@ body {
 }
 .lesson__note-title {
   max-width: 16.9375em;
-  height: 1.25em;
+  height: 1.5625em;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  border-bottom: 0.1px solid #ffffff;
 }
 .lesson__note-icon {
   width: 1.25em;
@@ -1161,6 +1162,7 @@ body {
   .lesson__note-title {
     font-size: 1.2em;
     overflow: hidden;
+    max-width: 13.75em;
   }
   .lesson__note-editor-button {
     font-size: 0.85em;

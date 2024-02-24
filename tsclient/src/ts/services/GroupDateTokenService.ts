@@ -291,7 +291,11 @@ class GroupDateTokenServiceClass implements IGroupDateTokenService {
       () => {
         runInAction(() => {
           this.groupStore.userNotesStatus = 'done';
-          this.groupStore.userNotesGETFetch();
+          if (this.groupStore.userNotes !== null) {
+            this.groupStore.userNotes.weeks[this.dateStore.weekNumber].user_notes[time_link_id] = text;
+          } else {
+            this.groupStore.userNotesGETFetch();
+          }
         })
       },
       () => {},
@@ -316,7 +320,11 @@ class GroupDateTokenServiceClass implements IGroupDateTokenService {
       () => {
         runInAction(() => {
           this.groupStore.groupNotesStatus = 'done';
-          this.groupStore.groupNotesGETFetch();
+          if (this.groupStore.groupNotes !== null) {
+            this.groupStore.groupNotes.weeks[this.dateStore.weekNumber].group_notes[time_link_id] = text;
+          } else {
+            this.groupStore.groupNotesGETFetch();
+          }
         })
       },
       () => {},

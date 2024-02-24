@@ -1,5 +1,5 @@
 import { dateStore } from "../../stores/dateStore";
-import { IUsableSchedule, IScheduleObjectExtended, ITeacherInfo, ITeacher, IScheduleObject, IGroupSchedule } from "../../types/stores/GroupTypes";
+import { IUsableSchedule, IScheduleObjectExtended, IScheduleObject, IGroupSchedule } from "../../types/stores/GroupTypes";
 
 export const WEEK_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
