@@ -60,15 +60,15 @@ pub async fn get_teachers_for_group(
     group_id: i32,
 ) -> DbResult<Vec<TeacherModel>> {
     let res = sqlx::query_as!(TeacherModel,
-        "SELECT * FROM teachers WHERE teachers.teacher_id IN (
-            SELECT DISTINCT schedule_objs_teachers.teacher_id FROM schedule_objs_teachers 
+        "SELECT DISTINCT teachers.* FROM teachers join schedule_objs_teachers
+            ON schedule_objs_teachers.teacher_id = teachers.teacher_id 
             JOIN schedule_objs ON schedule_objs_teachers.schedule_obj_id = schedule_objs.schedule_obj_id
             WHERE teachers.gen_start <= schedule_objs.teacher_gen_id 
             AND (teachers.gen_end IS null OR teachers.gen_end > schedule_objs.teacher_gen_id) 
-            AND schedule_objs.gen_end IS NULL and schedule_objs.group_id = $1
-        )",
+            AND schedule_objs.gen_end IS NULL and schedule_objs.group_id = $1",
         group_id)
         .fetch_all(&mut *con).await.context("Failed to get group current first teachers")?;
+
 
     Ok(res)
 }
