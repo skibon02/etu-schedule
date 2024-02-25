@@ -20,7 +20,9 @@ function Planning() {
     }, 100);
   }, []);
 
-  if (groupStore.groupNumberIdStatus !== 'done' || groupStore.groupScheduleStatus !== 'done' || groupStore.schedulePlanningStatus !== 'done' && groupStore.schedulePlanning === null) {
+  if (groupStore.groupNumberIdStatus !== 'done') {
+    return <NoSchedule description="loading" />
+  } else if (groupStore.groupId !== null &&  (groupStore.groupScheduleStatus !== 'done' || groupStore.schedulePlanningStatus !== 'done' && groupStore.schedulePlanning === null || groupStore.scheduleDiffsStatus !== 'done' && groupStore.scheduleDiffs === null)) {
     return <NoSchedule description="loading" />
   } else if (groupStore.groupNumberIdStatus === 'done' && groupStore.groupId === null) {
     return <NoSchedule description="noGroupChosen" />
