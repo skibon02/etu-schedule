@@ -329,6 +329,9 @@
     background: #d60000f8;
   }
 }
+.quill {
+  user-select: text;
+}
 
 .editor-transition-enter {
   overflow: hidden;
