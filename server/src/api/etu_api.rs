@@ -9,7 +9,6 @@ use crate::models::subjects::SubjectModel;
 use crate::models::teachers::TeacherModel;
 
 use itertools::Itertools;
-use rocket::http::ext::IntoCollection;
 use rocket::time::PrimitiveDateTime;
 
 const BASE_URL_SCHEDULE: &str = "https://digital.etu.ru/api/schedule/";

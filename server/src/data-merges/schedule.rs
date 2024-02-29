@@ -1,7 +1,7 @@
 use crate::data_merges::MergeResult;
 use crate::models;
 use crate::models::schedule::{
-    get_cur_schedule_for_group_with_subject, ScheduleObjModel, ScheduleObjModelNormalized, WeekDay,
+    get_cur_schedule_for_group_with_subject, ScheduleObjModelNormalized, WeekDay,
 };
 use anyhow::Context;
 use sqlx::PgConnection;

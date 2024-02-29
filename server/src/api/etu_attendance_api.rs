@@ -247,7 +247,7 @@ pub async fn get_current_user(token: String) -> anyhow::Result<GetCurrentUserRes
     }
 }
 
-#[derive(serde::Deserialize, Debug, serde::Serialize)]
+#[derive(serde::Deserialize, Debug, serde::Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SemesterInfo {
     pub id: i32,

@@ -1,7 +1,6 @@
 pub mod periodic_schedule_merge;
 
 pub use periodic_schedule_merge::*;
-use std::collections::btree_map::Entry;
 pub mod priority_schedule_merge;
 pub use priority_schedule_merge::*;
 pub mod attendance_keep_alive;
@@ -17,7 +16,7 @@ use std::time::Instant;
 use crate::api::etu_api;
 use crate::data_merges;
 use crate::models::groups::DepartmentModel;
-use crate::models::schedule::{ScheduleObjModel, ScheduleObjModelNormalized};
+use crate::models::schedule::ScheduleObjModelNormalized;
 use crate::models::subjects::{get_subjects_cur_gen, SubjectModel};
 use crate::models::teachers::{get_teachers_cur_gen, TeacherModel};
 

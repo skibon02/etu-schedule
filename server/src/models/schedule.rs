@@ -1,12 +1,9 @@
 use rocket::time::PrimitiveDateTime;
-use std::collections::BTreeSet;
 
 use sqlx::PgConnection;
 
 use crate::models;
-use crate::models::groups::GroupModel;
 use crate::models::subjects::SubjectModel;
-use crate::models::teachers::TeacherModel;
 use crate::models::DbResult;
 
 #[derive(sqlx::Type, Default, Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]

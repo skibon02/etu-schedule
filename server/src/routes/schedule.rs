@@ -1,4 +1,6 @@
-use std::collections::{BTreeMap, BTreeSet};
+use chrono::{DateTime, TimeDelta};
+use lazy_static::lazy_static;
+use std::collections::BTreeMap;
 use std::ops::DerefMut;
 
 use rocket::Route;
@@ -6,7 +8,7 @@ use rocket_db_pools::Connection;
 
 use crate::api::etu_attendance_api::SemesterInfo;
 use crate::bg_workers::{MERGE_REQUEST_CHANNEL, MERGE_REQUEST_CNT};
-use crate::models::schedule::{ScheduleObjModel, ScheduleObjModelNormalized};
+use crate::models::schedule::ScheduleObjModelNormalized;
 use crate::models::subjects::SubjectModel;
 use crate::models::teachers::TeacherModel;
 use crate::models::Db;
@@ -241,10 +243,34 @@ async fn get_groups(mut con: Connection<Db>) -> GetGroupsRes {
     GetGroupsRes::success(out_groups)
 }
 
+lazy_static! {
+    static ref INITIAL_SEMESTER_INFO: tokio::sync::RwLock<Option<SemesterInfo>> =
+        tokio::sync::RwLock::new(None);
+}
+
 #[get("/semester")]
 async fn semester_info() -> ResponderWithSuccess<SemesterInfo> {
-    let semester_info = api::etu_attendance_api::get_semester_info().await?;
-    ResponderWithSuccess::success(semester_info)
+    let mut lock = INITIAL_SEMESTER_INFO.write().await;
+    if lock.is_none() {
+        let info = api::etu_attendance_api::get_semester_info().await?;
+        *lock = Some(info);
+        ResponderWithSuccess::success(lock.as_ref().unwrap().clone())
+    } else {
+        let semester_end_date = DateTime::parse_from_rfc3339(&lock.as_ref().unwrap().end_date)
+            .unwrap()
+            .with_timezone(&chrono_tz::Europe::Moscow);
+        let now = chrono::Utc::now().with_timezone(&chrono_tz::Europe::Moscow);
+
+        if now > semester_end_date {
+            error!("Semester is over, but we still have it in cache!");
+            return ResponderWithSuccess::failed(Some("Semester is over!"));
+        }
+        let mut res = lock.as_ref().unwrap().clone();
+
+        res.current_date = now.to_rfc3339();
+
+        ResponderWithSuccess::success(res)
+    }
 }
 
 pub fn get_routes() -> Vec<Route> {

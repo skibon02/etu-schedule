@@ -10,14 +10,14 @@ extern crate rocket;
 
 use crate::models::Db;
 use rocket::fairing::{AdHoc, Fairing, Info, Kind};
-use rocket::http::{Header, Status};
+use rocket::http::{Header, Method, Status};
 use rocket::outcome::Outcome;
 use rocket::request::FromRequest;
 use rocket::{fairing, tokio, Build, Config, Request, Response, Rocket};
 use std::fmt::Arguments;
 use std::io::Write;
 use std::path::PathBuf;
-use std::sync::{Arc, OnceLock};
+use std::sync::OnceLock;
 use std::{env, fs};
 
 use rocket::fs::{FileServer, NamedFile};
@@ -76,6 +76,38 @@ impl Fairing for CORS {
                 Some(origin)
             })
             .next();
+    }
+}
+
+pub struct CacheFairing;
+
+#[rocket::async_trait]
+impl Fairing for CacheFairing {
+    fn info(&self) -> Info {
+        Info {
+            name: "Add Cache-Control header to responses",
+            kind: Kind::Response,
+        }
+    }
+
+    async fn on_response<'r>(&self, request: &'r Request<'_>, response: &mut Response<'r>) {
+        if request.method() == Method::Get {
+            if let Some(content_type) = response.content_type() {
+                if content_type.top() == "image"
+                    || content_type.is_css()
+                    || content_type.is_javascript()
+                    || content_type.top() == "video"
+                    || content_type.top() == "audio"
+                    || content_type.top() == "font"
+                {
+                    info!("Setting cache-control for: {:?}", content_type);
+                    response.set_header(Header::new(
+                        CACHE_CONTROL.as_str(),
+                        "public, max-age=31536000",
+                    ));
+                }
+            }
+        }
     }
 }
 
@@ -255,6 +287,7 @@ fn setup_logger() -> Result<(), fern::InitError> {
 
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
+use rocket::http::hyper::header::CACHE_CONTROL;
 use rocket::serde::json::json;
 use rocket::shield::{Hsts, Shield};
 use std::fs::{File, OpenOptions};
@@ -361,9 +394,7 @@ pub fn run() -> Rocket<Build> {
     match fs::read_to_string("vk_service_token.txt") {
         Ok(key) => {
             debug!("> VK: service key found");
-            VK_SERVICE_TOKEN
-                .set(Arc::try_from(key.trim()).unwrap())
-                .unwrap();
+            VK_SERVICE_TOKEN.set(key.trim().into()).unwrap();
         }
         Err(_) => {
             error!(
@@ -404,7 +435,8 @@ pub fn run() -> Rocket<Build> {
             Box::pin(async move {
                 tx.send(true).unwrap();
             })
-        }));
+        }))
+        .attach(CacheFairing);
 
     if !is_production_build {
         rocket = rocket.attach(CORS);
