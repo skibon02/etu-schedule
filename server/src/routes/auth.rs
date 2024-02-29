@@ -247,7 +247,6 @@ enum AuthorizeError {
     FailedDbRequest,
 }
 
-// TODO: fix when malformed object is received
 /// for VK API users.get with photo_200,contacts,bdate
 fn parse_auth_info(inp: serde_json::Value) -> UserInfo {
     UserInfo {
@@ -276,6 +275,12 @@ async fn process_auth(
     let user_info = vk_api::users_get(&access_token, "photo_200,sex,bdate")
         .await
         .ok_or(AuthorizeError::FailedVkRequest)?;
+
+    // Todo: use struct and serde to parse user_info
+    if user_info.is_null() {
+        error!("Failed to get user info: {:?}", user_info);
+        return Err(AuthorizeError::FailedVkRequest);
+    }
     info!("VK user: {:?}", user_info);
     let auth_info = (access_token, user_info["id"].to_string());
     let user_info = parse_auth_info(user_info.into_inner());
