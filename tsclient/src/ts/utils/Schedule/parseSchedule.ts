@@ -81,7 +81,7 @@ function sortScheduleByLesson(scheduleObjectI: IScheduleObject, scheduleObjectJ:
 }
 
 export function makeSchedule(groupSchedule: IGroupSchedule, date: Date): Array<IScheduleObjectExtended[] | [null, string]> {
-  let parity = dateStore.weekParity;
+  let parity = dateStore.getWeekNumber(date.toISOString()) % 2 ? '2' : '1';
   let currentDayOfWeek = WEEK_DAYS[date.getDay()];
 
   const week = parseWeek(groupSchedule.sched_objs, parity); // week[] -> 6 * day[] -> schedObjs{}

@@ -29,7 +29,7 @@ export class DateClass implements IDateClass {
     this.weekNumber = 0;
     this.currentWeekNumber = this.getWeekNumber(this.date);
     this.weekParity = this.weekNumber % 2 ? '2' : '1';
-    this.absoluteWeekParity = this.getWeekNumber((new Date()).toISOString()) % 2 ? '2' : '1';
+    this.absoluteWeekParity = this.getWeekNumber(this.date) % 2 ? '1' : '2';
     this.semesterStart = null;
     this.semesterEnd = null;
     this.maxWeekNumber = null;

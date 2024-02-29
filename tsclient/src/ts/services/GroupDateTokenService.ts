@@ -93,8 +93,8 @@ class GroupDateTokenServiceClass implements IGroupDateTokenService {
               this.groupStore.parsedSchedule1 = makeSchedule(d, new Date());
               this.groupStore.parsedSchedule2 = makeSchedule(d, new Date(new Date().getTime() + weekTime));
             } else {
-              this.groupStore.parsedSchedule2 = makeSchedule(d, new Date());
               this.groupStore.parsedSchedule1 = makeSchedule(d, new Date(new Date().getTime() + weekTime));
+              this.groupStore.parsedSchedule2 = makeSchedule(d, new Date());
             }
           } else {
             this.groupStore.parsedSchedule1 = null;
