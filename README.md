@@ -1,5 +1,5 @@
 # etu-schedule
-[<img src="tsclient/fish.png" width="200"/>](https://etu-schedule.ru)
+[<img src="tsclient/fish.png" width="200"/>](https://webglsamples.org/aquarium/aquarium.html)
 
 ## Что это?
   [***etu-schedule.ru***](https://etu-schedule.ru) - это проект для студентов ЛЭТИ, созданный преимущественно в обучающих целях.
