@@ -247,6 +247,7 @@ enum AuthorizeError {
     FailedDbRequest,
 }
 
+// TODO: fix when malformed object is received
 /// for VK API users.get with photo_200,contacts,bdate
 fn parse_auth_info(inp: serde_json::Value) -> UserInfo {
     UserInfo {
