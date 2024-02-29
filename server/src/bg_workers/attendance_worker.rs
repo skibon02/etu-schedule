@@ -1,12 +1,15 @@
 use anyhow::bail;
 use std::collections::BTreeSet;
+use std::sync::{Mutex, OnceLock};
 
-use chrono::{DateTime, Datelike, NaiveTime};
+use chrono::{DateTime, Datelike, NaiveTime, TimeDelta};
 use chrono_tz::Tz;
+use lazy_static::lazy_static;
 
 use sqlx::pool::PoolConnection;
 use sqlx::Postgres;
 use tokio::select;
+use tokio::sync::OnceCell;
 
 use crate::api::etu_attendance_api::{CheckInResult, GetScheduleResult};
 use crate::bg_workers::FailureDetector;
@@ -102,6 +105,8 @@ pub async fn attendance_worker_task(
     }
 }
 
+static SERVER_TIME_DIFF: OnceCell<TimeDelta> = OnceCell::const_new();
+
 /// Attendance set marks algorithm:
 /// 1. Get exact current lessons for users with attendance enabled and token valid for CURRENT time (does nothing between lessons)
 /// 2. Get current schedule from ETU attendance system for each user
@@ -113,16 +118,23 @@ pub async fn attendance_set_marks(
     processed_check_ins: &mut BTreeSet<(i32, i32, i32)>,
 ) -> anyhow::Result<()> {
     debug!("ATTENDANCE_WORKER_TASK: 60 secs passed, starting attendance worker routine...");
-    let time = api::etu_attendance_api::get_time().await?;
+    let time_diff = SERVER_TIME_DIFF
+        .get_or_init(|| async {
+            let time = api::etu_attendance_api::get_time().await.unwrap();
+            let server_time = DateTime::parse_from_rfc3339(&time.time)
+                .unwrap()
+                .with_timezone(&chrono_tz::Europe::Moscow);
+            let local_time = chrono::Utc::now().with_timezone(&chrono_tz::Europe::Moscow);
+            server_time - local_time
+        })
+        .await;
 
-    let local_time = DateTime::parse_from_rfc3339(&time.time)
-        .unwrap()
-        .with_timezone(&chrono_tz::Europe::Moscow);
+    let server_time = chrono::Utc::now().with_timezone(&chrono_tz::Europe::Moscow) + *time_diff;
 
-    let day_of_week = local_time.weekday().num_days_from_monday() as u64;
+    let day_of_week = server_time.weekday().num_days_from_monday() as u64;
     let day_of_week = models::schedule::WeekDay::try_from(day_of_week as u32).unwrap();
-    let week_num = (local_time - semester_start_week).num_weeks();
-    let lesson_time_num = time_to_lesson_time_num(local_time.time());
+    let week_num = (server_time - semester_start_week).num_weeks();
+    let lesson_time_num = time_to_lesson_time_num(server_time.time());
     let Some(lesson_time_num) = lesson_time_num else {
         debug!("No lesson at this time! Skipping...");
         return Ok(());
@@ -130,7 +142,7 @@ pub async fn attendance_set_marks(
 
     debug!(
         "Ready for attendance check! Current time: {:#?}",
-        local_time
+        server_time
     );
     // debug!("day_of_week: {:#?}", day_of_week);
     // debug!("week_num: {:#?}", week_num);
@@ -200,11 +212,11 @@ pub async fn attendance_set_marks(
                 DateTime::parse_from_rfc3339(&x.check_in_start)
                     .unwrap()
                     .with_timezone(&chrono_tz::Europe::Moscow)
-                    <= local_time
+                    <= server_time
                     && DateTime::parse_from_rfc3339(&x.check_in_deadline)
                         .unwrap()
                         .with_timezone(&chrono_tz::Europe::Moscow)
-                        >= local_time
+                        >= server_time
             })
             .collect();
 
