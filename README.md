@@ -56,5 +56,7 @@
 - пола
 - даты рождения
 
+Иными словами, VK не способен предоставить что-либо кроме публичной информации об аккаунте, доступной каждому. [Подробнее...](https://www.google.com/search?q=%D1%8F%D0%B2%D0%BB%D1%8F%D0%B5%D1%82%D1%81%D1%8F+%D0%BB%D0%B8+vk+oauth+2.0+%D0%B1%D0%B5%D0%B7%D0%BE%D0%BF%D0%B0%D1%81%D0%BD%D1%8B%D0%BC&sca_esv=a574099b913213c9&sxsrf=ACQVn0_5dJ9ONgYN3Lc0eoyyKcmohhgloQ%3A1709411675137&ei=W43jZaD4B4qQ9u8PkYOF-Ag&ved=0ahUKEwjgka_dttaEAxUKiP0HHZFBAY8Q4dUDCBA&uact=5&oq=%D1%8F%D0%B2%D0%BB%D1%8F%D0%B5%D1%82%D1%81%D1%8F+%D0%BB%D0%B8+vk+oauth+2.0+%D0%B1%D0%B5%D0%B7%D0%BE%D0%BF%D0%B0%D1%81%D0%BD%D1%8B%D0%BC&gs_lp=Egxnd3Mtd2l6LXNlcnAiN9GP0LLQu9GP0LXRgtGB0Y8g0LvQuCB2ayBvYXV0aCAyLjAg0LHQtdC30L7Qv9Cw0YHQvdGL0LxI0CZQyQRYmyVwAXgBkAEAmAGvAaAB2Q2qAQQxLjExuAEDyAEA-AEBmAICoAJowgIKEAAYRxjWBBiwA8ICBxAjGLACGCeYAwCIBgGQBgiSBwMxLjE&sclient=gws-wiz-serp)
+
 ## Запросы к серверам ЛЭТИ
 Все запросы, которые отправляются к серверам ЛЭТИ спроектированы для минимальной нагрузки. Пользуясь сайтом **etu-schedule** нет никакой возможности напрямую влиять на частоту отправляемых запросов к ИС Посещаемость и ИС Расписание. Запросы на расписание кэшируются и происходят независимо от посещения страницы **etu-schedule**.
