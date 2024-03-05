@@ -11,6 +11,7 @@ import InvalidTokenModal from './InvalidTokenModal'
 import TokenDescriptionModal from './TokenDescriptionModal'
 import TooManyRequestsModal from './TooManyRequestsModal'
 import { GroupDateTokenService } from '../../services/GroupDateTokenService'
+import LeaderForGroupModal from './LeaderForGroupModal'
 
 function FullNamePreference() {
 
@@ -103,6 +104,21 @@ function TokenPreference() {
     </div>
     </>
   )
+}
+
+function LeaderForGroupInfo() {
+  const [showModal, setShowModal] = useState<boolean>(false);
+
+  return (
+    <div className="profile__user-preference user-preference">
+      <div className="user-preference__title">
+        Информация для старост
+      </div>
+      <div className="user-preference__value">
+        <LeaderForGroupModal setShowModal={setShowModal} inCSST={showModal} />
+      </div>
+    </div>
+    )
 }
 
 const ObsFullNamePreference = observer(FullNamePreference);
