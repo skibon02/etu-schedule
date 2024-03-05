@@ -110,11 +110,12 @@ function LeaderForGroupInfo() {
   const [showModal, setShowModal] = useState<boolean>(false);
 
   return (
-    <div className="profile__user-preference user-preference">
+    <div className="profile__user-preference user-preference leader-for-group-preference">
       <div className="user-preference__title">
         Информация для старост
       </div>
       <div className="user-preference__value">
+        <div onClick={() => setShowModal(true)} className='attendance-token__description leader-for-group-preference__button'>Как мне оставлять заметки для группы?</div>
         <LeaderForGroupModal setShowModal={setShowModal} inCSST={showModal} />
       </div>
     </div>
@@ -124,6 +125,7 @@ function LeaderForGroupInfo() {
 const ObsFullNamePreference = observer(FullNamePreference);
 const ObsGroupPreference = observer(GroupPreference);
 const ObsTokenPreference = observer(TokenPreference);
+const ObsLeaderForGroupInfo = observer(LeaderForGroupInfo);
 
 function UserPreferences() {
 
@@ -132,6 +134,7 @@ function UserPreferences() {
       <ObsTokenPreference key={attendanceTokenStore.attendanceToken === null ? 1 : 0}  />
       <ObsGroupPreference />
       <ObsFullNamePreference />
+      <ObsLeaderForGroupInfo />
     </div>
   )
 }

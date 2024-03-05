@@ -120,6 +120,39 @@ body {
   }
 }
 
+.footer {
+  font-weight: 300;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: pxToEm(10px);
+  align-items: center;
+  height: pxToEm(100px);
+  background: #eeeeee;
+
+  &__link {
+    color: #11035e;
+    &:visited {
+      color: #11035e;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+  
+.under-footer-box {
+  height: pxToEm(100px);
+}
+
+.footer-size {
+  font-size: 1.1em;
+}
+
+
 @media screen and (max-width: 1000px) {
   .fish-message {
     font-size: 1.1em;
@@ -133,6 +166,10 @@ body {
   
   .fish-message {
     font-size: 0.85em;
+  }
+
+  .footer-size {
+    font-size: 0.9em;
   }
 }
 
@@ -151,12 +188,40 @@ body {
     height: 0;
   }
   .under-planning-thead-box-mobile {
-    height: pxToEm(35px);
+    height: pxToEm(0px);
   }
   
   .fish-message {
     width: 90%;
     top: pxToEm(20px);
+  }
+
+  .footer-size {
+    font-size: 0.7em;
+  }
+
+  .footer {
+    bottom: pxToEm(75px);
+  }
+
+  .under-footer-box {
+    height: pxToEm(30px);
+  }
+
+  .footer-schedule {
+    bottom: pxToEm(145px);
+  }
+
+  .shcedule-footer-box  {
+    height: pxToEm(100px);
+  }
+
+  .footer-planning {
+    bottom: pxToEm(205px);
+  }
+
+  .planning-footer-box {
+    height: pxToEm(160px);
   }
 }
 

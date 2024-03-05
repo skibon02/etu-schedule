@@ -6,6 +6,7 @@ function LeaderForGroupModal({setShowModal, inCSST}: {
 }) {
   return (
     <ModalTemplate
+      showDecline={false}
       titleText={'Чтобы оставлять заметки для группы вам необходимо добавить токен.'}
       confirmText={'Закрыть'}
       declineText={''}

@@ -8,6 +8,7 @@ import Profile from "../Profile/Profile";
 import NoMatchingRoute from './NoMatchingRoute';
 import Schedule from '../Shedule/Schedule';
 import Loading from './Loading';
+import Footer from '../Footer/Footer';
 
 function Router() {
   useRouter();
@@ -27,6 +28,7 @@ function Router() {
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/planning" element={<Planning />} />
         </Routes>
+        <Footer />
         <div className='under-header-box-mobile'></div>
       </div>
     )
