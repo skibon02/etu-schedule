@@ -284,3 +284,45 @@ pub async fn check_privilege_level(
         None => Ok(PrivilegeLevel::User),
     }
 }
+
+#[derive(Debug, Serialize)]
+pub struct UserStats {
+    pub registered_users: i32,
+    pub users_with_group: i32,
+    pub users_with_tokens: i32,
+    pub users_with_leader_privilege: i32,
+    pub most_popular_group: Option<GroupModel>,
+}
+
+
+pub async fn get_user_stats(con: &mut PgConnection) -> DbResult<UserStats> {
+    let registered_users = sqlx::query_scalar!("SELECT COUNT(*) FROM users")
+        .fetch_one(&mut *con)
+        .await?;
+
+    let users_with_group = sqlx::query_scalar!("SELECT COUNT(*) FROM user_data WHERE group_id IS NOT NULL")
+        .fetch_one(&mut *con)
+        .await?;
+
+    let users_with_tokens = sqlx::query_scalar!("SELECT COUNT(*) FROM user_data WHERE attendance_token IS NOT NULL")
+        .fetch_one(&mut *con)
+        .await?;
+
+    let users_with_leader_privilege = sqlx::query_scalar!("SELECT COUNT(*) FROM user_data WHERE leader_for_group IS NOT NULL")
+        .fetch_one(&mut *con)
+        .await?;
+
+    let most_popular_group = sqlx::query_as!(GroupModel,
+        "SELECT groups.* FROM groups JOIN user_data ON groups.group_id = user_data.group_id GROUP BY groups.group_id ORDER BY COUNT(*) DESC LIMIT 1"
+    )
+    .fetch_optional(&mut *con)
+    .await?;
+
+    Ok(UserStats {
+        registered_users: registered_users.unwrap_or(0) as i32,
+        users_with_group: users_with_group.unwrap_or(0) as i32,
+        users_with_tokens: users_with_tokens.unwrap_or(0) as i32,
+        users_with_leader_privilege: users_with_leader_privilege.unwrap_or(0) as i32,
+        most_popular_group,
+    })
+}

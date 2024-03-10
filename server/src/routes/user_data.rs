@@ -1,7 +1,7 @@
 use crate::api::etu_attendance_api::GetCurrentUserResult;
 use crate::models::groups::GroupModel;
 use crate::models::users::{
-    PrivilegeLevel, SubjectsTitleFormatting, UserDataModel, UserDataOptionalModel,
+    PrivilegeLevel, SubjectsTitleFormatting, UserDataModel, UserDataOptionalModel, UserStats,
 };
 use crate::models::Db;
 use crate::routes::auth::AuthorizeInfo;
@@ -309,6 +309,14 @@ async fn get_privilege_level(
     })
 }
 
+type GetStatsRes = ResponderWithSuccess<UserStats>;
+
+#[get("/user/get_stats")]
+pub async fn get_stats(mut db: Connection<Db>) -> GetStatsRes {
+    let stats = models::users::get_user_stats(&mut db).await?;
+    GetStatsRes::success(stats)
+}
+
 pub fn get_routes() -> Vec<Route> {
     routes![
         set_group,
@@ -316,6 +324,7 @@ pub fn get_routes() -> Vec<Route> {
         set_data,
         get_data,
         set_attendance_token,
-        get_privilege_level
+        get_privilege_level,
+        get_stats
     ]
 }
