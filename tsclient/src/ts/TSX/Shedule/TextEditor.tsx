@@ -72,8 +72,8 @@ function TextEditorTemplate({disabledEditor, inCSST, setActiveModal, text, setTe
           <div className="lesson__note-editor-buttons">
             {(desc === 'user' || desc === 'group' && !disabledEditor) &&
             <>
-            <div className="lesson__note-editor-button-decline lesson__note-editor-button" onClick={(e) => handleDecline(e, textCache)}>Отмена</div>
-            <div className="lesson__note-editor-button-confirm lesson__note-editor-button" onClick={(e) => handleConfirm(e, text)}>Сохранить</div>
+            <div className="lesson__note-editor-button-decline lesson__note-editor-button" role="button" onClick={(e) => handleDecline(e, textCache)}>Отмена</div>
+            <div className="lesson__note-editor-button-confirm lesson__note-editor-button" role="button" onClick={(e) => handleConfirm(e, text)}>Сохранить</div>
             </>
             }
           </div>

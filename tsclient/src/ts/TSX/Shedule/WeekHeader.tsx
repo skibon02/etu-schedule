@@ -35,11 +35,11 @@ function WeekHeader({weekParity}: {weekParity: string | null}) {
       </div>
       {activeStore.active === 'planning' &&
       <div className="planning-all-mark planning-all-mark__container">
-        <div onClick={() => GroupDateTokenService.schedulePlanningSETAllFetch(false)} 
+        <div role="button" onClick={() => GroupDateTokenService.schedulePlanningSETAllFetch(false)} 
           className="planning-all-mark__button planning-all-mark__button_red">
           Не посещать все пары
         </div>
-        <div onClick={() => GroupDateTokenService.schedulePlanningSETAllFetch(true)} 
+        <div role="button" onClick={() => GroupDateTokenService.schedulePlanningSETAllFetch(true)} 
           className="planning-all-mark__button planning-all-mark__button_green">
           Посещать все пары
         </div>

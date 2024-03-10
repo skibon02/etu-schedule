@@ -53,18 +53,18 @@ export default function ModalTemplate({
       timeout={300}
       classNames={'modal-transition'}
       unmountOnExit >
-      <div className="are-you-sure modal-transition" onClick={handleDecline}>
-        <div className="are-you-sure__body" onClick={(e) => e.stopPropagation()}>
+      <div className="are-you-sure modal-transition" role="button" onClick={handleDecline}>
+        <div className="are-you-sure__body" role="button" onClick={(e) => e.stopPropagation()}>
           <div className="are-you-sure__text">
             {titleText}
           </div>
           <div className="are-you-sure__buttons">
             <div className="are-you-sure__button are-you-sure__button_confirm"
-                 onClick={handleConfirm}>
+                 role="button" onClick={handleConfirm}>
               {confirmText}
             </div>
             {showDecline && <div className="are-you-sure__button are-you-sure__button_cancel"
-                 onClick={handleDecline}>
+                 role="button" onClick={handleDecline}>
               {declineText}
             </div>}
           </div>

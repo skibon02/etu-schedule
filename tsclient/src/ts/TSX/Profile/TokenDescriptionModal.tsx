@@ -18,11 +18,11 @@ export default function TokenDescriptionModal({setShowDescription, showDescripti
       classNames={'modal-transition'}
       unmountOnExit >
         <div className="modal-transition images-carousel-modal">
-          <div className="images-carousel-modal__close images-carousel-modal__button" onClick={close}>
+          <div className="images-carousel-modal__close images-carousel-modal__button" role="button" onClick={close}>
           </div>
-          <div className="images-carousel-modal__body" onClick={(e) => e.stopPropagation()}>
+          <div className="images-carousel-modal__body" role="button" onClick={(e) => e.stopPropagation()}>
             <div className="images-carousel-modal__current carousel-current">
-              <div className="carousel-current__prev images-carousel-modal__button" onClick={imageIndex.prev}>
+              <div className="carousel-current__prev images-carousel-modal__button" role="button" onClick={imageIndex.prev}>
                 {'<'}
               </div>
               <div className={showOrigin ? "carousel-current__image-container" : "carousel-current__image-container carousel-current__image-container_description"}>
@@ -34,7 +34,7 @@ export default function TokenDescriptionModal({setShowDescription, showDescripti
                       <div className="carousel-current__image-description-text">{descriptions[imageIndex.value]}</div>
                     </div>}
                     <img
-                      onClick={toggleShowOrigin}
+                      role="button" onClick={toggleShowOrigin}
                       className={showOrigin ? "carousel-current__image carousel-current__image_zoom-out" : "carousel-current__image"}
                       src={showOrigin ? origins[imageIndex.value] : images[imageIndex.value]} 
                       key={imageIndex.value} />
@@ -42,7 +42,7 @@ export default function TokenDescriptionModal({setShowDescription, showDescripti
                   </>
                 </CSSTransition>
               </div>
-              <div className="carousel-current__next images-carousel-modal__button" onClick={imageIndex.next}>
+              <div className="carousel-current__next images-carousel-modal__button" role="button" onClick={imageIndex.next}>
                 {'>'}
               </div>
             </div>
@@ -52,7 +52,7 @@ export default function TokenDescriptionModal({setShowDescription, showDescripti
                   className={imageIndex.value === i ? "carousel-all__image carousel-all__image_active" : "carousel-all__image"} 
                   src={e} 
                   key={i}
-                  onClick={imageIndex.current(i)} />
+                  role="button" onClick={imageIndex.current(i)} />
               )}
             </div>
           </div>

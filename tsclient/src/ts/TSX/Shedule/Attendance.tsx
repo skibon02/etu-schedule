@@ -21,7 +21,7 @@ function Attendance({
       <div className="attendance__container" >
         <div  
           className='attendance__pseudo-body' 
-          onClick={handleClockClick} >
+          role="button" onClick={handleClockClick} >
           <div 
             className={
               isDead ? 
@@ -38,7 +38,7 @@ function Attendance({
         {!needToShow && toggleMessage &&
           <div 
             className="attendance__message message"
-            onClick={handleMessageClick} >
+            role="button" onClick={handleMessageClick} >
             Изменение актуально только для этой недели
           </div> 
         }

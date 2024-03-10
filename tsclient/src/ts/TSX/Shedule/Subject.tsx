@@ -42,16 +42,16 @@ function Subject({subjectData, orderNumber, planning_time_link_id_value, schedul
           </div>
           {activeStore.active === 'schedule' && 
           <div className="lesson__notes">
-            <div className="lesson__user-note lesson__note" onClick={handleUserNoteClick}>
-              <div className="lesson__note-title" onClick={handleUserNoteTitleClick}>
+            <div className="lesson__user-note lesson__note" role="button" onClick={handleUserNoteClick}>
+              <div className="lesson__note-title" role="button" onClick={handleUserNoteTitleClick}>
                 <div className="lesson__user-note-icon lesson__note-icon"></div>
                 {truncateString(userText, 12) && <div className="lesson__user-note-text lesson__note-text">{activeModal === 'user' ? truncateString(userText, 20) : truncateString(userText, 12)}</div>}
               </div>
               <ObsUserEditor time_link_id={subjectData.time_link_id} activeModal={activeModal} setActiveModal={setActiveModal} text={userText} setText={setUserText} />
             </div>
             {(userDataStore.leaderForGroup || truncateString(groupText, 12) !== '') &&
-            <div className="lesson__group-note lesson__note" onClick={handleGroupNoteClick}>
-              <div className="lesson__note-title" onClick={handleGroupNoteTitleClick}>
+            <div className="lesson__group-note lesson__note" role="button" onClick={handleGroupNoteClick}>
+              <div className="lesson__note-title" role="button" onClick={handleGroupNoteTitleClick}>
                 <div className="lesson__group-note-icon lesson__note-icon"></div>
                 {truncateString(groupText, 12) && <div className="lesson__group-note-text lesson__note-text">{activeModal === 'group' ? truncateString(groupText, 20) : truncateString(groupText, 12)}</div>}
               </div>

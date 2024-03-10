@@ -70,7 +70,7 @@ function TokenPreference() {
       <div className="user-preference__title">
         Токен посещаемости:
         <div className='attendance-token__description-container'>
-          <div className="attendance-token__description" onClick={() => setShowDescription(true)}>
+          <div className="attendance-token__description" role="button" onClick={() => setShowDescription(true)}>
             Как получить токен?
           </div>
         </div>
@@ -91,12 +91,12 @@ function TokenPreference() {
           !attendanceTokenStore.attendanceToken ?
           <div 
             className="user-preference__button user-preference__confirm-button"
-            onClick={() => {GroupDateTokenService.attendanceTokenSetFetch(inputV)}}>
+            role="button" onClick={() => {GroupDateTokenService.attendanceTokenSetFetch(inputV)}}>
           </div>
           :
           <div 
             className="user-preference__button user-preference__delete-button"
-            onClick={() => setShowDeleteTokenModal(true)}>
+            role="button" onClick={() => setShowDeleteTokenModal(true)}>
           </div>  
           }
         </div>
@@ -115,7 +115,7 @@ function LeaderForGroupInfo() {
         Информация для старост
       </div>
       <div className="user-preference__value">
-        <div onClick={() => setShowModal(true)} className='attendance-token__description leader-for-group-preference__button'>Как мне оставлять заметки для группы?</div>
+        <div role="button" onClick={() => setShowModal(true)} className='attendance-token__description leader-for-group-preference__button'>Как мне оставлять заметки для группы?</div>
         <LeaderForGroupModal setShowModal={setShowModal} inCSST={showModal} />
       </div>
     </div>
