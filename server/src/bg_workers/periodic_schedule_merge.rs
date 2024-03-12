@@ -20,10 +20,19 @@ pub async fn periodic_schedule_merge_task(
         let new_groups = etu_api::get_groups_list().await;
         match new_groups {
             Ok(new_groups) => {
-                if data_merges::groups::groups_merge(&new_groups, &mut *con)
+                if let Err(e) = data_merges::groups::groups_merge(&new_groups, &mut *con)
                     .await
-                    .is_ok()
                 {
+                    error!(
+                        "PERIODIC_MERGE_TASK: Failed to merge groups: {:?}. Skipping",
+                        e
+                    );
+                    if fail_detector.failure() {
+                        error!("PERIODIC_MERGE_TASK: Too many failures. Exiting task...");
+                        return;
+                    }
+                }
+                else {
                     break;
                 }
             }
