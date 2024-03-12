@@ -13,3 +13,10 @@ keep semester start/end cached info during runtime
 full anyhow error trace with contexts
 
 get rid of unnamed tuples
+
+
+Problem with periodic merge task:
+[2024-03-13 01:58:49 ERROR] PERIODIC_MERGE_TASK: Failed to merge groups: Failed to insert new schedule object teachers
+Caused by:
+    0: error returned from database: duplicate key value violates unique constraint "schedule_objs_teachers_pkey"
+    1: duplicate key value violates unique constraint "schedule_objs_teachers_pkey". Skipping
