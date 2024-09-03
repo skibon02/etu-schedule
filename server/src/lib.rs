@@ -161,15 +161,11 @@ pub fn bg_worker(shutdown_notifier: watch::Receiver<bool>) -> AdHoc {
             let db = rocket.state::<Db>().unwrap();
             let mut db_con1 = db.acquire().await.unwrap();
             let mut db_con2 = db.acquire().await.unwrap();
-            let mut db_con3 = db.acquire().await.unwrap();
             tokio::task::spawn(async move {
                 bg_workers::periodic_schedule_merge_task(&mut db_con1, notifier_r1).await;
             });
             tokio::task::spawn(async move {
                 bg_workers::priority_schedule_merge_task(&mut db_con2, notifier_r2).await;
-            });
-            tokio::task::spawn(async move {
-                bg_workers::attendance_worker_task(&mut db_con3, notifier_r3).await;
             });
         })
     })

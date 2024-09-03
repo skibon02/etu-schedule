@@ -60,7 +60,7 @@ pub async fn get_subjects_for_group(
         "SELECT subjects.* FROM subjects join schedule_objs on \
             subjects.subject_id = schedule_objs.subject_id and subjects.gen_start <= schedule_objs.subject_gen_id \
             and (subjects.gen_end IS null OR subjects.gen_end > schedule_objs.subject_gen_id)\
-        WHERE schedule_objs.gen_end IS NULL AND schedule_objs.group_id = $1\
+        WHERE schedule_objs.gen_end IS NULL AND schedule_objs.group_id = $1 \
         GROUP BY subjects.subject_id, subject_obj_id",
         group_id)
         .fetch_all(&mut *con).await?;

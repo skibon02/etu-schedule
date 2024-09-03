@@ -514,7 +514,7 @@ fn parse_schedule_objs_groups(data: String) -> anyhow::Result<Vec<GroupScheduleO
 
 pub async fn get_groups_list() -> anyhow::Result<Vec<GroupOriginal>> {
     let url = format!(
-        "{}dicts/groups?scheduleId=594&withFaculty=true&withSemesterSeasons=false&withFlows=false",
+        "{}dicts/groups?scheduleId=publicated&withFaculty=true&withSemesterSeasons=false&withFlows=false",
         BASE_URL_GENERAL
     );
     let response = reqwest::Client::new()
