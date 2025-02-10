@@ -181,7 +181,7 @@ async fn single_schedule_obj_group_merge(
                     // insert new teachers
                     for teacher_id in input_sched_obj_teachers {
                         sqlx::query!(
-                            "INSERT INTO schedule_objs_teachers (schedule_obj_id, teacher_id) VALUES ($1, $2)",
+                            "INSERT INTO schedule_objs_teachers (schedule_obj_id, teacher_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
                             schedule_obj_id,
                             teacher_id
                         )
@@ -279,7 +279,7 @@ async fn single_schedule_obj_group_merge(
             // insert new teachers
             for teacher_id in input_sched_obj_teachers {
                 sqlx::query!(
-                    "INSERT INTO schedule_objs_teachers (schedule_obj_id, teacher_id) VALUES ($1, $2)",
+                    "INSERT INTO schedule_objs_teachers (schedule_obj_id, teacher_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
                     schedule_obj_id,
                     teacher_id
                 )

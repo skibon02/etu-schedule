@@ -73,7 +73,7 @@ impl From<(TeacherModel, Vec<String>)> for OutputTeacherModel {
 
             position: teacher.position,
             work_departments,
-            birthday: teacher.birthday,
+            birthday: teacher.birthday.unwrap_or("".to_string()),
             degree: teacher.degree,
             email: teacher.email,
             midname: teacher.midname,

@@ -13,7 +13,7 @@ pub struct TeacherModel {
     pub name: String,
     pub surname: String,
     pub midname: String,
-    pub birthday: String,
+    pub birthday: Option<String>,
     pub email: Option<String>,
     pub group_id: Option<i32>,
     pub is_worker: bool,
@@ -68,7 +68,6 @@ pub async fn get_teachers_for_group(
             AND schedule_objs.gen_end IS NULL and schedule_objs.group_id = $1",
         group_id)
         .fetch_all(&mut *con).await.context("Failed to get group current first teachers")?;
-
 
     Ok(res)
 }

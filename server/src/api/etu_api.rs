@@ -175,7 +175,7 @@ pub struct TeacherOriginal {
     midname: String,
     initials: String,
 
-    birthday: String,
+    birthday: Option<String>,
     email: Option<String>,
     group_id: Option<i32>,
 
@@ -188,7 +188,7 @@ pub struct TeacherOriginal {
 
 impl Into<(TeacherModel, Vec<String>)> for TeacherOriginal {
     fn into(self) -> (TeacherModel, Vec<String>) {
-        let fixed_birthday = self.birthday.rsplit("-").join("-");
+        let fixed_birthday = self.birthday.map(|birthday| birthday.rsplit("-").join("-"));
 
         let is_worker = self.roles.contains(&"worker".to_string());
         let is_student = self.roles.contains(&"student".to_string());
